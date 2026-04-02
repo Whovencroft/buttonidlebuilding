@@ -21,212 +21,253 @@
     };
   }
 
-  function getViewport(level, cssWidth, cssHeight) {
-    const padding = 24;
-
-    const usableWidth = Math.max(1, cssWidth - padding * 2);
-    const usableHeight = Math.max(1, cssHeight - padding * 2);
-
-    const scale = Math.min(
-      usableWidth / level.width,
-      usableHeight / level.height
-    );
-
-    const drawWidth = level.width * scale;
-    const drawHeight = level.height * scale;
-
-    const offsetX = (cssWidth - drawWidth) / 2;
-    const offsetY = (cssHeight - drawHeight) / 2;
+  function createView(runtime, cssWidth, cssHeight) {
+    const tileW = Math.max(72, Math.min(132, cssWidth / 6.8));
+    const tileH = tileW * 0.5;
+    const heightScale = tileH * 0.95;
 
     return {
-      scale,
-      offsetX,
-      offsetY,
-      drawWidth,
-      drawHeight
+      camX: runtime.camera?.x ?? runtime.marble.x,
+      camY: runtime.camera?.y ?? runtime.marble.y,
+      tileW,
+      tileH,
+      heightScale,
+      screenCx: cssWidth * 0.5,
+      screenCy: cssHeight * 0.26
     };
   }
 
-  function projectRect(rect, view) {
+  function project(x, y, z, view) {
+    const dx = x - view.camX;
+    const dy = y - view.camY;
+
     return {
-      x: view.offsetX + rect.x * view.scale,
-      y: view.offsetY + rect.y * view.scale,
-      w: rect.w * view.scale,
-      h: rect.h * view.scale
+      x: view.screenCx + (dx - dy) * (view.tileW * 0.5),
+      y: view.screenCy + (dx + dy) * (view.tileH * 0.5) - z * view.heightScale
     };
   }
 
-  function projectCircle(circle, view) {
-    return {
-      x: view.offsetX + circle.x * view.scale,
-      y: view.offsetY + circle.y * view.scale,
-      radius: circle.radius * view.scale
-    };
-  }
-
-  function drawRoundedRect(ctx, x, y, w, h, radius) {
-    const r = Math.min(radius, w / 2, h / 2);
-
+  function beginPoly(ctx, points) {
     ctx.beginPath();
-    ctx.moveTo(x + r, y);
-    ctx.arcTo(x + w, y, x + w, y + h, r);
-    ctx.arcTo(x + w, y + h, x, y + h, r);
-    ctx.arcTo(x, y + h, x, y, r);
-    ctx.arcTo(x, y, x + w, y, r);
+    ctx.moveTo(points[0].x, points[0].y);
+    for (let i = 1; i < points.length; i += 1) {
+      ctx.lineTo(points[i].x, points[i].y);
+    }
     ctx.closePath();
+  }
+
+  function getTileCorners(level, tx, ty) {
+    const cell = window.MarbleLevels.getCell(level, tx, ty);
+    const h = window.MarbleLevels.getCellCornerHeights(cell);
+
+    return {
+      nw: { x: tx, y: ty, z: h.nw },
+      ne: { x: tx + 1, y: ty, z: h.ne },
+      se: { x: tx + 1, y: ty + 1, z: h.se },
+      sw: { x: tx, y: ty + 1, z: h.sw }
+    };
+  }
+
+  function getTrackColor(cell) {
+    if (!cell) return '#475569';
+
+    switch (cell.kind) {
+      case 'goal':
+        return '#22c55e';
+      case 'hazard':
+        return '#ef4444';
+      case 'wall':
+        return '#475569';
+      default:
+        return '#94a3b8';
+    }
+  }
+
+  function darken(hex, amount = 0.8) {
+    const raw = hex.replace('#', '');
+    const r = parseInt(raw.slice(0, 2), 16);
+    const g = parseInt(raw.slice(2, 4), 16);
+    const b = parseInt(raw.slice(4, 6), 16);
+
+    const nr = Math.max(0, Math.min(255, Math.round(r * amount)));
+    const ng = Math.max(0, Math.min(255, Math.round(g * amount)));
+    const nb = Math.max(0, Math.min(255, Math.round(b * amount)));
+
+    return `rgb(${nr}, ${ng}, ${nb})`;
   }
 
   function renderBackground(ctx, cssWidth, cssHeight) {
     const gradient = ctx.createLinearGradient(0, 0, 0, cssHeight);
-    gradient.addColorStop(0, '#111823');
-    gradient.addColorStop(1, '#0b1017');
+    gradient.addColorStop(0, '#111827');
+    gradient.addColorStop(1, '#070b12');
 
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, cssWidth, cssHeight);
 
     ctx.save();
-    ctx.globalAlpha = 0.25;
+    ctx.globalAlpha = 0.18;
 
     const glowA = ctx.createRadialGradient(
-      cssWidth * 0.22,
+      cssWidth * 0.25,
       cssHeight * 0.22,
       10,
-      cssWidth * 0.22,
+      cssWidth * 0.25,
       cssHeight * 0.22,
       cssWidth * 0.35
     );
-    glowA.addColorStop(0, 'rgba(125, 211, 252, 0.35)');
-    glowA.addColorStop(1, 'rgba(125, 211, 252, 0)');
+    glowA.addColorStop(0, 'rgba(125,211,252,0.45)');
+    glowA.addColorStop(1, 'rgba(125,211,252,0)');
     ctx.fillStyle = glowA;
     ctx.fillRect(0, 0, cssWidth, cssHeight);
 
     const glowB = ctx.createRadialGradient(
-      cssWidth * 0.78,
-      cssHeight * 0.76,
+      cssWidth * 0.8,
+      cssHeight * 0.78,
       10,
-      cssWidth * 0.78,
-      cssHeight * 0.76,
+      cssWidth * 0.8,
+      cssHeight * 0.78,
       cssWidth * 0.28
     );
-    glowB.addColorStop(0, 'rgba(192, 132, 252, 0.28)');
-    glowB.addColorStop(1, 'rgba(192, 132, 252, 0)');
+    glowB.addColorStop(0, 'rgba(192,132,252,0.35)');
+    glowB.addColorStop(1, 'rgba(192,132,252,0)');
     ctx.fillStyle = glowB;
     ctx.fillRect(0, 0, cssWidth, cssHeight);
 
     ctx.restore();
   }
 
-  function renderArena(ctx, level, view) {
-    ctx.save();
+  function renderTile(ctx, level, tx, ty, view) {
+    const cell = window.MarbleLevels.getCell(level, tx, ty);
+    if (!cell || cell.kind === 'void') return;
 
-    drawRoundedRect(
-      ctx,
-      view.offsetX,
-      view.offsetY,
-      view.drawWidth,
-      view.drawHeight,
-      14
-    );
-    ctx.fillStyle = '#0f1722';
+    const corners = getTileCorners(level, tx, ty);
+    const top = [
+      project(corners.nw.x, corners.nw.y, corners.nw.z, view),
+      project(corners.ne.x, corners.ne.y, corners.ne.z, view),
+      project(corners.se.x, corners.se.y, corners.se.z, view),
+      project(corners.sw.x, corners.sw.y, corners.sw.z, view)
+    ];
+
+    const baseColor = getTrackColor(cell);
+    const southNeighbor = window.MarbleLevels.getCell(level, tx, ty + 1);
+    const eastNeighbor = window.MarbleLevels.getCell(level, tx + 1, ty);
+    const voidFloor = level.voidFloor ?? -1.5;
+
+    const southNeighborHeights =
+      southNeighbor && southNeighbor.kind !== 'void'
+        ? window.MarbleLevels.getCellCornerHeights(southNeighbor)
+        : { nw: voidFloor, ne: voidFloor, se: voidFloor, sw: voidFloor };
+
+    const eastNeighborHeights =
+      eastNeighbor && eastNeighbor.kind !== 'void'
+        ? window.MarbleLevels.getCellCornerHeights(eastNeighbor)
+        : { nw: voidFloor, ne: voidFloor, se: voidFloor, sw: voidFloor };
+
+    const southTopAvg = (corners.sw.z + corners.se.z) * 0.5;
+    const southBottomAvg = (southNeighborHeights.nw + southNeighborHeights.ne) * 0.5;
+    const eastTopAvg = (corners.ne.z + corners.se.z) * 0.5;
+    const eastBottomAvg = (eastNeighborHeights.nw + eastNeighborHeights.sw) * 0.5;
+
+    if (southTopAvg > southBottomAvg + 0.01) {
+      const southFace = [
+        project(corners.sw.x, corners.sw.y, corners.sw.z, view),
+        project(corners.se.x, corners.se.y, corners.se.z, view),
+        project(corners.se.x, corners.se.y, southNeighborHeights.ne, view),
+        project(corners.sw.x, corners.sw.y, southNeighborHeights.nw, view)
+      ];
+
+      beginPoly(ctx, southFace);
+      ctx.fillStyle = darken(baseColor, 0.55);
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+      ctx.stroke();
+    }
+
+    if (eastTopAvg > eastBottomAvg + 0.01) {
+      const eastFace = [
+        project(corners.ne.x, corners.ne.y, corners.ne.z, view),
+        project(corners.se.x, corners.se.y, corners.se.z, view),
+        project(corners.se.x, corners.se.y, eastNeighborHeights.sw, view),
+        project(corners.ne.x, corners.ne.y, eastNeighborHeights.nw, view)
+      ];
+
+      beginPoly(ctx, eastFace);
+      ctx.fillStyle = darken(baseColor, 0.7);
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+      ctx.stroke();
+    }
+
+    beginPoly(ctx, top);
+    ctx.fillStyle = baseColor;
     ctx.fill();
-
-    ctx.lineWidth = 2;
-    ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+    ctx.strokeStyle = 'rgba(241,245,249,0.18)';
+    ctx.lineWidth = 1.2;
     ctx.stroke();
 
-    ctx.restore();
-  }
-
-  function renderFailZones(ctx, runtime, view) {
-    ctx.save();
-
-    for (const zone of runtime.level.failZones) {
-      const r = projectRect(zone, view);
-
-      drawRoundedRect(ctx, r.x, r.y, r.w, r.h, 10);
-      ctx.fillStyle = 'rgba(251, 113, 133, 0.22)';
-      ctx.fill();
-
-      ctx.lineWidth = 2;
-      ctx.strokeStyle = 'rgba(251, 113, 133, 0.55)';
-      ctx.stroke();
-
+    if (cell.kind === 'hazard') {
       ctx.beginPath();
-      ctx.moveTo(r.x + 8, r.y + 8);
-      ctx.lineTo(r.x + r.w - 8, r.y + r.h - 8);
-      ctx.moveTo(r.x + r.w - 8, r.y + 8);
-      ctx.lineTo(r.x + 8, r.y + r.h - 8);
-      ctx.strokeStyle = 'rgba(251, 113, 133, 0.28)';
+      ctx.moveTo(top[0].x, top[0].y);
+      ctx.lineTo(top[2].x, top[2].y);
+      ctx.moveTo(top[1].x, top[1].y);
+      ctx.lineTo(top[3].x, top[3].y);
+      ctx.strokeStyle = 'rgba(255,255,255,0.18)';
       ctx.stroke();
     }
-
-    ctx.restore();
   }
 
-  function renderWalls(ctx, runtime, view) {
-    ctx.save();
-
-    for (const wall of runtime.level.walls) {
-      const r = projectRect(wall, view);
-
-      drawRoundedRect(ctx, r.x, r.y, r.w, r.h, 8);
-      ctx.fillStyle = '#334155';
-      ctx.fill();
-
-      ctx.lineWidth = 1.5;
-      ctx.strokeStyle = 'rgba(255,255,255,0.10)';
-      ctx.stroke();
-    }
-
-    ctx.restore();
-  }
-
-  function renderGoal(ctx, runtime, view) {
-    const goal = projectCircle(runtime.level.goal, view);
+  function renderGoalMarker(ctx, runtime, view) {
+    const goal = runtime.level.goal;
+    const p = project(goal.x, goal.y, 1.25, view);
+    const radius = Math.max(8, view.tileW * goal.radius * 0.42);
 
     ctx.save();
 
     const gradient = ctx.createRadialGradient(
-      goal.x - goal.radius * 0.25,
-      goal.y - goal.radius * 0.25,
-      goal.radius * 0.1,
-      goal.x,
-      goal.y,
-      goal.radius
+      p.x - radius * 0.25,
+      p.y - radius * 0.35,
+      radius * 0.15,
+      p.x,
+      p.y,
+      radius
     );
-    gradient.addColorStop(0, 'rgba(110, 231, 183, 0.95)');
-    gradient.addColorStop(1, 'rgba(16, 185, 129, 0.55)');
+    gradient.addColorStop(0, 'rgba(255,255,255,0.95)');
+    gradient.addColorStop(0.35, 'rgba(110,231,183,0.95)');
+    gradient.addColorStop(1, 'rgba(34,197,94,0.48)');
 
     ctx.beginPath();
-    ctx.arc(goal.x, goal.y, goal.radius, 0, Math.PI * 2);
+    ctx.arc(p.x, p.y, radius, 0, Math.PI * 2);
     ctx.fillStyle = gradient;
     ctx.fill();
 
-    ctx.lineWidth = 3;
-    ctx.strokeStyle = 'rgba(209, 250, 229, 0.85)';
-    ctx.stroke();
-
-    ctx.beginPath();
-    ctx.arc(goal.x, goal.y, goal.radius * 0.55, 0, Math.PI * 2);
     ctx.lineWidth = 2;
-    ctx.strokeStyle = 'rgba(255,255,255,0.5)';
+    ctx.strokeStyle = 'rgba(220,252,231,0.8)';
     ctx.stroke();
 
     ctx.restore();
   }
 
   function renderMarble(ctx, runtime, view) {
-    const marble = projectCircle(runtime.marble, view);
+    const marble = runtime.marble;
+    const shadowSurface = window.MarbleLevels.sampleCellSurface(
+      runtime.level,
+      marble.x,
+      marble.y
+    );
+    const shadowZ = shadowSurface ? shadowSurface.z : runtime.level.voidFloor ?? -1.5;
+
+    const shadow = project(marble.x, marble.y, shadowZ, view);
+    const ball = project(marble.x, marble.y, marble.z, view);
+    const radius = Math.max(8, view.tileW * marble.radius * 0.9);
 
     ctx.save();
 
-    const shadowY = marble.y + marble.radius * 0.45;
     ctx.beginPath();
     ctx.ellipse(
-      marble.x,
-      shadowY,
-      marble.radius * 0.9,
-      marble.radius * 0.45,
+      shadow.x,
+      shadow.y + radius * 0.35,
+      radius * 0.95,
+      radius * 0.48,
       0,
       0,
       Math.PI * 2
@@ -235,19 +276,19 @@
     ctx.fill();
 
     const gradient = ctx.createRadialGradient(
-      marble.x - marble.radius * 0.35,
-      marble.y - marble.radius * 0.45,
-      marble.radius * 0.12,
-      marble.x,
-      marble.y,
-      marble.radius
+      ball.x - radius * 0.35,
+      ball.y - radius * 0.48,
+      radius * 0.14,
+      ball.x,
+      ball.y,
+      radius
     );
     gradient.addColorStop(0, '#ffffff');
     gradient.addColorStop(0.2, '#cbd5e1');
     gradient.addColorStop(1, '#64748b');
 
     ctx.beginPath();
-    ctx.arc(marble.x, marble.y, marble.radius, 0, Math.PI * 2);
+    ctx.arc(ball.x, ball.y, radius, 0, Math.PI * 2);
     ctx.fillStyle = gradient;
     ctx.fill();
 
@@ -257,9 +298,9 @@
 
     ctx.beginPath();
     ctx.arc(
-      marble.x - marble.radius * 0.28,
-      marble.y - marble.radius * 0.32,
-      marble.radius * 0.18,
+      ball.x - radius * 0.25,
+      ball.y - radius * 0.32,
+      radius * 0.2,
       0,
       Math.PI * 2
     );
@@ -269,22 +310,22 @@
     ctx.restore();
   }
 
-  function renderStatusOverlay(ctx, runtime, cssWidth) {
+  function renderStatus(ctx, runtime, cssWidth) {
     if (runtime.status === 'running') return;
 
     ctx.save();
     ctx.font = '600 14px Inter, system-ui, sans-serif';
     ctx.textAlign = 'right';
-    ctx.fillStyle = 'rgba(230, 237, 243, 0.9)';
+    ctx.fillStyle = 'rgba(230,237,243,0.88)';
 
-    const text =
-      runtime.status === 'failed'
-        ? 'Failed'
-        : runtime.status === 'completed'
-          ? 'Cleared'
+    const label =
+      runtime.status === 'completed'
+        ? 'Cleared'
+        : runtime.status === 'failed'
+          ? 'Failed'
           : runtime.status;
 
-    ctx.fillText(text, cssWidth - 18, 28);
+    ctx.fillText(label, cssWidth - 18, 28);
     ctx.restore();
   }
 
@@ -292,17 +333,20 @@
     if (!runtime || !canvas) return;
 
     const { ctx, cssWidth, cssHeight } = fitCanvasToDisplay(canvas);
-    const view = getViewport(runtime.level, cssWidth, cssHeight);
+    const view = createView(runtime, cssWidth, cssHeight);
 
     ctx.clearRect(0, 0, cssWidth, cssHeight);
-
     renderBackground(ctx, cssWidth, cssHeight);
-    renderArena(ctx, runtime.level, view);
-    renderFailZones(ctx, runtime, view);
-    renderWalls(ctx, runtime, view);
-    renderGoal(ctx, runtime, view);
+
+    for (let ty = 0; ty < runtime.level.height; ty += 1) {
+      for (let tx = 0; tx < runtime.level.width; tx += 1) {
+        renderTile(ctx, runtime.level, tx, ty, view);
+      }
+    }
+
+    renderGoalMarker(ctx, runtime, view);
     renderMarble(ctx, runtime, view);
-    renderStatusOverlay(ctx, runtime, cssWidth);
+    renderStatus(ctx, runtime, cssWidth);
   }
 
   window.MarbleRenderer = {

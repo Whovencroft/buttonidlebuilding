@@ -145,10 +145,18 @@
         const result = window.MarblePhysics.updatePhysics(runtime, input.getAxis(), dt);
 
         if (result?.type === 'failed') {
-          showOverlay('Course Failed', 'You fell into a fail zone. Restart and try again.');
+         let reasonText = 'Run failed. Restart and try again.';
+
+         if (result.reason === 'fall') {
+           reasonText = 'You fell off the course. Restart and try again.';
+          } else if (result.reason === 'hazard') {
+            reasonText = 'You hit a hazard. Restart and try again.';
+         }
+
+         showOverlay('Course Failed', reasonText);
         } else if (result?.type === 'completed' && !runtime.resultApplied) {
-          applyCompletion(result);
-        }
+         applyCompletion(result);
+       }
       }
 
       render();
