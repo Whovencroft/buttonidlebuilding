@@ -218,6 +218,10 @@
   let marbleScene = null;
   let frameHandle = null;
   let saveHandle = null;
+  const TEST_SCENE_SEQUENCE = ['button_idle', 'marble'];
+  const DEBUG_TYPED_COMMAND = 'NEXTSCENE';
+  let debugCommandBuffer = '';
+  let debugCommandLastKeyAt = 0;
   let lastFrame = performance.now();
 
   function getState() {
@@ -320,6 +324,66 @@
     elements.switchMarbleSceneBtn.classList.toggle('active', activeSceneId === 'marble');
   }
 
+    function getNextSceneId(currentSceneId) {
+    const index = TEST_SCENE_SEQUENCE.indexOf(currentSceneId);
+    if (index === -1) return TEST_SCENE_SEQUENCE[0] || 'button_idle';
+    return TEST_SCENE_SEQUENCE[(index + 1) % TEST_SCENE_SEQUENCE.length];
+  }
+
+  function advanceToNextSceneForTesting() {
+    const currentSceneId = sceneManager ? sceneManager.getActiveSceneId() : state.app.activeScene;
+    const nextSceneId = getNextSceneId(currentSceneId);
+
+    state.app.activeScene = nextSceneId;
+    sceneManager.setActiveScene(nextSceneId, { state });
+    renderShell();
+    saveGame();
+
+    elements.saveStatus.textContent = `Debug scene advance: ${currentSceneId} → ${nextSceneId}`;
+  }
+
+  function isTypingTarget(target) {
+    if (!(target instanceof HTMLElement)) return false;
+    const tag = target.tagName;
+    return (
+      tag === 'INPUT' ||
+      tag === 'TEXTAREA' ||
+      target.isContentEditable
+    );
+  }
+
+  function handleDebugSceneCommand(event) {
+    if (isTypingTarget(event.target)) return;
+
+    const nowMs = performance.now();
+    if (nowMs - debugCommandLastKeyAt > 1800) {
+      debugCommandBuffer = '';
+    }
+    debugCommandLastKeyAt = nowMs;
+
+    if (event.key === 'Escape') {
+      debugCommandBuffer = '';
+      return;
+    }
+
+    if (event.key.length !== 1) return;
+
+    debugCommandBuffer += event.key.toUpperCase();
+
+    if (!DEBUG_TYPED_COMMAND.startsWith(debugCommandBuffer)) {
+      debugCommandBuffer = event.key.toUpperCase();
+      if (!DEBUG_TYPED_COMMAND.startsWith(debugCommandBuffer)) {
+        debugCommandBuffer = '';
+        return;
+      }
+    }
+
+    if (debugCommandBuffer === DEBUG_TYPED_COMMAND) {
+      debugCommandBuffer = '';
+      advanceToNextSceneForTesting();
+    }
+  }
+
   function applyMarbleReward(result) {
     const reward = result.reward || {};
     const marbleSlice = state.scenes.marble;
@@ -400,6 +464,7 @@
     elements.saveBtn.addEventListener('click', () => saveGame(true));
     elements.exportBtn.addEventListener('click', exportSave);
     elements.importBtn.addEventListener('click', importSave);
+    document.addEventListener('keydown', handleDebugSceneCommand);
     elements.resetBtn.addEventListener('click', hardReset);
     elements.fakeCrashBtn.addEventListener('click', () => {
       if (buttonScene && typeof buttonScene.simulateFakeCrash === 'function') {
