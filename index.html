@@ -51,26 +51,32 @@
               <h2>Main Button</h2>
               <div class="small" id="buttonModeLabel">Mode: Manual humiliation</div>
             </div>
-            <div class="panel-body button-stage">
-              <div class="button-sandbox" id="buttonSandbox">
-                <button class="big-button" id="mainButton">Press Me</button>
-                <div class="button-center-note" id="buttonNote">I built a game about not playing a game; it feels like self indulgence, or maybe self flagellation.</div>
-                <div id="fakeButtonLayer"></div>
+            <div class="panel-body">
+              <div class="scene-host" id="sceneHost">
+                <div class="scene-root scene-root-dom active" id="buttonIdleSceneRoot" data-scene-id="button_idle">
+                  <div class="button-stage">
+                    <div class="button-sandbox" id="buttonSandbox">
+                      <button class="big-button" id="mainButton">Press Me</button>
+                      <div class="button-center-note" id="buttonNote">I built a game about not playing a game; it feels like self indulgence, or maybe self flagellation.</div>
+                      <div id="fakeButtonLayer"></div>
+                    </div>
+                    <div class="popup-zone" id="popupZone"></div>
+                    <div class="ending-modal" id="autonomyEndingModal" hidden>
+                      <div class="ending-card">
+                        <div class="popup-title">Full Autonomy Achieved</div>
+                        <div class="small" id="endingBody">
+                          The button no longer requires visible labor.
+                        </div>
+                        <div class="ending-actions">
+                          <button class="action-btn" id="endingObserveBtn">Observe</button>
+                          <button class="action-btn" id="endingReassertBtn">Reassert Control</button>
+                          <button class="prestige-btn" id="endingPrestigeBtn">Prestige in Shame</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div class="popup-zone" id="popupZone"></div>
-              <div class="ending-modal" id="autonomyEndingModal" hidden>
-              <div class="ending-card">
-              <div class="popup-title">Full Autonomy Achieved</div>
-              <div class="small" id="endingBody">
-            The button no longer requires visible labor.
-             </div>
-              <div class="ending-actions">
-                <button class="action-btn" id="endingObserveBtn">Observe</button>
-                <button class="action-btn" id="endingReassertBtn">Reassert Control</button>
-                <button class="prestige-btn" id="endingPrestigeBtn">Prestige in Shame</button>
-               </div>
-              </div>
-             </div>
             </div>
           </div>
 
@@ -420,7 +426,7 @@
         "incompatible": [],
         "effects": {
           "passiveMult": 1.6,
-          "liarChance": 0.62,
+          "liarChance": 0.22,
           "costMult": 1.18
         }
       },
@@ -432,7 +438,7 @@
         "incompatible": ["inflation_hedge"],
         "effects": {
           "allowDebt": true,
-          "debtLimit": 25000,
+          "debtLimit": 2500,
           "debtBoost": 1.0,
           "passiveMult": 1.12
         }
@@ -481,7 +487,7 @@
        "effects": {
           "cursorEvasion": 1,
           "fakeButtons": 3,
-         "manualMult": 50,
+         "manualMult": 20,
          "autonomyGain": 0.05,
          "fakeCrashRate": 0.004
         }
@@ -603,6 +609,7 @@
   }
   </script>
 
+    <script src="./js/core/scene_manager.js"></script>
     <script src="./js/main.js"></script>
 </body>
 </html>
