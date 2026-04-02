@@ -283,6 +283,8 @@
 
       const imported = importEncodedState(raw);
       imported.stats.imports = (imported.stats.imports || 0) + 1;
+      imported.session.lastTick = now();
+      imported.session.lastSave = 0;
       replaceState(imported, { save: true });
       elements.saveStatus.textContent = 'Import succeeded.';
     } catch (error) {
