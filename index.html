@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Button That Learns To Press Itself</title>
+    <link rel="stylesheet" href="./css/styles.css" />
+</head>
+<body>
+  <div class="app">
+    <div class="topbar">
+      <div class="stat hero">
+        <div class="label">Displayed Presses</div>
+        <div class="value" id="displayedPresses">0</div>
+        <div class="subvalue" id="truePressesSub">True total hidden in plain sight</div>
+      </div>
+      <div class="stat">
+        <div class="label">Presses / sec</div>
+        <div class="value" id="pps">0</div>
+        <div class="subvalue" id="manualValue">Manual press value: 1</div>
+      </div>
+      <div class="stat">
+        <div class="label">Autonomy</div>
+        <div class="value" id="autonomyValue">0%</div>
+        <div class="subvalue" id="autonomySub">Still dependent on you</div>
+      </div>
+      <div class="stat">
+        <div class="label">Debt</div>
+        <div class="value" id="debtValue">0</div>
+        <div class="subvalue" id="debtSub">Financially irresponsible mode locked</div>
+      </div>
+      <div class="stat">
+        <div class="label">Regret</div>
+        <div class="value" id="regretValue">0</div>
+        <div class="subvalue" id="layerSummary">No layers yet</div>
+      </div>
+      <div class="stat">
+        <div class="label">Active Rules</div>
+        <div class="value" id="activeRulesValue">0 / 2</div>
+        <div class="subvalue" id="comboSummary">No harmful innovations selected</div>
+      </div>
+    </div>
+
+    <div class="tabs" id="tabs"></div>
+
+    <div class="content">
+      <section class="tab-panel active" data-tab="play">
+        <div class="game-grid">
+          <div class="panel">
+            <div class="panel-header">
+              <h2>Main Button</h2>
+              <div class="small" id="buttonModeLabel">Mode: Manual humiliation</div>
+            </div>
+            <div class="panel-body button-stage">
+              <div class="button-sandbox" id="buttonSandbox">
+                <button class="big-button" id="mainButton">Press Me</button>
+                <div class="button-center-note" id="buttonNote">I built a game about not playing a game; it feels like self indulgence, or maybe self flagellation.</div>
+                <div id="fakeButtonLayer"></div>
+              </div>
+              <div class="popup-zone" id="popupZone"></div>
+              <div class="ending-modal" id="autonomyEndingModal" hidden>
+              <div class="ending-card">
+              <div class="popup-title">Full Autonomy Achieved</div>
+              <div class="small" id="endingBody">
+            The button no longer requires visible labor.
+             </div>
+              <div class="ending-actions">
+                <button class="action-btn" id="endingObserveBtn">Observe</button>
+                <button class="action-btn" id="endingReassertBtn">Reassert Control</button>
+                <button class="prestige-btn" id="endingPrestigeBtn">Prestige in Shame</button>
+               </div>
+              </div>
+             </div>
+            </div>
+          </div>
+
+          <div class="column-stack">
+            <div class="panel">
+              <div class="panel-header">
+                <h2>Automation</h2>
+                <div class="small" id="automationSummary">0 owned</div>
+              </div>
+              <div class="panel-body">
+                <div class="card-list" id="upgradeList"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="column-stack">
+            <div class="panel">
+              <div class="panel-header">
+                <h2>Situation</h2>
+                <div class="small">The game remains extremely stupid.</div>
+              </div>
+              <div class="panel-body">
+                <div class="card-list">
+                  <div class="card">
+                    <div class="card-row">
+                      <div>
+                        <div class="card-title">Efficiency</div>
+                        <div class="card-desc">Each source of presses is multiplied by a stack of increasingly questionable decisions.</div>
+                      </div>
+                      <div class="good nowrap" id="efficiencyValue">x1.00</div>
+                    </div>
+                    <div class="formula" id="formulaEfficiency"></div>
+                  </div>
+                  <div class="card">
+                    <div class="card-row">
+                      <div>
+                        <div class="card-title">Inflation</div>
+                        <div class="card-desc">Prices climb because the button industry is overheated.</div>
+                      </div>
+                      <div class="warn nowrap" id="inflationValue">x1.00</div>
+                    </div>
+                    <div class="formula" id="formulaInflation"></div>
+                  </div>
+                  <div class="card">
+                    <div class="card-title">Idle Exploitation</div>
+                    <div class="card-desc" id="idleDesc">Being absent is slowly becoming optimal, which feels disrespectful.</div>
+                    <div class="meter"><span id="idleMeter"></span></div>
+                    <div class="small" id="idleStatus">Idle bonus: x1.00</div>
+                  </div>
+                  <div class="card">
+                    <div class="card-row">
+                     <div>
+                      <div class="card-title">Automation Reappropriation</div>
+                      <div class="card-desc" id="dumbDownDesc">
+                        Strip some autonomy away for a rising cost. The button is watching.
+                      </div>
+                    </div>
+                   <div class="warn nowrap" id="larcenyValue">Larceny 0</div>
+                   </div>
+                    <div class="formula" id="dumbDownFormula"></div>
+                    <button class="action-btn" id="dumbDownBtn">Dumb the Button Down</button>
+                  </div>
+                  <div class="card">
+                    <div class="card-title">Recent Log</div>
+                    <div class="log-box" id="recentLog"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="tab-panel" data-tab="rules">
+        <div class="grid-2" style="min-height: 0;">
+          <div class="panel">
+            <div class="panel-header">
+              <h2>Rule Modules</h2>
+              <div class="small">Exactly 2 can be active at once</div>
+            </div>
+            <div class="panel-body">
+              <div class="card-list" id="moduleList"></div>
+            </div>
+          </div>
+          <div class="column-stack">
+            <div class="panel">
+              <div class="panel-header">
+                <h2>Active Loadout</h2>
+                <div class="small" id="loadoutSummary">Nothing dangerous equipped</div>
+              </div>
+              <div class="panel-body">
+                <div class="card-list" id="activeLoadoutList"></div>
+              </div>
+            </div>
+            <div class="panel">
+              <div class="panel-header">
+                <h2>Combo Effects</h2>
+                <div class="small">Some bad ideas work together</div>
+              </div>
+              <div class="panel-body">
+                <div class="card-list" id="comboList"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="tab-panel" data-tab="layers">
+        <div class="grid-2" style="min-height: 0;">
+          <div class="panel">
+            <div class="panel-header">
+              <h2>Layer Resets</h2>
+              <div class="small">Infinite escalation through poor life choices</div>
+            </div>
+            <div class="panel-body">
+              <div class="card-list" id="layerList"></div>
+            </div>
+          </div>
+          <div class="column-stack">
+            <div class="panel">
+              <div class="panel-header">
+                <h2>Layer Inventory</h2>
+                <div class="small">The economy was not meant to survive this</div>
+              </div>
+              <div class="panel-body">
+                <div class="card-list" id="resourceList"></div>
+              </div>
+            </div>
+            <div class="panel">
+              <div class="panel-header">
+                <h2>Formulas</h2>
+                <div class="small">Data-driven and extensible</div>
+              </div>
+              <div class="panel-body">
+                <div class="card-list" id="formulaList"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="tab-panel" data-tab="save">
+        <div class="grid-2" style="min-height: 0;">
+          <div class="column-stack">
+            <div class="panel">
+              <div class="panel-header">
+                <h2>Save Tools</h2>
+                <div class="small">Stored in localStorage</div>
+              </div>
+              <div class="panel-body">
+                <div class="grid-3">
+                  <button class="action-btn" id="saveBtn">Save Now</button>
+                  <button class="action-btn" id="exportBtn">Export Save</button>
+                  <button class="action-btn" id="importBtn">Import Save</button>
+                </div>
+                <div style="height: 10px;"></div>
+                <textarea id="saveField" placeholder="Exported save string will appear here. Paste one here before importing."></textarea>
+                <div style="height: 10px;"></div>
+                <div class="grid-2">
+                  <button class="action-btn" id="resetBtn">Hard Reset</button>
+                  <button class="action-btn" id="fakeCrashBtn">Simulate Browser Abuse</button>
+                </div>
+                <div style="height: 10px;"></div>
+                <div class="config-note" id="saveStatus">Autosaves every 5 seconds and on major actions.</div>
+              </div>
+            </div>
+            <div class="panel">
+              <div class="panel-header">
+                <h2>Framework Notes</h2>
+                <div class="small">How to extend the prototype</div>
+              </div>
+              <div class="panel-body">
+                <div class="card-list" id="frameworkNotes"></div>
+              </div>
+            </div>
+          </div>
+          <div class="column-stack">
+            <div class="panel">
+              <div class="panel-header">
+                <h2>Embedded Data JSON</h2>
+                <div class="small">Edit this structure to add content</div>
+              </div>
+              <div class="panel-body">
+                <div class="code-box" id="configPreview"></div>
+              </div>
+            </div>
+            <div class="panel">
+              <div class="panel-header">
+                <h2>Session Stats</h2>
+                <div class="small">Proof of bad decisions</div>
+              </div>
+              <div class="panel-body">
+                <div class="card-list" id="sessionStats"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="statusbar">
+      <div class="message" id="messageBar">You could stop anytime. The button disagrees.</div>
+      <div class="status-right">
+        <span id="autosaveStatus">Autosave: waiting</span>
+        <span id="clockStatus">Ticking</span>
+        <span id="versionStatus">Framework v0.14</span>
+      </div>
+    </div>
+  </div>
+
+  <script id="gameData" type="application/json">
+  {
+    "meta": {
+      "title": "Button That Learns To Press Itself",
+      "version": "0.14",
+      "saveKey": "buttonLearnsToPressItselfSave",
+      "ticksPerSecond": 20,
+      "maxActiveModules": 2
+    },
+    "tabs": [
+      { "id": "play", "label": "Game" },
+      { "id": "rules", "label": "Rules" },
+      { "id": "layers", "label": "Layers" },
+      { "id": "save", "label": "Save / Config" }
+    ],
+    "buttonNames": [
+      "Press Me",
+      "Don’t Press Me",
+      "This Won’t Help",
+      "You Again?",
+      "Please Delegate",
+      "Manual Labor",
+      "Totally Optional",
+      "Fine. Press It.",
+      "This Is Not Progress",
+      "Do Not Encourage It",
+      "Who Did This To You?",
+      "No Efficiency Gained",
+      "Wasting Your Life Away"
+    ],
+    "messages": [
+      "You built a machine to avoid a machine-shaped obligation.",
+      "The button respects your commitment to avoiding effort by exerting effort.",
+      "This is a very stupid industry and you are leading it.",
+      "Every number here was invented by the button lobby.",
+      "You could stop anytime. The system has prepared objections.",
+      "The passive income is active disrespect.",
+      "No regulator approved Press Debt.",
+      "The fake buttons are a trust exercise that you are failing.",
+      "The economy is now button-adjacent and unstable.",
+      "Autonomy is just laziness with better branding.",
+      "Push the button to make the number go up, my little pidgeon.",
+      "Big numbers mean big dopamine, right?",
+      "Have you spoken to a doctor about this behaviour yet?"
+    ],
+    "upgrades": [
+      {
+        "id": "tired_finger",
+        "name": "Tired Finger",
+        "description": "+0.1 presses/sec. The cheapest possible surrender.",
+        "baseCost": 10,
+        "costMult": 1.15,
+        "pps": 0.1,
+        "unlockAt": 0
+      },
+      {
+        "id": "borrowed_finger",
+        "name": "Borrowed Finger",
+        "description": "+1 press/sec. Outsourced with no questions asked.",
+        "baseCost": 50,
+        "costMult": 1.17,
+        "pps": 1,
+        "unlockAt": 20
+      },
+      {
+        "id": "questionable_machine",
+        "name": "Questionable Machine",
+        "description": "+5 presses/sec. Emits noises that feel illegal.",
+        "baseCost": 250,
+        "costMult": 1.21,
+        "pps": 5,
+        "unlockAt": 100
+      },
+      {
+        "id": "definitely_not_a_sweatshop",
+        "name": "Definitely Not a Sweatshop",
+        "description": "+25 presses/sec. The name is doing too much work.",
+        "baseCost": 1200,
+        "costMult": 1.24,
+        "pps": 25,
+        "unlockAt": 800
+      },
+      {
+        "id": "corporate_press_department",
+        "name": "Corporate Press Department",
+        "description": "+120 presses/sec. Now with meetings about pressing.",
+        "baseCost": 12000,
+        "costMult": 1.29,
+        "pps": 120,
+        "unlockAt": 4500
+      },
+      {
+        "id": "press_farm",
+        "name": "Press Farm",
+        "description": "+750 presses/sec. Sustainably harvested nonsense.",
+        "baseCost": 180000,
+        "costMult": 1.33,
+        "pps": 750,
+        "unlockAt": 50000
+      },
+      {
+        "id": "cloud_presser_cluster",
+        "name": "Cloud Presser Cluster",
+        "description": "+5000 presses/sec. Now your idleness is scalable.",
+        "baseCost": 2600000,
+        "costMult": 1.37,
+        "pps": 5000,
+        "unlockAt": 500000
+      },
+      {
+        "id": "agency_of_autonomous_presses",
+        "name": "Agency of Autonomous Presses",
+        "description": "+40000 presses/sec. A bureaucracy of self-importance.",
+        "baseCost": 45000000,
+        "costMult": 1.42,
+        "pps": 40000,
+        "unlockAt": 5000000
+      }
+    ],
+    "modules": [
+      {
+        "id": "friction_compensation",
+        "name": "Friction Compensation",
+        "description": "Manual clicks hit harder. Passive systems run smoother.",
+        "unlockAt": 80,
+        "incompatible": [],
+        "effects": {
+          "manualMult": 2.5,
+          "passiveMult": 1.1
+        }
+      },
+      {
+        "id": "fraudulent_accounting",
+        "name": "Fraudulent Accounting",
+        "description": "Displayed totals become unreliable. Passive output improves anyway.",
+        "unlockAt": 300,
+        "incompatible": [],
+        "effects": {
+          "passiveMult": 1.6,
+          "liarChance": 0.62,
+          "costMult": 1.18
+        }
+      },
+      {
+        "id": "debt_spiral",
+        "name": "Debt Spiral",
+        "description": "Allows negative presses. More debt means more growth, which is not comforting.",
+        "unlockAt": 1200,
+        "incompatible": ["inflation_hedge"],
+        "effects": {
+          "allowDebt": true,
+          "debtLimit": 25000,
+          "debtBoost": 1.0,
+          "passiveMult": 1.12
+        }
+      },
+      {
+        "id": "union_avoidance",
+        "name": "Union Avoidance",
+        "description": "Big passive growth. Manual clicks become spiritually optional.",
+        "unlockAt": 3000,
+        "incompatible": ["human_touch"],
+        "effects": {
+          "passiveMult": 1.9,
+          "manualMult": 0.85,
+          "autonomyGain": 0.07
+        }
+      },
+      {
+        "id": "human_touch",
+        "name": "Human Touch",
+        "description": "Manual clicks matter again. Automation becomes less dignified.",
+        "unlockAt": 3000,
+        "incompatible": ["union_avoidance"],
+        "effects": {
+          "manualMult": 8.2,
+          "passiveMult": 0.76,
+          "clickResetIdle": true
+        }
+      },
+      {
+        "id": "inflation_hedge",
+        "name": "Inflation Hedge",
+        "description": "Upgrade prices ease up a little. Debt is forbidden for obvious reasons.",
+        "unlockAt": 1800,
+        "incompatible": ["debt_spiral"],
+        "effects": {
+          "costMult": 0.72,
+          "passiveMult": 1.08
+        }
+      },
+      {
+        "id": "user_repellant",
+        "name": "User Repellant",
+        "description": "The main button develops evasive behavior. It is not hiding anything from you.",
+       "unlockAt": 8500,
+       "incompatible": [],
+       "effects": {
+          "cursorEvasion": 1,
+          "fakeButtons": 3,
+         "manualMult": 50,
+         "autonomyGain": 0.05,
+         "fakeCrashRate": 0.004
+        }
+      
+      },
+      {
+        "id": "anti_idle_compliance",
+        "name": "Anti-Idle Compliance",
+        "description": "Not clicking boosts income. The game grows more insulting about it.",
+        "unlockAt": 600,
+        "incompatible": [],
+        "effects": {
+          "idleEnabled": true,
+          "idleScale": 1.0,
+          "liarChance": 0.08
+        }
+      }
+    ],
+    "combos": [
+      {
+        "id": "creative_bankruptcy",
+        "modules": ["debt_spiral", "fraudulent_accounting"],
+        "name": "Creative Bankruptcy",
+        "description": "Debt growth is stronger and the UI gets less honest.",
+        "effects": {
+          "debtComboMult": 2.0,
+          "liarChance": 0.18,
+          "passiveMult": 1.2
+        }
+      },
+      {
+        "id": "full_autonomy",
+        "modules": ["union_avoidance", "user_repellant"],
+        "name": "Full Autonomy",
+        "description": "Autonomy rises faster and the button hides earlier.",
+        "effects": {
+          "autonomyGain": 0.12,
+          "hideButtonAt": 80,
+          "passiveMult": 1.25
+        }
+      },
+      {
+        "id": "resentful_presence",
+        "modules": ["human_touch", "anti_idle_compliance"],
+        "name": "Resentful Presence",
+        "description": "Manual clicks and idle bonuses both get stronger, which is rude either way.",
+        "effects": {
+          "manualMult": 1.7,
+          "idleScale": 1.4,
+          "passiveMult": 1.05
+        }
+      },
+      {
+        "id": "competent_procurement",
+        "modules": ["friction_compensation", "inflation_hedge"],
+        "name": "Competent Procurement",
+        "description": "Costs drop and automation runs slightly better. Disturbingly reasonable.",
+        "effects": {
+          "costMult": 0.65,
+          "passiveMult": 1.15
+        }
+      }
+    ],
+    "layers": [
+      {
+        "id": "regret",
+        "name": "Press Prestige",
+        "resourceKey": "regret",
+        "baseResource": "presses",
+        "description": "Reset the button economy. Gain Regret for future boosts.",
+        "unlockAt": 100000,
+        "formula": "floor((log10(max(presses,1)) - 4)^2)",
+        "effectText": "Regret increases all output and autonomy growth.",
+        "reset": ["presses", "upgrades", "modules", "autonomy", "debt"]
+      },
+      {
+        "id": "meta_presses",
+        "name": "Meta-Presses",
+        "resourceKey": "metaPresses",
+        "baseResource": "presses",
+        "description": "Distill raw presses into meta-presses that multiply passive production.",
+        "unlockAt": 1000000,
+        "formula": "floor((presses / 1000000)^0.5)",
+        "effectText": "Each Meta-Press increases passive output and manual value.",
+        "reset": []
+      },
+      {
+        "id": "hyper_presses",
+        "name": "Hyper-Presses",
+        "resourceKey": "hyperPresses",
+        "baseResource": "metaPresses",
+        "description": "Compress meta-presses into hyper-presses to increase efficiency.",
+        "unlockAt": 25,
+        "formula": "floor((metaPresses / 25)^0.5)",
+        "effectText": "Each Hyper-Press boosts efficiency and weakens inflation.",
+        "reset": []
+      },
+      {
+        "id": "press_derivatives",
+        "name": "Press Derivatives",
+        "resourceKey": "pressDerivatives",
+        "baseResource": "hyperPresses",
+        "description": "A bad financial abstraction that feeds autonomy and combo scaling.",
+        "unlockAt": 10,
+        "formula": "floor((hyperPresses / 10)^0.5)",
+        "effectText": "Derivatives improve autonomy and layer gains.",
+        "reset": []
+      }
+    ],
+    "frameworkNotes": [
+      "All gameplay content lives in the JSON block inside this HTML file. Add upgrades, modules, combos, and layers there first.",
+      "The engine reads upgrade.pps and module.effects to calculate production. Extend effects in getComputed() and the UI renderers to support new mechanics.",
+      "Layer formulas are implemented in getLayerGain(). Add new resource types by updating the save schema and boost calculations.",
+      "The module system is the reusable puzzle layer. It already supports unlock thresholds, incompatibilities, active-slot limits, and pair synergies.",
+      "Offline progress uses lastTick timestamps. The same save structure can be reused for other idle prototypes with different content JSON.",
+      "Is this the best way to create this kind of game?  Absolutely not.  Is it the most lazy way I could think of?  Yes.",
+      "David, use this dumb thing to start making the dumb thing you keep thinking about."
+    ]
+  }
+  </script>
+
+    <script src="./js/main.js"></script>
+</body>
+</html>
