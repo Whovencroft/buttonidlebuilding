@@ -386,7 +386,7 @@ function completeIdleGame() {
       let clickResetIdle = false;
       let hideButtonAt = 100;
       let fakeCrashRate = 0;
-      const regretDebtFloor = 2500 * Math.max(1, Math.floor(s.regret ||));
+      const regretDebtFloor = 2500 * Math.max(1, Math.floor(s.regret || 0));
 
       const autonomySuppressed = now() < (s.session.autonomySuppressedUntil || 0);
       const activeModules = s.activeModules.map(getModuleById).filter(Boolean);
@@ -426,11 +426,6 @@ function completeIdleGame() {
       } else {
         debtLimit = 0;
       }
-
-      elements.debtSub.textContent = computer.allowDebt
-        ? `Debt limit ${format(computed.debtLimit)} * boost x${format(computed.debtBoost)}`
-        ? `Debt limit ${format(computed.debtLimit)} • scales with Regret • boost x${format(computed.debtBoost)}`
-         : 'Financially irresponsible mode locked';
 
       if (autonomySuppressed) {
         autonomyGain = 0;
@@ -1156,7 +1151,7 @@ function completeIdleGame() {
 
       elements.debtValue.textContent = format(-Math.min(0, s.presses));
       elements.debtSub.textContent = computed.allowDebt
-        ? `Debt limit ${format(computed.debtLimit)} • boost x${format(computed.debtBoost)}`
+        ? `Debt limit ${format(computed.debtLimit)} • scales with Regret • boost x${format(computed.debtBoost)}`
         : 'Financially irresponsible mode locked';
 
       elements.regretValue.textContent = format(s.regret);
