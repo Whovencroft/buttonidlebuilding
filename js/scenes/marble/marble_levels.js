@@ -206,7 +206,7 @@
     setCell(level, 10, 2, { kind: 'hazard', h: 4 });
     setCell(level, 10, 7, { kind: 'hazard', h: 4 });
     setCell(level, 8, 8, { kind: 'hazard', h: 4 });
-    setCell(level, 13, 14, { kind: 'hazard', h: 4 });
+    setCell(level, 2, 14, { kind: 'hazard', h: 4 });
     setCell(level, 15, 13, { kind: 'hazard', h: 4 });
     setCell(level, 14, 14, { kind: 'goal', h: 4 });
 
