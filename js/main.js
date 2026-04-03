@@ -585,7 +585,7 @@ function switchScene(sceneId, options = {}) {
 
   if (sceneId === 'marble') {
     if (!marbleScene) {
-      elements.saveStatus.textContent = 'Marble scene failed to load. Check the console error.';
+      elements.saveStatus.textContent = 'Marble scene failed to load.';
       return;
     }
 
