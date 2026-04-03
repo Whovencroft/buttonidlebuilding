@@ -381,7 +381,7 @@
   function renderShell() {
     renderTabs();
 
-    const activeSceneId = sceneManager ? sceneManager.getActiveSceneId() : state.app.activeScene;
+    const activeSceneId = sceneManager ? sceneManager.getActiveSceneId() : 'button_idle';
     const isMarble = activeSceneId === 'marble';
     const marbleUnlocked = !!state.scenes.marble.unlocked;
 
