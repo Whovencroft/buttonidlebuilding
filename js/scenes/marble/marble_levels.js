@@ -306,3 +306,35 @@
     sampleSupportSurface
   };
 })();
+
+
+   function getCellCornerHeights(cell) {
+     if (!cell) {
+       return { nw: 0, ne: 0, se: 0, sw: 0 };
+     }
+
+       default:
+         return { nw: h, ne: h, se: h, sw: h };
+     }
+  
+ 
+   function getCellTopZ(cell) {
+     const heights = getCellCornerHeights(cell);
+     return Math.max(heights.nw, heights.ne, heights.se, heights.sw);
+   }
+
+   window.MarbleLevels = {
+     LEVELS,
+     getLevelById,
+     getLevelIndex,
+     getNextLevelId,
+     getUnlockedLevelIds,
+     isLevelUnlocked,
+     getCell,
+     getCellCornerHeights,
+     getCellTopZ,
+     getCellGradient,
+     sampleCellSurface,
+     sampleSupportSurface
+   };
+();

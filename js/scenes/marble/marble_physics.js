@@ -7,7 +7,26 @@
   const MAX_STEP_UP = 0.48;
   const GROUND_SNAP = 0.18;
   const VERTICAL_GRAVITY = -22.0;
-  const MOVE_STEP = 0.12;
+  const MOVE_STEP = 0.08;
+  const FOOTPRINT_CLEARANCE = 0.72;
+  const WALL_Z_EPSILON = 0.04;
+
+  function getFootprintOffsets(radius, clearance = FOOTPRINT_CLEARANCE) {
+    const r = radius * clearance;
+    const d = r * 0.7071;
+
+    return [
+      [0, 0],
+      [r, 0],
+      [-r, 0],
+      [0, r],
+      [0, -r],
+      [d, d],
+      [d, -d],
+      [-d, d],
+      [-d, -d]
+    ];
+  }
 
   function clampSpeed(marble, maxSpeed) {
     const speed = Math.hypot(marble.vx, marble.vy);
@@ -61,48 +80,57 @@
     return 'ground';
   }
 
-  function isWallAt(level, x, y, radius = 0) {
-    const offsets = [
-      [0, 0],
-      [radius, 0],
-      [-radius, 0],
-      [0, radius],
-      [0, -radius]
-    ];
+  function getBlockingWallTop(level, x, y, radius = 0) {
+    let maxTop = null;
 
-    for (const [ox, oy] of offsets) {
+    for (const [ox, oy] of getFootprintOffsets(radius)) {
       const tx = Math.floor(x + ox);
       const ty = Math.floor(y + oy);
       const cell = window.MarbleLevels.getCell(level, tx, ty);
-      if (cell && cell.kind === 'wall') {
-        return true;
-      }
+
+      if (!cell || cell.kind !== 'wall') continue;
+
+      const top =
+        typeof window.MarbleLevels.getCellTopZ === 'function'
+          ? window.MarbleLevels.getCellTopZ(cell)
+          : (cell.h || 0);
+
+      maxTop = maxTop === null ? top : Math.max(maxTop, top);
     }
 
-    return false;
+    return maxTop;
+  }
+
+  function wallBlocksAtHeight(level, marble, targetX, targetY, targetZ) {
+    const wallTop = getBlockingWallTop(level, targetX, targetY, marble.radius);
+    if (wallTop === null) return false;
+
+    const marbleBottom = targetZ - marble.radius;
+    return marbleBottom <= wallTop + WALL_Z_EPSILON;
   }
 
   function tryGroundMove(runtime, currentSurface, targetX, targetY) {
     const level = runtime.level;
-    const radius = runtime.marble.radius;
+    const marble = runtime.marble;
+    const targetZ = currentSurface.z + marble.radius;
 
-    if (isWallAt(level, targetX, targetY, radius * 0.8)) {
+    if (wallBlocksAtHeight(level, marble, targetX, targetY, targetZ)) {
       return {
         blocked: true,
-        x: runtime.marble.x,
-        y: runtime.marble.y,
+        x: marble.x,
+        y: marble.y,
         groundSurface: currentSurface
       };
     }
 
-    const nextSurface = getSupportedSurface(level, targetX, targetY, radius);
+    const nextSurface = getSupportedSurface(level, targetX, targetY, marble.radius);
     const transition = classifySurfaceTransition(currentSurface, nextSurface);
 
     if (transition === 'blocked') {
       return {
         blocked: true,
-        x: runtime.marble.x,
-        y: runtime.marble.y,
+        x: marble.x,
+        y: marble.y,
         groundSurface: currentSurface
       };
     }
@@ -211,22 +239,23 @@
     const stepDt = dt / steps;
 
     for (let i = 0; i < steps; i += 1) {
+      const targetZ = marble.z + marble.vz * stepDt;
       const targetX = marble.x + marble.vx * stepDt;
       const targetY = marble.y + marble.vy * stepDt;
 
-      if (isWallAt(level, targetX, marble.y, marble.radius * 0.8)) {
+      if (wallBlocksAtHeight(level, marble, targetX, marble.y, targetZ)) {
         marble.vx = 0;
       } else {
         marble.x = targetX;
       }
 
-      if (isWallAt(level, marble.x, targetY, marble.radius * 0.8)) {
+      if (wallBlocksAtHeight(level, marble, marble.x, targetY, targetZ)) {
         marble.vy = 0;
       } else {
         marble.y = targetY;
       }
 
-      marble.z += marble.vz * stepDt;
+      marble.z = targetZ;
 
       const surface = getSupportedSurface(level, marble.x, marble.y, marble.radius);
 
