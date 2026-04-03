@@ -5,7 +5,6 @@
   const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
   const now = () => Date.now();
   const log10 = (v) => Math.log(v) / Math.log(10);
-  const IDLE_GAME_INFINITY_TARGET = Number.MAX_VALUE;
 
   function format(num, digits = 2) {
     if (!Number.isFinite(num)) return '∞';
@@ -73,13 +72,13 @@
     }
 
     function hasReachedInfinityEnding() {
-  const s = state();
-  return (
-    !!s.flags.idleGameComplete ||
-    s.totalPressesEarned >= IDLE_GAME_INFINITY_TARGET ||
-    s.presses >= IDLE_GAME_INFINITY_TARGET
-  );
-}
+      const s = state();
+      return (
+      !!s.flags.idleGameComplete ||
+      !Number.isFinite(s.presses) ||
+      !Number.isFinite(s.totalPressesEarned)
+    );
+  }
 
 function completeIdleGame() {
   const s = state();
@@ -613,6 +612,12 @@ function completeIdleGame() {
 
       maybeCycleButtonName();
       maybeLieOnClick(computed);
+
+      if (hasReachedInfinityEnding()) {
+        completeIdleGame();
+        return;
+      }
+
       render();
     }
 
@@ -779,6 +784,11 @@ function completeIdleGame() {
       s.totalPressesEarned += gain;
       s.totalGeneratedPresses += gain;
       s.session.offlineSeconds += seconds;
+
+      if (hasReachedInfinityEnding()) {
+        completeIdleGame();
+        return;
+    }
 
       logMessage(
         `Offline progress recovered ${format(gain)} presses across ${format(seconds, 1)} seconds.`,
