@@ -4,9 +4,10 @@
   const SLOPE_ACCEL = 16.0;
   const MAX_GROUND_SPEED = 7.2;
   const MAX_AIR_SPEED = 8.0;
-  const MAX_STEP_UP = 0.34;
+  const MAX_STEP_UP = 0.48;
   const GROUND_SNAP = 0.18;
   const VERTICAL_GRAVITY = -22.0;
+  const MOVE_STEP = 0.12;
 
   function clampSpeed(marble, maxSpeed) {
     const speed = Math.hypot(marble.vx, marble.vy);
@@ -46,6 +47,10 @@
     clampSpeed(marble, MAX_AIR_SPEED);
   }
 
+  function getSupportedSurface(level, x, y, radius) {
+    return window.MarbleLevels.sampleSupportSurface(level, x, y, radius);
+  }
+
   function classifySurfaceTransition(currentSurface, nextSurface) {
     if (!nextSurface) return 'air';
 
@@ -56,17 +61,32 @@
     return 'ground';
   }
 
-  function isWallAt(level, x, y) {
-    const tx = Math.floor(x);
-    const ty = Math.floor(y);
-    const cell = window.MarbleLevels.getCell(level, tx, ty);
-    return !!cell && cell.kind === 'wall';
+  function isWallAt(level, x, y, radius = 0) {
+    const offsets = [
+      [0, 0],
+      [radius, 0],
+      [-radius, 0],
+      [0, radius],
+      [0, -radius]
+    ];
+
+    for (const [ox, oy] of offsets) {
+      const tx = Math.floor(x + ox);
+      const ty = Math.floor(y + oy);
+      const cell = window.MarbleLevels.getCell(level, tx, ty);
+      if (cell && cell.kind === 'wall') {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   function tryGroundMove(runtime, currentSurface, targetX, targetY) {
     const level = runtime.level;
+    const radius = runtime.marble.radius;
 
-    if (isWallAt(level, targetX, targetY)) {
+    if (isWallAt(level, targetX, targetY, radius * 0.8)) {
       return {
         blocked: true,
         x: runtime.marble.x,
@@ -75,7 +95,7 @@
       };
     }
 
-    const nextSurface = window.MarbleLevels.sampleCellSurface(level, targetX, targetY);
+    const nextSurface = getSupportedSurface(level, targetX, targetY, radius);
     const transition = classifySurfaceTransition(currentSurface, nextSurface);
 
     if (transition === 'blocked') {
@@ -98,112 +118,128 @@
   function moveGrounded(runtime, dt) {
     const marble = runtime.marble;
     const level = runtime.level;
-    const currentSurface =
-      window.MarbleLevels.sampleCellSurface(level, marble.x, marble.y);
+    let currentSurface = getSupportedSurface(level, marble.x, marble.y, marble.radius);
 
     if (!currentSurface) {
       marble.grounded = false;
       return null;
     }
 
-    const full = tryGroundMove(
-      runtime,
-      currentSurface,
-      marble.x + marble.vx * dt,
-      marble.y + marble.vy * dt
-    );
+    const totalDx = marble.vx * dt;
+    const totalDy = marble.vy * dt;
+    const steps = Math.max(1, Math.ceil(Math.hypot(totalDx, totalDy) / MOVE_STEP));
+    const stepDt = dt / steps;
 
-    if (!full.blocked) {
-      marble.x = full.x;
-      marble.y = full.y;
+    for (let i = 0; i < steps; i += 1) {
+      const full = tryGroundMove(
+        runtime,
+        currentSurface,
+        marble.x + marble.vx * stepDt,
+        marble.y + marble.vy * stepDt
+      );
 
-      if (full.groundSurface) {
-        marble.grounded = true;
-        marble.z = full.groundSurface.z + marble.radius;
-        marble.vz = 0;
-        return full.groundSurface;
+      if (!full.blocked) {
+        marble.x = full.x;
+        marble.y = full.y;
+
+        if (full.groundSurface) {
+          currentSurface = full.groundSurface;
+          marble.grounded = true;
+          marble.z = currentSurface.z + marble.radius;
+          marble.vz = 0;
+          continue;
+        }
+
+        marble.grounded = false;
+        return null;
       }
 
-      marble.grounded = false;
-      return null;
-    }
+      const tryX = tryGroundMove(
+        runtime,
+        currentSurface,
+        marble.x + marble.vx * stepDt,
+        marble.y
+      );
 
-    const tryX = tryGroundMove(
-      runtime,
-      currentSurface,
-      marble.x + marble.vx * dt,
-      marble.y
-    );
+      if (!tryX.blocked) {
+        marble.x = tryX.x;
+        marble.y = tryX.y;
+      } else {
+        marble.vx = 0;
+      }
 
-    if (!tryX.blocked) {
-      marble.x = tryX.x;
-      marble.y = tryX.y;
-    } else {
-      marble.vx = 0;
-    }
+      const xSurface =
+        getSupportedSurface(level, marble.x, marble.y, marble.radius) || currentSurface;
 
-    const xSurface =
-      window.MarbleLevels.sampleCellSurface(level, marble.x, marble.y) || currentSurface;
+      const tryY = tryGroundMove(
+        runtime,
+        xSurface,
+        marble.x,
+        marble.y + marble.vy * stepDt
+      );
 
-    const tryY = tryGroundMove(
-      runtime,
-      xSurface,
-      marble.x,
-      marble.y + marble.vy * dt
-    );
+      if (!tryY.blocked) {
+        marble.x = tryY.x;
+        marble.y = tryY.y;
+      } else {
+        marble.vy = 0;
+      }
 
-    if (!tryY.blocked) {
-      marble.x = tryY.x;
-      marble.y = tryY.y;
-    } else {
-      marble.vy = 0;
-    }
+      currentSurface = getSupportedSurface(level, marble.x, marble.y, marble.radius);
 
-    const finalSurface = window.MarbleLevels.sampleCellSurface(level, marble.x, marble.y);
+      if (!currentSurface) {
+        marble.grounded = false;
+        return null;
+      }
 
-    if (finalSurface) {
       marble.grounded = true;
-      marble.z = finalSurface.z + marble.radius;
+      marble.z = currentSurface.z + marble.radius;
       marble.vz = 0;
-      return finalSurface;
     }
 
-    marble.grounded = false;
-    return null;
+    return currentSurface;
   }
 
   function moveAirborne(runtime, dt) {
     const marble = runtime.marble;
     const level = runtime.level;
+    const distance = Math.max(
+      Math.hypot(marble.vx * dt, marble.vy * dt),
+      Math.abs(marble.vz * dt) * 0.25
+    );
+    const steps = Math.max(1, Math.ceil(distance / MOVE_STEP));
+    const stepDt = dt / steps;
 
-    const targetX = marble.x + marble.vx * dt;
-    const targetY = marble.y + marble.vy * dt;
+    for (let i = 0; i < steps; i += 1) {
+      const targetX = marble.x + marble.vx * stepDt;
+      const targetY = marble.y + marble.vy * stepDt;
 
-    if (isWallAt(level, targetX, marble.y)) {
-      marble.vx = 0;
-    } else {
-      marble.x = targetX;
-    }
+      if (isWallAt(level, targetX, marble.y, marble.radius * 0.8)) {
+        marble.vx = 0;
+      } else {
+        marble.x = targetX;
+      }
 
-    if (isWallAt(level, marble.x, targetY)) {
-      marble.vy = 0;
-    } else {
-      marble.y = targetY;
-    }
+      if (isWallAt(level, marble.x, targetY, marble.radius * 0.8)) {
+        marble.vy = 0;
+      } else {
+        marble.y = targetY;
+      }
 
-    marble.z += marble.vz * dt;
+      marble.z += marble.vz * stepDt;
 
-    const surface = window.MarbleLevels.sampleCellSurface(level, marble.x, marble.y);
+      const surface = getSupportedSurface(level, marble.x, marble.y, marble.radius);
 
-    if (
-      surface &&
-      marble.z <= surface.z + marble.radius + GROUND_SNAP &&
-      marble.vz <= 0
-    ) {
-      marble.grounded = true;
-      marble.z = surface.z + marble.radius;
-      marble.vz = 0;
-      return surface;
+      if (
+        surface &&
+        marble.z <= surface.z + marble.radius + GROUND_SNAP &&
+        marble.vz <= 0
+      ) {
+        marble.grounded = true;
+        marble.z = surface.z + marble.radius;
+        marble.vz = 0;
+        return surface;
+      }
     }
 
     marble.grounded = false;
@@ -212,10 +248,10 @@
 
   function updateCamera(runtime, dt) {
     const speed = Math.hypot(runtime.marble.vx, runtime.marble.vy);
-    const lookAhead = Math.min(0.42, speed * 0.06);
+    const lookAhead = Math.min(0.18, speed * 0.025);
     const targetX = runtime.marble.x + runtime.marble.vx * lookAhead;
     const targetY = runtime.marble.y + runtime.marble.vy * lookAhead;
-    const follow = Math.min(1, dt * 8.5);
+    const follow = Math.min(1, dt * 9.5);
 
     runtime.camera.x += (targetX - runtime.camera.x) * follow;
     runtime.camera.y += (targetY - runtime.camera.y) * follow;
@@ -249,8 +285,7 @@
 
     const marble = runtime.marble;
     const level = runtime.level;
-    let groundSurface =
-      window.MarbleLevels.sampleCellSurface(level, marble.x, marble.y);
+    let groundSurface = getSupportedSurface(level, marble.x, marble.y, marble.radius);
 
     if (marble.grounded && groundSurface) {
       applyGroundForces(runtime, inputAxis, dt, groundSurface);

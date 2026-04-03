@@ -16,11 +16,17 @@
       overlayTitle: null,
       overlayBody: null,
       restartBtn: null,
-      returnBtn: null
+      nextBtn: null,
+      returnBtn: null,
+      levelStrip: null
     };
 
     function marbleSlice() {
       return getState().scenes.marble;
+    }
+
+    function currentLevelId() {
+      return marbleSlice().currentLevelId || 'training_run';
     }
 
     function buildDom() {
@@ -37,6 +43,8 @@
               <span class="pill">Time: <strong data-marble-timer>0.00s</strong></span>
               <span class="pill">Best: <strong data-marble-best>--</strong></span>
             </div>
+
+            <div class="marble-level-strip" data-marble-level-strip></div>
           </div>
 
           <div class="marble-help">WASD / Arrow Keys to move • R restart • Esc return</div>
@@ -47,6 +55,7 @@
               <div class="small" data-marble-overlay-body></div>
               <div class="marble-overlay-actions">
                 <button class="action-btn" data-marble-restart>Restart</button>
+                <button class="action-btn" data-marble-next hidden>Next Level</button>
                 <button class="action-btn" data-marble-return>Return to Button Scene</button>
               </div>
             </div>
@@ -62,18 +71,73 @@
       refs.overlayTitle = root.querySelector('[data-marble-overlay-title]');
       refs.overlayBody = root.querySelector('[data-marble-overlay-body]');
       refs.restartBtn = root.querySelector('[data-marble-restart]');
+      refs.nextBtn = root.querySelector('[data-marble-next]');
       refs.returnBtn = root.querySelector('[data-marble-return]');
+      refs.levelStrip = root.querySelector('[data-marble-level-strip]');
 
-      refs.restartBtn.addEventListener('click', restartRun);
-      refs.returnBtn.addEventListener('click', () => switchScene('button_idle'));
+      refs.restartBtn.addEventListener('click', () => restartRun());
+      refs.nextBtn.addEventListener('click', () => goToNextLevel());
+      refs.returnBtn.addEventListener('click', () => switchScene('button_idle', { force: true }));
+    }
+
+    function ensureInput() {
+      if (!input) {
+        input = window.MarbleInput.createInput();
+      }
+    }
+
+    function renderLevelStrip() {
+      if (!refs.levelStrip) return;
+
+      const slice = marbleSlice();
+
+      refs.levelStrip.innerHTML = window.MarbleLevels.LEVELS.map((level, index) => {
+        const unlocked = window.MarbleLevels.isLevelUnlocked(slice.clearedLevels, level.id);
+        const active = runtime && runtime.level.id === level.id;
+
+        return `
+          <button
+            class="marble-level-btn ${active ? 'active' : ''}"
+            data-marble-level="${level.id}"
+            ${unlocked ? '' : 'disabled'}
+            title="${level.name}"
+          >
+            ${index + 1}. ${level.name}
+          </button>
+        `;
+      }).join('');
+
+      root.querySelectorAll('[data-marble-level]').forEach((button) => {
+        button.addEventListener('click', () => {
+          loadLevel(button.dataset.marbleLevel);
+        });
+      });
+    }
+
+    function loadLevel(levelId, options = {}) {
+      buildDom();
+      ensureInput();
+
+      const level = window.MarbleLevels.getLevelById(levelId);
+      marbleSlice().currentLevelId = level.id;
+      runtime = window.MarbleState.createRuntime(level.id);
+
+      hideOverlay();
+      renderLevelStrip();
+      render();
+
+      if (!options.silentSave) {
+        saveNow();
+      }
+
+      return runtime;
     }
 
     function ensureRuntime() {
       if (!runtime) {
-        runtime = window.MarbleState.createRuntime('training_run');
-      }
-      if (!input) {
-        input = window.MarbleInput.createInput();
+        loadLevel(currentLevelId(), { silentSave: true });
+      } else {
+        ensureInput();
       }
     }
 
@@ -86,52 +150,83 @@
       }
     }
 
-    function restartRun() {
+    function restartRun(options = {}) {
       ensureRuntime();
       window.MarbleState.restartRuntime(runtime);
       hideOverlay();
       render();
-      saveNow();
+
+      if (!options.silentSave) {
+        saveNow();
+      }
     }
 
     function hideOverlay() {
       refs.overlay.hidden = true;
+      refs.nextBtn.hidden = true;
+      refs.nextBtn.disabled = true;
     }
 
-    function showOverlay(title, body) {
+    function showOverlay(title, body, options = {}) {
       refs.overlayTitle.textContent = title;
       refs.overlayBody.textContent = body;
       refs.overlay.hidden = false;
+      refs.nextBtn.hidden = !options.showNext;
+      refs.nextBtn.disabled = !options.showNext;
+    }
+
+    function goToNextLevel() {
+      const nextLevelId = window.MarbleLevels.getNextLevelId(currentLevelId());
+      if (!nextLevelId) return;
+      if (!window.MarbleLevels.isLevelUnlocked(marbleSlice().clearedLevels, nextLevelId)) return;
+
+      loadLevel(nextLevelId);
     }
 
     function applyCompletion(result) {
       const slice = marbleSlice();
-
-      if (!slice.clearedLevels.includes(result.levelId)) {
-        slice.clearedLevels.push(result.levelId);
-      }
-
-      const existingBest = slice.bestTimes[result.levelId];
-      if (!existingBest || result.bestTimeMs < existingBest) {
-        slice.bestTimes[result.levelId] = result.bestTimeMs;
-      }
+      const nextLevelId = window.MarbleLevels.getNextLevelId(result.levelId);
+      const nextWasUnlocked = nextLevelId
+        ? window.MarbleLevels.isLevelUnlocked(slice.clearedLevels, nextLevelId)
+        : false;
 
       const claimKey = result.reward?.claimKey;
       const alreadyClaimed = claimKey ? !!slice.rewardClaims[claimKey] : false;
 
       if (!alreadyClaimed) {
         applyMarbleReward(result);
+      } else {
+        if (!slice.clearedLevels.includes(result.levelId)) {
+          slice.clearedLevels.push(result.levelId);
+        }
+
+        const existingBest = slice.bestTimes[result.levelId];
+        if (!existingBest || result.bestTimeMs < existingBest) {
+          slice.bestTimes[result.levelId] = result.bestTimeMs;
+        }
       }
 
       runtime.resultApplied = true;
+
+      const nextIsUnlocked = nextLevelId
+        ? window.MarbleLevels.isLevelUnlocked(slice.clearedLevels, nextLevelId)
+        : false;
+
+      renderLevelStrip();
 
       const rewardText = alreadyClaimed
         ? 'Reward already claimed. Best time updated if improved.'
         : `Reward granted: ${result.reward?.presses || 0} presses.`;
 
+      const unlockText =
+        nextLevelId && !nextWasUnlocked && nextIsUnlocked
+          ? ` Level ${window.MarbleLevels.getLevelIndex(nextLevelId) + 1} unlocked.`
+          : '';
+
       showOverlay(
         'Stage Cleared',
-        `${runtime.level.name} complete in ${(result.bestTimeMs / 1000).toFixed(2)}s. ${rewardText}`
+        `${runtime.level.name} complete in ${(result.bestTimeMs / 1000).toFixed(2)}s. ${rewardText}${unlockText}`,
+        { showNext: !!(nextLevelId && nextIsUnlocked) }
       );
     }
 
@@ -139,7 +234,7 @@
       if (!runtime || !input) return;
 
       if (input.consumePressed('Escape')) {
-        switchScene('button_idle');
+        switchScene('button_idle', { force: true });
         input.endFrame();
         return;
       }
@@ -181,10 +276,17 @@
       const bestMs = marbleSlice().bestTimes[runtime.level.id];
       refs.best.textContent = bestMs ? `${(bestMs / 1000).toFixed(2)}s` : '--';
 
+      renderLevelStrip();
       window.MarbleRenderer.render(runtime, refs.canvas);
     }
 
     function onStateLoaded() {
+      const slice = marbleSlice();
+
+      if (!slice.currentLevelId) {
+        slice.currentLevelId = 'training_run';
+      }
+
       prepare(elements.sceneHost);
       render();
     }
@@ -193,9 +295,19 @@
       id: 'marble',
       root,
 
-      enter() {
+      enter(context = {}) {
         prepare(elements.sceneHost);
+        ensureInput();
         input.attach();
+
+        if (!runtime || (context.startLevelId && context.startLevelId !== runtime.level.id)) {
+          loadLevel(context.startLevelId || currentLevelId(), { silentSave: true });
+        }
+
+        if (context.restartLevel) {
+          restartRun({ silentSave: true });
+        }
+
         hideOverlay();
         render();
       },

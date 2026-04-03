@@ -55,7 +55,8 @@
         introducedDebt: false,
         introducedFakeButtons: false,
         introducedLayers: false,
-        autonomyEndingSeen: false
+        autonomyEndingSeen: false,
+        idleGameComplete: false
       },
       app: {
         activeScene: 'button_idle'
@@ -63,7 +64,8 @@
       scenes: {
         button_idle: {},
         marble: {
-          unlocked: true,
+          unlocked: false,
+          currentLevelId: 'training_run',
           bestTimes: {},
           clearedLevels: [],
           rewardClaims: {},
@@ -86,6 +88,14 @@
       data.app.activeScene = 'button_idle';
     }
 
+    if (!data.flags || typeof data.flags !== 'object' || Array.isArray(data.flags)) {
+      data.flags = {};
+    }
+
+    if (typeof data.flags.idleGameComplete !== 'boolean') {
+      data.flags.idleGameComplete = false;
+    }
+
     if (!data.scenes || typeof data.scenes !== 'object' || Array.isArray(data.scenes)) {
       data.scenes = {};
     }
@@ -98,7 +108,14 @@
       data.scenes.marble = {};
     }
 
-    data.scenes.marble.unlocked = data.scenes.marble.unlocked !== false;
+    if (typeof data.scenes.marble.unlocked !== 'boolean') {
+      data.scenes.marble.unlocked = false;
+    }
+
+    if (typeof data.scenes.marble.currentLevelId !== 'string' || !data.scenes.marble.currentLevelId) {
+      data.scenes.marble.currentLevelId = 'training_run';
+    }
+
     data.scenes.marble.bestTimes = data.scenes.marble.bestTimes || {};
     data.scenes.marble.clearedLevels = Array.isArray(data.scenes.marble.clearedLevels) ? data.scenes.marble.clearedLevels : [];
     data.scenes.marble.rewardClaims = data.scenes.marble.rewardClaims || {};
@@ -146,6 +163,7 @@
   let state = loadGame() || defaultState();
 
   const elements = {
+    appRoot: document.querySelector('.app'),
     tabs: $('tabs'),
     displayedPresses: $('displayedPresses'),
     truePressesSub: $('truePressesSub'),
@@ -224,6 +242,12 @@
   let debugCommandLastKeyAt = 0;
   let lastFrame = performance.now();
 
+  let transitionOverlay = null;
+  let transitionBackdrop = null;
+  let transitionOrb = null;
+  let transitionNote = null;
+  let endingTransitionActive = false;
+
   function getState() {
     return state;
   }
@@ -255,7 +279,7 @@
 
     if (sceneManager) {
       sceneManager.notifyStateLoaded({ state });
-      sceneManager.setActiveScene(state.app.activeScene, { state });
+      sceneManager.setActiveScene(state.app.activeScene, { state, force: true });
       sceneManager.render({ state });
     }
 
@@ -304,6 +328,10 @@
       <button class="tab-btn ${state.ui.activeTab === tab.id ? 'active' : ''}" data-tab-target="${tab.id}">${tab.label}</button>
     `).join('');
 
+    document.querySelectorAll('.tab-panel').forEach((panel) => {
+      panel.classList.toggle('active', panel.dataset.tab === state.ui.activeTab);
+    });
+
     Array.from(elements.tabs.querySelectorAll('.tab-btn')).forEach((btn) => {
       btn.addEventListener('click', () => {
         state.ui.activeTab = btn.dataset.tabTarget;
@@ -315,18 +343,60 @@
     });
   }
 
+  function ensureTransitionOverlay() {
+    if (transitionOverlay) return;
+
+    transitionOverlay = document.createElement('div');
+    transitionOverlay.className = 'scene-transition-overlay';
+    transitionOverlay.hidden = true;
+    transitionOverlay.innerHTML = `
+      <div class="scene-transition-overlay-backdrop"></div>
+      <div class="scene-transition-overlay-orb"></div>
+      <div class="scene-transition-overlay-note"></div>
+    `;
+
+    document.body.appendChild(transitionOverlay);
+
+    transitionBackdrop = transitionOverlay.querySelector('.scene-transition-overlay-backdrop');
+    transitionOrb = transitionOverlay.querySelector('.scene-transition-overlay-orb');
+    transitionNote = transitionOverlay.querySelector('.scene-transition-overlay-note');
+  }
+
+  function clearTransitionOverlay() {
+    if (!transitionOverlay) return;
+
+    transitionOverlay.hidden = true;
+    transitionOverlay.classList.remove('active');
+    transitionBackdrop.style.opacity = '0';
+    transitionOrb.getAnimations().forEach((animation) => animation.cancel());
+    transitionBackdrop.getAnimations().forEach((animation) => animation.cancel());
+
+    if (elements.appRoot) {
+      elements.appRoot.classList.remove('app-scene-transitioning');
+    }
+
+    endingTransitionActive = false;
+  }
+
   function renderShell() {
     renderTabs();
 
     const activeSceneId = sceneManager ? sceneManager.getActiveSceneId() : state.app.activeScene;
     const isMarble = activeSceneId === 'marble';
+    const marbleUnlocked = !!state.scenes.marble.unlocked;
 
     elements.playGameGrid.classList.toggle('scene-marble-active', isMarble);
     elements.switchButtonSceneBtn.classList.toggle('active', activeSceneId === 'button_idle');
     elements.switchMarbleSceneBtn.classList.toggle('active', activeSceneId === 'marble');
+    elements.switchMarbleSceneBtn.disabled = !marbleUnlocked;
+    elements.switchMarbleSceneBtn.textContent = marbleUnlocked ? 'Marble Game' : 'Marble Locked';
+
+    if (elements.appRoot) {
+      elements.appRoot.classList.toggle('app-marble-mode', isMarble);
+    }
   }
 
-    function getNextSceneId(currentSceneId) {
+  function getNextSceneId(currentSceneId) {
     const index = TEST_SCENE_SEQUENCE.indexOf(currentSceneId);
     if (index === -1) return TEST_SCENE_SEQUENCE[0] || 'button_idle';
     return TEST_SCENE_SEQUENCE[(index + 1) % TEST_SCENE_SEQUENCE.length];
@@ -336,10 +406,7 @@
     const currentSceneId = sceneManager ? sceneManager.getActiveSceneId() : state.app.activeScene;
     const nextSceneId = getNextSceneId(currentSceneId);
 
-    state.app.activeScene = nextSceneId;
-    sceneManager.setActiveScene(nextSceneId, { state });
-    renderShell();
-    saveGame();
+    switchScene(nextSceneId, { force: true });
 
     elements.saveStatus.textContent = `Debug scene advance: ${currentSceneId} → ${nextSceneId}`;
   }
@@ -421,22 +488,124 @@
     saveGame();
   }
 
-  function switchScene(sceneId) {
-  if (!sceneManager) return;
+  function beginEndingTransitionToMarble() {
+    if (endingTransitionActive) return;
 
-  if (
-    sceneId === 'marble' &&
-    marbleScene &&
-    typeof marbleScene.prepare === 'function'
-  ) {
-    marbleScene.prepare(elements.sceneHost);
+    ensureTransitionOverlay();
+    endingTransitionActive = true;
+
+    state.scenes.marble.unlocked = true;
+    state.scenes.marble.currentLevelId = state.scenes.marble.currentLevelId || 'training_run';
+    state.ui.activeTab = 'play';
+    saveGame();
+
+    const buttonRect = elements.mainButton.getBoundingClientRect();
+    const hostRect = elements.sceneHost.getBoundingClientRect();
+
+    const startX = buttonRect.left + buttonRect.width * 0.5;
+    const startY = buttonRect.top + buttonRect.height * 0.5;
+    const targetX = hostRect.left + hostRect.width * 0.5;
+    const targetY = hostRect.top + hostRect.height * 0.5;
+
+    transitionOverlay.hidden = false;
+    transitionOverlay.classList.add('active');
+    transitionNote.textContent = 'The button outgrew counting and dropped into something else.';
+
+    transitionOrb.style.left = `${startX}px`;
+    transitionOrb.style.top = `${startY}px`;
+    transitionOrb.style.width = `${buttonRect.width}px`;
+    transitionOrb.style.height = `${buttonRect.height}px`;
+
+    if (elements.appRoot) {
+      elements.appRoot.classList.add('app-scene-transitioning');
+    }
+
+    transitionBackdrop.animate(
+      [
+        { opacity: 0 },
+        { opacity: 1 }
+      ],
+      {
+        duration: 260,
+        easing: 'ease-out',
+        fill: 'forwards'
+      }
+    );
+
+    const dx = targetX - startX;
+    const dy = targetY - startY;
+
+    const orbAnimation = transitionOrb.animate(
+      [
+        {
+          transform: 'translate(-50%, -50%) translate(0px, 0px) scale(1)',
+          borderRadius: '999px',
+          boxShadow: '0 18px 42px rgba(0,0,0,0.3)'
+        },
+        {
+          transform: `translate(-50%, -50%) translate(${dx * 0.14}px, ${dy * 0.32}px) scale(0.9)`,
+          borderRadius: '999px',
+          boxShadow: '0 24px 58px rgba(0,0,0,0.34)',
+          offset: 0.45
+        },
+        {
+          transform: `translate(-50%, -50%) translate(${dx}px, ${dy}px) scale(0.17)`,
+          borderRadius: '50%',
+          boxShadow: '0 10px 24px rgba(0,0,0,0.36)'
+        }
+      ],
+      {
+        duration: 1320,
+        easing: 'cubic-bezier(0.22, 1, 0.36, 1)',
+        fill: 'forwards'
+      }
+    );
+
+    setTimeout(() => {
+      switchScene('marble', {
+        force: true,
+        silentSave: true,
+        startLevelId: state.scenes.marble.currentLevelId,
+        restartLevel: true,
+        enteredFromEnding: true
+      });
+    }, 650);
+
+    orbAnimation.finished.finally(() => {
+      setTimeout(() => {
+        clearTransitionOverlay();
+        renderShell();
+        saveGame();
+      }, 100);
+    });
   }
 
-  state.app.activeScene = sceneId;
-  sceneManager.setActiveScene(sceneId, { state });
-  renderShell();
-  saveGame();
-}
+  function switchScene(sceneId, options = {}) {
+    if (!sceneManager) return;
+
+    if (sceneId === 'marble' && !state.scenes.marble.unlocked && !options.force) {
+      elements.saveStatus.textContent = 'The marble game is still locked.';
+      return;
+    }
+
+    if (
+      sceneId === 'marble' &&
+      marbleScene &&
+      typeof marbleScene.prepare === 'function'
+    ) {
+      marbleScene.prepare(elements.sceneHost);
+    }
+
+    state.ui.activeTab = 'play';
+    state.app.activeScene = sceneId;
+
+    sceneManager.setActiveScene(sceneId, { state, ...options });
+    renderShell();
+
+    if (!options.silentSave) {
+      saveGame();
+    }
+  }
 
   const api = {
     config: CONFIG,
@@ -449,6 +618,13 @@
     replaceState,
     encodeSave,
     importEncodedState,
+    beginEndingTransitionToMarble,
+    isEndingTransitionActive() {
+      return endingTransitionActive;
+    },
+    isMarbleUnlocked() {
+      return !!state.scenes.marble.unlocked;
+    },
     setSaveStatus(text) {
       elements.saveStatus.textContent = text;
     }
@@ -469,13 +645,18 @@
   sceneManager.registerScene(marbleScene);
 
   function attachShellEvents() {
-    elements.switchButtonSceneBtn.addEventListener('click', () => switchScene('button_idle'));
-    elements.switchMarbleSceneBtn.addEventListener('click', () => switchScene('marble'));
+    elements.switchButtonSceneBtn.addEventListener('click', () => switchScene('button_idle', { force: true }));
+
+    elements.switchMarbleSceneBtn.addEventListener('click', () => {
+      switchScene('marble');
+    });
+
     const prewarmMarble = () => {
+      if (!state.scenes.marble.unlocked) return;
       if (marbleScene && typeof marbleScene.prepare === 'function') {
         marbleScene.prepare(elements.sceneHost);
       }
-    }
+    };
 
     elements.switchMarbleSceneBtn.addEventListener('mouseenter', prewarmMarble);
     elements.switchMarbleSceneBtn.addEventListener('focus', prewarmMarble);
@@ -523,7 +704,7 @@
   function init() {
     renderShell();
     sceneManager.notifyStateLoaded({ state });
-    sceneManager.setActiveScene(state.app.activeScene, { state });
+    sceneManager.setActiveScene(state.app.activeScene, { state, force: true });
     sceneManager.render({ state });
     attachShellEvents();
 

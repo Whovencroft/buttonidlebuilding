@@ -5,6 +5,7 @@
   const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
   const now = () => Date.now();
   const log10 = (v) => Math.log(v) / Math.log(10);
+  const IDLE_GAME_INFINITY_TARGET = Number.MAX_VALUE;
 
   function format(num, digits = 2) {
     if (!Number.isFinite(num)) return '∞';
@@ -38,7 +39,13 @@
   }
 
   function create(api) {
-    const { elements, getState, saveNow } = api;
+    const {
+      elements,
+      getState,
+      saveNow,
+      beginEndingTransitionToMarble,
+      isEndingTransitionActive
+    } = api;
 
     const root = elements.buttonIdleSceneRoot;
 
@@ -64,6 +71,33 @@
     function state() {
       return getState();
     }
+
+    function hasReachedInfinityEnding() {
+  const s = state();
+  return (
+    !!s.flags.idleGameComplete ||
+    s.totalPressesEarned >= IDLE_GAME_INFINITY_TARGET ||
+    s.presses >= IDLE_GAME_INFINITY_TARGET
+  );
+}
+
+function completeIdleGame() {
+  const s = state();
+  if (s.flags.idleGameComplete) return;
+
+  s.flags.idleGameComplete = true;
+  s.scenes.marble.unlocked = true;
+  s.scenes.marble.currentLevelId =
+    s.scenes.marble.currentLevelId || 'training_run';
+  s.ui.autonomyEndingOpen = false;
+
+  logMessage('The button has awakened, now begins its journey.', 'good');
+  saveNow();
+
+  if (typeof beginEndingTransitionToMarble === 'function') {
+    beginEndingTransitionToMarble();
+  }
+}
 
     function ensureLog() {
       const s = state();
@@ -1025,17 +1059,21 @@
       const hidden = s.autonomy >= computed.hideButtonAt;
       elements.mainButton.classList.toggle('hidden', hidden);
 
-      elements.buttonModeLabel.textContent = hidden
-        ? `Mode: Fully automated at ${format(s.autonomy)}% autonomy`
-        : computed.cursorEvasion > 0
-          ? 'Mode: Evasive and ungrateful'
-          : 'Mode: Manual humiliation';
+      elements.buttonModeLabel.textContent = s.flags.idleGameComplete
+        ? 'Mode: Transition'
+        : hidden
+          ? `Mode: Fully automated at ${format(s.autonomy)}% autonomy`
+          : computed.cursorEvasion > 0
+            ? 'Mode: Evasive and ungrateful'
+            : 'Mode: Manual humiliation';
 
-      elements.buttonNote.textContent = hidden
-        ? 'The button no longer needs your hand. It still judges it.'
-        : computed.allowDebt
-          ? 'You can now buy things with presses you do not possess.'
-          : 'Your job is to remove yourself from this process.';
+      elements.buttonNote.textContent = s.flags.idleGameComplete
+        ? 'The button has decided.  You are unnecessary.'
+        : hidden
+          ? 'The button no longer needs your hand. It still judges it.'
+          : computed.allowDebt
+            ? 'You can now buy things with presses you do not possess.'
+            : 'Your job is to remove yourself from this process.';
     }
 
     function renderFakeButtons() {
@@ -1076,19 +1114,23 @@
     function renderTopStats() {
       const s = state();
       const computed = getComputed();
-      const shownPresses = getDisplayedPresses(s.presses, computed);
+      const reachedEnding = hasReachedInfinityEnding();
+      const shownPresses = reachedEnding ? Infinity : getDisplayedPresses(s.presses, computed);
 
-      elements.displayedPresses.textContent = format(shownPresses);
-      elements.truePressesSub.textContent =
-        `True presses: ${format(s.presses)} • total earned ${format(s.totalPressesEarned)}`;
+      elements.displayedPresses.textContent = reachedEnding ? '∞' : format(shownPresses);
+      elements.truePressesSub.textContent = reachedEnding
+        ? `Total earned: ${format(s.totalPressesEarned)} • the number has stopped behaving`
+        : `True presses: ${format(s.presses)} • total earned ${format(s.totalPressesEarned)}`;
 
       elements.pps.textContent = format(computed.effectivePps);
       elements.manualValue.textContent = `Manual press value: ${format(computed.manualValue)}`;
       elements.autonomyValue.textContent = `${format(s.autonomy)}%`;
 
-      elements.autonomySub.textContent = s.autonomy >= computed.hideButtonAt
-        ? 'The system no longer requires visible participation'
-        : `+${format(computed.autonomyGain, 3)}/s before automation pressure`;
+      elements.autonomySub.textContent = reachedEnding
+        ? 'This idle game has ended.  You are optional.'
+        : s.autonomy >= computed.hideButtonAt
+          ? 'The system no longer requires visible participation'
+          : `+${format(computed.autonomyGain, 3)}/s before automation pressure`;
 
       elements.debtValue.textContent = format(-Math.min(0, s.presses));
       elements.debtSub.textContent = computed.allowDebt
@@ -1165,18 +1207,38 @@
       const computed = getComputed();
       const gain = computed.effectivePps * dt;
 
-      s.presses += gain;
-      s.totalPressesEarned += gain;
-      s.totalGeneratedPresses += gain;
-      s.autonomy = clamp(
-        s.autonomy + computed.autonomyGain * dt * (1 + computed.effectivePps * 0.0004),
-        0,
-        100
-      );
+      if (!s.flags.idleGameComplete) {
+        s.presses += gain;
+        s.totalPressesEarned += gain;
+        s.totalGeneratedPresses += gain;
+        s.autonomy = clamp(
+          s.autonomy + computed.autonomyGain * dt * (1 + computed.effectivePps * 0.0004),
+          0,
+          100
+        );
+      }
+
+      if (hasReachedInfinityEnding()) {
+        completeIdleGame();
+      }
+
+      if (
+        s.flags.idleGameComplete &&
+        typeof isEndingTransitionActive === 'function' &&
+        isEndingTransitionActive()
+      ) {
+        if (current - lastUiRender >= 125) {
+          lastUiRender = current;
+          renderLive();
+        }
+
+        s.session.lastTick = current;
+        return;
+      }
 
       const endingCooldownActive = current < (s.session.autonomyEndingCooldownUntil || 0);
 
-      if (s.autonomy >= 100 && !s.ui.autonomyEndingOpen && !endingCooldownActive) {
+      if (!s.flags.idleGameComplete && s.autonomy >= 100 && !s.ui.autonomyEndingOpen && !endingCooldownActive) {
         openAutonomyEnding();
       }
 

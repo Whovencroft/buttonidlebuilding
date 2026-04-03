@@ -48,20 +48,20 @@
   }
 
   function createView(runtime, cssWidth, cssHeight) {
-    const tileW = Math.max(104, Math.min(188, cssWidth / 4.6));
-    const tileH = tileW * 0.5;
-    const heightScale = tileH * 1.02;
+  const tileW = Math.max(88, Math.min(168, cssWidth / 6.2));
+  const tileH = tileW * 0.5;
+  const heightScale = tileH * 1.02;
 
-    return {
-      camX: runtime.camera?.x ?? runtime.marble.x,
-      camY: runtime.camera?.y ?? runtime.marble.y,
-      tileW,
-      tileH,
-      heightScale,
-      screenCx: cssWidth * 0.5,
-      screenCy: cssHeight * 0.56
-    };
-  }
+  return {
+    camX: runtime.camera?.x ?? runtime.marble.x,
+    camY: runtime.camera?.y ?? runtime.marble.y,
+    tileW,
+    tileH,
+    heightScale,
+    screenCx: cssWidth * 0.5,
+    screenCy: cssHeight * 0.5
+  };
+}
 
   function worldProject(x, y, z, metrics) {
     return {

@@ -102,6 +102,39 @@
     };
   }
 
+  function sampleSupportSurface(level, x, y, radius = 0.26, clearance = 0.72) {
+    const center = sampleCellSurface(level, x, y);
+    if (!center) return null;
+
+    const r = radius * clearance;
+    const d = r * 0.7071;
+    const offsets = [
+      [0, 0],
+      [r, 0],
+      [-r, 0],
+      [0, r],
+      [0, -r],
+      [d, d],
+      [d, -d],
+      [-d, d],
+      [-d, -d]
+    ];
+
+    const samples = [];
+    for (const [ox, oy] of offsets) {
+      const sample = sampleCellSurface(level, x + ox, y + oy);
+      if (!sample) return null;
+      samples.push(sample);
+    }
+
+    return {
+      ...center,
+      supportSamples: samples,
+      minSupportZ: Math.min(...samples.map((sample) => sample.z)),
+      maxSupportZ: Math.max(...samples.map((sample) => sample.z))
+    };
+  }
+
   function buildTrainingRun() {
     const level = {
       id: 'training_run',
@@ -120,37 +153,19 @@
       cells: createGrid(18, 18)
     };
 
-    // Start platform
     fillRect(level, 1, 1, 3, 3, { kind: 'track', h: 5 });
-
-    // First downhill run east
     fillRect(level, 4, 1, 1, 3, { kind: 'track', h: 4, slope: 'E' });
     fillRect(level, 5, 1, 3, 3, { kind: 'track', h: 4 });
-
-    // Turn south and descend
     fillRect(level, 5, 4, 3, 1, { kind: 'track', h: 3, slope: 'S' });
     fillRect(level, 5, 5, 3, 3, { kind: 'track', h: 3 });
-
-    // Mid bridge
     fillRect(level, 8, 6, 4, 2, { kind: 'track', h: 3 });
-
-    // Descend again east
     fillRect(level, 12, 6, 1, 2, { kind: 'track', h: 2, slope: 'E' });
     fillRect(level, 13, 6, 3, 3, { kind: 'track', h: 2 });
-
-    // Keep level 1 clean. No hazards yet.
-    setCell(level, 13, 8, { kind: 'track', h: 2 });
-    setCell(level, 15, 6, { kind: 'track', h: 2 });
-
-    // South turn and final descent
     fillRect(level, 14, 9, 2, 1, { kind: 'track', h: 1, slope: 'S' });
     fillRect(level, 14, 10, 2, 4, { kind: 'track', h: 1 });
-
-    // Final narrow bridge and goal
     fillRect(level, 15, 14, 1, 2, { kind: 'track', h: 1 });
     setCell(level, 15, 15, { kind: 'goal', h: 1 });
 
-    // Some blockers for silhouette and readability
     setCell(level, 8, 5, { kind: 'wall', h: 4 });
     setCell(level, 9, 5, { kind: 'wall', h: 4 });
     setCell(level, 12, 9, { kind: 'wall', h: 3 });
@@ -159,18 +174,136 @@
     return level;
   }
 
-  const LEVELS = [buildTrainingRun()];
+  function buildSwitchbackBasin() {
+    const level = {
+      id: 'switchback_basin',
+      name: 'Switchback Basin',
+      width: 18,
+      height: 18,
+      killZ: -4,
+      voidFloor: -2,
+      start: { x: 2.5, y: 2.5 },
+      goal: { x: 14.5, y: 14.5, radius: 0.42 },
+      reward: {
+        presses: 25000,
+        unlocks: ['marble_switchback_complete'],
+        claimKey: 'switchback_basin'
+      },
+      cells: createGrid(18, 18)
+    };
+
+    fillRect(level, 1, 1, 3, 3, { kind: 'track', h: 4 });
+    fillRect(level, 4, 2, 4, 1, { kind: 'track', h: 4 });
+    fillRect(level, 8, 1, 3, 3, { kind: 'track', h: 4 });
+    fillRect(level, 9, 4, 1, 3, { kind: 'track', h: 4 });
+    fillRect(level, 8, 7, 3, 3, { kind: 'track', h: 4 });
+    fillRect(level, 11, 8, 3, 1, { kind: 'track', h: 4 });
+    fillRect(level, 14, 7, 2, 3, { kind: 'track', h: 4 });
+    fillRect(level, 15, 10, 1, 3, { kind: 'track', h: 4 });
+    fillRect(level, 13, 13, 3, 3, { kind: 'track', h: 4 });
+
+    setCell(level, 8, 1, { kind: 'hazard', h: 4 });
+    setCell(level, 10, 2, { kind: 'hazard', h: 4 });
+    setCell(level, 10, 7, { kind: 'hazard', h: 4 });
+    setCell(level, 8, 8, { kind: 'hazard', h: 4 });
+    setCell(level, 14, 8, { kind: 'hazard', h: 4 });
+    setCell(level, 13, 14, { kind: 'hazard', h: 4 });
+    setCell(level, 15, 13, { kind: 'hazard', h: 4 });
+    setCell(level, 14, 14, { kind: 'goal', h: 4 });
+
+    setCell(level, 11, 2, { kind: 'wall', h: 5 });
+    setCell(level, 7, 8, { kind: 'wall', h: 5 });
+    setCell(level, 16, 12, { kind: 'wall', h: 5 });
+
+    return level;
+  }
+
+  function buildNeedleGauntlet() {
+    const level = {
+      id: 'needle_gauntlet',
+      name: 'Needle Gauntlet',
+      width: 22,
+      height: 18,
+      killZ: -5,
+      voidFloor: -2.5,
+      start: { x: 2, y: 2 },
+      goal: { x: 17.5, y: 15.5, radius: 0.4 },
+      reward: {
+        presses: 125000,
+        unlocks: ['marble_needle_complete'],
+        claimKey: 'needle_gauntlet'
+      },
+      cells: createGrid(22, 18)
+    };
+
+    fillRect(level, 1, 1, 2, 2, { kind: 'track', h: 5 });
+    fillRect(level, 3, 1, 5, 1, { kind: 'track', h: 5 });
+    fillRect(level, 7, 2, 1, 4, { kind: 'track', h: 5 });
+    fillRect(level, 8, 5, 5, 1, { kind: 'track', h: 5 });
+    fillRect(level, 12, 6, 1, 4, { kind: 'track', h: 5 });
+    fillRect(level, 9, 10, 3, 1, { kind: 'track', h: 5 });
+    fillRect(level, 9, 11, 1, 3, { kind: 'track', h: 5 });
+    fillRect(level, 10, 13, 5, 1, { kind: 'track', h: 5 });
+    fillRect(level, 14, 10, 1, 4, { kind: 'track', h: 5 });
+    fillRect(level, 15, 10, 4, 1, { kind: 'track', h: 5 });
+    fillRect(level, 18, 11, 1, 5, { kind: 'track', h: 5 });
+    fillRect(level, 17, 15, 2, 2, { kind: 'track', h: 5 });
+
+    setCell(level, 18, 16, { kind: 'hazard', h: 5 });
+    setCell(level, 18, 15, { kind: 'hazard', h: 5 });
+    setCell(level, 17, 15, { kind: 'goal', h: 5 });
+
+    setCell(level, 8, 2, { kind: 'wall', h: 6 });
+    setCell(level, 13, 9, { kind: 'wall', h: 6 });
+    setCell(level, 15, 14, { kind: 'wall', h: 6 });
+
+    return level;
+  }
+
+  const LEVELS = [
+    buildTrainingRun(),
+    buildSwitchbackBasin(),
+    buildNeedleGauntlet()
+  ];
 
   function getLevelById(id) {
     return LEVELS.find((level) => level.id === id) || LEVELS[0];
   }
 
+  function getLevelIndex(id) {
+    return LEVELS.findIndex((level) => level.id === id);
+  }
+
+  function getNextLevelId(id) {
+    const index = getLevelIndex(id);
+    if (index < 0 || index >= LEVELS.length - 1) return null;
+    return LEVELS[index + 1].id;
+  }
+
+  function isLevelUnlocked(clearedLevels = [], levelId) {
+    const index = getLevelIndex(levelId);
+    if (index <= 0) return true;
+    if (clearedLevels.includes(levelId)) return true;
+    return clearedLevels.includes(LEVELS[index - 1].id);
+  }
+
+  function getUnlockedLevelIds(clearedLevels = []) {
+    return LEVELS
+      .filter((level) => isLevelUnlocked(clearedLevels, level.id))
+      .map((level) => level.id);
+  }
+
   window.MarbleLevels = {
     LEVELS,
     getLevelById,
+    getLevelIndex,
+    getNextLevelId,
+    getUnlockedLevelIds,
+    isLevelUnlocked,
     getCell,
     getCellCornerHeights,
     getCellGradient,
-    sampleCellSurface
+    sampleCellSurface,
+    sampleSupportSurface
   };
 })();

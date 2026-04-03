@@ -2,7 +2,11 @@
   const MARBLE_RADIUS = 0.26;
 
   function getStartZ(level) {
-    const sample = window.MarbleLevels.sampleCellSurface(level, level.start.x, level.start.y);
+    const sample =
+      typeof window.MarbleLevels.sampleSupportSurface === 'function'
+        ? window.MarbleLevels.sampleSupportSurface(level, level.start.x, level.start.y, MARBLE_RADIUS)
+        : window.MarbleLevels.sampleCellSurface(level, level.start.x, level.start.y);
+
     if (!sample) return MARBLE_RADIUS;
     return sample.z + MARBLE_RADIUS;
   }

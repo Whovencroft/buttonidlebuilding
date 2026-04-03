@@ -654,3 +654,157 @@
       html, body { overflow: auto; }
       .app { height: auto; min-height: 100vh; }
     }
+
+    .mini-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.marble-level-strip {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  pointer-events: auto;
+}
+
+.marble-level-btn {
+  background: rgba(10, 14, 20, 0.78);
+  color: var(--text);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: border-color 0.14s ease, background 0.14s ease, opacity 0.14s ease;
+}
+
+.marble-level-btn:hover {
+  border-color: var(--accent);
+}
+
+.marble-level-btn.active {
+  background: linear-gradient(180deg, rgba(125,211,252,0.22), rgba(125,211,252,0.08));
+  border-color: var(--accent);
+}
+
+.marble-level-btn:disabled {
+  opacity: 0.38;
+  cursor: not-allowed;
+}
+
+.app.app-marble-mode {
+  grid-template-rows: 1fr;
+  padding: 0;
+  gap: 0;
+}
+
+.app.app-marble-mode > .topbar,
+.app.app-marble-mode > .tabs,
+.app.app-marble-mode > .statusbar {
+  display: none;
+}
+
+.app.app-marble-mode .content,
+.app.app-marble-mode .tab-panel.active,
+.app.app-marble-mode .game-grid,
+.app.app-marble-mode .panel,
+.app.app-marble-mode .panel-body,
+.app.app-marble-mode .scene-host,
+.app.app-marble-mode .scene-root,
+.app.app-marble-mode .marble-stage {
+  height: 100vh;
+  min-height: 100vh;
+}
+
+.app.app-marble-mode .content {
+  grid-template-columns: 1fr;
+}
+
+.app.app-marble-mode .panel {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+.app.app-marble-mode .panel-header {
+  display: none;
+}
+
+.app.app-marble-mode .panel-body {
+  padding: 0;
+  overflow: hidden;
+}
+
+.app.app-marble-mode .marble-stage {
+  border-radius: 0;
+  border: 0;
+}
+
+.app.app-scene-transitioning > .topbar,
+.app.app-scene-transitioning > .tabs,
+.app.app-scene-transitioning > .statusbar,
+.app.app-scene-transitioning .button-only-pane {
+  opacity: 0;
+  transform: translateY(-12px);
+  pointer-events: none;
+  transition: opacity 0.28s ease, transform 0.28s ease;
+}
+
+.app.app-scene-transitioning .button-stage {
+  opacity: 0.2;
+  transform: scale(0.96);
+  transition: opacity 0.28s ease, transform 0.28s ease;
+}
+
+.scene-transition-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.scene-transition-overlay[hidden] {
+  display: none;
+}
+
+.scene-transition-overlay-backdrop {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(125,211,252,0.12), transparent 24%),
+    linear-gradient(180deg, rgba(5,8,12,0.2), rgba(5,8,12,0.7));
+  opacity: 0;
+}
+
+.scene-transition-overlay-orb {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  width: 220px;
+  height: 220px;
+  transform: translate(-50%, -50%);
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 30% 25%, rgba(255,255,255,0.18), rgba(255,255,255,0.04) 35%, rgba(0,0,0,0.1) 100%),
+    linear-gradient(180deg, #253244, #1b2532);
+  border: 1px solid rgba(255,255,255,0.12);
+  box-shadow: 0 18px 42px rgba(0,0,0,0.3);
+}
+
+.scene-transition-overlay-note {
+  position: absolute;
+  left: 50%;
+  bottom: 36px;
+  transform: translateX(-50%);
+  color: rgba(230,237,243,0.88);
+  background: rgba(10, 14, 20, 0.8);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 999px;
+  padding: 10px 14px;
+  font-size: 0.9rem;
+  backdrop-filter: blur(8px);
+}
