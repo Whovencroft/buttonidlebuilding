@@ -381,7 +381,7 @@
   function renderShell() {
     renderTabs();
 
-    const activeSceneId = sceneManager ? sceneManager.getActiveSceneId() : state.app.activeScene;
+    const activeSceneId = sceneManager ? sceneManager.getActiveSceneId() : 'button_idle';
     const isMarble = activeSceneId === 'marble';
     const marbleUnlocked = !!state.scenes.marble.unlocked;
 
@@ -580,32 +580,35 @@
     });
   }
 
-  function switchScene(sceneId, options = {}) {
-    if (!sceneManager) return;
+function switchScene(sceneId, options = {}) {
+  if (!sceneManager) return;
 
-    if (sceneId === 'marble' && !state.scenes.marble.unlocked && !options.force) {
+  if (sceneId === 'marble') {
+    if (!marbleScene) {
+      elements.saveStatus.textContent = 'Marble scene failed to load.';
+      return;
+    }
+
+    if (!state.scenes.marble.unlocked && !options.force) {
       elements.saveStatus.textContent = 'The marble game is still locked.';
       return;
     }
 
-    if (
-      sceneId === 'marble' &&
-      marbleScene &&
-      typeof marbleScene.prepare === 'function'
-    ) {
+    if (typeof marbleScene.prepare === 'function') {
       marbleScene.prepare(elements.sceneHost);
     }
-
-    state.ui.activeTab = 'play';
-    state.app.activeScene = sceneId;
-
-    sceneManager.setActiveScene(sceneId, { state, ...options });
-    renderShell();
-
-    if (!options.silentSave) {
-      saveGame();
-    }
   }
+
+  state.ui.activeTab = 'play';
+  state.app.activeScene = sceneId;
+
+  sceneManager.setActiveScene(sceneId, { state, ...options });
+  renderShell();
+
+  if (!options.silentSave) {
+    saveGame();
+  }
+}
 
   const api = {
     config: CONFIG,
@@ -631,18 +634,29 @@
   };
 
   buttonScene = window.ButtonIdleScene.create(api);
+
+sceneManager = window.ButtonSceneManager.createSceneManager({
+  host: elements.sceneHost,
+  onSceneChanged: ({ currentSceneId }) => {
+    state.app.activeScene = currentSceneId;
+    renderShell();
+  }
+});
+
+sceneManager.registerScene(buttonScene);
+
+try {
+  if (!window.MarbleScene || typeof window.MarbleScene.create !== 'function') {
+    throw new Error('MarbleScene.create is unavailable.');
+  }
+
   marbleScene = window.MarbleScene.create(api);
-
-  sceneManager = window.ButtonSceneManager.createSceneManager({
-    host: elements.sceneHost,
-    onSceneChanged: ({ currentSceneId }) => {
-      state.app.activeScene = currentSceneId;
-      renderShell();
-    }
-  });
-
-  sceneManager.registerScene(buttonScene);
   sceneManager.registerScene(marbleScene);
+} catch (error) {
+  console.error('Marble scene failed to initialize:', error);
+  marbleScene = null;
+  state.scenes.marble.unlocked = false;
+}
 
   function attachShellEvents() {
     elements.switchButtonSceneBtn.addEventListener('click', () => switchScene('button_idle', { force: true }));
@@ -651,12 +665,13 @@
       switchScene('marble');
     });
 
-    const prewarmMarble = () => {
-      if (!state.scenes.marble.unlocked) return;
-      if (marbleScene && typeof marbleScene.prepare === 'function') {
-        marbleScene.prepare(elements.sceneHost);
-      }
-    };
+  const prewarmMarble = () => {
+    if (!marbleScene) return;
+    if (!state.scenes.marble.unlocked) return;
+    if (typeof marbleScene.prepare === 'function') {
+      marbleScene.prepare(elements.sceneHost);
+    }
+  };
 
     elements.switchMarbleSceneBtn.addEventListener('mouseenter', prewarmMarble);
     elements.switchMarbleSceneBtn.addEventListener('focus', prewarmMarble);
