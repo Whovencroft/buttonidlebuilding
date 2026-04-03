@@ -77,16 +77,13 @@
       }
     }
 
-    function warmVisibleCanvas() {
-      if (!runtime || !refs.canvas) return;
-      if (!window.MarbleRenderer || typeof window.MarbleRenderer.prepare !== 'function') return;
+    function prepare(source = elements.sceneHost) {
+      buildDom();
+      ensureRuntime();
 
-      window.MarbleRenderer.prepare(runtime, refs.canvas);
-
-      requestAnimationFrame(() => {
-        if (!runtime || !refs.canvas) return;
-        window.MarbleRenderer.prepare(runtime, refs.canvas);
-      });
+      if (window.MarbleRenderer && typeof window.MarbleRenderer.prepare === 'function') {
+        window.MarbleRenderer.prepare(runtime, source);
+      }
     }
 
     function restartRun() {
@@ -188,8 +185,7 @@
     }
 
     function onStateLoaded() {
-      ensureRuntime();
-      buildDom();
+      prepare(elements.sceneHost);
       render();
     }
 
@@ -198,11 +194,9 @@
       root,
 
       enter() {
-        buildDom();
-        ensureRuntime();
+        prepare(elements.sceneHost);
         input.attach();
         hideOverlay();
-        warmVisibleCanvas();
         render();
       },
 
@@ -214,7 +208,8 @@
 
       update,
       render,
-      onStateLoaded
+      onStateLoaded,
+      prepare
     };
   }
 

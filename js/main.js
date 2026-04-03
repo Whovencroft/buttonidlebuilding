@@ -422,12 +422,21 @@
   }
 
   function switchScene(sceneId) {
-    if (!sceneManager) return;
-    state.app.activeScene = sceneId;
-    sceneManager.setActiveScene(sceneId, { state });
-    renderShell();
-    saveGame();
+  if (!sceneManager) return;
+
+  if (
+    sceneId === 'marble' &&
+    marbleScene &&
+    typeof marbleScene.prepare === 'function'
+  ) {
+    marbleScene.prepare(elements.sceneHost);
   }
+
+  state.app.activeScene = sceneId;
+  sceneManager.setActiveScene(sceneId, { state });
+  renderShell();
+  saveGame();
+}
 
   const api = {
     config: CONFIG,
@@ -462,6 +471,14 @@
   function attachShellEvents() {
     elements.switchButtonSceneBtn.addEventListener('click', () => switchScene('button_idle'));
     elements.switchMarbleSceneBtn.addEventListener('click', () => switchScene('marble'));
+    const prewarmMarble = () => {
+      if (marbleScene && typeof marbleScene.prepare === 'function') {
+        marbleScene.prepare(elements.sceneHost);
+      }
+    }
+
+    elements.switchMarbleSceneBtn.addEventListener('mouseenter', prewarmMarble);
+    elements.switchMarbleSceneBtn.addEventListener('focus', prewarmMarble);
 
     elements.saveBtn.addEventListener('click', () => saveGame(true));
     elements.exportBtn.addEventListener('click', exportSave);

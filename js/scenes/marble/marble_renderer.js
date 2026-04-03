@@ -1,4 +1,30 @@
 (() => {
+  const stageCacheByKey = new Map();
+
+  function resolveCssSize(source) {
+    if (!source) return { width: 0, height: 0 };
+
+    if (
+      typeof source.width === 'number' &&
+      typeof source.height === 'number'
+    ) {
+      return {
+        width: Math.max(0, source.width),
+        height: Math.max(0, source.height)
+      };
+    }
+
+    if (typeof source.getBoundingClientRect === 'function') {
+      const rect = source.getBoundingClientRect();
+      return {
+        width: Math.max(0, rect.width),
+        height: Math.max(0, rect.height)
+      };
+    }
+
+    return { width: 0, height: 0 };
+  }
+
   function fitCanvasToDisplay(canvas) {
     const rect = canvas.getBoundingClientRect();
     const dpr = window.devicePixelRatio || 1;
@@ -33,17 +59,24 @@
       tileH,
       heightScale,
       screenCx: cssWidth * 0.5,
-      screenCy: cssHeight * 0.46
+      screenCy: cssHeight * 0.56
+    };
+  }
+
+  function worldProject(x, y, z, metrics) {
+    return {
+      x: (x - y) * (metrics.tileW * 0.5),
+      y: (x + y) * (metrics.tileH * 0.5) - z * metrics.heightScale
     };
   }
 
   function project(x, y, z, view) {
-    const dx = x - view.camX;
-    const dy = y - view.camY;
+    const p = worldProject(x, y, z, view);
+    const cam = worldProject(view.camX, view.camY, 0, view);
 
     return {
-      x: view.screenCx + (dx - dy) * (view.tileW * 0.5),
-      y: view.screenCy + (dx + dy) * (view.tileH * 0.5) - z * view.heightScale
+      x: view.screenCx + p.x - cam.x,
+      y: view.screenCy + p.y - cam.y
     };
   }
 
@@ -136,29 +169,31 @@
     ctx.restore();
   }
 
-  function getVisibleTileBounds(runtime, view) {
-    const halfCols = Math.ceil(view.screenCx / (view.tileW * 0.5)) + 4;
-    const halfRows = Math.ceil((view.screenCy + 220) / (view.tileH * 0.5)) + 6;
-    const span = Math.max(halfCols, halfRows);
+  function getLevelMaxHeight(level) {
+    let maxH = 0;
 
-    return {
-      minX: Math.max(0, Math.floor(view.camX - span)),
-      maxX: Math.min(runtime.level.width - 1, Math.ceil(view.camX + span)),
-      minY: Math.max(0, Math.floor(view.camY - span)),
-      maxY: Math.min(runtime.level.height - 1, Math.ceil(view.camY + span))
-    };
+    for (let ty = 0; ty < level.height; ty += 1) {
+      for (let tx = 0; tx < level.width; tx += 1) {
+        const cell = window.MarbleLevels.getCell(level, tx, ty);
+        if (!cell || cell.kind === 'void') continue;
+        const heights = window.MarbleLevels.getCellCornerHeights(cell);
+        maxH = Math.max(maxH, heights.nw, heights.ne, heights.se, heights.sw);
+      }
+    }
+
+    return maxH;
   }
 
-  function renderTile(ctx, level, tx, ty, view) {
+  function renderStaticTile(ctx, level, tx, ty, metrics, worldToCache) {
     const cell = window.MarbleLevels.getCell(level, tx, ty);
     if (!cell || cell.kind === 'void') return;
 
     const corners = getTileCorners(level, tx, ty);
     const top = [
-      project(corners.nw.x, corners.nw.y, corners.nw.z, view),
-      project(corners.ne.x, corners.ne.y, corners.ne.z, view),
-      project(corners.se.x, corners.se.y, corners.se.z, view),
-      project(corners.sw.x, corners.sw.y, corners.sw.z, view)
+      worldToCache(worldProject(corners.nw.x, corners.nw.y, corners.nw.z, metrics)),
+      worldToCache(worldProject(corners.ne.x, corners.ne.y, corners.ne.z, metrics)),
+      worldToCache(worldProject(corners.se.x, corners.se.y, corners.se.z, metrics)),
+      worldToCache(worldProject(corners.sw.x, corners.sw.y, corners.sw.z, metrics))
     ];
 
     const baseColor = getTrackColor(cell);
@@ -183,10 +218,10 @@
 
     if (southTopAvg > southBottomAvg + 0.01) {
       const southFace = [
-        project(corners.sw.x, corners.sw.y, corners.sw.z, view),
-        project(corners.se.x, corners.se.y, corners.se.z, view),
-        project(corners.se.x, corners.se.y, southNeighborHeights.ne, view),
-        project(corners.sw.x, corners.sw.y, southNeighborHeights.nw, view)
+        worldToCache(worldProject(corners.sw.x, corners.sw.y, corners.sw.z, metrics)),
+        worldToCache(worldProject(corners.se.x, corners.se.y, corners.se.z, metrics)),
+        worldToCache(worldProject(corners.se.x, corners.se.y, southNeighborHeights.ne, metrics)),
+        worldToCache(worldProject(corners.sw.x, corners.sw.y, southNeighborHeights.nw, metrics))
       ];
 
       beginPoly(ctx, southFace);
@@ -198,10 +233,10 @@
 
     if (eastTopAvg > eastBottomAvg + 0.01) {
       const eastFace = [
-        project(corners.ne.x, corners.ne.y, corners.ne.z, view),
-        project(corners.se.x, corners.se.y, corners.se.z, view),
-        project(corners.se.x, corners.se.y, eastNeighborHeights.sw, view),
-        project(corners.ne.x, corners.ne.y, eastNeighborHeights.nw, view)
+        worldToCache(worldProject(corners.ne.x, corners.ne.y, corners.ne.z, metrics)),
+        worldToCache(worldProject(corners.se.x, corners.se.y, corners.se.z, metrics)),
+        worldToCache(worldProject(corners.se.x, corners.se.y, eastNeighborHeights.sw, metrics)),
+        worldToCache(worldProject(corners.ne.x, corners.ne.y, eastNeighborHeights.nw, metrics))
       ];
 
       beginPoly(ctx, eastFace);
@@ -229,10 +264,10 @@
     }
   }
 
-  function renderGoalMarker(ctx, runtime, view) {
-    const goal = runtime.level.goal;
-    const p = project(goal.x, goal.y, 1.25, view);
-    const radius = Math.max(8, view.tileW * goal.radius * 0.42);
+  function renderStaticGoal(ctx, level, metrics, worldToCache) {
+    const goal = level.goal;
+    const p = worldToCache(worldProject(goal.x, goal.y, 1.25, metrics));
+    const radius = Math.max(8, metrics.tileW * goal.radius * 0.42);
 
     ctx.save();
 
@@ -258,6 +293,62 @@
     ctx.stroke();
 
     ctx.restore();
+  }
+
+  function buildStageCache(level, metrics) {
+    const padding = Math.ceil(metrics.tileW * 2);
+    const maxH = getLevelMaxHeight(level);
+
+    const minX = -(level.height + 3) * (metrics.tileW * 0.5);
+    const maxX = (level.width + 3) * (metrics.tileW * 0.5);
+    const minY = -(maxH + 5) * metrics.heightScale - metrics.tileH * 3;
+    const maxY = (level.width + level.height + 4) * (metrics.tileH * 0.5) + metrics.tileH * 6;
+
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.max(1, Math.ceil(maxX - minX + padding * 2));
+    canvas.height = Math.max(1, Math.ceil(maxY - minY + padding * 2));
+
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    function worldToCache(point) {
+      return {
+        x: point.x - minX + padding,
+        y: point.y - minY + padding
+      };
+    }
+
+    for (let ty = 0; ty < level.height; ty += 1) {
+      for (let tx = 0; tx < level.width; tx += 1) {
+        renderStaticTile(ctx, level, tx, ty, metrics, worldToCache);
+      }
+    }
+
+    renderStaticGoal(ctx, level, metrics, worldToCache);
+
+    return {
+      canvas,
+      minX,
+      minY,
+      padding
+    };
+  }
+
+  function getStageCache(runtime, cssWidth, cssHeight) {
+    const metrics = createView(runtime, cssWidth, cssHeight);
+    const key =
+      `${runtime.level.id}|` +
+      `${Math.round(metrics.tileW * 100)}|` +
+      `${Math.round(metrics.tileH * 100)}|` +
+      `${Math.round(metrics.heightScale * 100)}`;
+
+    let cache = stageCacheByKey.get(key);
+    if (!cache) {
+      cache = buildStageCache(runtime.level, metrics);
+      stageCacheByKey.set(key, cache);
+    }
+
+    return cache;
   }
 
   function renderMarble(ctx, runtime, view) {
@@ -347,18 +438,16 @@
 
     const { ctx, cssWidth, cssHeight } = fitCanvasToDisplay(canvas);
     const view = createView(runtime, cssWidth, cssHeight);
-    const bounds = getVisibleTileBounds(runtime, view);
+    const cache = getStageCache(runtime, cssWidth, cssHeight);
+    const cam = worldProject(view.camX, view.camY, 0, view);
 
     ctx.clearRect(0, 0, cssWidth, cssHeight);
     renderBackground(ctx, cssWidth, cssHeight);
 
-    for (let ty = bounds.minY; ty <= bounds.maxY; ty += 1) {
-      for (let tx = bounds.minX; tx <= bounds.maxX; tx += 1) {
-        renderTile(ctx, runtime.level, tx, ty, view);
-      }
-    }
+    const stageX = view.screenCx - cam.x + cache.minX - cache.padding;
+    const stageY = view.screenCy - cam.y + cache.minY - cache.padding;
+    ctx.drawImage(cache.canvas, stageX, stageY);
 
-    renderGoalMarker(ctx, runtime, view);
     renderMarble(ctx, runtime, view);
     renderStatus(ctx, runtime, cssWidth);
   }
@@ -367,8 +456,11 @@
     draw(runtime, canvas);
   }
 
-  function prepare(runtime, canvas) {
-    draw(runtime, canvas);
+  function prepare(runtime, source) {
+    if (!runtime) return;
+    const size = resolveCssSize(source);
+    if (size.width < 16 || size.height < 16) return;
+    getStageCache(runtime, size.width, size.height);
   }
 
   window.MarbleRenderer = {
