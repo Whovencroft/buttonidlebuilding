@@ -138,9 +138,9 @@
     fillRect(level, 12, 6, 1, 2, { kind: 'track', h: 2, slope: 'E' });
     fillRect(level, 13, 6, 3, 3, { kind: 'track', h: 2 });
 
-    // Hazard shoulders
-    setCell(level, 13, 8, { kind: 'hazard', h: 2 });
-    setCell(level, 15, 6, { kind: 'hazard', h: 2 });
+    // Keep level 1 clean. No hazards yet.
+    setCell(level, 13, 8, { kind: 'track', h: 2 });
+    setCell(level, 15, 6, { kind: 'track', h: 2 });
 
     // South turn and final descent
     fillRect(level, 14, 9, 2, 1, { kind: 'track', h: 1, slope: 'S' });

@@ -22,9 +22,9 @@
   }
 
   function createView(runtime, cssWidth, cssHeight) {
-    const tileW = Math.max(72, Math.min(132, cssWidth / 6.8));
+    const tileW = Math.max(104, Math.min(188, cssWidth / 4.6));
     const tileH = tileW * 0.5;
-    const heightScale = tileH * 0.95;
+    const heightScale = tileH * 1.02;
 
     return {
       camX: runtime.camera?.x ?? runtime.marble.x,
@@ -33,7 +33,7 @@
       tileH,
       heightScale,
       screenCx: cssWidth * 0.5,
-      screenCy: cssHeight * 0.26
+      screenCy: cssHeight * 0.46
     };
   }
 
@@ -134,6 +134,19 @@
     ctx.fillRect(0, 0, cssWidth, cssHeight);
 
     ctx.restore();
+  }
+
+  function getVisibleTileBounds(runtime, view) {
+    const halfCols = Math.ceil(view.screenCx / (view.tileW * 0.5)) + 4;
+    const halfRows = Math.ceil((view.screenCy + 220) / (view.tileH * 0.5)) + 6;
+    const span = Math.max(halfCols, halfRows);
+
+    return {
+      minX: Math.max(0, Math.floor(view.camX - span)),
+      maxX: Math.min(runtime.level.width - 1, Math.ceil(view.camX + span)),
+      minY: Math.max(0, Math.floor(view.camY - span)),
+      maxY: Math.min(runtime.level.height - 1, Math.ceil(view.camY + span))
+    };
   }
 
   function renderTile(ctx, level, tx, ty, view) {
@@ -329,17 +342,18 @@
     ctx.restore();
   }
 
-  function render(runtime, canvas) {
+  function draw(runtime, canvas) {
     if (!runtime || !canvas) return;
 
     const { ctx, cssWidth, cssHeight } = fitCanvasToDisplay(canvas);
     const view = createView(runtime, cssWidth, cssHeight);
+    const bounds = getVisibleTileBounds(runtime, view);
 
     ctx.clearRect(0, 0, cssWidth, cssHeight);
     renderBackground(ctx, cssWidth, cssHeight);
 
-    for (let ty = 0; ty < runtime.level.height; ty += 1) {
-      for (let tx = 0; tx < runtime.level.width; tx += 1) {
+    for (let ty = bounds.minY; ty <= bounds.maxY; ty += 1) {
+      for (let tx = bounds.minX; tx <= bounds.maxX; tx += 1) {
         renderTile(ctx, runtime.level, tx, ty, view);
       }
     }
@@ -349,7 +363,16 @@
     renderStatus(ctx, runtime, cssWidth);
   }
 
+  function render(runtime, canvas) {
+    draw(runtime, canvas);
+  }
+
+  function prepare(runtime, canvas) {
+    draw(runtime, canvas);
+  }
+
   window.MarbleRenderer = {
-    render
+    render,
+    prepare
   };
 })();

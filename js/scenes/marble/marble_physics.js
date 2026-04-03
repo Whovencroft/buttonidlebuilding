@@ -211,9 +211,11 @@
   }
 
   function updateCamera(runtime, dt) {
-    const targetX = runtime.marble.x + runtime.marble.vx * 0.08;
-    const targetY = runtime.marble.y + runtime.marble.vy * 0.08;
-    const follow = Math.min(1, dt * 4.5);
+    const speed = Math.hypot(runtime.marble.vx, runtime.marble.vy);
+    const lookAhead = Math.min(0.42, speed * 0.06);
+    const targetX = runtime.marble.x + runtime.marble.vx * lookAhead;
+    const targetY = runtime.marble.y + runtime.marble.vy * lookAhead;
+    const follow = Math.min(1, dt * 8.5);
 
     runtime.camera.x += (targetX - runtime.camera.x) * follow;
     runtime.camera.y += (targetY - runtime.camera.y) * follow;
