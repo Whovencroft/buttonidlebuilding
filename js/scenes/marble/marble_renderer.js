@@ -88,7 +88,7 @@
       case 'hazard':
         return '#ef4444';
       case 'wall':
-        return '#64748b';
+        return '#475569';
       default:
         return '#94a3b8';
     }
@@ -155,17 +155,9 @@
     return window.MarbleLevels.getCellCornerHeights(cell);
   }
 
-  function pushCommand(commands, depth, draw) {
-    commands.push({
-      depth,
-      order: commands.length,
-      draw
-    });
-  }
-
-  function addTileCommands(commands, level, tx, ty, view) {
+  function buildTileGeometry(level, tx, ty, view) {
     const cell = window.MarbleLevels.getCell(level, tx, ty);
-    if (!cell || cell.kind === 'void') return;
+    if (!cell || cell.kind === 'void') return null;
 
     const corners = getTileCorners(level, tx, ty);
     const top = [
@@ -177,6 +169,7 @@
 
     const baseColor = getTrackColor(cell);
     const voidFloor = level.voidFloor ?? -1.5;
+
     const southNeighborHeights = getNeighborHeights(level, tx, ty + 1, voidFloor);
     const eastNeighborHeights = getNeighborHeights(level, tx + 1, ty, voidFloor);
 
@@ -185,61 +178,89 @@
     const eastTopAvg = (corners.ne.z + corners.se.z) * 0.5;
     const eastBottomAvg = (eastNeighborHeights.nw + eastNeighborHeights.sw) * 0.5;
 
+    let southFace = null;
+    let eastFace = null;
+
     if (southTopAvg > southBottomAvg + 0.01) {
-      const southFace = [
+      southFace = [
         project(corners.sw.x, corners.sw.y, corners.sw.z, view),
         project(corners.se.x, corners.se.y, corners.se.z, view),
         project(corners.se.x, corners.se.y, southNeighborHeights.ne, view),
         project(corners.sw.x, corners.sw.y, southNeighborHeights.nw, view)
       ];
-
-      pushCommand(commands, averageY(southFace), (ctx) => {
-        beginPoly(ctx, southFace);
-        ctx.fillStyle = darken(baseColor, 0.55);
-        ctx.fill();
-        ctx.strokeStyle = 'rgba(255,255,255,0.05)';
-        ctx.stroke();
-      });
     }
 
     if (eastTopAvg > eastBottomAvg + 0.01) {
-      const eastFace = [
+      eastFace = [
         project(corners.ne.x, corners.ne.y, corners.ne.z, view),
         project(corners.se.x, corners.se.y, corners.se.z, view),
         project(corners.se.x, corners.se.y, eastNeighborHeights.sw, view),
         project(corners.ne.x, corners.ne.y, eastNeighborHeights.nw, view)
       ];
-
-      pushCommand(commands, averageY(eastFace), (ctx) => {
-        beginPoly(ctx, eastFace);
-        ctx.fillStyle = darken(baseColor, 0.7);
-        ctx.fill();
-        ctx.strokeStyle = 'rgba(255,255,255,0.05)';
-        ctx.stroke();
-      });
     }
 
-    pushCommand(commands, averageY(top) - 0.2, (ctx) => {
-      beginPoly(ctx, top);
-      ctx.fillStyle = baseColor;
-      ctx.fill();
-      ctx.strokeStyle = 'rgba(241,245,249,0.18)';
-      ctx.lineWidth = 1.2;
-      ctx.stroke();
-
-      if (cell.kind === 'hazard') {
-        ctx.beginPath();
-        ctx.moveTo(top[0].x, top[0].y);
-        ctx.lineTo(top[2].x, top[2].y);
-        ctx.moveTo(top[1].x, top[1].y);
-        ctx.lineTo(top[3].x, top[3].y);
-        ctx.strokeStyle = 'rgba(255,255,255,0.18)';
-        ctx.stroke();
-      }
-    });
+    return {
+      cell,
+      baseColor,
+      top,
+      southFace,
+      eastFace
+    };
   }
 
-  function addGoalCommand(commands, runtime, view) {
+  function renderTileFaces(ctx, geom) {
+    if (!geom) return;
+
+    if (geom.southFace) {
+      beginPoly(ctx, geom.southFace);
+      ctx.fillStyle = darken(geom.baseColor, 0.55);
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+      ctx.stroke();
+    }
+
+    if (geom.eastFace) {
+      beginPoly(ctx, geom.eastFace);
+      ctx.fillStyle = darken(geom.baseColor, 0.7);
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+      ctx.stroke();
+    }
+  }
+
+  function renderTileTop(ctx, geom) {
+    if (!geom) return;
+
+    beginPoly(ctx, geom.top);
+    ctx.fillStyle = geom.baseColor;
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(241,245,249,0.18)';
+    ctx.lineWidth = 1.2;
+    ctx.stroke();
+
+    if (geom.cell.kind === 'hazard') {
+      ctx.beginPath();
+      ctx.moveTo(geom.top[0].x, geom.top[0].y);
+      ctx.lineTo(geom.top[2].x, geom.top[2].y);
+      ctx.moveTo(geom.top[1].x, geom.top[1].y);
+      ctx.lineTo(geom.top[3].x, geom.top[3].y);
+      ctx.strokeStyle = 'rgba(255,255,255,0.18)';
+      ctx.stroke();
+    }
+  }
+
+  function renderStage(ctx, runtime, view) {
+    for (let ty = 0; ty < runtime.level.height; ty += 1) {
+      for (let tx = 0; tx < runtime.level.width; tx += 1) {
+        const geom = buildTileGeometry(runtime.level, tx, ty, view);
+        if (!geom) continue;
+        renderTileFaces(ctx, geom);
+        renderTileTop(ctx, geom);
+      }
+    }
+  }
+
+  function renderGoal(ctx, runtime, view) {
     const goal = runtime.level.goal;
     const goalSurface = window.MarbleLevels.sampleCellSurface(
       runtime.level,
@@ -250,107 +271,132 @@
     const p = project(goal.x, goal.y, goalZ, view);
     const radius = Math.max(8, view.tileW * goal.radius * 0.42);
 
-    pushCommand(commands, p.y - 0.1, (ctx) => {
-      ctx.save();
+    ctx.save();
 
-      const gradient = ctx.createRadialGradient(
-        p.x - radius * 0.25,
-        p.y - radius * 0.35,
-        radius * 0.15,
-        p.x,
-        p.y,
-        radius
-      );
-      gradient.addColorStop(0, 'rgba(255,255,255,0.95)');
-      gradient.addColorStop(0.35, 'rgba(110,231,183,0.95)');
-      gradient.addColorStop(1, 'rgba(34,197,94,0.48)');
+    const gradient = ctx.createRadialGradient(
+      p.x - radius * 0.25,
+      p.y - radius * 0.35,
+      radius * 0.15,
+      p.x,
+      p.y,
+      radius
+    );
+    gradient.addColorStop(0, 'rgba(255,255,255,0.95)');
+    gradient.addColorStop(0.35, 'rgba(110,231,183,0.95)');
+    gradient.addColorStop(1, 'rgba(34,197,94,0.48)');
 
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, radius, 0, Math.PI * 2);
-      ctx.fillStyle = gradient;
-      ctx.fill();
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, radius, 0, Math.PI * 2);
+    ctx.fillStyle = gradient;
+    ctx.fill();
 
-      ctx.lineWidth = 2;
-      ctx.strokeStyle = 'rgba(220,252,231,0.8)';
-      ctx.stroke();
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = 'rgba(220,252,231,0.8)';
+    ctx.stroke();
 
-      ctx.restore();
-    });
+    ctx.restore();
   }
 
-  function addMarbleCommands(commands, runtime, view) {
+  function getMarbleProjection(runtime, view) {
     const marble = runtime.marble;
     const shadowSurface = window.MarbleLevels.sampleCellSurface(
       runtime.level,
       marble.x,
       marble.y
     );
-    const shadowZ = shadowSurface ? shadowSurface.z : (runtime.level.voidFloor ?? -1.5);
+    const shadowZ = shadowSurface ? shadowSurface.z : runtime.level.voidFloor ?? -1.5;
 
     const shadow = project(marble.x, marble.y, shadowZ, view);
     const ball = project(marble.x, marble.y, marble.z, view);
     const radius = Math.max(8, view.tileW * marble.radius * 0.9);
 
-    const depthOffset = Math.max(
-      -radius * 0.6,
-      Math.min(radius * 0.2, ball.y - shadow.y)
+    return {
+      shadow,
+      ball,
+      radius,
+      shadowZ
+    };
+  }
+
+  function renderMarble(ctx, runtime, view) {
+    const { shadow, ball, radius } = getMarbleProjection(runtime, view);
+
+    ctx.save();
+
+    ctx.beginPath();
+    ctx.ellipse(
+      shadow.x,
+      shadow.y + radius * 0.35,
+      radius * 0.95,
+      radius * 0.48,
+      0,
+      0,
+      Math.PI * 2
     );
-    const marbleDepth = shadow.y + depthOffset;
+    ctx.fillStyle = 'rgba(0,0,0,0.28)';
+    ctx.fill();
 
-    pushCommand(commands, shadow.y - 0.1, (ctx) => {
-      ctx.save();
-      ctx.beginPath();
-      ctx.ellipse(
-        shadow.x,
-        shadow.y + radius * 0.35,
-        radius * 0.95,
-        radius * 0.48,
-        0,
-        0,
-        Math.PI * 2
-      );
-      ctx.fillStyle = 'rgba(0,0,0,0.28)';
-      ctx.fill();
-      ctx.restore();
-    });
+    const gradient = ctx.createRadialGradient(
+      ball.x - radius * 0.35,
+      ball.y - radius * 0.48,
+      radius * 0.14,
+      ball.x,
+      ball.y,
+      radius
+    );
+    gradient.addColorStop(0, '#ffffff');
+    gradient.addColorStop(0.2, '#cbd5e1');
+    gradient.addColorStop(1, '#64748b');
 
-    pushCommand(commands, marbleDepth, (ctx) => {
-      ctx.save();
+    ctx.beginPath();
+    ctx.arc(ball.x, ball.y, radius, 0, Math.PI * 2);
+    ctx.fillStyle = gradient;
+    ctx.fill();
 
-      const gradient = ctx.createRadialGradient(
-        ball.x - radius * 0.35,
-        ball.y - radius * 0.48,
-        radius * 0.14,
-        ball.x,
-        ball.y,
-        radius
-      );
-      gradient.addColorStop(0, '#ffffff');
-      gradient.addColorStop(0.2, '#cbd5e1');
-      gradient.addColorStop(1, '#64748b');
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = 'rgba(255,255,255,0.65)';
+    ctx.stroke();
 
-      ctx.beginPath();
-      ctx.arc(ball.x, ball.y, radius, 0, Math.PI * 2);
-      ctx.fillStyle = gradient;
-      ctx.fill();
+    ctx.beginPath();
+    ctx.arc(
+      ball.x - radius * 0.25,
+      ball.y - radius * 0.32,
+      radius * 0.2,
+      0,
+      Math.PI * 2
+    );
+    ctx.fillStyle = 'rgba(255,255,255,0.75)';
+    ctx.fill();
 
-      ctx.lineWidth = 2;
-      ctx.strokeStyle = 'rgba(255,255,255,0.65)';
-      ctx.stroke();
+    ctx.restore();
+  }
 
-      ctx.beginPath();
-      ctx.arc(
-        ball.x - radius * 0.25,
-        ball.y - radius * 0.32,
-        radius * 0.2,
-        0,
-        Math.PI * 2
-      );
-      ctx.fillStyle = 'rgba(255,255,255,0.75)';
-      ctx.fill();
+  function renderFrontOccluders(ctx, runtime, view) {
+    const { shadow } = getMarbleProjection(runtime, view);
+    const occludeCutoffY = shadow.y - 1;
 
-      ctx.restore();
-    });
+    for (let ty = 0; ty < runtime.level.height; ty += 1) {
+      for (let tx = 0; tx < runtime.level.width; tx += 1) {
+        const geom = buildTileGeometry(runtime.level, tx, ty, view);
+        if (!geom) continue;
+
+        if (geom.southFace && averageY(geom.southFace) >= occludeCutoffY) {
+          beginPoly(ctx, geom.southFace);
+          ctx.fillStyle = darken(geom.baseColor, 0.55);
+          ctx.fill();
+          ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+          ctx.stroke();
+        }
+
+        if (geom.eastFace && averageY(geom.eastFace) >= occludeCutoffY) {
+          beginPoly(ctx, geom.eastFace);
+          ctx.fillStyle = darken(geom.baseColor, 0.7);
+          ctx.fill();
+          ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+          ctx.stroke();
+        }
+      }
+    }
   }
 
   function renderStatus(ctx, runtime, cssWidth) {
@@ -381,28 +427,10 @@
     ctx.clearRect(0, 0, cssWidth, cssHeight);
     renderBackground(ctx, cssWidth, cssHeight);
 
-    const commands = [];
-
-    for (let ty = 0; ty < runtime.level.height; ty += 1) {
-      for (let tx = 0; tx < runtime.level.width; tx += 1) {
-        addTileCommands(commands, runtime.level, tx, ty, view);
-      }
-    }
-
-    addGoalCommand(commands, runtime, view);
-    addMarbleCommands(commands, runtime, view);
-
-    commands.sort((a, b) => {
-      if (a.depth === b.depth) {
-        return a.order - b.order;
-      }
-      return a.depth - b.depth;
-    });
-
-    for (const command of commands) {
-      command.draw(ctx);
-    }
-
+    renderStage(ctx, runtime, view);
+    renderGoal(ctx, runtime, view);
+    renderMarble(ctx, runtime, view);
+    renderFrontOccluders(ctx, runtime, view);
     renderStatus(ctx, runtime, cssWidth);
   }
 
