@@ -212,7 +212,7 @@
 
     setCell(level, 11, 2, { kind: 'wall', h: 5 });
     setCell(level, 7, 8, { kind: 'wall', h: 5 });
-    setCell(level, 16, 12, { kind: 'wall', h: 5 });
+    setCell(level, 14, 6, { kind: 'wall', h: 5 });
 
     return level;
   }
