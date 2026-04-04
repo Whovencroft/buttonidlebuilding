@@ -413,7 +413,7 @@
     return overlapsX && faceIsInFront;
   }
 
-    function getFaceBounds(points) {
+  function getFaceBounds(points) {
     let minX = Infinity;
     let maxX = -Infinity;
     let minY = Infinity;
@@ -433,12 +433,14 @@
     if (!face) return false;
 
     const bounds = getFaceBounds(face);
+    const padX = radius * 1.05;
+    const padY = radius * 0.95;
 
     return !(
-      bounds.maxX < ball.x - radius ||
-      bounds.minX > ball.x + radius ||
-      bounds.maxY < ball.y - radius ||
-      bounds.minY > ball.y + radius
+      bounds.maxX < ball.x - padX ||
+      bounds.minX > ball.x + padX ||
+      bounds.maxY < ball.y - padY ||
+      bounds.minY > ball.y + padY
     );
   }
 
@@ -456,13 +458,15 @@
     ctx.stroke();
   }
 
-    function renderFrontOccluders(ctx, runtime, view) {
+  function renderFrontOccluders(ctx, runtime, view) {
     const { ball, radius } = getMarbleProjection(runtime, view);
 
     for (let ty = 0; ty < runtime.level.height; ty += 1) {
       for (let tx = 0; tx < runtime.level.width; tx += 1) {
         const geom = buildTileGeometry(runtime.level, tx, ty, view);
         if (!geom) continue;
+
+        if (geom.cell.kind !== 'wall') continue;
 
         if (geom.southFace && faceIntersectsMarble(geom.southFace, ball, radius)) {
           ctx.save();
