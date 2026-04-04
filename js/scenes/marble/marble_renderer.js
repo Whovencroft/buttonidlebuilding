@@ -21,10 +21,19 @@
     };
   }
 
-  function createView(runtime, cssWidth, cssHeight) {
-    const tileW = Math.max(88, Math.min(168, cssWidth / 6.2));
+    function createView(runtime, cssWidth, cssHeight) {
+    const base = Math.min(cssWidth, cssHeight);
+
+    const tileW = Math.max(
+      56,
+      Math.min(
+        110,
+        Math.min(cssWidth / 9.25, cssHeight / 6.4, base / 5.8)
+      )
+    );
+
     const tileH = tileW * 0.5;
-    const heightScale = tileH * 1.02;
+    const heightScale = tileH * 0.92;
 
     return {
       camX: runtime.camera?.x ?? runtime.marble.x,
@@ -33,7 +42,7 @@
       tileH,
       heightScale,
       screenCx: cssWidth * 0.5,
-      screenCy: cssHeight * 0.5
+      screenCy: cssHeight * 0.42
     };
   }
 
