@@ -209,6 +209,8 @@
     }
 
     return {
+      tx,
+      ty,
       cell,
       baseColor,
       top,
@@ -380,40 +382,7 @@
     ctx.restore();
   }
 
-    function getFaceBounds(points) {
-    let minX = Infinity;
-    let maxX = -Infinity;
-    let minY = Infinity;
-    let maxY = -Infinity;
-
-    for (const point of points) {
-      if (point.x < minX) minX = point.x;
-      if (point.x > maxX) maxX = point.x;
-      if (point.y < minY) minY = point.y;
-      if (point.y > maxY) maxY = point.y;
-    }
-
-    return { minX, maxX, minY, maxY };
-  }
-
-  function faceCanOccludeMarble(face, marbleBall, marbleRadius) {
-    if (!face) return false;
-
-    const bounds = getFaceBounds(face);
-    const horizontalMargin = marbleRadius * .9;
-    const verticalMargin = marbleRadius * 0.35;
-
-    const overlapsX =
-      bounds.maxX >= marbleBall.x - horizontalMargin &&
-      bounds.minX <= marbleBall.x + horizontalMargin;
-
-    const faceIsInFront =
-      bounds.maxY >= marbleBall.y - verticalMargin;
-
-    return overlapsX && faceIsInFront;
-  }
-
-  function getFaceBounds(points) {
+      function getFaceBounds(points) {
     let minX = Infinity;
     let maxX = -Infinity;
     let minY = Infinity;
@@ -433,8 +402,8 @@
     if (!face) return false;
 
     const bounds = getFaceBounds(face);
-    const padX = radius * 1.05;
-    const padY = radius * 0.95;
+    const padX = radius * 1.0;
+    const padY = radius * 1.0;
 
     return !(
       bounds.maxX < ball.x - padX ||
@@ -442,6 +411,34 @@
       bounds.maxY < ball.y - padY ||
       bounds.minY > ball.y + padY
     );
+  }
+
+  function wallFaceShouldOcclude(faceName, geom, marble, ball, radius) {
+    const face = faceName === 'south' ? geom.southFace : geom.eastFace;
+    if (!face) return false;
+    if (!faceIntersectsMarble(face, ball, radius)) return false;
+
+    const inset = 0.02;
+
+    if (faceName === 'south') {
+      const edgeY = geom.ty + 1;
+      const withinX =
+        marble.x >= geom.tx - marble.radius &&
+        marble.x <= geom.tx + 1 + marble.radius;
+      const behindFace = marble.y < edgeY - inset;
+      return withinX && behindFace;
+    }
+
+    if (faceName === 'east') {
+      const edgeX = geom.tx + 1;
+      const withinY =
+        marble.y >= geom.ty - marble.radius &&
+        marble.y <= geom.ty + 1 + marble.radius;
+      const behindFace = marble.x < edgeX - inset;
+      return withinY && behindFace;
+    }
+
+    return false;
   }
 
   function clipToMarble(ctx, ball, radius) {
@@ -459,23 +456,23 @@
   }
 
   function renderFrontOccluders(ctx, runtime, view) {
+    const marble = runtime.marble;
     const { ball, radius } = getMarbleProjection(runtime, view);
 
     for (let ty = 0; ty < runtime.level.height; ty += 1) {
       for (let tx = 0; tx < runtime.level.width; tx += 1) {
         const geom = buildTileGeometry(runtime.level, tx, ty, view);
         if (!geom) continue;
-
         if (geom.cell.kind !== 'wall') continue;
 
-        if (geom.southFace && faceIntersectsMarble(geom.southFace, ball, radius)) {
+        if (wallFaceShouldOcclude('south', geom, marble, ball, radius)) {
           ctx.save();
           clipToMarble(ctx, ball, radius);
           repaintFace(ctx, geom.southFace, darken(geom.baseColor, 0.55));
           ctx.restore();
         }
 
-        if (geom.eastFace && faceIntersectsMarble(geom.eastFace, ball, radius)) {
+        if (wallFaceShouldOcclude('east', geom, marble, ball, radius)) {
           ctx.save();
           clipToMarble(ctx, ball, radius);
           repaintFace(ctx, geom.eastFace, darken(geom.baseColor, 0.7));
