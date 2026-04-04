@@ -417,7 +417,7 @@
     if (faceName === 'south') {
     if (!faceIntersectsMarble(face, ball, radius, 1.0, 2.4)) return false;
     } else {
-    if (!faceIntersectsMarble(face, ball, radius, 1.1, 1.2)) return false;
+    if (!faceIntersectsMarble(face, ball, radius, 1.1, 2.4)) return false;
     }
 
     const inset = 0.02;
