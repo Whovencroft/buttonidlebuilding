@@ -460,6 +460,28 @@ function wallTopShouldOcclude(geom, marble, ball, radius) {
   return topInFrontOfBall;
 }
 
+  function wallStillCoversSupport(face, runtime, marble) {
+  if (!face) return false;
+
+  const support = window.MarbleLevels.sampleCellSurface(
+    runtime.level,
+    marble.x,
+    marble.y
+  );
+
+  if (!support) {
+    return true;
+  }
+
+  const faceBounds = getFaceBounds(face);
+  const supportScreen = project(marble.x, marble.y, support.z, createView(runtime,
+    runtime._lastCssWidth || 1280,
+    runtime._lastCssHeight || 720
+  ));
+
+  return faceBounds.maxY >= supportScreen.y - 1;
+}
+
   function clipToMarble(ctx, ball, radius) {
     ctx.beginPath();
     ctx.arc(ball.x, ball.y, radius + 1.5, 0, Math.PI * 2);
@@ -484,21 +506,30 @@ function wallTopShouldOcclude(geom, marble, ball, radius) {
         if (!geom) continue;
         if (geom.cell.kind !== 'wall') continue;
 
-        if (wallFaceShouldOcclude('south', geom, marble, ball, radius)) {
+        if (
+          wallFaceShouldOcclude('south', geom, marble, ball, radius) &&
+          wallStillCoversSupport(geom.southFace, runtime, marble)
+        ) {
           ctx.save();
           clipToMarble(ctx, ball, radius);
           repaintFace(ctx, geom.southFace, darken(geom.baseColor, 0.55));
           ctx.restore();
         }
 
-        if (wallFaceShouldOcclude('east', geom, marble, ball, radius)) {
+        if (
+          wallFaceShouldOcclude('east', geom, marble, ball, radius) &&
+          wallStillCoversSupport(geom.eastFace, runtime, marble)
+        ) {
           ctx.save();
           clipToMarble(ctx, ball, radius);
           repaintFace(ctx, geom.eastFace, darken(geom.baseColor, 0.7));
           ctx.restore();
         }
 
-        if (wallTopShouldOcclude(geom, marble, ball, radius)) {
+        if (
+          wallTopShouldOcclude(geom, marble, ball, radius) &&
+          wallStillCoversSupport(geom.top, runtime, marble)
+        ) {
           ctx.save();
           clipToMarble(ctx, ball, radius);
           repaintTop(ctx, geom.top, geom.baseColor);
@@ -532,6 +563,8 @@ function wallTopShouldOcclude(geom, marble, ball, radius) {
 
     const { ctx, cssWidth, cssHeight } = fitCanvasToDisplay(canvas);
     const view = createView(runtime, cssWidth, cssHeight);
+    runtime._lastCssWidth = cssWidth;
+    runtime._lastCssHeight = cssHeight;
 
     ctx.clearRect(0, 0, cssWidth, cssHeight);
     renderBackground(ctx, cssWidth, cssHeight);
