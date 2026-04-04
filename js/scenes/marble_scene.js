@@ -20,6 +20,8 @@
       marble: {
         x: level.start.x,
         y: level.start.y,
+        lookX: 0,
+        lookY: 0,
         z: getStartZ(level),
         vx: 0,
         vy: 0,
@@ -50,6 +52,8 @@
 
     runtime.camera.x = level.start.x;
     runtime.camera.y = level.start.y;
+    runtime.camera.lookX = 0;
+    runtime.camera.LookY = 0;
 
     runtime.status = 'running';
     runtime.timerMs = 0;
