@@ -415,9 +415,9 @@
     const face = faceName === 'south' ? geom.southFace : geom.eastFace;
     if (!face) return false;
     if (faceName === 'south') {
-    if (!faceIntersectsMarble(face, ball, radius, 1.0, 2.4)) return false;
+    if (!faceIntersectsMarble(face, ball, radius, 1.0, 2.0)) return false;
     } else {
-    if (!faceIntersectsMarble(face, ball, radius, 1.1, 2.4)) return false;
+    if (!faceIntersectsMarble(face, ball, radius, 2.2, 1.2)) return false;
     }
 
     const inset = 0.02;
