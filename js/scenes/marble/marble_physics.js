@@ -5,6 +5,7 @@
   const MAX_GROUND_SPEED = 7.2;
   const MAX_AIR_SPEED = 8.0;
   const MAX_STEP_UP = 0.48;
+  const MAX_STEP_DOWN = 0.65;
   const GROUND_SNAP = 0.18;
   const VERTICAL_GRAVITY = -22.0;
   const MOVE_STEP = 0.08;
@@ -66,20 +67,33 @@
     clampSpeed(marble, MAX_AIR_SPEED);
   }
 
-  function getSupportedSurface(level, x, y, radius) {
-    return window.MarbleLevels.sampleSupportSurface(level, x, y, radius);
+  function getSupportedSurface(level, x, y, radius, includeWalls = true) {
+    return window.MarbleLevels.sampleSupportSurface(
+      level,
+      x,
+      y,
+      radius,
+      0.72,
+      { includeWalls }
+    );
   }
 
   function classifySurfaceTransition(currentSurface, nextSurface) {
     if (!nextSurface) return 'air';
 
-    if (nextSurface.z > currentSurface.z + MAX_STEP_UP) {
+    const stepUp = nextSurface.z - currentSurface.z;
+    if (stepUp > MAX_STEP_UP) {
       return 'blocked';
+    }
+
+    const stepDown = currentSurface.z - nextSurface.z;
+    if (stepDown > MAX_STEP_DOWN) {
+      return 'air';
     }
 
     return 'ground';
   }
-
+  
   function getBlockingWallTop(level, x, y, radius = 0) {
     let maxTop = null;
 

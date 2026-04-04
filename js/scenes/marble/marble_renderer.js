@@ -441,6 +441,32 @@
     return false;
   }
 
+  function repaintTop(ctx, top, fillStyle) {
+  beginPoly(ctx, top);
+  ctx.fillStyle = fillStyle;
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(241,245,249,0.18)';
+  ctx.lineWidth = 1.2;
+  ctx.stroke();
+}
+
+function wallTopShouldOcclude(geom, marble, ball, radius) {
+  if (geom.cell.kind !== 'wall') return false;
+  if (!faceIntersectsMarble(geom.top, ball, radius)) return false;
+
+  const wallTopZ = window.MarbleLevels.getCellTopZ(geom.cell);
+  const marbleBottomZ = marble.z - marble.radius;
+
+  if (marbleBottomZ >= wallTopZ - 0.01) {
+    return false;
+  }
+
+  const behindNorthSide = marble.y < geom.ty + 1 - 0.02;
+  const behindWestSide = marble.x < geom.tx + 1 - 0.02;
+
+  return behindNorthSide || behindWestSide;
+}
+
   function clipToMarble(ctx, ball, radius) {
     ctx.beginPath();
     ctx.arc(ball.x, ball.y, radius + 1.5, 0, Math.PI * 2);
@@ -476,6 +502,13 @@
           ctx.save();
           clipToMarble(ctx, ball, radius);
           repaintFace(ctx, geom.eastFace, darken(geom.baseColor, 0.7));
+          ctx.restore();
+        }
+
+        if (wallTopShouldOcclude(geom, marble, ball, radius)) {
+          ctx.save();
+          clipToMarble(ctx, ball, radius);
+          repaintTop(ctx, geom.top, geom.baseColor);
           ctx.restore();
         }
       }

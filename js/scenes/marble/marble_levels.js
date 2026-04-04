@@ -79,13 +79,15 @@
     }
   }
 
-  function sampleCellSurface(level, x, y) {
+  function sampleCellSurface(level, x, y, options = {}) {
+    const includeWalls = !!options.includeWalls;
     const tx = Math.floor(x);
     const ty = Math.floor(y);
     const cell = getCell(level, tx, ty);
 
     if (!cell) return null;
-    if (cell.kind === 'void' || cell.kind === 'wall') return null;
+    if (cell.kind === 'void') return null;
+    if (cell.kind === 'wall' && !includeWalls) return null;
 
     const u = x - tx;
     const v = y - ty;
@@ -107,8 +109,8 @@
     };
   }
 
-  function sampleSupportSurface(level, x, y, radius = 0.26, clearance = 0.72) {
-    const center = sampleCellSurface(level, x, y);
+  function sampleSupportSurface(level, x, y, radius = 0.26, clearance = 0.72, options = {}) {
+    const center = sampleCellSurface(level, x, y, options);
     if (!center) return null;
 
     const r = radius * clearance;
@@ -127,7 +129,7 @@
 
     const samples = [];
     for (const [ox, oy] of offsets) {
-      const sample = sampleCellSurface(level, x + ox, y + oy);
+      const sample = sampleCellSurface(level, x + ox, y + oy, options);
       if (!sample) return null;
       samples.push(sample);
     }
