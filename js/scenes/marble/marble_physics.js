@@ -276,12 +276,37 @@
   }
 
   function updateCamera(runtime, dt) {
-    const speed = Math.hypot(runtime.marble.vx, runtime.marble.vy);
-    const lookAhead = Math.min(0.18, speed * 0.025);
-    const targetX = runtime.marble.x + runtime.marble.vx * lookAhead;
-    const targetY = runtime.marble.y + runtime.marble.vy * lookAhead;
-    const follow = Math.min(1, dt * 9.5);
+    const marble = runtime.marble;
+    const speed = Math.hypot(marble.vx, marble.vy);
 
+    if (!runtime.camera) {
+      runtime.camera = { x: marble.x, y: marble.y };
+    }
+
+    if (typeof runtime.camera.lookX !== 'number') runtime.camera.lookX = 0;
+    if (typeof runtime.camera.lookY !== 'number') runtime.camera.lookY = 0;
+
+    let dirX = 0;
+    let dirY = 0;
+
+    if (speed > 0.001) {
+      dirX = marble.vx / speed;
+      dirY = marble.vy / speed;
+    }
+
+    const desiredLookDistance =
+      speed > 0.05
+        ? Math.min(1.6, 0.45 + speed * 0.18)
+        : 0;
+
+    const lookFollow = Math.min(1, dt * 10);
+    runtime.camera.lookX += (dirX * desiredLookDistance - runtime.camera.lookX) * lookFollow;
+    runtime.camera.lookY += (dirY * desiredLookDistance - runtime.camera.lookY) * lookFollow;
+
+    const targetX = marble.x + runtime.camera.lookX;
+    const targetY = marble.y + runtime.camera.lookY;
+
+    const follow = Math.min(1, dt * 12.5);
     runtime.camera.x += (targetX - runtime.camera.x) * follow;
     runtime.camera.y += (targetY - runtime.camera.y) * follow;
   }
