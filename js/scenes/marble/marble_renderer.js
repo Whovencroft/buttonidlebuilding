@@ -413,7 +413,50 @@
     return overlapsX && faceIsInFront;
   }
 
-  function renderFrontOccluders(ctx, runtime, view) {
+    function getFaceBounds(points) {
+    let minX = Infinity;
+    let maxX = -Infinity;
+    let minY = Infinity;
+    let maxY = -Infinity;
+
+    for (const point of points) {
+      if (point.x < minX) minX = point.x;
+      if (point.x > maxX) maxX = point.x;
+      if (point.y < minY) minY = point.y;
+      if (point.y > maxY) maxY = point.y;
+    }
+
+    return { minX, maxX, minY, maxY };
+  }
+
+  function faceIntersectsMarble(face, ball, radius) {
+    if (!face) return false;
+
+    const bounds = getFaceBounds(face);
+
+    return !(
+      bounds.maxX < ball.x - radius ||
+      bounds.minX > ball.x + radius ||
+      bounds.maxY < ball.y - radius ||
+      bounds.minY > ball.y + radius
+    );
+  }
+
+  function clipToMarble(ctx, ball, radius) {
+    ctx.beginPath();
+    ctx.arc(ball.x, ball.y, radius + 1.5, 0, Math.PI * 2);
+    ctx.clip();
+  }
+
+  function repaintFace(ctx, face, fillStyle) {
+    beginPoly(ctx, face);
+    ctx.fillStyle = fillStyle;
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+    ctx.stroke();
+  }
+
+    function renderFrontOccluders(ctx, runtime, view) {
     const { ball, radius } = getMarbleProjection(runtime, view);
 
     for (let ty = 0; ty < runtime.level.height; ty += 1) {
@@ -421,20 +464,18 @@
         const geom = buildTileGeometry(runtime.level, tx, ty, view);
         if (!geom) continue;
 
-        if (geom.southFace && faceCanOccludeMarble(geom.southFace, ball, radius)) {
-          beginPoly(ctx, geom.southFace);
-          ctx.fillStyle = darken(geom.baseColor, 0.55);
-          ctx.fill();
-          ctx.strokeStyle = 'rgba(255,255,255,0.05)';
-          ctx.stroke();
+        if (geom.southFace && faceIntersectsMarble(geom.southFace, ball, radius)) {
+          ctx.save();
+          clipToMarble(ctx, ball, radius);
+          repaintFace(ctx, geom.southFace, darken(geom.baseColor, 0.55));
+          ctx.restore();
         }
 
-        if (geom.eastFace && faceCanOccludeMarble(geom.eastFace, ball, radius)) {
-          beginPoly(ctx, geom.eastFace);
-          ctx.fillStyle = darken(geom.baseColor, 0.7);
-          ctx.fill();
-          ctx.strokeStyle = 'rgba(255,255,255,0.05)';
-          ctx.stroke();
+        if (geom.eastFace && faceIntersectsMarble(geom.eastFace, ball, radius)) {
+          ctx.save();
+          clipToMarble(ctx, ball, radius);
+          repaintFace(ctx, geom.eastFace, darken(geom.baseColor, 0.7));
+          ctx.restore();
         }
       }
     }
