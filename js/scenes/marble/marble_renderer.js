@@ -454,7 +454,7 @@
 
 function wallTopShouldOcclude(geom, marble, ball, radius) {
   if (geom.cell.kind !== 'wall') return false;
-  if (!faceIntersectsMarble(geom.top, ball, radius)) return false;
+  if (!faceIntersectsMarble(geom.top, ball, radius, 1.1, 2.9)) return false;
 
   const wallTopZ = window.MarbleLevels.getCellTopZ(geom.cell);
   const marbleBottomZ = marble.z - marble.radius;
