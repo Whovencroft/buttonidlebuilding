@@ -412,36 +412,27 @@
     }
 
   function wallFaceShouldOcclude(faceName, geom, marble, ball, radius) {
-    const face = faceName === 'south' ? geom.southFace : geom.eastFace;
-    if (!face) return false;
-    if (faceName === 'south') {
+  const face = faceName === 'south' ? geom.southFace : geom.eastFace;
+  if (!face) return false;
+
+  if (faceName === 'south') {
     if (!faceIntersectsMarble(face, ball, radius, 1.0, 2.0)) return false;
-    } else {
+  } else {
     if (!faceIntersectsMarble(face, ball, radius, 2.2, 1.2)) return false;
-    }
+  }
 
-    const inset = 0.02;
+  const wallTopZ = window.MarbleLevels.getCellTopZ(geom.cell);
+  const marbleBottomZ = marble.z - marble.radius;
 
-    if (faceName === 'south') {
-      const edgeY = geom.ty + 1;
-      const withinX =
-        marble.x >= geom.tx - marble.radius &&
-        marble.x <= geom.tx + 1 + marble.radius;
-      const behindFace = marble.y < edgeY - inset;
-      return withinX && behindFace;
-    }
-
-    if (faceName === 'east') {
-      const edgeX = geom.tx + 1;
-      const withinY =
-        marble.y >= geom.ty - marble.radius &&
-        marble.y <= geom.ty + 1 + marble.radius;
-      const behindFace = marble.x < edgeX - inset;
-      return withinY && behindFace;
-    }
-
+  if (marbleBottomZ >= wallTopZ - 0.01) {
     return false;
   }
+
+  const bounds = getFaceBounds(face);
+  const faceInFrontOfBall = bounds.maxY >= ball.y - radius * 0.35;
+
+  return faceInFrontOfBall;
+}
 
   function repaintTop(ctx, top, fillStyle) {
   beginPoly(ctx, top);
@@ -454,7 +445,7 @@
 
 function wallTopShouldOcclude(geom, marble, ball, radius) {
   if (geom.cell.kind !== 'wall') return false;
-  if (!faceIntersectsMarble(geom.top, ball, radius)) return false;
+  if (!faceIntersectsMarble(geom.top, ball, radius, 1.1, 2.9)) return false;
 
   const wallTopZ = window.MarbleLevels.getCellTopZ(geom.cell);
   const marbleBottomZ = marble.z - marble.radius;
@@ -463,10 +454,10 @@ function wallTopShouldOcclude(geom, marble, ball, radius) {
     return false;
   }
 
-  const behindNorthSide = marble.y < geom.ty + 1 - 0.02;
-  const behindWestSide = marble.x < geom.tx + 1 - 0.02;
+  const topBounds = getFaceBounds(geom.top);
+  const topInFrontOfBall = topBounds.maxY >= ball.y - radius * 0.2;
 
-  return behindNorthSide || behindWestSide;
+  return topInFrontOfBall;
 }
 
   function clipToMarble(ctx, ball, radius) {
