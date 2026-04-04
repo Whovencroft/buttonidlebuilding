@@ -427,16 +427,16 @@
       const withinX =
         marble.x >= geom.tx - marble.radius &&
         marble.x <= geom.tx + 1 + marble.radius;
-      const behindFace = marble.y > edgeY + inset;
+      const behindFace = marble.y < edgeY - inset;
       return withinX && behindFace;
     }
 
     if (faceName === 'east') {
-      const edgeX = geom.tx;
+      const edgeX = geom.tx + 1;
       const withinY =
         marble.y >= geom.ty - marble.radius &&
         marble.y <= geom.ty + 1 + marble.radius;
-      const behindFace = marble.x > edgeX + inset;
+      const behindFace = marble.x < edgeX - inset;
       return withinY && behindFace;
     }
 
