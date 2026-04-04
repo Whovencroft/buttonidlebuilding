@@ -380,16 +380,48 @@
     ctx.restore();
   }
 
+    function getFaceBounds(points) {
+    let minX = Infinity;
+    let maxX = -Infinity;
+    let minY = Infinity;
+    let maxY = -Infinity;
+
+    for (const point of points) {
+      if (point.x < minX) minX = point.x;
+      if (point.x > maxX) maxX = point.x;
+      if (point.y < minY) minY = point.y;
+      if (point.y > maxY) maxY = point.y;
+    }
+
+    return { minX, maxX, minY, maxY };
+  }
+
+  function faceCanOccludeMarble(face, marbleBall, marbleRadius) {
+    if (!face) return false;
+
+    const bounds = getFaceBounds(face);
+    const horizontalMargin = marbleRadius * 0.9;
+    const verticalMargin = marbleRadius * 0.35;
+
+    const overlapsX =
+      bounds.maxX >= marbleBall.x - horizontalMargin &&
+      bounds.minX <= marbleBall.x + horizontalMargin;
+
+    const faceIsInFront =
+      bounds.maxY >= marbleBall.y - verticalMargin;
+
+    return overlapsX && faceIsInFront;
+  }
+
   function renderFrontOccluders(ctx, runtime, view) {
-    const { shadow } = getMarbleProjection(runtime, view);
-    const occludeCutoffY = shadow.y - 1;
+    const { ball, radius } = getMarbleProjection(runtime, view);
 
     for (let ty = 0; ty < runtime.level.height; ty += 1) {
       for (let tx = 0; tx < runtime.level.width; tx += 1) {
         const geom = buildTileGeometry(runtime.level, tx, ty, view);
         if (!geom) continue;
 
-        if (geom.southFace && averageY(geom.southFace) >= occludeCutoffY) {
+        if (geom.southFace && faceCanOccludeMarble(geom.southFace, ball, radius)) {
           beginPoly(ctx, geom.southFace);
           ctx.fillStyle = darken(geom.baseColor, 0.55);
           ctx.fill();
@@ -397,7 +429,7 @@
           ctx.stroke();
         }
 
-        if (geom.eastFace && averageY(geom.eastFace) >= occludeCutoffY) {
+        if (geom.eastFace && faceCanOccludeMarble(geom.eastFace, ball, radius)) {
           beginPoly(ctx, geom.eastFace);
           ctx.fillStyle = darken(geom.baseColor, 0.7);
           ctx.fill();
