@@ -495,25 +495,30 @@
   }
 
   function wallStillCoversSupport(face, runtime, marble, view) {
-    if (!face) return false;
+  if (!face) return false;
 
-    const support = window.MarbleLevels.sampleCellSurface(
-      runtime.level,
-      marble.x,
-      marble.y
-    );
+  const support = window.MarbleLevels.sampleCellSurface(
+    runtime.level,
+    marble.x,
+    marble.y
+  );
 
-    if (!support) {
-      return true;
-    }
-
-    const supportScreen = project(marble.x, marble.y, support.z, view);
-    const slice = getVerticalSliceYRange(face, supportScreen.x);
-
-    if (!slice) return false;
-
-    return slice.maxY >= supportScreen.y - 1;
+  if (!support) {
+    return true;
   }
+
+  const supportScreen = project(marble.x, marble.y, support.z, view);
+  const slice = getVerticalSliceYRange(face, supportScreen.x);
+
+  if (!slice) return false;
+
+  const pad = 1.0;
+
+  return (
+    supportScreen.y >= slice.minY - pad &&
+    supportScreen.y <= slice.maxY + pad
+  );
+}
 
   function clipToMarble(ctx, ball, radius) {
     ctx.beginPath();
