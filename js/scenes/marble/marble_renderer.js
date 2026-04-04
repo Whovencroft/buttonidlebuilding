@@ -403,7 +403,7 @@
 
     const bounds = getFaceBounds(face);
     const padX = radius * 1.15;
-    const padY = radius * 2.0;
+    const padY = radius * 2.4;
 
     return !(
       bounds.maxX < ball.x - padX ||
