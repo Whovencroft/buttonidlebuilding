@@ -398,25 +398,27 @@
     return { minX, maxX, minY, maxY };
   }
 
-  function faceIntersectsMarble(face, ball, radius) {
-    if (!face) return false;
+    function faceIntersectsMarble(face, ball, radius, padX = 1.0, padY = 1.0) {
+      if (!face) return false;
 
-    const bounds = getFaceBounds(face);
-    const padX = radius * 1.5;
-    const padY = radius * 2.4;
+      const bounds = getFaceBounds(face);
 
-    return !(
-      bounds.maxX < ball.x - padX ||
-      bounds.minX > ball.x + padX ||
-      bounds.maxY < ball.y - padY ||
-      bounds.minY > ball.y + padY
-    );
-  }
+      return !(
+        bounds.maxX < ball.x - radius * padX ||
+        bounds.minX > ball.x + radius * padX ||
+        bounds.maxY < ball.y - radius * padY ||
+        bounds.minY > ball.y + radius * padY
+      );
+    }
 
   function wallFaceShouldOcclude(faceName, geom, marble, ball, radius) {
     const face = faceName === 'south' ? geom.southFace : geom.eastFace;
     if (!face) return false;
-    if (!faceIntersectsMarble(face, ball, radius)) return false;
+    if (faceName === 'south') {
+    if (!faceIntersectsMarble(face, ball, radius, 1.0, 2.4)) return false;
+    } else {
+    if (!faceIntersectsMarble(face, ball, radius, 1.1, 1.2)) return false;
+    }
 
     const inset = 0.02;
 
