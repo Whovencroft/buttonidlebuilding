@@ -402,7 +402,7 @@
     if (!face) return false;
 
     const bounds = getFaceBounds(face);
-    const padX = radius * 1.15;
+    const padX = radius * 1.5;
     const padY = radius * 2.4;
 
     return !(
