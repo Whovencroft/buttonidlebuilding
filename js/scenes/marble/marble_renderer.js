@@ -21,7 +21,7 @@
     };
   }
 
-    function createView(runtime, cssWidth, cssHeight) {
+  function createView(runtime, cssWidth, cssHeight) {
     const base = Math.min(cssWidth, cssHeight);
 
     const tileW = Math.max(
@@ -70,10 +70,6 @@
       ctx.lineTo(points[i].x, points[i].y);
     }
     ctx.closePath();
-  }
-
-  function averageY(points) {
-    return points.reduce((sum, point) => sum + point.y, 0) / Math.max(1, points.length);
   }
 
   function getTileCorners(level, tx, ty) {
@@ -382,7 +378,7 @@
     ctx.restore();
   }
 
-      function getFaceBounds(points) {
+  function getFaceBounds(points) {
     let minX = Infinity;
     let maxX = -Infinity;
     let minY = Infinity;
@@ -398,89 +394,126 @@
     return { minX, maxX, minY, maxY };
   }
 
-    function faceIntersectsMarble(face, ball, radius, padX = 1.0, padY = 1.0) {
-      if (!face) return false;
+  function getVerticalSliceYRange(points, x) {
+    const ys = [];
 
-      const bounds = getFaceBounds(face);
+    for (let i = 0; i < points.length; i += 1) {
+      const a = points[i];
+      const b = points[(i + 1) % points.length];
 
-      return !(
-        bounds.maxX < ball.x - radius * padX ||
-        bounds.minX > ball.x + radius * padX ||
-        bounds.maxY < ball.y - radius * padY ||
-        bounds.minY > ball.y + radius * padY
-      );
+      const minX = Math.min(a.x, b.x);
+      const maxX = Math.max(a.x, b.x);
+
+      if (x < minX || x > maxX) continue;
+
+      if (Math.abs(a.x - b.x) < 0.0001) {
+        ys.push(a.y, b.y);
+        continue;
+      }
+
+      const t = (x - a.x) / (b.x - a.x);
+      if (t >= 0 && t <= 1) {
+        ys.push(a.y + (b.y - a.y) * t);
+      }
     }
 
+    if (ys.length < 2) return null;
+
+    ys.sort((a, b) => a - b);
+    return {
+      minY: ys[0],
+      maxY: ys[ys.length - 1]
+    };
+  }
+
+  function faceIntersectsMarble(face, ball, radius, padX = 1.0, padY = 1.0) {
+    if (!face) return false;
+
+    const bounds = getFaceBounds(face);
+
+    return !(
+      bounds.maxX < ball.x - radius * padX ||
+      bounds.minX > ball.x + radius * padX ||
+      bounds.maxY < ball.y - radius * padY ||
+      bounds.minY > ball.y + radius * padY
+    );
+  }
+
   function wallFaceShouldOcclude(faceName, geom, marble, ball, radius) {
-  const face = faceName === 'south' ? geom.southFace : geom.eastFace;
-  if (!face) return false;
+    const face = faceName === 'south' ? geom.southFace : geom.eastFace;
+    if (!face) return false;
 
-  if (faceName === 'south') {
-    if (!faceIntersectsMarble(face, ball, radius, 1.0, 2.0)) return false;
-  } else {
-    if (!faceIntersectsMarble(face, ball, radius, 2.2, 1.2)) return false;
+    if (faceName === 'south') {
+      if (!faceIntersectsMarble(face, ball, radius, 1.0, 2.0)) return false;
+    } else {
+      if (!faceIntersectsMarble(face, ball, radius, 2.2, 1.2)) return false;
+    }
+
+    const wallTopZ = window.MarbleLevels.getCellTopZ(geom.cell);
+    const marbleBottomZ = marble.z - marble.radius;
+
+    if (marbleBottomZ >= wallTopZ - 0.01) {
+      return false;
+    }
+
+    const slice = getVerticalSliceYRange(face, ball.x);
+    if (!slice) return false;
+
+    return (
+      slice.maxY >= ball.y - radius * 0.15 &&
+      slice.minY <= ball.y + radius * 0.9
+    );
   }
-
-  const wallTopZ = window.MarbleLevels.getCellTopZ(geom.cell);
-  const marbleBottomZ = marble.z - marble.radius;
-
-  if (marbleBottomZ >= wallTopZ - 0.01) {
-    return false;
-  }
-
-  const bounds = getFaceBounds(face);
-  const faceInFrontOfBall = bounds.maxY >= ball.y - radius * 0.35;
-
-  return faceInFrontOfBall;
-}
 
   function repaintTop(ctx, top, fillStyle) {
-  beginPoly(ctx, top);
-  ctx.fillStyle = fillStyle;
-  ctx.fill();
-  ctx.strokeStyle = 'rgba(241,245,249,0.18)';
-  ctx.lineWidth = 1.2;
-  ctx.stroke();
-}
-
-function wallTopShouldOcclude(geom, marble, ball, radius) {
-  if (geom.cell.kind !== 'wall') return false;
-  if (!faceIntersectsMarble(geom.top, ball, radius, 1.1, 2.9)) return false;
-
-  const wallTopZ = window.MarbleLevels.getCellTopZ(geom.cell);
-  const marbleBottomZ = marble.z - marble.radius;
-
-  if (marbleBottomZ >= wallTopZ - 0.01) {
-    return false;
+    beginPoly(ctx, top);
+    ctx.fillStyle = fillStyle;
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(241,245,249,0.18)';
+    ctx.lineWidth = 1.2;
+    ctx.stroke();
   }
 
-  const topBounds = getFaceBounds(geom.top);
-  const topInFrontOfBall = topBounds.maxY >= ball.y - radius * 0.2;
+  function wallTopShouldOcclude(geom, marble, ball, radius) {
+    if (geom.cell.kind !== 'wall') return false;
+    if (!faceIntersectsMarble(geom.top, ball, radius, 1.0, 1.5)) return false;
 
-  return topInFrontOfBall;
-}
+    const wallTopZ = window.MarbleLevels.getCellTopZ(geom.cell);
+    const marbleBottomZ = marble.z - marble.radius;
 
-  function wallStillCoversSupport(face, runtime, marble) {
-  if (!face) return false;
+    if (marbleBottomZ >= wallTopZ - 0.01) {
+      return false;
+    }
 
-  const support = window.MarbleLevels.sampleCellSurface(
-    runtime.level,
-    marble.x,
-    marble.y
-  );
+    const slice = getVerticalSliceYRange(geom.top, ball.x);
+    if (!slice) return false;
 
-  if (!support) {
-    return true;
+    return (
+      slice.maxY >= ball.y - radius * 0.1 &&
+      slice.minY <= ball.y + radius * 0.7
+    );
   }
 
-  const faceBounds = getFaceBounds(face);
-  const supportScreen = project(marble.x, marble.y, support.z, createView(runtime,
-    runtime._lastCssWidth || 1280,
-    runtime._lastCssHeight || 720
-  ));
+  function wallStillCoversSupport(face, runtime, marble, view) {
+    if (!face) return false;
 
-  return faceBounds.maxY >= supportScreen.y - 1;
-}
+    const support = window.MarbleLevels.sampleCellSurface(
+      runtime.level,
+      marble.x,
+      marble.y
+    );
+
+    if (!support) {
+      return true;
+    }
+
+    const supportScreen = project(marble.x, marble.y, support.z, view);
+    const slice = getVerticalSliceYRange(face, supportScreen.x);
+
+    if (!slice) return false;
+
+    return slice.maxY >= supportScreen.y - 1;
+  }
 
   function clipToMarble(ctx, ball, radius) {
     ctx.beginPath();
@@ -508,7 +541,7 @@ function wallTopShouldOcclude(geom, marble, ball, radius) {
 
         if (
           wallFaceShouldOcclude('south', geom, marble, ball, radius) &&
-          wallStillCoversSupport(geom.southFace, runtime, marble)
+          wallStillCoversSupport(geom.southFace, runtime, marble, view)
         ) {
           ctx.save();
           clipToMarble(ctx, ball, radius);
@@ -518,7 +551,7 @@ function wallTopShouldOcclude(geom, marble, ball, radius) {
 
         if (
           wallFaceShouldOcclude('east', geom, marble, ball, radius) &&
-          wallStillCoversSupport(geom.eastFace, runtime, marble)
+          wallStillCoversSupport(geom.eastFace, runtime, marble, view)
         ) {
           ctx.save();
           clipToMarble(ctx, ball, radius);
@@ -528,7 +561,7 @@ function wallTopShouldOcclude(geom, marble, ball, radius) {
 
         if (
           wallTopShouldOcclude(geom, marble, ball, radius) &&
-          wallStillCoversSupport(geom.top, runtime, marble)
+          wallStillCoversSupport(geom.top, runtime, marble, view)
         ) {
           ctx.save();
           clipToMarble(ctx, ball, radius);
@@ -563,8 +596,6 @@ function wallTopShouldOcclude(geom, marble, ball, radius) {
 
     const { ctx, cssWidth, cssHeight } = fitCanvasToDisplay(canvas);
     const view = createView(runtime, cssWidth, cssHeight);
-    runtime._lastCssWidth = cssWidth;
-    runtime._lastCssHeight = cssHeight;
 
     ctx.clearRect(0, 0, cssWidth, cssHeight);
     renderBackground(ctx, cssWidth, cssHeight);
