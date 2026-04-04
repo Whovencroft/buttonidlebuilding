@@ -401,7 +401,7 @@
 
     const bounds = getFaceBounds(face);
     const horizontalMargin = marbleRadius * 1.1;
-    const verticalMargin = marbleRadius * 0.35;
+    const verticalMargin = marbleRadius * 0.5;
 
     const overlapsX =
       bounds.maxX >= marbleBall.x - horizontalMargin &&
