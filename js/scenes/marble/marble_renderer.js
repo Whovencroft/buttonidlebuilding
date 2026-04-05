@@ -552,21 +552,21 @@ function wallStillCoversSupport(geom, faceName, runtime, marble, view) {
 
       if (
         wallFaceShouldOcclude('south', geom, marble, ball, radius) &&
-        wallStillCoversSupport(geom.southFace, runtime, marble, view)
+        wallStillCoversSupport(geom, 'south', runtime, marble, view)
       ) {
         repaintFace(ctx, geom.southFace, darken(geom.baseColor, 0.55));
       }
 
       if (
         wallFaceShouldOcclude('east', geom, marble, ball, radius) &&
-        wallStillCoversSupport(geom.eastFace, runtime, marble, view)
+        wallStillCoversSupport(geom, 'east', runtime, marble, view)
       ) {
         repaintFace(ctx, geom.eastFace, darken(geom.baseColor, 0.7));
       }
 
       if (
         wallTopShouldOcclude(geom, marble, ball, radius) &&
-        wallStillCoversSupport(geom.top, runtime, marble, view)
+        wallStillCoversSupport(geom, 'top', runtime, marble, view)
       ) {
         repaintTop(ctx, geom.top, geom.baseColor);
       }
