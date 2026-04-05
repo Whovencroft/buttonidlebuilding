@@ -270,7 +270,7 @@ function renderGroundTops(ctx, runtime, view) {
   }
 }
 
-function renderWallBodies(ctx, runtime, view) {
+function renderWallFaces(ctx, runtime, view) {
   for (let ty = 0; ty < runtime.level.height; ty += 1) {
     for (let tx = 0; tx < runtime.level.width; tx += 1) {
       const geom = buildTileGeometry(runtime.level, tx, ty, view);
@@ -279,6 +279,17 @@ function renderWallBodies(ctx, runtime, view) {
 
       renderTileFacePolygon(ctx, geom.southFace, darken(geom.baseColor, 0.55));
       renderTileFacePolygon(ctx, geom.eastFace, darken(geom.baseColor, 0.7));
+    }
+  }
+}
+
+function renderWallTops(ctx, runtime, view) {
+  for (let ty = 0; ty < runtime.level.height; ty += 1) {
+    for (let tx = 0; tx < runtime.level.width; tx += 1) {
+      const geom = buildTileGeometry(runtime.level, tx, ty, view);
+      if (!geom) continue;
+      if (geom.cell.kind !== 'wall') continue;
+
       renderTileTop(ctx, geom);
     }
   }
@@ -610,7 +621,8 @@ function renderWallBodies(ctx, runtime, view) {
 
     renderGroundFaces(ctx, runtime, view);
     renderGroundTops(ctx, runtime, view);
-    renderWallBodies(ctx, runtime, view);
+    renderWallFaces(ctx, runtime, view);
+    renderWallTops(ctx, runtime, view);
     renderGoal(ctx, runtime, view);
     renderMarble(ctx, runtime, view);
     renderFrontOccluders(ctx, runtime, view);
