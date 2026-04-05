@@ -494,9 +494,7 @@
     );
   }
 
-  function wallStillCoversSupport(face, runtime, marble, view) {
-  if (!face) return false;
-
+function wallStillCoversSupport(geom, faceName, runtime, marble, view) {
   const support = window.MarbleLevels.sampleCellSurface(
     runtime.level,
     marble.x,
@@ -507,12 +505,26 @@
     return true;
   }
 
+  const wallFrontDepth = geom.tx + geom.ty + 1;
+  const supportDepth = marble.x + marble.y;
+
+  if (supportDepth > wallFrontDepth + 0.05) {
+    return false;
+  }
+
+  const poly =
+    faceName === 'south' ? geom.southFace :
+    faceName === 'east' ? geom.eastFace :
+    geom.top;
+
+  if (!poly) return false;
+
   const supportScreen = project(marble.x, marble.y, support.z, view);
-  const slice = getVerticalSliceYRange(face, supportScreen.x);
+  const slice = getVerticalSliceYRange(poly, supportScreen.x);
 
   if (!slice) return false;
 
-  const pad = 1.0;
+  const pad = 0.35;
 
   return (
     supportScreen.y >= slice.minY - pad &&
@@ -546,7 +558,7 @@
 
         if (
           wallFaceShouldOcclude('south', geom, marble, ball, radius) &&
-          wallStillCoversSupport(geom.southFace, runtime, marble, view)
+          wallStillCoversSupport(geom, 'south', runtime, marble, view)
         ) {
           ctx.save();
           clipToMarble(ctx, ball, radius);
@@ -556,7 +568,7 @@
 
         if (
           wallFaceShouldOcclude('east', geom, marble, ball, radius) &&
-          wallStillCoversSupport(geom.eastFace, runtime, marble, view)
+          wallStillCoversSupport(geom, 'east', runtime, marble, view)
         ) {
           ctx.save();
           clipToMarble(ctx, ball, radius);
@@ -566,7 +578,7 @@
 
         if (
           wallTopShouldOcclude(geom, marble, ball, radius) &&
-          wallStillCoversSupport(geom.top, runtime, marble, view)
+          wallStillCoversSupport(geom, 'top', runtime, marble, view)
         ) {
           ctx.save();
           clipToMarble(ctx, ball, radius);
