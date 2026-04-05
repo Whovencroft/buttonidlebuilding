@@ -93,7 +93,7 @@
       case 'hazard':
         return '#ef4444';
       case 'wall':
-        return '#475569';
+        return '#334155';
       default:
         return '#94a3b8';
     }
@@ -160,9 +160,9 @@
     return window.MarbleLevels.getCellCornerHeights(cell);
   }
 
-  function buildTileGeometry(level, tx, ty, view) {
+  function buildGroundTileGeometry(level, tx, ty, view) {
     const cell = window.MarbleLevels.getCell(level, tx, ty);
-    if (!cell || cell.kind === 'void') return null;
+    if (!cell || cell.kind === 'void' || cell.kind === 'wall') return null;
 
     const corners = getTileCorners(level, tx, ty);
     const top = [
@@ -215,6 +215,42 @@
     };
   }
 
+  function buildWallCubeGeometry(tx, ty, z0, view, baseColor) {
+    const z1 = z0 + 1;
+
+    const top = [
+      project(tx, ty, z1, view),
+      project(tx + 1, ty, z1, view),
+      project(tx + 1, ty + 1, z1, view),
+      project(tx, ty + 1, z1, view)
+    ];
+
+    const southFace = [
+      project(tx, ty + 1, z1, view),
+      project(tx + 1, ty + 1, z1, view),
+      project(tx + 1, ty + 1, z0, view),
+      project(tx, ty + 1, z0, view)
+    ];
+
+    const eastFace = [
+      project(tx + 1, ty, z1, view),
+      project(tx + 1, ty + 1, z1, view),
+      project(tx + 1, ty + 1, z0, view),
+      project(tx + 1, ty, z0, view)
+    ];
+
+    return {
+      tx,
+      ty,
+      z0,
+      z1,
+      baseColor,
+      top,
+      southFace,
+      eastFace
+    };
+  }
+
   function renderTileFacePolygon(ctx, points, fillStyle) {
     if (!points) return;
     beginPoly(ctx, points);
@@ -224,7 +260,7 @@
     ctx.stroke();
   }
 
-  function renderTileTop(ctx, geom) {
+  function renderGroundTop(ctx, geom) {
     if (!geom) return;
 
     beginPoly(ctx, geom.top);
@@ -245,55 +281,90 @@
     }
   }
 
+  function repaintTop(ctx, top, fillStyle) {
+    if (!top) return;
+    beginPoly(ctx, top);
+    ctx.fillStyle = fillStyle;
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(241,245,249,0.18)';
+    ctx.lineWidth = 1.2;
+    ctx.stroke();
+  }
+
+  function getCellTop(level, tx, ty, fallback = 0) {
+    const cell = window.MarbleLevels.getCell(level, tx, ty);
+    if (!cell || cell.kind === 'void') return fallback;
+    return window.MarbleLevels.getCellTopZ(cell);
+  }
+
+  function getWallTop(level, tx, ty) {
+    const cell = window.MarbleLevels.getCell(level, tx, ty);
+    if (!cell || cell.kind !== 'wall') return 0;
+    return Math.max(1, Math.round(window.MarbleLevels.getCellTopZ(cell)));
+  }
+
   function renderGroundFaces(ctx, runtime, view) {
-  for (let ty = 0; ty < runtime.level.height; ty += 1) {
-    for (let tx = 0; tx < runtime.level.width; tx += 1) {
-      const geom = buildTileGeometry(runtime.level, tx, ty, view);
-      if (!geom) continue;
-      if (geom.cell.kind === 'wall') continue;
+    for (let ty = 0; ty < runtime.level.height; ty += 1) {
+      for (let tx = 0; tx < runtime.level.width; tx += 1) {
+        const geom = buildGroundTileGeometry(runtime.level, tx, ty, view);
+        if (!geom) continue;
 
-      renderTileFacePolygon(ctx, geom.southFace, darken(geom.baseColor, 0.55));
-      renderTileFacePolygon(ctx, geom.eastFace, darken(geom.baseColor, 0.7));
+        renderTileFacePolygon(ctx, geom.southFace, darken(geom.baseColor, 0.55));
+        renderTileFacePolygon(ctx, geom.eastFace, darken(geom.baseColor, 0.7));
+      }
     }
   }
-}
 
-function renderGroundTops(ctx, runtime, view) {
-  for (let ty = 0; ty < runtime.level.height; ty += 1) {
-    for (let tx = 0; tx < runtime.level.width; tx += 1) {
-      const geom = buildTileGeometry(runtime.level, tx, ty, view);
-      if (!geom) continue;
-      if (geom.cell.kind === 'wall') continue;
+  function renderWallCubeFaces(ctx, runtime, view) {
+    for (let ty = 0; ty < runtime.level.height; ty += 1) {
+      for (let tx = 0; tx < runtime.level.width; tx += 1) {
+        const cell = window.MarbleLevels.getCell(runtime.level, tx, ty);
+        if (!cell || cell.kind !== 'wall') continue;
 
-      renderTileTop(ctx, geom);
+        const baseColor = getTrackColor(cell);
+        const wallTop = getWallTop(runtime.level, tx, ty);
+        const southNeighborTop = getCellTop(runtime.level, tx, ty + 1, 0);
+        const eastNeighborTop = getCellTop(runtime.level, tx + 1, ty, 0);
+
+        for (let z = 0; z < wallTop; z += 1) {
+          const cube = buildWallCubeGeometry(tx, ty, z, view, baseColor);
+
+          if (cube.z1 > southNeighborTop + 0.01) {
+            renderTileFacePolygon(ctx, cube.southFace, darken(baseColor, 0.55));
+          }
+
+          if (cube.z1 > eastNeighborTop + 0.01) {
+            renderTileFacePolygon(ctx, cube.eastFace, darken(baseColor, 0.7));
+          }
+        }
+      }
     }
   }
-}
 
-function renderWallFaces(ctx, runtime, view) {
-  for (let ty = 0; ty < runtime.level.height; ty += 1) {
-    for (let tx = 0; tx < runtime.level.width; tx += 1) {
-      const geom = buildTileGeometry(runtime.level, tx, ty, view);
-      if (!geom) continue;
-      if (geom.cell.kind !== 'wall') continue;
-
-      renderTileFacePolygon(ctx, geom.southFace, darken(geom.baseColor, 0.55));
-      renderTileFacePolygon(ctx, geom.eastFace, darken(geom.baseColor, 0.7));
+  function renderGroundTops(ctx, runtime, view) {
+    for (let ty = 0; ty < runtime.level.height; ty += 1) {
+      for (let tx = 0; tx < runtime.level.width; tx += 1) {
+        const geom = buildGroundTileGeometry(runtime.level, tx, ty, view);
+        if (!geom) continue;
+        renderGroundTop(ctx, geom);
+      }
     }
   }
-}
 
-function renderWallTops(ctx, runtime, view) {
-  for (let ty = 0; ty < runtime.level.height; ty += 1) {
-    for (let tx = 0; tx < runtime.level.width; tx += 1) {
-      const geom = buildTileGeometry(runtime.level, tx, ty, view);
-      if (!geom) continue;
-      if (geom.cell.kind !== 'wall') continue;
+  function renderWallCubeTops(ctx, runtime, view) {
+    for (let ty = 0; ty < runtime.level.height; ty += 1) {
+      for (let tx = 0; tx < runtime.level.width; tx += 1) {
+        const cell = window.MarbleLevels.getCell(runtime.level, tx, ty);
+        if (!cell || cell.kind !== 'wall') continue;
 
-      renderTileTop(ctx, geom);
+        const baseColor = getTrackColor(cell);
+        const wallTop = getWallTop(runtime.level, tx, ty);
+        const cube = buildWallCubeGeometry(tx, ty, wallTop - 1, view, baseColor);
+
+        repaintTop(ctx, cube.top, baseColor);
+      }
     }
   }
-}
 
   function renderGoal(ctx, runtime, view) {
     const goal = runtime.level.goal;
@@ -467,13 +538,7 @@ function renderWallTops(ctx, runtime, view) {
     );
   }
 
-  function marbleBelowWallTop(geom, marble) {
-    const wallTopZ = window.MarbleLevels.getCellTopZ(geom.cell);
-    const marbleBottomZ = marble.z - marble.radius;
-    return marbleBottomZ < wallTopZ - 0.01;
-  }
-
-  function wallStillCoversSupport(geom, faceName, runtime, marble, view) {
+  function polyStillCoversSupport(poly, runtime, marble, view) {
     const support = window.MarbleLevels.sampleCellSurface(
       runtime.level,
       marble.x,
@@ -484,26 +549,12 @@ function renderWallTops(ctx, runtime, view) {
       return true;
     }
 
-    const wallFrontDepth = geom.tx + geom.ty + 1;
-    const supportDepth = marble.x + marble.y;
-
-    if (supportDepth > wallFrontDepth + 0.05) {
-      return false;
-    }
-
-    const poly =
-      faceName === 'south' ? geom.southFace :
-      faceName === 'east' ? geom.eastFace :
-      geom.top;
-
-    if (!poly) return false;
-
     const supportScreen = project(marble.x, marble.y, support.z, view);
     const slice = getVerticalSliceYRange(poly, supportScreen.x);
 
     if (!slice) return false;
 
-    const pad = 0.35;
+    const pad = 0.25;
 
     return (
       supportScreen.y >= slice.minY - pad &&
@@ -511,81 +562,61 @@ function renderWallTops(ctx, runtime, view) {
     );
   }
 
-  function wallFaceShouldOcclude(faceName, geom, marble, ball, radius, runtime, view) {
-    const face = faceName === 'south' ? geom.southFace : geom.eastFace;
-    if (!face) return false;
-    if (!marbleBelowWallTop(geom, marble)) return false;
-    if (!wallStillCoversSupport(geom, faceName, runtime, marble, view)) return false;
-
-    if (faceName === 'south') {
-      if (!faceIntersectsMarble(face, ball, radius, 1.0, 2.0)) return false;
-    } else {
-      if (!faceIntersectsMarble(face, ball, radius, 2.2, 1.2)) return false;
-    }
-
-    const slice = getVerticalSliceYRange(face, ball.x);
-    if (!slice) return false;
-
-    return (
-      slice.maxY >= ball.y - radius * 0.15 &&
-      slice.minY <= ball.y + radius * 0.9
-    );
-  }
-
-  function wallTopShouldOcclude(geom, marble, ball, radius, runtime, view) {
-    if (geom.cell.kind !== 'wall') return false;
-    if (!marbleBelowWallTop(geom, marble)) return false;
-    if (!wallStillCoversSupport(geom, 'top', runtime, marble, view)) return false;
-    if (!faceIntersectsMarble(geom.top, ball, radius, 1.0, 1.5)) return false;
-
-    const slice = getVerticalSliceYRange(geom.top, ball.x);
-    if (!slice) return false;
-
-    return (
-      slice.maxY >= ball.y - radius * 0.1 &&
-      slice.minY <= ball.y + radius * 0.7
-    );
-  }
-
-  function repaintFace(ctx, face, fillStyle) {
-    if (!face) return;
-    beginPoly(ctx, face);
-    ctx.fillStyle = fillStyle;
-    ctx.fill();
-    ctx.strokeStyle = 'rgba(255,255,255,0.05)';
-    ctx.stroke();
-  }
-
-  function repaintTop(ctx, top, fillStyle) {
-    if (!top) return;
-    beginPoly(ctx, top);
-    ctx.fillStyle = fillStyle;
-    ctx.fill();
-    ctx.strokeStyle = 'rgba(241,245,249,0.18)';
-    ctx.lineWidth = 1.2;
-    ctx.stroke();
+  function wallTileStillInFront(tx, ty, marble) {
+    const wallFrontDepth = tx + ty + 1;
+    const supportDepth = marble.x + marble.y;
+    return supportDepth <= wallFrontDepth + 0.05;
   }
 
   function renderFrontOccluders(ctx, runtime, view) {
     const marble = runtime.marble;
+    const marbleBottomZ = marble.z - marble.radius;
     const { ball, radius } = getMarbleProjection(runtime, view);
 
     for (let ty = 0; ty < runtime.level.height; ty += 1) {
       for (let tx = 0; tx < runtime.level.width; tx += 1) {
-        const geom = buildTileGeometry(runtime.level, tx, ty, view);
-        if (!geom) continue;
-        if (geom.cell.kind !== 'wall') continue;
+        const cell = window.MarbleLevels.getCell(runtime.level, tx, ty);
+        if (!cell || cell.kind !== 'wall') continue;
+        if (!wallTileStillInFront(tx, ty, marble)) continue;
 
-        if (wallFaceShouldOcclude('south', geom, marble, ball, radius, runtime, view)) {
-          repaintFace(ctx, geom.southFace, darken(geom.baseColor, 0.55));
+        const baseColor = getTrackColor(cell);
+        const wallTop = getWallTop(runtime.level, tx, ty);
+        const southNeighborTop = getCellTop(runtime.level, tx, ty + 1, 0);
+        const eastNeighborTop = getCellTop(runtime.level, tx + 1, ty, 0);
+
+        for (let z = 0; z < wallTop; z += 1) {
+          const cube = buildWallCubeGeometry(tx, ty, z, view, baseColor);
+
+          if (marbleBottomZ >= cube.z1 - 0.01) {
+            continue;
+          }
+
+          if (
+            cube.z1 > southNeighborTop + 0.01 &&
+            faceIntersectsMarble(cube.southFace, ball, radius, 1.0, 1.1) &&
+            polyStillCoversSupport(cube.southFace, runtime, marble, view)
+          ) {
+            renderTileFacePolygon(ctx, cube.southFace, darken(baseColor, 0.55));
+          }
+
+          if (
+            cube.z1 > eastNeighborTop + 0.01 &&
+            faceIntersectsMarble(cube.eastFace, ball, radius, 1.2, 1.0) &&
+            polyStillCoversSupport(cube.eastFace, runtime, marble, view)
+          ) {
+            renderTileFacePolygon(ctx, cube.eastFace, darken(baseColor, 0.7));
+          }
         }
 
-        if (wallFaceShouldOcclude('east', geom, marble, ball, radius, runtime, view)) {
-          repaintFace(ctx, geom.eastFace, darken(geom.baseColor, 0.7));
-        }
+        if (marbleBottomZ < wallTop - 0.01) {
+          const topCube = buildWallCubeGeometry(tx, ty, wallTop - 1, view, baseColor);
 
-        if (wallTopShouldOcclude(geom, marble, ball, radius, runtime, view)) {
-          repaintTop(ctx, geom.top, geom.baseColor);
+          if (
+            faceIntersectsMarble(topCube.top, ball, radius, 1.0, 1.2) &&
+            polyStillCoversSupport(topCube.top, runtime, marble, view)
+          ) {
+            repaintTop(ctx, topCube.top, baseColor);
+          }
         }
       }
     }
@@ -620,9 +651,9 @@ function renderWallTops(ctx, runtime, view) {
     renderBackground(ctx, cssWidth, cssHeight);
 
     renderGroundFaces(ctx, runtime, view);
+    renderWallCubeFaces(ctx, runtime, view);
     renderGroundTops(ctx, runtime, view);
-    renderWallFaces(ctx, runtime, view);
-    renderWallTops(ctx, runtime, view);
+    renderWallCubeTops(ctx, runtime, view);
     renderGoal(ctx, runtime, view);
     renderMarble(ctx, runtime, view);
     renderFrontOccluders(ctx, runtime, view);
