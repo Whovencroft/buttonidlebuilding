@@ -532,12 +532,6 @@ function wallStillCoversSupport(geom, faceName, runtime, marble, view) {
   );
 }
 
-  function clipToMarble(ctx, ball, radius) {
-    ctx.beginPath();
-    ctx.arc(ball.x, ball.y, radius + 1.5, 0, Math.PI * 2);
-    ctx.clip();
-  }
-
   function repaintFace(ctx, face, fillStyle) {
     beginPoly(ctx, face);
     ctx.fillStyle = fillStyle;
@@ -547,47 +541,38 @@ function wallStillCoversSupport(geom, faceName, runtime, marble, view) {
   }
 
   function renderFrontOccluders(ctx, runtime, view) {
-    const marble = runtime.marble;
-    const { ball, radius } = getMarbleProjection(runtime, view);
+  const marble = runtime.marble;
+  const { ball, radius } = getMarbleProjection(runtime, view);
 
-    for (let ty = 0; ty < runtime.level.height; ty += 1) {
-      for (let tx = 0; tx < runtime.level.width; tx += 1) {
-        const geom = buildTileGeometry(runtime.level, tx, ty, view);
-        if (!geom) continue;
-        if (geom.cell.kind !== 'wall') continue;
+  for (let ty = 0; ty < runtime.level.height; ty += 1) {
+    for (let tx = 0; tx < runtime.level.width; tx += 1) {
+      const geom = buildTileGeometry(runtime.level, tx, ty, view);
+      if (!geom) continue;
+      if (geom.cell.kind !== 'wall') continue;
 
-        if (
-          wallFaceShouldOcclude('south', geom, marble, ball, radius) &&
-          wallStillCoversSupport(geom, 'south', runtime, marble, view)
-        ) {
-          ctx.save();
-          clipToMarble(ctx, ball, radius);
-          repaintFace(ctx, geom.southFace, darken(geom.baseColor, 0.55));
-          ctx.restore();
-        }
+      if (
+        wallFaceShouldOcclude('south', geom, marble, ball, radius) &&
+        wallStillCoversSupport(geom.southFace, runtime, marble, view)
+      ) {
+        repaintFace(ctx, geom.southFace, darken(geom.baseColor, 0.55));
+      }
 
-        if (
-          wallFaceShouldOcclude('east', geom, marble, ball, radius) &&
-          wallStillCoversSupport(geom, 'east', runtime, marble, view)
-        ) {
-          ctx.save();
-          clipToMarble(ctx, ball, radius);
-          repaintFace(ctx, geom.eastFace, darken(geom.baseColor, 0.7));
-          ctx.restore();
-        }
+      if (
+        wallFaceShouldOcclude('east', geom, marble, ball, radius) &&
+        wallStillCoversSupport(geom.eastFace, runtime, marble, view)
+      ) {
+        repaintFace(ctx, geom.eastFace, darken(geom.baseColor, 0.7));
+      }
 
-        if (
-          wallTopShouldOcclude(geom, marble, ball, radius) &&
-          wallStillCoversSupport(geom, 'top', runtime, marble, view)
-        ) {
-          ctx.save();
-          clipToMarble(ctx, ball, radius);
-          repaintTop(ctx, geom.top, geom.baseColor);
-          ctx.restore();
-        }
+      if (
+        wallTopShouldOcclude(geom, marble, ball, radius) &&
+        wallStillCoversSupport(geom.top, runtime, marble, view)
+      ) {
+        repaintTop(ctx, geom.top, geom.baseColor);
       }
     }
   }
+}
 
   function renderStatus(ctx, runtime, cssWidth) {
     if (runtime.status === 'running') return;
