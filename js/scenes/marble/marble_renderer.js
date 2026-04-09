@@ -303,20 +303,34 @@
     return Math.max(1, Math.round(window.MarbleLevels.getCellTopZ(cell)));
   }
 
-  function renderGroundFaces(ctx, runtime, view) {
-    for (let ty = 0; ty < runtime.level.height; ty += 1) {
-      for (let tx = 0; tx < runtime.level.width; tx += 1) {
-        const geom = buildGroundTileGeometry(runtime.level, tx, ty, view);
-        if (!geom) continue;
+    function renderWallFaceSegment(ctx, tx, ty, zBottom, zTop, view, fillStyle, face) {
+    if (zTop <= zBottom + 0.0001) return;
 
-        renderTileFacePolygon(ctx, geom.southFace, darken(geom.baseColor, 0.55));
-        renderTileFacePolygon(ctx, geom.eastFace, darken(geom.baseColor, 0.7));
-      }
+    let points = null;
+
+    if (face === 'south') {
+      points = [
+        project(tx, ty + 1, zTop, view),
+        project(tx + 1, ty + 1, zTop, view),
+        project(tx + 1, ty + 1, zBottom, view),
+        project(tx, ty + 1, zBottom, view)
+      ];
+    } else if (face === 'east') {
+      points = [
+        project(tx + 1, ty, zTop, view),
+        project(tx + 1, ty + 1, zTop, view),
+        project(tx + 1, ty + 1, zBottom, view),
+        project(tx + 1, ty, zBottom, view)
+      ];
     }
+
+    renderTileFacePolygon(ctx, points, fillStyle);
   }
 
-  function renderWallCubeFaces(ctx, runtime, view, options = {}) {
+    function renderWallCubeFaces(ctx, runtime, view, options = {}) {
     const drawAboveFloor = !!options.drawAboveFloor;
+    const wallBaseZ = 0;
+    const eps = 0.01;
 
     for (let ty = 0; ty < runtime.level.height; ty += 1) {
       for (let tx = 0; tx < runtime.level.width; tx += 1) {
@@ -325,24 +339,74 @@
 
         const baseColor = getTrackColor(cell);
         const wallTop = getWallTop(runtime.level, tx, ty);
-        const southNeighborTop = getCellTop(runtime.level, tx, ty + 1, runtime.level.voidFloor ?? 0);
-        const eastNeighborTop = getCellTop(runtime.level, tx + 1, ty, runtime.level.voidFloor ?? 0);
 
-        for (let z = 0; z < wallTop; z += 1) {
-          const cube = buildWallCubeGeometry(tx, ty, z, view, baseColor);
+        const southNeighborTop = getCellTop(
+          runtime.level,
+          tx,
+          ty + 1,
+          runtime.level.voidFloor ?? 0
+        );
 
-          const southExposed = cube.z1 > southNeighborTop + 0.01;
-          const eastExposed = cube.z1 > eastNeighborTop + 0.01;
+        const eastNeighborTop = getCellTop(
+          runtime.level,
+          tx + 1,
+          ty,
+          runtime.level.voidFloor ?? 0
+        );
 
-          const southIsAboveFloor = cube.z0 >= southNeighborTop - 0.01;
-          const eastIsAboveFloor = cube.z0 >= eastNeighborTop - 0.01;
+        if (wallTop > southNeighborTop + eps) {
+          const southSplitZ = Math.max(wallBaseZ, Math.min(wallTop, southNeighborTop));
 
-          if (southExposed && southIsAboveFloor === drawAboveFloor) {
-            renderTileFacePolygon(ctx, cube.southFace, darken(baseColor, 0.55));
+          if (!drawAboveFloor) {
+            renderWallFaceSegment(
+              ctx,
+              tx,
+              ty,
+              wallBaseZ,
+              southSplitZ,
+              view,
+              darken(baseColor, 0.55),
+              'south'
+            );
+          } else {
+            renderWallFaceSegment(
+              ctx,
+              tx,
+              ty,
+              Math.max(wallBaseZ, southNeighborTop),
+              wallTop,
+              view,
+              darken(baseColor, 0.55),
+              'south'
+            );
           }
+        }
 
-          if (eastExposed && eastIsAboveFloor === drawAboveFloor) {
-            renderTileFacePolygon(ctx, cube.eastFace, darken(baseColor, 0.7));
+        if (wallTop > eastNeighborTop + eps) {
+          const eastSplitZ = Math.max(wallBaseZ, Math.min(wallTop, eastNeighborTop));
+
+          if (!drawAboveFloor) {
+            renderWallFaceSegment(
+              ctx,
+              tx,
+              ty,
+              wallBaseZ,
+              eastSplitZ,
+              view,
+              darken(baseColor, 0.7),
+              'east'
+            );
+          } else {
+            renderWallFaceSegment(
+              ctx,
+              tx,
+              ty,
+              Math.max(wallBaseZ, eastNeighborTop),
+              wallTop,
+              view,
+              darken(baseColor, 0.7),
+              'east'
+            );
           }
         }
       }
