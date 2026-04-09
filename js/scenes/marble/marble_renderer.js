@@ -224,6 +224,9 @@
       ];
     }
 
+    const avgTopZ =
+      (corners.nw.z + corners.ne.z + corners.se.z + corners.sw.z) * 0.25;
+
     return {
       tx,
       ty,
@@ -231,7 +234,8 @@
       baseColor,
       top,
       southFace,
-      eastFace
+      eastFace,
+      avgTopZ
     };
   }
 
@@ -281,12 +285,52 @@
     ctx.stroke();
   }
 
-  function renderGroundTop(ctx, geom) {
+  function getPlayerReferenceZ(runtime) {
+    const surface = window.MarbleLevels.sampleCellSurface(
+      runtime.level,
+      runtime.marble.x,
+      runtime.marble.y,
+      { includeWalls: false }
+    );
+
+    return surface ? surface.z : (runtime.marble.z - runtime.marble.radius);
+  }
+
+  function renderRelativeHeightCue(ctx, geom, runtime) {
+    const playerZ = getPlayerReferenceZ(runtime);
+    const diff = geom.avgTopZ - playerZ;
+
+    if (Math.abs(diff) < 0.35) return;
+
+    if (diff > 0) {
+      const alpha = Math.min(0.28, 0.07 + diff * 0.045);
+      beginPoly(ctx, geom.top);
+      ctx.fillStyle = `rgba(96,165,250,${alpha})`;
+      ctx.fill();
+      ctx.strokeStyle = `rgba(191,219,254,${Math.min(0.55, alpha + 0.12)})`;
+      ctx.lineWidth = 1;
+      ctx.stroke();
+      return;
+    }
+
+    const alpha = Math.min(0.22, 0.06 + Math.abs(diff) * 0.035);
+    beginPoly(ctx, geom.top);
+    ctx.fillStyle = `rgba(245,158,11,${alpha})`;
+    ctx.fill();
+    ctx.strokeStyle = `rgba(253,224,71,${Math.min(0.42, alpha + 0.08)})`;
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  }
+
+  function renderGroundTop(ctx, geom, runtime) {
     if (!geom) return;
 
     beginPoly(ctx, geom.top);
     ctx.fillStyle = geom.baseColor;
     ctx.fill();
+
+    renderRelativeHeightCue(ctx, geom, runtime);
+
     ctx.strokeStyle = 'rgba(241,245,249,0.18)';
     ctx.lineWidth = 1.2;
     ctx.stroke();
@@ -341,7 +385,7 @@
 
     renderTileFacePolygon(ctx, geom.southFace, darken(geom.baseColor, 0.55));
     renderTileFacePolygon(ctx, geom.eastFace, darken(geom.baseColor, 0.7));
-    renderGroundTop(ctx, geom);
+    renderGroundTop(ctx, geom, runtime);
   }
 
   function renderWallCubeFacesForTile(ctx, runtime, tx, ty, view, drawAboveFloor) {

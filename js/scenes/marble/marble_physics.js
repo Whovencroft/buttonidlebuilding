@@ -1,14 +1,13 @@
 (() => {
   const GROUND_STEER_ACCEL = 12.5;
-  const AIR_STEER_ACCEL = 4.2;
+  const AIR_STEER_ACCEL = 4.0;
   const SLOPE_ACCEL = 16.0;
   const MAX_GROUND_SPEED = 7.2;
-  const MAX_AIR_SPEED = 8.4;
+  const MAX_AIR_SPEED = 8.0;
   const MAX_STEP_UP = 0.48;
   const MAX_STEP_DOWN = 0.8;
   const GROUND_SNAP = 0.24;
   const VERTICAL_GRAVITY = -22.0;
-  const JUMP_IMPULSE = 7.25;
   const MOVE_STEP = 0.08;
 
   const GROUND_SUPPORT_CLEARANCE = 0.54;
@@ -19,6 +18,18 @@
   const MIN_LANDING_SUPPORT_RATIO = 0.34;
 
   const WALL_Z_EPSILON = 0.04;
+
+  const JUMP_IMPULSE = 6.7;
+  const COYOTE_TIME = 0.11;
+  const JUMP_BUFFER_TIME = 0.14;
+  const JUMP_COOLDOWN = 0.12;
+  const JUMP_LIFT = 0.08;
+
+  function ensureJumpState(marble) {
+    if (typeof marble.coyoteTime !== 'number') marble.coyoteTime = 0;
+    if (typeof marble.jumpBufferTime !== 'number') marble.jumpBufferTime = 0;
+    if (typeof marble.jumpCooldownTime !== 'number') marble.jumpCooldownTime = 0;
+  }
 
   function getFootprintOffsets(radius, clearance) {
     const r = radius * clearance;
@@ -330,7 +341,6 @@
       Math.hypot(marble.vx * dt, marble.vy * dt),
       Math.abs(marble.vz * dt) * 0.25
     );
-
     const steps = Math.max(1, Math.ceil(distance / MOVE_STEP));
     const stepDt = dt / steps;
 
@@ -428,6 +438,36 @@
     return runtime.lastResult;
   }
 
+  function performJump(marble, surface) {
+    marble.grounded = false;
+    marble.vz = JUMP_IMPULSE;
+    marble.z = Math.max(
+      marble.z,
+      surface.z + marble.radius + JUMP_LIFT
+    );
+    marble.coyoteTime = 0;
+    marble.jumpBufferTime = 0;
+    marble.jumpCooldownTime = JUMP_COOLDOWN;
+  }
+
+  function updateJumpTimers(marble, jumpPressed, grounded, dt) {
+    ensureJumpState(marble);
+
+    if (jumpPressed) {
+      marble.jumpBufferTime = JUMP_BUFFER_TIME;
+    } else {
+      marble.jumpBufferTime = Math.max(0, marble.jumpBufferTime - dt);
+    }
+
+    if (grounded) {
+      marble.coyoteTime = COYOTE_TIME;
+    } else {
+      marble.coyoteTime = Math.max(0, marble.coyoteTime - dt);
+    }
+
+    marble.jumpCooldownTime = Math.max(0, marble.jumpCooldownTime - dt);
+  }
+
   function updatePhysics(runtime, inputState, dt) {
     if (runtime.status !== 'running') {
       return runtime.lastResult;
@@ -439,11 +479,17 @@
     const jumpPressed = !!inputState?.jumpPressed;
 
     let groundSurface = getGroundSupport(level, marble.x, marble.y, marble.radius);
+    const isSupportedNow = !!(marble.grounded && groundSurface);
 
-    if (marble.grounded && groundSurface && jumpPressed) {
-      marble.grounded = false;
-      marble.vz = Math.max(marble.vz, JUMP_IMPULSE);
-      marble.z = groundSurface.z + marble.radius + 0.02;
+    updateJumpTimers(marble, jumpPressed, isSupportedNow, dt);
+
+    if (
+      groundSurface &&
+      marble.coyoteTime > 0 &&
+      marble.jumpBufferTime > 0 &&
+      marble.jumpCooldownTime <= 0
+    ) {
+      performJump(marble, groundSurface);
       groundSurface = null;
     }
 

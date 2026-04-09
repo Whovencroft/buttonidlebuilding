@@ -6,6 +6,7 @@
     let runtime = null;
     let input = null;
     let built = false;
+    let levelStripSignature = '';
 
     const refs = {
       canvas: null,
@@ -47,7 +48,7 @@
             <div class="marble-level-strip" data-marble-level-strip></div>
           </div>
 
-          <div class="marble-help">WASD / Arrow Keys to move • Space jump • R restart • Esc return</div>
+          <div class="marble-help">WASD / Arrow Keys move • Space jump • Blue above you • Gold below you • R restart • Esc return</div>
 
           <div class="marble-overlay" data-marble-overlay hidden>
             <div class="marble-overlay-card">
@@ -78,6 +79,13 @@
       refs.restartBtn.addEventListener('click', () => restartRun());
       refs.nextBtn.addEventListener('click', () => goToNextLevel());
       refs.returnBtn.addEventListener('click', () => switchScene('button_idle', { force: true }));
+
+      refs.levelStrip.addEventListener('click', (event) => {
+        const button = event.target.closest('[data-marble-level]');
+        if (!button) return;
+        if (button.disabled) return;
+        loadLevel(button.dataset.marbleLevel);
+      });
     }
 
     function ensureInput() {
@@ -86,8 +94,22 @@
       }
     }
 
-    function renderLevelStrip() {
+    function getLevelStripSignature() {
+      const slice = marbleSlice();
+      const activeLevelId = runtime?.level?.id || '';
+      const unlockedIds = window.MarbleLevels.getUnlockedLevelIds(slice.clearedLevels).join('|');
+      return `${activeLevelId}::${unlockedIds}`;
+    }
+
+    function renderLevelStrip(force = false) {
       if (!refs.levelStrip) return;
+
+      const signature = getLevelStripSignature();
+      if (!force && signature === levelStripSignature) {
+        return;
+      }
+
+      levelStripSignature = signature;
 
       const slice = marbleSlice();
 
@@ -101,17 +123,12 @@
             data-marble-level="${level.id}"
             ${unlocked ? '' : 'disabled'}
             title="${level.name}"
+            type="button"
           >
             ${index + 1}. ${level.name}
           </button>
         `;
       }).join('');
-
-      root.querySelectorAll('[data-marble-level]').forEach((button) => {
-        button.addEventListener('click', () => {
-          loadLevel(button.dataset.marbleLevel);
-        });
-      });
     }
 
     function loadLevel(levelId, options = {}) {
@@ -123,7 +140,7 @@
       runtime = window.MarbleState.createRuntime(level.id);
 
       hideOverlay();
-      renderLevelStrip();
+      renderLevelStrip(true);
       render();
 
       if (!options.silentSave) {
@@ -154,6 +171,7 @@
       ensureRuntime();
       window.MarbleState.restartRuntime(runtime);
       hideOverlay();
+      renderLevelStrip(true);
       render();
 
       if (!options.silentSave) {
@@ -212,7 +230,7 @@
         ? window.MarbleLevels.isLevelUnlocked(slice.clearedLevels, nextLevelId)
         : false;
 
-      renderLevelStrip();
+      renderLevelStrip(true);
 
       const rewardText = alreadyClaimed
         ? 'Reward already claimed. Best time updated if improved.'
@@ -283,7 +301,6 @@
       const bestMs = marbleSlice().bestTimes[runtime.level.id];
       refs.best.textContent = bestMs ? `${(bestMs / 1000).toFixed(2)}s` : '--';
 
-      renderLevelStrip();
       window.MarbleRenderer.render(runtime, refs.canvas);
     }
 
@@ -295,6 +312,7 @@
       }
 
       prepare(elements.sceneHost);
+      renderLevelStrip(true);
       render();
     }
 
@@ -316,6 +334,7 @@
         }
 
         hideOverlay();
+        renderLevelStrip(true);
         render();
       },
 
