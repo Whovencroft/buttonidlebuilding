@@ -339,81 +339,92 @@
     );
   }
 
-  function renderGroundFaces(ctx, runtime, view) {
-    for (let ty = 0; ty < runtime.level.height; ty += 1) {
-      for (let tx = 0; tx < runtime.level.width; tx += 1) {
-        const geom = buildGroundTileGeometry(runtime.level, tx, ty, view);
-        if (!geom) continue;
+  function renderGroundTile(ctx, runtime, tx, ty, view) {
+    const geom = buildGroundTileGeometry(runtime.level, tx, ty, view);
+    if (!geom) return;
 
-        renderTileFacePolygon(ctx, geom.southFace, darken(geom.baseColor, 0.55));
-        renderTileFacePolygon(ctx, geom.eastFace, darken(geom.baseColor, 0.7));
-      }
-    }
+    renderTileFacePolygon(ctx, geom.southFace, darken(geom.baseColor, 0.55));
+    renderTileFacePolygon(ctx, geom.eastFace, darken(geom.baseColor, 0.7));
+    renderGroundTop(ctx, geom);
   }
 
-  function renderWallCubeFaces(ctx, runtime, view, options = {}) {
-    const drawAboveFloor = !!options.drawAboveFloor;
+  function renderWallCubeFacesForTile(ctx, runtime, tx, ty, view, drawAboveFloor) {
+    const cell = window.MarbleLevels.getCell(runtime.level, tx, ty);
+    if (!cell || cell.kind !== 'wall') return;
+
     const fallbackZ = runtime.level.voidFloor ?? 0;
     const eps = 0.01;
+    const baseColor = getTrackColor(cell);
+    const wallTop = getWallTop(runtime.level, tx, ty);
+    const southNeighborTop = getSouthNeighborEdgeTop(runtime.level, tx, ty, fallbackZ);
+    const eastNeighborTop = getEastNeighborEdgeTop(runtime.level, tx, ty, fallbackZ);
 
-    for (let ty = 0; ty < runtime.level.height; ty += 1) {
-      for (let tx = 0; tx < runtime.level.width; tx += 1) {
-        const cell = window.MarbleLevels.getCell(runtime.level, tx, ty);
-        if (!cell || cell.kind !== 'wall') continue;
+    for (let z = 0; z < wallTop; z += 1) {
+      const cube = buildWallCubeGeometry(tx, ty, z, view, baseColor);
 
-        const baseColor = getTrackColor(cell);
-        const wallTop = getWallTop(runtime.level, tx, ty);
-        const southNeighborTop = getSouthNeighborEdgeTop(runtime.level, tx, ty, fallbackZ);
-        const eastNeighborTop = getEastNeighborEdgeTop(runtime.level, tx, ty, fallbackZ);
+      const southExposed = cube.z1 > southNeighborTop + eps;
+      const eastExposed = cube.z1 > eastNeighborTop + eps;
 
-        for (let z = 0; z < wallTop; z += 1) {
-          const cube = buildWallCubeGeometry(tx, ty, z, view, baseColor);
+      const southAboveFloor = cube.z0 >= southNeighborTop - eps;
+      const eastAboveFloor = cube.z0 >= eastNeighborTop - eps;
 
-          const southExposed = cube.z1 > southNeighborTop + eps;
-          const eastExposed = cube.z1 > eastNeighborTop + eps;
+      if (southExposed && southAboveFloor === drawAboveFloor) {
+        renderTileFacePolygon(ctx, cube.southFace, darken(baseColor, 0.55));
+      }
 
-          const southAboveFloor = cube.z0 >= southNeighborTop - eps;
-          const eastAboveFloor = cube.z0 >= eastNeighborTop - eps;
-
-          if (southExposed && southAboveFloor === drawAboveFloor) {
-            renderTileFacePolygon(ctx, cube.southFace, darken(baseColor, 0.55));
-          }
-
-          if (eastExposed && eastAboveFloor === drawAboveFloor) {
-            renderTileFacePolygon(ctx, cube.eastFace, darken(baseColor, 0.7));
-          }
-        }
+      if (eastExposed && eastAboveFloor === drawAboveFloor) {
+        renderTileFacePolygon(ctx, cube.eastFace, darken(baseColor, 0.7));
       }
     }
   }
 
-  function renderGroundTops(ctx, runtime, view) {
-    for (let ty = 0; ty < runtime.level.height; ty += 1) {
-      for (let tx = 0; tx < runtime.level.width; tx += 1) {
-        const geom = buildGroundTileGeometry(runtime.level, tx, ty, view);
-        if (!geom) continue;
-        renderGroundTop(ctx, geom);
-      }
-    }
-  }
+  function renderWallTopForTile(ctx, runtime, tx, ty, view) {
+    const cell = window.MarbleLevels.getCell(runtime.level, tx, ty);
+    if (!cell || cell.kind !== 'wall') return;
 
-  function renderWallCubeTops(ctx, runtime, view) {
     const fallbackZ = runtime.level.voidFloor ?? 0;
+    const baseColor = getTrackColor(cell);
+    const wallTop = getWallTop(runtime.level, tx, ty);
 
-    for (let ty = 0; ty < runtime.level.height; ty += 1) {
-      for (let tx = 0; tx < runtime.level.width; tx += 1) {
-        const cell = window.MarbleLevels.getCell(runtime.level, tx, ty);
-        if (!cell || cell.kind !== 'wall') continue;
+    if (isWallTopBuried(runtime.level, tx, ty, wallTop, fallbackZ)) {
+      return;
+    }
 
-        const baseColor = getTrackColor(cell);
-        const wallTop = getWallTop(runtime.level, tx, ty);
+    const cube = buildWallCubeGeometry(tx, ty, wallTop - 1, view, baseColor);
+    repaintTop(ctx, cube.top, baseColor);
+  }
 
-        if (isWallTopBuried(runtime.level, tx, ty, wallTop, fallbackZ)) {
-          continue;
-        }
+  function getTileDrawOrder(level) {
+    const tiles = [];
 
-        const cube = buildWallCubeGeometry(tx, ty, wallTop - 1, view, baseColor);
-        repaintTop(ctx, cube.top, baseColor);
+    for (let ty = 0; ty < level.height; ty += 1) {
+      for (let tx = 0; tx < level.width; tx += 1) {
+        tiles.push({ tx, ty, depth: tx + ty });
+      }
+    }
+
+    tiles.sort((a, b) => {
+      if (a.depth !== b.depth) return a.depth - b.depth;
+      if (a.ty !== b.ty) return a.ty - b.ty;
+      return a.tx - b.tx;
+    });
+
+    return tiles;
+  }
+
+  function renderTerrain(ctx, runtime, view) {
+    const tiles = getTileDrawOrder(runtime.level);
+
+    for (const { tx, ty } of tiles) {
+      const cell = window.MarbleLevels.getCell(runtime.level, tx, ty);
+      if (!cell || cell.kind === 'void') continue;
+
+      if (cell.kind === 'wall') {
+        renderWallCubeFacesForTile(ctx, runtime, tx, ty, view, false);
+        renderWallTopForTile(ctx, runtime, tx, ty, view);
+        renderWallCubeFacesForTile(ctx, runtime, tx, ty, view, true);
+      } else {
+        renderGroundTile(ctx, runtime, tx, ty, view);
       }
     }
   }
@@ -711,12 +722,7 @@
 
     ctx.clearRect(0, 0, cssWidth, cssHeight);
     renderBackground(ctx, cssWidth, cssHeight);
-
-    renderGroundFaces(ctx, runtime, view);
-    renderWallCubeFaces(ctx, runtime, view, { drawAboveFloor: false });
-    renderGroundTops(ctx, runtime, view);
-    renderWallCubeTops(ctx, runtime, view);
-    renderWallCubeFaces(ctx, runtime, view, { drawAboveFloor: true });
+    renderTerrain(ctx, runtime, view);
     renderGoal(ctx, runtime, view);
     renderMarble(ctx, runtime, view);
     renderFrontOccluders(ctx, runtime, view);
