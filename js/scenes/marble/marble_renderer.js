@@ -606,7 +606,6 @@
 
     ctx.beginPath();
     ctx.arc(ball.x, ball.y, radius, 0, Math.PI * 2);
-    ctx, Math.PI * 2);
     ctx.fillStyle = gradient;
     ctx.fill();
 
