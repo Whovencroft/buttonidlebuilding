@@ -303,33 +303,49 @@
     return Math.max(1, Math.round(window.MarbleLevels.getCellTopZ(cell)));
   }
 
-    function renderWallFaceSegment(ctx, tx, ty, zBottom, zTop, view, fillStyle, face) {
-    if (zTop <= zBottom + 0.0001) return;
+  function renderGroundFaces(ctx, runtime, view) {
+    for (let ty = 0; ty < runtime.level.height; ty += 1) {
+      for (let tx = 0; tx < runtime.level.width; tx += 1) {
+        const geom = buildGroundTileGeometry(runtime.level, tx, ty, view);
+        if (!geom) continue;
+
+        renderTileFacePolygon(ctx, geom.southFace, darken(geom.baseColor, 0.55));
+        renderTileFacePolygon(ctx, geom.eastFace, darken(geom.baseColor, 0.7));
+      }
+    }
+  }
+
+  function renderWallFaceBand(ctx, tx, ty, side, topA, topB, bottomA, bottomB, view, fillStyle) {
+    const eps = 0.0001;
+    if (topA <= bottomA + eps && topB <= bottomB + eps) {
+      return;
+    }
 
     let points = null;
 
-    if (face === 'south') {
+    if (side === 'south') {
       points = [
-        project(tx, ty + 1, zTop, view),
-        project(tx + 1, ty + 1, zTop, view),
-        project(tx + 1, ty + 1, zBottom, view),
-        project(tx, ty + 1, zBottom, view)
+        project(tx, ty + 1, topA, view),
+        project(tx + 1, ty + 1, topB, view),
+        project(tx + 1, ty + 1, bottomB, view),
+        project(tx, ty + 1, bottomA, view)
       ];
-    } else if (face === 'east') {
+    } else if (side === 'east') {
       points = [
-        project(tx + 1, ty, zTop, view),
-        project(tx + 1, ty + 1, zTop, view),
-        project(tx + 1, ty + 1, zBottom, view),
-        project(tx + 1, ty, zBottom, view)
+        project(tx + 1, ty, topA, view),
+        project(tx + 1, ty + 1, topB, view),
+        project(tx + 1, ty + 1, bottomB, view),
+        project(tx + 1, ty, bottomA, view)
       ];
     }
 
     renderTileFacePolygon(ctx, points, fillStyle);
   }
 
-    function renderWallCubeFaces(ctx, runtime, view, options = {}) {
+  function renderWallCubeFaces(ctx, runtime, view, options = {}) {
     const drawAboveFloor = !!options.drawAboveFloor;
     const wallBaseZ = 0;
+    const fallbackZ = runtime.level.voidFloor ?? wallBaseZ;
     const eps = 0.01;
 
     for (let ty = 0; ty < runtime.level.height; ty += 1) {
@@ -340,72 +356,96 @@
         const baseColor = getTrackColor(cell);
         const wallTop = getWallTop(runtime.level, tx, ty);
 
-        const southNeighborTop = getCellTop(
+        const southNeighborHeights = getNeighborHeights(
           runtime.level,
           tx,
           ty + 1,
-          runtime.level.voidFloor ?? 0
+          fallbackZ
         );
 
-        const eastNeighborTop = getCellTop(
+        const eastNeighborHeights = getNeighborHeights(
           runtime.level,
           tx + 1,
           ty,
-          runtime.level.voidFloor ?? 0
+          fallbackZ
         );
 
-        if (wallTop > southNeighborTop + eps) {
-          const southSplitZ = Math.max(wallBaseZ, Math.min(wallTop, southNeighborTop));
+        const southWestSplit = Math.max(
+          wallBaseZ,
+          Math.min(wallTop, southNeighborHeights.nw)
+        );
+        const southEastSplit = Math.max(
+          wallBaseZ,
+          Math.min(wallTop, southNeighborHeights.ne)
+        );
 
-          if (!drawAboveFloor) {
-            renderWallFaceSegment(
+        const eastNorthSplit = Math.max(
+          wallBaseZ,
+          Math.min(wallTop, eastNeighborHeights.nw)
+        );
+        const eastSouthSplit = Math.max(
+          wallBaseZ,
+          Math.min(wallTop, eastNeighborHeights.sw)
+        );
+
+        if (drawAboveFloor) {
+          if (wallTop > southWestSplit + eps || wallTop > southEastSplit + eps) {
+            renderWallFaceBand(
               ctx,
               tx,
               ty,
-              wallBaseZ,
-              southSplitZ,
-              view,
-              darken(baseColor, 0.55),
-              'south'
-            );
-          } else {
-            renderWallFaceSegment(
-              ctx,
-              tx,
-              ty,
-              Math.max(wallBaseZ, southNeighborTop),
+              'south',
               wallTop,
+              wallTop,
+              southWestSplit,
+              southEastSplit,
               view,
-              darken(baseColor, 0.55),
-              'south'
+              darken(baseColor, 0.55)
             );
           }
-        }
 
-        if (wallTop > eastNeighborTop + eps) {
-          const eastSplitZ = Math.max(wallBaseZ, Math.min(wallTop, eastNeighborTop));
-
-          if (!drawAboveFloor) {
-            renderWallFaceSegment(
+          if (wallTop > eastNorthSplit + eps || wallTop > eastSouthSplit + eps) {
+            renderWallFaceBand(
               ctx,
               tx,
               ty,
-              wallBaseZ,
-              eastSplitZ,
-              view,
-              darken(baseColor, 0.7),
-              'east'
-            );
-          } else {
-            renderWallFaceSegment(
-              ctx,
-              tx,
-              ty,
-              Math.max(wallBaseZ, eastNeighborTop),
+              'east',
               wallTop,
+              wallTop,
+              eastNorthSplit,
+              eastSouthSplit,
               view,
-              darken(baseColor, 0.7),
-              'east'
+              darken(baseColor, 0.7)
+            );
+          }
+        } else {
+          if (southWestSplit > wallBaseZ + eps || southEastSplit > wallBaseZ + eps) {
+            renderWallFaceBand(
+              ctx,
+              tx,
+              ty,
+              'south',
+              southWestSplit,
+              southEastSplit,
+              wallBaseZ,
+              wallBaseZ,
+              view,
+              darken(baseColor, 0.55)
+            );
+          }
+
+          if (eastNorthSplit > wallBaseZ + eps || eastSouthSplit > wallBaseZ + eps) {
+            renderWallFaceBand(
+              ctx,
+              tx,
+              ty,
+              'east',
+              eastNorthSplit,
+              eastSouthSplit,
+              wallBaseZ,
+              wallBaseZ,
+              view,
+              darken(baseColor, 0.7)
             );
           }
         }
