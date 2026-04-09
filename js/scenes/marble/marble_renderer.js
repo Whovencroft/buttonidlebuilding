@@ -285,15 +285,58 @@
     ctx.stroke();
   }
 
+  function getVisualSupportZ(level, x, y, radius, fallbackZ) {
+    const ringA = Math.max(radius * 1.15, 0.28);
+    const ringB = Math.max(radius * 2.1, 0.55);
+    const dA = ringA * 0.7071;
+    const dB = ringB * 0.7071;
+
+    const offsets = [
+      [0, 0],
+
+      [ringA, 0],
+      [-ringA, 0],
+      [0, ringA],
+      [0, -ringA],
+      [dA, dA],
+      [dA, -dA],
+      [-dA, dA],
+      [-dA, -dA],
+
+      [ringB, 0],
+      [-ringB, 0],
+      [0, ringB],
+      [0, -ringB],
+      [dB, dB],
+      [dB, -dB],
+      [-dB, dB],
+      [-dB, -dB]
+    ];
+
+    for (const [ox, oy] of offsets) {
+      const sample = window.MarbleLevels.sampleCellSurface(
+        level,
+        x + ox,
+        y + oy,
+        { includeWalls: true }
+      );
+
+      if (sample) {
+        return sample.z;
+      }
+    }
+
+    return fallbackZ;
+  }
+
   function getPlayerReferenceZ(runtime) {
-    const surface = window.MarbleLevels.sampleCellSurface(
+    return getVisualSupportZ(
       runtime.level,
       runtime.marble.x,
       runtime.marble.y,
-      { includeWalls: false }
+      runtime.marble.radius,
+      runtime.marble.z - runtime.marble.radius
     );
-
-    return surface ? surface.z : (runtime.marble.z - runtime.marble.radius);
   }
 
   function renderRelativeHeightCue(ctx, geom, runtime) {
@@ -509,13 +552,13 @@
 
   function getMarbleProjection(runtime, view) {
     const marble = runtime.marble;
-    const shadowSurface = window.MarbleLevels.sampleCellSurface(
+    const shadowZ = getVisualSupportZ(
       runtime.level,
       marble.x,
       marble.y,
-      { includeWalls: false }
+      marble.radius,
+      runtime.level.voidFloor ?? -1.5
     );
-    const shadowZ = shadowSurface ? shadowSurface.z : (runtime.level.voidFloor ?? -1.5);
 
     const shadow = project(marble.x, marble.y, shadowZ, view);
     const ball = project(marble.x, marble.y, marble.z, view);
@@ -563,6 +606,7 @@
 
     ctx.beginPath();
     ctx.arc(ball.x, ball.y, radius, 0, Math.PI * 2);
+    ctx, Math.PI * 2);
     ctx.fillStyle = gradient;
     ctx.fill();
 
@@ -635,18 +679,15 @@
   }
 
   function getOcclusionAnchor(runtime, marble, view) {
-    const support = window.MarbleLevels.sampleCellSurface(
+    const supportZ = getVisualSupportZ(
       runtime.level,
       marble.x,
       marble.y,
-      { includeWalls: false }
+      marble.radius,
+      marble.z - marble.radius
     );
 
-    if (support) {
-      return project(marble.x, marble.y, support.z + 0.02, view);
-    }
-
-    return project(marble.x, marble.y, marble.z - marble.radius, view);
+    return project(marble.x, marble.y, supportZ + 0.02, view);
   }
 
   function faceShouldOccludeMarble(face, runtime, marble, ball, radius, view, padX = 1.0, padY = 1.0) {

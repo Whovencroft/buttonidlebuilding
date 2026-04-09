@@ -6,9 +6,9 @@
   const MAX_AIR_SPEED = 8.0;
   const MAX_STEP_UP = 0.48;
   const MAX_STEP_DOWN = 0.8;
-  const GROUND_SNAP = 0.24;
+  const GROUND_SNAP = 0.18;
   const VERTICAL_GRAVITY = -22.0;
-  const MOVE_STEP = 0.08;
+  const MOVE_STEP = 0.06;
 
   const GROUND_SUPPORT_CLEARANCE = 0.54;
   const LANDING_SUPPORT_CLEARANCE = 0.5;
@@ -74,7 +74,7 @@
     };
   }
 
-  function sampleSupport(level, x, y, radius, clearance, minRatio) {
+  function sampleSupport(level, x, y, radius, clearance, minRatio, includeWalls) {
     const offsets = getFootprintOffsets(radius, clearance);
     const samples = [];
     let center = null;
@@ -84,7 +84,7 @@
         level,
         x + ox,
         y + oy,
-        { includeWalls: false }
+        { includeWalls }
       );
 
       if (ox === 0 && oy === 0) {
@@ -127,7 +127,8 @@
       y,
       radius,
       GROUND_SUPPORT_CLEARANCE,
-      MIN_GROUNDED_SUPPORT_RATIO
+      MIN_GROUNDED_SUPPORT_RATIO,
+      true
     );
   }
 
@@ -138,7 +139,8 @@
       y,
       radius,
       LANDING_SUPPORT_CLEARANCE,
-      MIN_LANDING_SUPPORT_RATIO
+      MIN_LANDING_SUPPORT_RATIO,
+      true
     );
   }
 
