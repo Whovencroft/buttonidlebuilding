@@ -170,6 +170,16 @@
     return Math.max(heights.nw, heights.sw);
   }
 
+  function getNorthNeighborEdgeTop(level, tx, ty, fallbackZ) {
+    const heights = getNeighborHeights(level, tx, ty - 1, fallbackZ);
+    return Math.max(heights.sw, heights.se);
+  }
+
+  function getWestNeighborEdgeTop(level, tx, ty, fallbackZ) {
+    const heights = getNeighborHeights(level, tx - 1, ty, fallbackZ);
+    return Math.max(heights.ne, heights.se);
+  }
+
   function buildGroundTileGeometry(level, tx, ty, view) {
     const cell = window.MarbleLevels.getCell(level, tx, ty);
     if (!cell || cell.kind === 'void' || cell.kind === 'wall') return null;
@@ -313,6 +323,22 @@
     return Math.max(1, Math.round(window.MarbleLevels.getCellTopZ(cell)));
   }
 
+  function isWallTopBuried(level, tx, ty, wallTop, fallbackZ) {
+    const eps = 0.01;
+
+    const northTop = getNorthNeighborEdgeTop(level, tx, ty, fallbackZ);
+    const southTop = getSouthNeighborEdgeTop(level, tx, ty, fallbackZ);
+    const eastTop = getEastNeighborEdgeTop(level, tx, ty, fallbackZ);
+    const westTop = getWestNeighborEdgeTop(level, tx, ty, fallbackZ);
+
+    return (
+      northTop >= wallTop - eps &&
+      southTop >= wallTop - eps &&
+      eastTop >= wallTop - eps &&
+      westTop >= wallTop - eps
+    );
+  }
+
   function renderGroundFaces(ctx, runtime, view) {
     for (let ty = 0; ty < runtime.level.height; ty += 1) {
       for (let tx = 0; tx < runtime.level.width; tx += 1) {
@@ -346,14 +372,14 @@
           const southExposed = cube.z1 > southNeighborTop + eps;
           const eastExposed = cube.z1 > eastNeighborTop + eps;
 
-          const southIsAboveFloor = cube.z0 >= southNeighborTop - eps;
-          const eastIsAboveFloor = cube.z0 >= eastNeighborTop - eps;
+          const southAboveFloor = cube.z0 >= southNeighborTop - eps;
+          const eastAboveFloor = cube.z0 >= eastNeighborTop - eps;
 
-          if (southExposed && southIsAboveFloor === drawAboveFloor) {
+          if (southExposed && southAboveFloor === drawAboveFloor) {
             renderTileFacePolygon(ctx, cube.southFace, darken(baseColor, 0.55));
           }
 
-          if (eastExposed && eastIsAboveFloor === drawAboveFloor) {
+          if (eastExposed && eastAboveFloor === drawAboveFloor) {
             renderTileFacePolygon(ctx, cube.eastFace, darken(baseColor, 0.7));
           }
         }
@@ -372,6 +398,8 @@
   }
 
   function renderWallCubeTops(ctx, runtime, view) {
+    const fallbackZ = runtime.level.voidFloor ?? 0;
+
     for (let ty = 0; ty < runtime.level.height; ty += 1) {
       for (let tx = 0; tx < runtime.level.width; tx += 1) {
         const cell = window.MarbleLevels.getCell(runtime.level, tx, ty);
@@ -379,8 +407,12 @@
 
         const baseColor = getTrackColor(cell);
         const wallTop = getWallTop(runtime.level, tx, ty);
-        const cube = buildWallCubeGeometry(tx, ty, wallTop - 1, view, baseColor);
 
+        if (isWallTopBuried(runtime.level, tx, ty, wallTop, fallbackZ)) {
+          continue;
+        }
+
+        const cube = buildWallCubeGeometry(tx, ty, wallTop - 1, view, baseColor);
         repaintTop(ctx, cube.top, baseColor);
       }
     }
@@ -593,6 +625,7 @@
     const marbleBottomZ = marble.z - marble.radius;
     const { ball, radius } = getMarbleProjection(runtime, view);
     const fallbackZ = runtime.level.voidFloor ?? 0;
+    const eps = 0.01;
 
     for (let ty = 0; ty < runtime.level.height; ty += 1) {
       for (let tx = 0; tx < runtime.level.width; tx += 1) {
@@ -608,12 +641,16 @@
         for (let z = 0; z < wallTop; z += 1) {
           const cube = buildWallCubeGeometry(tx, ty, z, view, baseColor);
 
-          if (marbleBottomZ >= cube.z1 - 0.01) {
+          if (marbleBottomZ >= cube.z1 - eps) {
             continue;
           }
 
+          const southAboveFloor = cube.z0 >= southNeighborTop - eps;
+          const eastAboveFloor = cube.z0 >= eastNeighborTop - eps;
+
           if (
-            cube.z1 > southNeighborTop + 0.01 &&
+            southAboveFloor &&
+            cube.z1 > southNeighborTop + eps &&
             faceIntersectsMarble(cube.southFace, ball, radius, 1.0, 1.1) &&
             polyStillCoversSupport(cube.southFace, runtime, marble, view)
           ) {
@@ -621,7 +658,8 @@
           }
 
           if (
-            cube.z1 > eastNeighborTop + 0.01 &&
+            eastAboveFloor &&
+            cube.z1 > eastNeighborTop + eps &&
             faceIntersectsMarble(cube.eastFace, ball, radius, 1.2, 1.0) &&
             polyStillCoversSupport(cube.eastFace, runtime, marble, view)
           ) {
@@ -629,7 +667,10 @@
           }
         }
 
-        if (marbleBottomZ < wallTop - 0.01) {
+        if (
+          marbleBottomZ < wallTop - eps &&
+          !isWallTopBuried(runtime.level, tx, ty, wallTop, fallbackZ)
+        ) {
           const topCube = buildWallCubeGeometry(tx, ty, wallTop - 1, view, baseColor);
 
           if (
