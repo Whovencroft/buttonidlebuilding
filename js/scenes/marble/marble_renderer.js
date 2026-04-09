@@ -160,6 +160,16 @@
     return window.MarbleLevels.getCellCornerHeights(cell);
   }
 
+  function getSouthNeighborEdgeTop(level, tx, ty, fallbackZ) {
+    const heights = getNeighborHeights(level, tx, ty + 1, fallbackZ);
+    return Math.max(heights.nw, heights.ne);
+  }
+
+  function getEastNeighborEdgeTop(level, tx, ty, fallbackZ) {
+    const heights = getNeighborHeights(level, tx + 1, ty, fallbackZ);
+    return Math.max(heights.nw, heights.sw);
+  }
+
   function buildGroundTileGeometry(level, tx, ty, view) {
     const cell = window.MarbleLevels.getCell(level, tx, ty);
     if (!cell || cell.kind === 'void' || cell.kind === 'wall') return null;
@@ -315,37 +325,9 @@
     }
   }
 
-  function renderWallFaceBand(ctx, tx, ty, side, topA, topB, bottomA, bottomB, view, fillStyle) {
-    const eps = 0.0001;
-    if (topA <= bottomA + eps && topB <= bottomB + eps) {
-      return;
-    }
-
-    let points = null;
-
-    if (side === 'south') {
-      points = [
-        project(tx, ty + 1, topA, view),
-        project(tx + 1, ty + 1, topB, view),
-        project(tx + 1, ty + 1, bottomB, view),
-        project(tx, ty + 1, bottomA, view)
-      ];
-    } else if (side === 'east') {
-      points = [
-        project(tx + 1, ty, topA, view),
-        project(tx + 1, ty + 1, topB, view),
-        project(tx + 1, ty + 1, bottomB, view),
-        project(tx + 1, ty, bottomA, view)
-      ];
-    }
-
-    renderTileFacePolygon(ctx, points, fillStyle);
-  }
-
   function renderWallCubeFaces(ctx, runtime, view, options = {}) {
     const drawAboveFloor = !!options.drawAboveFloor;
-    const wallBaseZ = 0;
-    const fallbackZ = runtime.level.voidFloor ?? wallBaseZ;
+    const fallbackZ = runtime.level.voidFloor ?? 0;
     const eps = 0.01;
 
     for (let ty = 0; ty < runtime.level.height; ty += 1) {
@@ -355,98 +337,24 @@
 
         const baseColor = getTrackColor(cell);
         const wallTop = getWallTop(runtime.level, tx, ty);
+        const southNeighborTop = getSouthNeighborEdgeTop(runtime.level, tx, ty, fallbackZ);
+        const eastNeighborTop = getEastNeighborEdgeTop(runtime.level, tx, ty, fallbackZ);
 
-        const southNeighborHeights = getNeighborHeights(
-          runtime.level,
-          tx,
-          ty + 1,
-          fallbackZ
-        );
+        for (let z = 0; z < wallTop; z += 1) {
+          const cube = buildWallCubeGeometry(tx, ty, z, view, baseColor);
 
-        const eastNeighborHeights = getNeighborHeights(
-          runtime.level,
-          tx + 1,
-          ty,
-          fallbackZ
-        );
+          const southExposed = cube.z1 > southNeighborTop + eps;
+          const eastExposed = cube.z1 > eastNeighborTop + eps;
 
-        const southWestSplit = Math.max(
-          wallBaseZ,
-          Math.min(wallTop, southNeighborHeights.nw)
-        );
-        const southEastSplit = Math.max(
-          wallBaseZ,
-          Math.min(wallTop, southNeighborHeights.ne)
-        );
+          const southIsAboveFloor = cube.z0 >= southNeighborTop - eps;
+          const eastIsAboveFloor = cube.z0 >= eastNeighborTop - eps;
 
-        const eastNorthSplit = Math.max(
-          wallBaseZ,
-          Math.min(wallTop, eastNeighborHeights.nw)
-        );
-        const eastSouthSplit = Math.max(
-          wallBaseZ,
-          Math.min(wallTop, eastNeighborHeights.sw)
-        );
-
-        if (drawAboveFloor) {
-          if (wallTop > southWestSplit + eps || wallTop > southEastSplit + eps) {
-            renderWallFaceBand(
-              ctx,
-              tx,
-              ty,
-              'south',
-              wallTop,
-              wallTop,
-              southWestSplit,
-              southEastSplit,
-              view,
-              darken(baseColor, 0.55)
-            );
+          if (southExposed && southIsAboveFloor === drawAboveFloor) {
+            renderTileFacePolygon(ctx, cube.southFace, darken(baseColor, 0.55));
           }
 
-          if (wallTop > eastNorthSplit + eps || wallTop > eastSouthSplit + eps) {
-            renderWallFaceBand(
-              ctx,
-              tx,
-              ty,
-              'east',
-              wallTop,
-              wallTop,
-              eastNorthSplit,
-              eastSouthSplit,
-              view,
-              darken(baseColor, 0.7)
-            );
-          }
-        } else {
-          if (southWestSplit > wallBaseZ + eps || southEastSplit > wallBaseZ + eps) {
-            renderWallFaceBand(
-              ctx,
-              tx,
-              ty,
-              'south',
-              southWestSplit,
-              southEastSplit,
-              wallBaseZ,
-              wallBaseZ,
-              view,
-              darken(baseColor, 0.55)
-            );
-          }
-
-          if (eastNorthSplit > wallBaseZ + eps || eastSouthSplit > wallBaseZ + eps) {
-            renderWallFaceBand(
-              ctx,
-              tx,
-              ty,
-              'east',
-              eastNorthSplit,
-              eastSouthSplit,
-              wallBaseZ,
-              wallBaseZ,
-              view,
-              darken(baseColor, 0.7)
-            );
+          if (eastExposed && eastIsAboveFloor === drawAboveFloor) {
+            renderTileFacePolygon(ctx, cube.eastFace, darken(baseColor, 0.7));
           }
         }
       }
@@ -684,6 +592,7 @@
     const marble = runtime.marble;
     const marbleBottomZ = marble.z - marble.radius;
     const { ball, radius } = getMarbleProjection(runtime, view);
+    const fallbackZ = runtime.level.voidFloor ?? 0;
 
     for (let ty = 0; ty < runtime.level.height; ty += 1) {
       for (let tx = 0; tx < runtime.level.width; tx += 1) {
@@ -693,8 +602,8 @@
 
         const baseColor = getTrackColor(cell);
         const wallTop = getWallTop(runtime.level, tx, ty);
-        const southNeighborTop = getCellTop(runtime.level, tx, ty + 1, 0);
-        const eastNeighborTop = getCellTop(runtime.level, tx + 1, ty, 0);
+        const southNeighborTop = getSouthNeighborEdgeTop(runtime.level, tx, ty, fallbackZ);
+        const eastNeighborTop = getEastNeighborEdgeTop(runtime.level, tx, ty, fallbackZ);
 
         for (let z = 0; z < wallTop; z += 1) {
           const cube = buildWallCubeGeometry(tx, ty, z, view, baseColor);
