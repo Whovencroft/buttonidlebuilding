@@ -1,26 +1,18 @@
 (() => {
   const GROUND_STEER_ACCEL = 12.5;
-  const AIR_STEER_ACCEL = 4.2;
+  const AIR_STEER_ACCEL = 4.0;
   const SLOPE_ACCEL = 16.0;
   const MAX_GROUND_SPEED = 7.2;
-  const MAX_AIR_SPEED = 8.4;
+  const MAX_AIR_SPEED = 8.0;
   const MAX_STEP_UP = 0.48;
-  const MAX_STEP_DOWN = 0.8;
-  const GROUND_SNAP = 0.24;
+  const MAX_STEP_DOWN = 0.65;
+  const GROUND_SNAP = 0.18;
   const VERTICAL_GRAVITY = -22.0;
-  const JUMP_IMPULSE = 7.25;
   const MOVE_STEP = 0.08;
-
-  const GROUND_SUPPORT_CLEARANCE = 0.54;
-  const LANDING_SUPPORT_CLEARANCE = 0.5;
-  const WALL_COLLISION_CLEARANCE = 0.92;
-
-  const MIN_GROUNDED_SUPPORT_RATIO = 0.45;
-  const MIN_LANDING_SUPPORT_RATIO = 0.34;
-
+  const FOOTPRINT_CLEARANCE = 0.72;
   const WALL_Z_EPSILON = 0.04;
 
-  function getFootprintOffsets(radius, clearance) {
+  function getFootprintOffsets(radius, clearance = FOOTPRINT_CLEARANCE) {
     const r = radius * clearance;
     const d = r * 0.7071;
 
@@ -46,95 +38,10 @@
     marble.vy *= scale;
   }
 
-  function averageGradient(samples) {
-    if (!samples.length) return { gx: 0, gy: 0 };
-
-    let gx = 0;
-    let gy = 0;
-
-    for (const sample of samples) {
-      gx += sample.gradient?.gx ?? 0;
-      gy += sample.gradient?.gy ?? 0;
-    }
-
-    return {
-      gx: gx / samples.length,
-      gy: gy / samples.length
-    };
-  }
-
-  function sampleSupport(level, x, y, radius, clearance, minRatio) {
-    const offsets = getFootprintOffsets(radius, clearance);
-    const samples = [];
-    let center = null;
-
-    for (const [ox, oy] of offsets) {
-      const sample = window.MarbleLevels.sampleCellSurface(
-        level,
-        x + ox,
-        y + oy,
-        { includeWalls: false }
-      );
-
-      if (ox === 0 && oy === 0) {
-        center = sample;
-      }
-
-      if (sample) {
-        samples.push(sample);
-      }
-    }
-
-    if (!samples.length) return null;
-
-    const supportRatio = samples.length / offsets.length;
-    if (supportRatio < minRatio) {
-      return null;
-    }
-
-    const bestSample = center || samples.reduce((best, sample) => {
-      if (!best) return sample;
-      return sample.z > best.z ? sample : best;
-    }, null);
-
-    return {
-      ...bestSample,
-      centerSample: center,
-      supportSamples: samples,
-      supportRatio,
-      minSupportZ: Math.min(...samples.map((sample) => sample.z)),
-      maxSupportZ: Math.max(...samples.map((sample) => sample.z)),
-      z: center ? center.z : bestSample.z,
-      gradient: center?.gradient || averageGradient(samples)
-    };
-  }
-
-  function getGroundSupport(level, x, y, radius) {
-    return sampleSupport(
-      level,
-      x,
-      y,
-      radius,
-      GROUND_SUPPORT_CLEARANCE,
-      MIN_GROUNDED_SUPPORT_RATIO
-    );
-  }
-
-  function getLandingSupport(level, x, y, radius) {
-    return sampleSupport(
-      level,
-      x,
-      y,
-      radius,
-      LANDING_SUPPORT_CLEARANCE,
-      MIN_LANDING_SUPPORT_RATIO
-    );
-  }
-
   function applyGroundForces(runtime, inputAxis, dt, surface) {
     const marble = runtime.marble;
-    const downhillX = -(surface.gradient?.gx ?? 0);
-    const downhillY = -(surface.gradient?.gy ?? 0);
+    const downhillX = -surface.gradient.gx;
+    const downhillY = -surface.gradient.gy;
 
     marble.vx += (inputAxis.x * GROUND_STEER_ACCEL + downhillX * SLOPE_ACCEL) * dt;
     marble.vy += (inputAxis.y * GROUND_STEER_ACCEL + downhillY * SLOPE_ACCEL) * dt;
@@ -160,10 +67,21 @@
     clampSpeed(marble, MAX_AIR_SPEED);
   }
 
+  function getSupportedSurface(level, x, y, radius, includeWalls = true) {
+    return window.MarbleLevels.sampleSupportSurface(
+      level,
+      x,
+      y,
+      radius,
+      0.72,
+      { includeWalls }
+    );
+  }
+
   function classifySurfaceTransition(currentSurface, nextSurface) {
     if (!nextSurface) return 'air';
 
-    const stepUp = nextSurface.maxSupportZ - currentSurface.z;
+    const stepUp = nextSurface.z - currentSurface.z;
     if (stepUp > MAX_STEP_UP) {
       return 'blocked';
     }
@@ -175,11 +93,11 @@
 
     return 'ground';
   }
-
+  
   function getBlockingWallTop(level, x, y, radius = 0) {
     let maxTop = null;
 
-    for (const [ox, oy] of getFootprintOffsets(radius, WALL_COLLISION_CLEARANCE)) {
+    for (const [ox, oy] of getFootprintOffsets(radius)) {
       const tx = Math.floor(x + ox);
       const ty = Math.floor(y + oy);
       const cell = window.MarbleLevels.getCell(level, tx, ty);
@@ -219,7 +137,7 @@
       };
     }
 
-    const nextSurface = getGroundSupport(level, targetX, targetY, marble.radius);
+    const nextSurface = getSupportedSurface(level, targetX, targetY, marble.radius);
     const transition = classifySurfaceTransition(currentSurface, nextSurface);
 
     if (transition === 'blocked') {
@@ -242,7 +160,7 @@
   function moveGrounded(runtime, dt) {
     const marble = runtime.marble;
     const level = runtime.level;
-    let currentSurface = getGroundSupport(level, marble.x, marble.y, marble.radius);
+    let currentSurface = getSupportedSurface(level, marble.x, marble.y, marble.radius);
 
     if (!currentSurface) {
       marble.grounded = false;
@@ -292,7 +210,8 @@
         marble.vx = 0;
       }
 
-      const xSurface = getGroundSupport(level, marble.x, marble.y, marble.radius) || currentSurface;
+      const xSurface =
+        getSupportedSurface(level, marble.x, marble.y, marble.radius) || currentSurface;
 
       const tryY = tryGroundMove(
         runtime,
@@ -308,7 +227,7 @@
         marble.vy = 0;
       }
 
-      currentSurface = getGroundSupport(level, marble.x, marble.y, marble.radius);
+      currentSurface = getSupportedSurface(level, marble.x, marble.y, marble.radius);
 
       if (!currentSurface) {
         marble.grounded = false;
@@ -330,7 +249,6 @@
       Math.hypot(marble.vx * dt, marble.vy * dt),
       Math.abs(marble.vz * dt) * 0.25
     );
-
     const steps = Math.max(1, Math.ceil(distance / MOVE_STEP));
     const stepDt = dt / steps;
 
@@ -353,7 +271,7 @@
 
       marble.z = targetZ;
 
-      const surface = getLandingSupport(level, marble.x, marble.y, marble.radius);
+      const surface = getSupportedSurface(level, marble.x, marble.y, marble.radius);
 
       if (
         surface &&
@@ -376,7 +294,7 @@
     const speed = Math.hypot(marble.vx, marble.vy);
 
     if (!runtime.camera) {
-      runtime.camera = { x: marble.x, y: marble.y, lookX: 0, lookY: 0 };
+      runtime.camera = { x: marble.x, y: marble.y };
     }
 
     if (typeof runtime.camera.lookX !== 'number') runtime.camera.lookX = 0;
@@ -428,24 +346,14 @@
     return runtime.lastResult;
   }
 
-  function updatePhysics(runtime, inputState, dt) {
+  function updatePhysics(runtime, inputAxis, dt) {
     if (runtime.status !== 'running') {
       return runtime.lastResult;
     }
 
     const marble = runtime.marble;
     const level = runtime.level;
-    const inputAxis = inputState?.axis || { x: 0, y: 0 };
-    const jumpPressed = !!inputState?.jumpPressed;
-
-    let groundSurface = getGroundSupport(level, marble.x, marble.y, marble.radius);
-
-    if (marble.grounded && groundSurface && jumpPressed) {
-      marble.grounded = false;
-      marble.vz = Math.max(marble.vz, JUMP_IMPULSE);
-      marble.z = groundSurface.z + marble.radius + 0.02;
-      groundSurface = null;
-    }
+    let groundSurface = getSupportedSurface(level, marble.x, marble.y, marble.radius);
 
     if (marble.grounded && groundSurface) {
       applyGroundForces(runtime, inputAxis, dt, groundSurface);

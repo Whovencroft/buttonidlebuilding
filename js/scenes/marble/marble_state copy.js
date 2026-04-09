@@ -47,7 +47,7 @@
             <div class="marble-level-strip" data-marble-level-strip></div>
           </div>
 
-          <div class="marble-help">WASD / Arrow Keys to move • Space jump • R restart • Esc return</div>
+          <div class="marble-help">WASD / Arrow Keys to move • R restart • Esc return</div>
 
           <div class="marble-overlay" data-marble-overlay hidden>
             <div class="marble-overlay-card">
@@ -246,14 +246,7 @@
       }
 
       if (runtime.status === 'running') {
-        const result = window.MarblePhysics.updatePhysics(
-          runtime,
-          {
-            axis: input.getAxis(),
-            jumpPressed: input.consumePressed('Space')
-          },
-          dt
-        );
+        const result = window.MarblePhysics.updatePhysics(runtime, input.getAxis(), dt);
 
         if (result?.type === 'failed') {
           let reasonText = 'Run failed. Restart and try again.';

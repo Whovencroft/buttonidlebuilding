@@ -31,9 +31,7 @@
       },
       camera: {
         x: level.start.x,
-        y: level.start.y,
-        lookX: 0,
-        lookY: 0
+        y: level.start.y
       },
       status: 'running',
       timerMs: 0,
@@ -55,7 +53,7 @@
     runtime.camera.x = level.start.x;
     runtime.camera.y = level.start.y;
     runtime.camera.lookX = 0;
-    runtime.camera.lookY = 0;
+    runtime.camera.LookY = 0;
 
     runtime.status = 'running';
     runtime.timerMs = 0;
