@@ -4,9 +4,11 @@
   const SLOPE_ACCEL = 16.0;
   const MAX_GROUND_SPEED = 7.2;
   const MAX_AIR_SPEED = 8.0;
+
   const MAX_STEP_UP = 0.48;
   const MAX_STEP_DOWN = 0.8;
   const GROUND_SNAP = 0.18;
+
   const VERTICAL_GRAVITY = -22.0;
   const MOVE_STEP = 0.06;
 
@@ -18,6 +20,9 @@
   const MIN_LANDING_SUPPORT_RATIO = 0.34;
 
   const WALL_Z_EPSILON = 0.04;
+  const COLLISION_PUSH_EPSILON = 0.0015;
+  const COLLISION_BINARY_STEPS = 10;
+  const COLLISION_RESOLVE_PASSES = 3;
 
   const JUMP_IMPULSE = 6.7;
   const COYOTE_TIME = 0.11;
@@ -29,6 +34,10 @@
     if (typeof marble.coyoteTime !== 'number') marble.coyoteTime = 0;
     if (typeof marble.jumpBufferTime !== 'number') marble.jumpBufferTime = 0;
     if (typeof marble.jumpCooldownTime !== 'number') marble.jumpCooldownTime = 0;
+  }
+
+  function clamp(value, min, max) {
+    return Math.max(min, Math.min(max, value));
   }
 
   function getFootprintOffsets(radius, clearance) {
@@ -144,6 +153,17 @@
     );
   }
 
+  function getWallTop(level, tx, ty) {
+    const cell = window.MarbleLevels.getCell(level, tx, ty);
+    if (!cell || cell.kind !== 'wall') return null;
+
+    if (typeof window.MarbleLevels.getCellTopZ === 'function') {
+      return window.MarbleLevels.getCellTopZ(cell);
+    }
+
+    return cell.h || 0;
+  }
+
   function applyGroundForces(runtime, inputAxis, dt, surface) {
     const marble = runtime.marble;
     const downhillX = -(surface.gradient?.gx ?? 0);
@@ -189,66 +209,250 @@
     return 'ground';
   }
 
-  function getBlockingWallTop(level, x, y, radius = 0) {
-    let maxTop = null;
+  function rectCircleOverlapData(minX, minY, maxX, maxY, circleX, circleY, radius) {
+    const closestX = clamp(circleX, minX, maxX);
+    const closestY = clamp(circleY, minY, maxY);
 
-    for (const [ox, oy] of getFootprintOffsets(radius, WALL_COLLISION_CLEARANCE)) {
-      const tx = Math.floor(x + ox);
-      const ty = Math.floor(y + oy);
-      const cell = window.MarbleLevels.getCell(level, tx, ty);
+    const dx = circleX - closestX;
+    const dy = circleY - closestY;
+    const distSq = dx * dx + dy * dy;
 
-      if (!cell || cell.kind !== 'wall') continue;
-
-      const top =
-        typeof window.MarbleLevels.getCellTopZ === 'function'
-          ? window.MarbleLevels.getCellTopZ(cell)
-          : (cell.h || 0);
-
-      maxTop = maxTop === null ? top : Math.max(maxTop, top);
+    if (distSq > radius * radius) {
+      return null;
     }
 
-    return maxTop;
-  }
-
-  function wallBlocksAtHeight(level, marble, targetX, targetY, targetZ) {
-    const wallTop = getBlockingWallTop(level, targetX, targetY, marble.radius);
-    if (wallTop === null) return false;
-
-    const marbleBottom = targetZ - marble.radius;
-    return marbleBottom <= wallTop + WALL_Z_EPSILON;
-  }
-
-  function tryGroundMove(runtime, currentSurface, targetX, targetY) {
-    const level = runtime.level;
-    const marble = runtime.marble;
-    const targetZ = currentSurface.z + marble.radius;
-
-    if (wallBlocksAtHeight(level, marble, targetX, targetY, targetZ)) {
+    if (distSq > 0.0000001) {
+      const dist = Math.sqrt(distSq);
       return {
-        blocked: true,
-        x: marble.x,
-        y: marble.y,
-        groundSurface: currentSurface
+        penetration: radius - dist,
+        normal: {
+          x: dx / dist,
+          y: dy / dist
+        }
       };
     }
 
-    const nextSurface = getGroundSupport(level, targetX, targetY, marble.radius);
-    const transition = classifySurfaceTransition(currentSurface, nextSurface);
+    const left = circleX - minX;
+    const right = maxX - circleX;
+    const top = circleY - minY;
+    const bottom = maxY - circleY;
 
-    if (transition === 'blocked') {
-      return {
-        blocked: true,
-        x: marble.x,
-        y: marble.y,
-        groundSurface: currentSurface
-      };
+    let penetration = left + radius;
+    let normal = { x: -1, y: 0 };
+
+    if (right < left && right <= top && right <= bottom) {
+      penetration = right + radius;
+      normal = { x: 1, y: 0 };
+    } else if (top < left && top <= right && top <= bottom) {
+      penetration = top + radius;
+      normal = { x: 0, y: -1 };
+    } else if (bottom < left && bottom <= right && bottom <= top) {
+      penetration = bottom + radius;
+      normal = { x: 0, y: 1 };
+    }
+
+    return { penetration, normal };
+  }
+
+  function getBlockingWallOverlaps(level, x, y, zCheck, radius, supportZ) {
+    const overlaps = [];
+    const marbleBottom = zCheck - radius;
+
+    const minTx = Math.floor(x - radius) - 1;
+    const maxTx = Math.floor(x + radius) + 1;
+    const minTy = Math.floor(y - radius) - 1;
+    const maxTy = Math.floor(y + radius) + 1;
+
+    for (let ty = minTy; ty <= maxTy; ty += 1) {
+      for (let tx = minTx; tx <= maxTx; tx += 1) {
+        const cell = window.MarbleLevels.getCell(level, tx, ty);
+        if (!cell || cell.kind !== 'wall') continue;
+
+        const wallTop = getWallTop(level, tx, ty);
+        if (wallTop === null) continue;
+
+        if (marbleBottom > wallTop + WALL_Z_EPSILON) {
+          continue;
+        }
+
+        if (supportZ !== null && supportZ !== undefined && supportZ >= wallTop - WALL_Z_EPSILON) {
+          continue;
+        }
+
+        const overlap = rectCircleOverlapData(
+          tx,
+          ty,
+          tx + 1,
+          ty + 1,
+          x,
+          y,
+          radius
+        );
+
+        if (!overlap) continue;
+
+        overlaps.push({
+          tx,
+          ty,
+          wallTop,
+          penetration: overlap.penetration,
+          normal: overlap.normal
+        });
+      }
+    }
+
+    return overlaps;
+  }
+
+  function combineCollisionNormal(overlaps) {
+    if (!overlaps.length) return null;
+
+    let nx = 0;
+    let ny = 0;
+    let best = overlaps[0];
+
+    for (const overlap of overlaps) {
+      nx += overlap.normal.x * overlap.penetration;
+      ny += overlap.normal.y * overlap.penetration;
+
+      if (overlap.penetration > best.penetration) {
+        best = overlap;
+      }
+    }
+
+    const len = Math.hypot(nx, ny);
+    if (len <= 0.000001) {
+      return { x: best.normal.x, y: best.normal.y };
+    }
+
+    return { x: nx / len, y: ny / len };
+  }
+
+  function removeIntoWallComponent(vx, vy, normal) {
+    if (!normal) {
+      return { vx, vy };
+    }
+
+    const into = vx * normal.x + vy * normal.y;
+    if (into >= 0) {
+      return { vx, vy };
     }
 
     return {
-      blocked: false,
-      x: targetX,
-      y: targetY,
-      groundSurface: transition === 'ground' ? nextSurface : null
+      vx: vx - normal.x * into,
+      vy: vy - normal.y * into
+    };
+  }
+
+  function resolveSweptWallMovement(level, marble, startX, startY, moveX, moveY, zCheck, supportZ) {
+    let currentX = startX;
+    let currentY = startY;
+    let remainingX = moveX;
+    let remainingY = moveY;
+    let collided = false;
+    let lastNormal = null;
+
+    for (let pass = 0; pass < COLLISION_RESOLVE_PASSES; pass += 1) {
+      const targetX = currentX + remainingX;
+      const targetY = currentY + remainingY;
+
+      const targetOverlaps = getBlockingWallOverlaps(
+        level,
+        targetX,
+        targetY,
+        zCheck,
+        marble.radius,
+        supportZ
+      );
+
+      if (!targetOverlaps.length) {
+        return {
+          x: targetX,
+          y: targetY,
+          collided,
+          normal: lastNormal
+        };
+      }
+
+      collided = true;
+
+      let lo = 0;
+      let hi = 1;
+
+      for (let i = 0; i < COLLISION_BINARY_STEPS; i += 1) {
+        const mid = (lo + hi) * 0.5;
+        const testX = currentX + remainingX * mid;
+        const testY = currentY + remainingY * mid;
+
+        const overlaps = getBlockingWallOverlaps(
+          level,
+          testX,
+          testY,
+          zCheck,
+          marble.radius,
+          supportZ
+        );
+
+        if (overlaps.length) {
+          hi = mid;
+        } else {
+          lo = mid;
+        }
+      }
+
+      const safeX = currentX + remainingX * lo;
+      const safeY = currentY + remainingY * lo;
+
+      const hitX = currentX + remainingX * hi;
+      const hitY = currentY + remainingY * hi;
+
+      const hitOverlaps = getBlockingWallOverlaps(
+        level,
+        hitX,
+        hitY,
+        zCheck,
+        marble.radius,
+        supportZ
+      );
+
+      const normal = combineCollisionNormal(hitOverlaps);
+      lastNormal = normal;
+
+      if (!normal) {
+        return {
+          x: safeX,
+          y: safeY,
+          collided: true,
+          normal: null
+        };
+      }
+
+      currentX = safeX + normal.x * COLLISION_PUSH_EPSILON;
+      currentY = safeY + normal.y * COLLISION_PUSH_EPSILON;
+
+      const remainingFactor = 1 - lo;
+      let slideX = remainingX * remainingFactor;
+      let slideY = remainingY * remainingFactor;
+
+      const slide = removeIntoWallComponent(slideX, slideY, normal);
+      remainingX = slide.vx;
+      remainingY = slide.vy;
+
+      if (Math.hypot(remainingX, remainingY) < 0.0001) {
+        return {
+          x: currentX,
+          y: currentY,
+          collided: true,
+          normal
+        };
+      }
+    }
+
+    return {
+      x: currentX,
+      y: currentY,
+      collided,
+      normal: lastNormal
     };
   }
 
@@ -268,62 +472,55 @@
     const stepDt = dt / steps;
 
     for (let i = 0; i < steps; i += 1) {
-      const full = tryGroundMove(
-        runtime,
-        currentSurface,
-        marble.x + marble.vx * stepDt,
-        marble.y + marble.vy * stepDt
+      const stepDx = marble.vx * stepDt;
+      const stepDy = marble.vy * stepDt;
+
+      const previewSurface = getGroundSupport(
+        level,
+        marble.x + stepDx,
+        marble.y + stepDy,
+        marble.radius
       );
 
-      if (!full.blocked) {
-        marble.x = full.x;
-        marble.y = full.y;
+      const transition = classifySurfaceTransition(currentSurface, previewSurface);
 
-        if (full.groundSurface) {
-          currentSurface = full.groundSurface;
-          marble.grounded = true;
-          marble.z = currentSurface.z + marble.radius;
-          marble.vz = 0;
-          continue;
-        }
+      const collisionSupportZ =
+        transition === 'ground'
+          ? previewSurface.z
+          : currentSurface.z;
 
-        marble.grounded = false;
-        return null;
-      }
-
-      const tryX = tryGroundMove(
-        runtime,
-        currentSurface,
-        marble.x + marble.vx * stepDt,
-        marble.y
-      );
-
-      if (!tryX.blocked) {
-        marble.x = tryX.x;
-        marble.y = tryX.y;
-      } else {
-        marble.vx = 0;
-      }
-
-      const xSurface = getGroundSupport(level, marble.x, marble.y, marble.radius) || currentSurface;
-
-      const tryY = tryGroundMove(
-        runtime,
-        xSurface,
+      const resolved = resolveSweptWallMovement(
+        level,
+        marble,
         marble.x,
-        marble.y + marble.vy * stepDt
+        marble.y,
+        stepDx,
+        stepDy,
+        marble.z,
+        collisionSupportZ
       );
 
-      if (!tryY.blocked) {
-        marble.x = tryY.x;
-        marble.y = tryY.y;
-      } else {
-        marble.vy = 0;
+      marble.x = resolved.x;
+      marble.y = resolved.y;
+
+      if (resolved.collided && resolved.normal) {
+        const adjusted = removeIntoWallComponent(marble.vx, marble.vy, resolved.normal);
+        marble.vx = adjusted.vx;
+        marble.vy = adjusted.vy;
       }
 
-      currentSurface = getGroundSupport(level, marble.x, marble.y, marble.radius);
+      const landedSurface = getGroundSupport(level, marble.x, marble.y, marble.radius);
+      const landedTransition = classifySurfaceTransition(currentSurface, landedSurface);
 
-      if (!currentSurface) {
+      if (landedTransition === 'ground' && landedSurface) {
+        currentSurface = landedSurface;
+        marble.grounded = true;
+        marble.z = currentSurface.z + marble.radius;
+        marble.vz = 0;
+        continue;
+      }
+
+      if (landedTransition === 'air') {
         marble.grounded = false;
         return null;
       }
@@ -339,31 +536,50 @@
   function moveAirborne(runtime, dt) {
     const marble = runtime.marble;
     const level = runtime.level;
+
     const distance = Math.max(
       Math.hypot(marble.vx * dt, marble.vy * dt),
       Math.abs(marble.vz * dt) * 0.25
     );
+
     const steps = Math.max(1, Math.ceil(distance / MOVE_STEP));
     const stepDt = dt / steps;
 
     for (let i = 0; i < steps; i += 1) {
+      const stepDx = marble.vx * stepDt;
+      const stepDy = marble.vy * stepDt;
       const targetZ = marble.z + marble.vz * stepDt;
-      const targetX = marble.x + marble.vx * stepDt;
-      const targetY = marble.y + marble.vy * stepDt;
 
-      if (wallBlocksAtHeight(level, marble, targetX, marble.y, targetZ)) {
-        marble.vx = 0;
-      } else {
-        marble.x = targetX;
-      }
+      const previewSupport = getLandingSupport(
+        level,
+        marble.x + stepDx,
+        marble.y + stepDy,
+        marble.radius
+      );
 
-      if (wallBlocksAtHeight(level, marble, marble.x, targetY, targetZ)) {
-        marble.vy = 0;
-      } else {
-        marble.y = targetY;
-      }
+      const collisionSupportZ = previewSupport ? previewSupport.z : null;
+      const zCheck = Math.min(marble.z, targetZ);
 
+      const resolved = resolveSweptWallMovement(
+        level,
+        marble,
+        marble.x,
+        marble.y,
+        stepDx,
+        stepDy,
+        zCheck,
+        collisionSupportZ
+      );
+
+      marble.x = resolved.x;
+      marble.y = resolved.y;
       marble.z = targetZ;
+
+      if (resolved.collided && resolved.normal) {
+        const adjusted = removeIntoWallComponent(marble.vx, marble.vy, resolved.normal);
+        marble.vx = adjusted.vx;
+        marble.vy = adjusted.vy;
+      }
 
       const surface = getLandingSupport(level, marble.x, marble.y, marble.radius);
 
