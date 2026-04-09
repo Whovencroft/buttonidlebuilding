@@ -180,26 +180,6 @@
     return Math.max(heights.ne, heights.se);
   }
 
-  function getSouthNeighborEdgeTop(level, tx, ty, fallbackZ) {
-    const heights = getNeighborHeights(level, tx, ty + 1, fallbackZ);
-    return Math.max(heights.nw, heights.ne);
-  }
-
-  function getEastNeighborEdgeTop(level, tx, ty, fallbackZ) {
-    const heights = getNeighborHeights(level, tx + 1, ty, fallbackZ);
-    return Math.max(heights.nw, heights.sw);
-  }
-
-  function getNorthNeighborEdgeTop(level, tx, ty, fallbackZ) {
-    const heights = getNeighborHeights(level, tx, ty - 1, fallbackZ);
-    return Math.max(heights.sw, heights.se);
-  }
-
-  function getWestNeighborEdgeTop(level, tx, ty, fallbackZ) {
-    const heights = getNeighborHeights(level, tx - 1, ty, fallbackZ);
-    return Math.max(heights.ne, heights.se);
-  }
-
   function buildGroundTileGeometry(level, tx, ty, view) {
     const cell = window.MarbleLevels.getCell(level, tx, ty);
     if (!cell || cell.kind === 'void' || cell.kind === 'wall') return null;
@@ -410,15 +390,7 @@
     const wallTop = getWallTop(runtime.level, tx, ty);
     const southNeighborTop = getSouthNeighborEdgeTop(runtime.level, tx, ty, fallbackZ);
     const eastNeighborTop = getEastNeighborEdgeTop(runtime.level, tx, ty, fallbackZ);
-    const fallbackZ = runtime.level.voidFloor ?? 0;
-    const eps = 0.01;
-    const baseColor = getTrackColor(cell);
-    const wallTop = getWallTop(runtime.level, tx, ty);
-    const southNeighborTop = getSouthNeighborEdgeTop(runtime.level, tx, ty, fallbackZ);
-    const eastNeighborTop = getEastNeighborEdgeTop(runtime.level, tx, ty, fallbackZ);
 
-    for (let z = 0; z < wallTop; z += 1) {
-      const cube = buildWallCubeGeometry(tx, ty, z, view, baseColor);
     for (let z = 0; z < wallTop; z += 1) {
       const cube = buildWallCubeGeometry(tx, ty, z, view, baseColor);
 
