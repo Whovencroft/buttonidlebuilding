@@ -4,7 +4,7 @@
   const DEFAULT_SUPPORT_RADIUS = 0.17;
   const DEFAULT_SEED = 0x5f3759df;
 
-  function resolveLevel(levelOrId = 'training_run') {
+  function resolveLevel(levelOrId = 'fork_rejoin_test') {
     if (levelOrId && typeof levelOrId === 'object' && typeof levelOrId.id === 'string') {
       return levelOrId;
     }
@@ -15,18 +15,18 @@
     return marble.collisionRadius ?? DEFAULT_COLLISION_RADIUS;
   }
 
-  function getStartZ(level, marble = {}) {
-    const sample =
-      typeof window.MarbleLevels.sampleSupportSurface === 'function'
-        ? window.MarbleLevels.sampleSupportSurface(
-            level,
-            level.start.x,
-            level.start.y,
-            marble.supportRadius ?? DEFAULT_SUPPORT_RADIUS,
-            0.72,
-            { minRatio: 0.45 }
-          )
-        : window.MarbleLevels.sampleWalkableSurface(level, level.start.x, level.start.y);
+  function getStartZ(level, marble = {}, dynamicState = null) {
+    const sample = window.MarbleLevels.sampleSupportSurface(
+      level,
+      level.start.x,
+      level.start.y,
+      marble.supportRadius ?? DEFAULT_SUPPORT_RADIUS,
+      0.72,
+      {
+        minRatio: 0.45,
+        runtime: dynamicState
+      }
+    );
 
     if (!sample) return getContactRadius(marble);
     return sample.z + getContactRadius(marble);
@@ -37,7 +37,7 @@
       return level.generatorSpec.seed >>> 0;
     }
     if (typeof window.MarbleLevels?.hashSeed === 'function') {
-      return window.MarbleLevels.hashSeed(level?.id || 'training_run');
+      return window.MarbleLevels.hashSeed(level?.id || 'fork_rejoin_test');
     }
     return DEFAULT_SEED;
   }
@@ -56,21 +56,44 @@
       supportRadius: DEFAULT_SUPPORT_RADIUS,
       coyoteTime: 0,
       jumpBufferTime: 0,
-      jumpCooldownTime: 0
+      jumpCooldownTime: 0,
+      supportSource: null,
+      supportRef: null,
+      lastSafePosition: null
     };
   }
 
-  function createRuntime(levelOrId = 'training_run') {
+  function buildReplaySkeleton(level, marble, seed) {
+    return {
+      version: 2,
+      levelId: level.id,
+      seed,
+      fixedStep: 1 / 120,
+      radii: {
+        renderRadius: marble.renderRadius,
+        collisionRadius: marble.collisionRadius,
+        supportRadius: marble.supportRadius
+      },
+      frames: [],
+      result: null
+    };
+  }
+
+  function createRuntime(levelOrId = 'fork_rejoin_test') {
     const level = resolveLevel(levelOrId);
     const marble = createMarbleBody();
+    const seed = createReplaySeed(level);
+    const dynamicState = window.MarbleLevels.createDynamicState(level, seed);
+
     marble.x = level.start.x;
     marble.y = level.start.y;
-    marble.z = getStartZ(level, marble);
+    marble.z = getStartZ(level, marble, dynamicState);
 
     return {
       levelId: level.id,
       level,
       marble,
+      dynamicState,
       camera: {
         x: level.start.x,
         y: level.start.y,
@@ -80,35 +103,29 @@
       fixedStep: 1 / 120,
       accumulator: 0,
       simTick: 0,
-      seed: createReplaySeed(level),
-      replay: {
-        version: 1,
-        levelId: level.id,
-        seed: createReplaySeed(level),
-        fixedStep: 1 / 120,
-        radii: {
-          renderRadius: DEFAULT_RENDER_RADIUS,
-          collisionRadius: DEFAULT_COLLISION_RADIUS,
-          supportRadius: DEFAULT_SUPPORT_RADIUS
-        },
-        frames: [],
-        result: null
-      },
+      seed,
+      replay: buildReplaySkeleton(level, marble, seed),
       cameraSmoothing: 1,
       status: 'running',
       timerMs: 0,
       resultApplied: false,
-      lastResult: null
+      lastResult: null,
+      debug: {
+        showRouteGraph: false,
+        showGrid: false,
+        showActorBounds: false
+      }
     };
   }
 
   function restartRuntime(runtime) {
     const level = runtime.level;
     const marble = runtime.marble;
+    runtime.dynamicState = window.MarbleLevels.createDynamicState(level, runtime.seed);
 
     marble.x = level.start.x;
     marble.y = level.start.y;
-    marble.z = getStartZ(level, marble);
+    marble.z = getStartZ(level, marble, runtime.dynamicState);
     marble.vx = 0;
     marble.vy = 0;
     marble.vz = 0;
@@ -116,6 +133,9 @@
     marble.coyoteTime = 0;
     marble.jumpBufferTime = 0;
     marble.jumpCooldownTime = 0;
+    marble.supportSource = null;
+    marble.supportRef = null;
+    marble.lastSafePosition = null;
 
     runtime.camera.x = level.start.x;
     runtime.camera.y = level.start.y;
@@ -128,19 +148,7 @@
     runtime.timerMs = 0;
     runtime.resultApplied = false;
     runtime.lastResult = null;
-    runtime.replay = {
-      version: 1,
-      levelId: level.id,
-      seed: runtime.seed,
-      fixedStep: runtime.fixedStep,
-      radii: {
-        renderRadius: marble.renderRadius,
-        collisionRadius: marble.collisionRadius,
-        supportRadius: marble.supportRadius
-      },
-      frames: [],
-      result: null
-    };
+    runtime.replay = buildReplaySkeleton(level, marble, runtime.seed);
     return runtime;
   }
 
