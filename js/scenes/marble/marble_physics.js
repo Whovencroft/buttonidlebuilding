@@ -1,21 +1,19 @@
 (() => {
   const GROUND_STEER_ACCEL = 12.5;
-  const AIR_STEER_ACCEL = 4.0;
+  const AIR_STEER_ACCEL = 4.4;
   const SLOPE_ACCEL = 16.0;
-  const MAX_GROUND_SPEED = 7.2;
-  const MAX_AIR_SPEED = 8.0;
+  const MAX_GROUND_SPEED = 7.15;
+  const MAX_AIR_SPEED = 8.1;
 
   const MAX_STEP_UP = 0.48;
-  const MAX_STEP_DOWN = 0.8;
-  const GROUND_SNAP = 0.18;
+  const MAX_STEP_DOWN = 0.88;
+  const GROUND_SNAP = 0.2;
 
   const VERTICAL_GRAVITY = -22.0;
-  const MOVE_STEP = 0.06;
+  const MOVE_STEP = 0.055;
 
-  const GROUND_SUPPORT_CLEARANCE = 0.54;
-  const LANDING_SUPPORT_CLEARANCE = 0.5;
-  const WALL_COLLISION_CLEARANCE = 0.92;
-
+  const GROUND_SUPPORT_CLEARANCE = 1.0;
+  const LANDING_SUPPORT_CLEARANCE = 0.92;
   const MIN_GROUNDED_SUPPORT_RATIO = 0.45;
   const MIN_LANDING_SUPPORT_RATIO = 0.34;
 
@@ -38,23 +36,6 @@
 
   function clamp(value, min, max) {
     return Math.max(min, Math.min(max, value));
-  }
-
-  function getFootprintOffsets(radius, clearance) {
-    const r = radius * clearance;
-    const d = r * 0.7071;
-
-    return [
-      [0, 0],
-      [r, 0],
-      [-r, 0],
-      [0, r],
-      [0, -r],
-      [d, d],
-      [d, -d],
-      [-d, d],
-      [-d, -d]
-    ];
   }
 
   function clampSpeed(marble, maxSpeed) {
@@ -83,49 +64,21 @@
     };
   }
 
-  function sampleSupport(level, x, y, radius, clearance, minRatio, includeWalls) {
-    const offsets = getFootprintOffsets(radius, clearance);
-    const samples = [];
-    let center = null;
+  function sampleSupport(level, x, y, radius, clearance, minRatio) {
+    const support = window.MarbleLevels.sampleSupportSurface(
+      level,
+      x,
+      y,
+      radius,
+      clearance,
+      { minRatio }
+    );
 
-    for (const [ox, oy] of offsets) {
-      const sample = window.MarbleLevels.sampleCellSurface(
-        level,
-        x + ox,
-        y + oy,
-        { includeWalls }
-      );
-
-      if (ox === 0 && oy === 0) {
-        center = sample;
-      }
-
-      if (sample) {
-        samples.push(sample);
-      }
-    }
-
-    if (!samples.length) return null;
-
-    const supportRatio = samples.length / offsets.length;
-    if (supportRatio < minRatio) {
-      return null;
-    }
-
-    const bestSample = center || samples.reduce((best, sample) => {
-      if (!best) return sample;
-      return sample.z > best.z ? sample : best;
-    }, null);
+    if (!support) return null;
 
     return {
-      ...bestSample,
-      centerSample: center,
-      supportSamples: samples,
-      supportRatio,
-      minSupportZ: Math.min(...samples.map((sample) => sample.z)),
-      maxSupportZ: Math.max(...samples.map((sample) => sample.z)),
-      z: center ? center.z : bestSample.z,
-      gradient: center?.gradient || averageGradient(samples)
+      ...support,
+      gradient: support.gradient || averageGradient(support.supportSamples || [])
     };
   }
 
@@ -136,8 +89,7 @@
       y,
       radius,
       GROUND_SUPPORT_CLEARANCE,
-      MIN_GROUNDED_SUPPORT_RATIO,
-      true
+      MIN_GROUNDED_SUPPORT_RATIO
     );
   }
 
@@ -148,20 +100,8 @@
       y,
       radius,
       LANDING_SUPPORT_CLEARANCE,
-      MIN_LANDING_SUPPORT_RATIO,
-      true
+      MIN_LANDING_SUPPORT_RATIO
     );
-  }
-
-  function getWallTop(level, tx, ty) {
-    const cell = window.MarbleLevels.getCell(level, tx, ty);
-    if (!cell || cell.kind !== 'wall') return null;
-
-    if (typeof window.MarbleLevels.getCellTopZ === 'function') {
-      return window.MarbleLevels.getCellTopZ(cell);
-    }
-
-    return cell.h || 0;
   }
 
   function applyGroundForces(runtime, inputAxis, dt, surface) {
@@ -254,7 +194,7 @@
     return { penetration, normal };
   }
 
-  function getBlockingWallOverlaps(level, x, y, zCheck, radius, supportZ) {
+  function getBlockingBlockerOverlaps(level, x, y, zCheck, radius, supportZ) {
     const overlaps = [];
     const marbleBottom = zCheck - radius;
 
@@ -265,17 +205,20 @@
 
     for (let ty = minTy; ty <= maxTy; ty += 1) {
       for (let tx = minTx; tx <= maxTx; tx += 1) {
-        const cell = window.MarbleLevels.getCell(level, tx, ty);
-        if (!cell || cell.kind !== 'wall') continue;
+        const blocker = window.MarbleLevels.getBlockerCell(level, tx, ty);
+        if (!blocker) continue;
 
-        const wallTop = getWallTop(level, tx, ty);
-        if (wallTop === null) continue;
-
-        if (marbleBottom > wallTop + WALL_Z_EPSILON) {
+        const blockerTop = blocker.top;
+        if (marbleBottom > blockerTop + WALL_Z_EPSILON) {
           continue;
         }
 
-        if (supportZ !== null && supportZ !== undefined && supportZ >= wallTop - WALL_Z_EPSILON) {
+        if (
+          blocker.walkableTop &&
+          supportZ !== null &&
+          supportZ !== undefined &&
+          supportZ >= blockerTop - WALL_Z_EPSILON
+        ) {
           continue;
         }
 
@@ -294,9 +237,10 @@
         overlaps.push({
           tx,
           ty,
-          wallTop,
+          blockerTop,
           penetration: overlap.penetration,
-          normal: overlap.normal
+          normal: overlap.normal,
+          blocker
         });
       }
     }
@@ -344,7 +288,7 @@
     };
   }
 
-  function resolveSweptWallMovement(level, marble, startX, startY, moveX, moveY, zCheck, supportZ) {
+  function resolveSweptBlockerMovement(level, marble, startX, startY, moveX, moveY, zCheck, supportZ) {
     let currentX = startX;
     let currentY = startY;
     let remainingX = moveX;
@@ -356,12 +300,12 @@
       const targetX = currentX + remainingX;
       const targetY = currentY + remainingY;
 
-      const targetOverlaps = getBlockingWallOverlaps(
+      const targetOverlaps = getBlockingBlockerOverlaps(
         level,
         targetX,
         targetY,
         zCheck,
-        marble.radius,
+        marble.collisionRadius,
         supportZ
       );
 
@@ -384,12 +328,12 @@
         const testX = currentX + remainingX * mid;
         const testY = currentY + remainingY * mid;
 
-        const overlaps = getBlockingWallOverlaps(
+        const overlaps = getBlockingBlockerOverlaps(
           level,
           testX,
           testY,
           zCheck,
-          marble.radius,
+          marble.collisionRadius,
           supportZ
         );
 
@@ -406,12 +350,12 @@
       const hitX = currentX + remainingX * hi;
       const hitY = currentY + remainingY * hi;
 
-      const hitOverlaps = getBlockingWallOverlaps(
+      const hitOverlaps = getBlockingBlockerOverlaps(
         level,
         hitX,
         hitY,
         zCheck,
-        marble.radius,
+        marble.collisionRadius,
         supportZ
       );
 
@@ -431,10 +375,11 @@
       currentY = safeY + normal.y * COLLISION_PUSH_EPSILON;
 
       const remainingFactor = 1 - lo;
-      let slideX = remainingX * remainingFactor;
-      let slideY = remainingY * remainingFactor;
-
-      const slide = removeIntoWallComponent(slideX, slideY, normal);
+      const slide = removeIntoWallComponent(
+        remainingX * remainingFactor,
+        remainingY * remainingFactor,
+        normal
+      );
       remainingX = slide.vx;
       remainingY = slide.vy;
 
@@ -459,7 +404,7 @@
   function moveGrounded(runtime, dt) {
     const marble = runtime.marble;
     const level = runtime.level;
-    let currentSurface = getGroundSupport(level, marble.x, marble.y, marble.radius);
+    let currentSurface = getGroundSupport(level, marble.x, marble.y, marble.supportRadius);
 
     if (!currentSurface) {
       marble.grounded = false;
@@ -479,17 +424,13 @@
         level,
         marble.x + stepDx,
         marble.y + stepDy,
-        marble.radius
+        marble.supportRadius
       );
 
       const transition = classifySurfaceTransition(currentSurface, previewSurface);
+      const collisionSupportZ = transition === 'ground' ? previewSurface.z : currentSurface.z;
 
-      const collisionSupportZ =
-        transition === 'ground'
-          ? previewSurface.z
-          : currentSurface.z;
-
-      const resolved = resolveSweptWallMovement(
+      const resolved = resolveSweptBlockerMovement(
         level,
         marble,
         marble.x,
@@ -509,13 +450,13 @@
         marble.vy = adjusted.vy;
       }
 
-      const landedSurface = getGroundSupport(level, marble.x, marble.y, marble.radius);
+      const landedSurface = getGroundSupport(level, marble.x, marble.y, marble.supportRadius);
       const landedTransition = classifySurfaceTransition(currentSurface, landedSurface);
 
       if (landedTransition === 'ground' && landedSurface) {
         currentSurface = landedSurface;
         marble.grounded = true;
-        marble.z = currentSurface.z + marble.radius;
+        marble.z = currentSurface.z + marble.collisionRadius;
         marble.vz = 0;
         continue;
       }
@@ -526,7 +467,7 @@
       }
 
       marble.grounded = true;
-      marble.z = currentSurface.z + marble.radius;
+      marble.z = currentSurface.z + marble.collisionRadius;
       marble.vz = 0;
     }
 
@@ -554,13 +495,13 @@
         level,
         marble.x + stepDx,
         marble.y + stepDy,
-        marble.radius
+        marble.supportRadius
       );
 
       const collisionSupportZ = previewSupport ? previewSupport.z : null;
       const zCheck = Math.min(marble.z, targetZ);
 
-      const resolved = resolveSweptWallMovement(
+      const resolved = resolveSweptBlockerMovement(
         level,
         marble,
         marble.x,
@@ -581,15 +522,15 @@
         marble.vy = adjusted.vy;
       }
 
-      const surface = getLandingSupport(level, marble.x, marble.y, marble.radius);
+      const surface = getLandingSupport(level, marble.x, marble.y, marble.supportRadius);
 
       if (
         surface &&
-        marble.z <= surface.z + marble.radius + GROUND_SNAP &&
+        marble.z <= surface.z + marble.collisionRadius + GROUND_SNAP &&
         marble.vz <= 0
       ) {
         marble.grounded = true;
-        marble.z = surface.z + marble.radius;
+        marble.z = surface.z + marble.collisionRadius;
         marble.vz = 0;
         return surface;
       }
@@ -618,11 +559,7 @@
       dirY = marble.vy / speed;
     }
 
-    const desiredLookDistance =
-      speed > 0.05
-        ? Math.min(1.6, 0.45 + speed * 0.18)
-        : 0;
-
+    const desiredLookDistance = speed > 0.05 ? Math.min(1.6, 0.45 + speed * 0.18) : 0;
     const lookFollow = Math.min(1, dt * 10);
     runtime.camera.lookX += (dirX * desiredLookDistance - runtime.camera.lookX) * lookFollow;
     runtime.camera.lookY += (dirY * desiredLookDistance - runtime.camera.lookY) * lookFollow;
@@ -645,12 +582,12 @@
     return runtime.lastResult;
   }
 
-  function complete(runtime) {
+  function complete(runtime, bestTimeMs) {
     runtime.status = 'completed';
     runtime.lastResult = {
       type: 'completed',
       levelId: runtime.level.id,
-      bestTimeMs: Math.round(runtime.timerMs),
+      bestTimeMs,
       reward: runtime.level.reward
     };
     return runtime.lastResult;
@@ -659,10 +596,7 @@
   function performJump(marble, surface) {
     marble.grounded = false;
     marble.vz = JUMP_IMPULSE;
-    marble.z = Math.max(
-      marble.z,
-      surface.z + marble.radius + JUMP_LIFT
-    );
+    marble.z = Math.max(marble.z, surface.z + marble.collisionRadius + JUMP_LIFT);
     marble.coyoteTime = 0;
     marble.jumpBufferTime = 0;
     marble.jumpCooldownTime = JUMP_COOLDOWN;
@@ -686,6 +620,30 @@
     marble.jumpCooldownTime = Math.max(0, marble.jumpCooldownTime - dt);
   }
 
+  function evaluateTriggers(runtime, groundSurface) {
+    if (!groundSurface) return null;
+
+    const trigger = window.MarbleLevels.getTriggerCell(runtime.level, groundSurface.tx, groundSurface.ty);
+    if (!trigger) return null;
+
+    if (trigger.kind === 'hazard') {
+      return fail(runtime, 'hazard');
+    }
+
+    if (trigger.kind === 'goal') {
+      const cx = groundSurface.tx + 0.5;
+      const cy = groundSurface.ty + 0.5;
+      const radius = trigger.radius ?? runtime.level.goal?.radius ?? 0.42;
+      const dx = runtime.marble.x - cx;
+      const dy = runtime.marble.y - cy;
+      if (Math.hypot(dx, dy) <= radius) {
+        return complete(runtime, Math.round(runtime.timerMs));
+      }
+    }
+
+    return null;
+  }
+
   function updatePhysics(runtime, inputState, dt) {
     if (runtime.status !== 'running') {
       return runtime.lastResult;
@@ -696,7 +654,7 @@
     const inputAxis = inputState?.axis || { x: 0, y: 0 };
     const jumpPressed = !!inputState?.jumpPressed;
 
-    let groundSurface = getGroundSupport(level, marble.x, marble.y, marble.radius);
+    let groundSurface = getGroundSupport(level, marble.x, marble.y, marble.supportRadius);
     const isSupportedNow = !!(marble.grounded && groundSurface);
 
     updateJumpTimers(marble, jumpPressed, isSupportedNow, dt);
@@ -723,14 +681,9 @@
     runtime.timerMs += dt * 1000;
     updateCamera(runtime, dt);
 
-    if (groundSurface && groundSurface.cell.kind === 'hazard') {
-      return fail(runtime, 'hazard');
-    }
-
-    const dx = marble.x - level.goal.x;
-    const dy = marble.y - level.goal.y;
-    if (Math.hypot(dx, dy) <= level.goal.radius) {
-      return complete(runtime);
+    const triggerResult = evaluateTriggers(runtime, groundSurface);
+    if (triggerResult) {
+      return triggerResult;
     }
 
     if (marble.z < level.killZ) {

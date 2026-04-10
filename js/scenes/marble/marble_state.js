@@ -1,10 +1,15 @@
 (() => {
-  function create(api) {
-    const { elements, getState, applyMarbleReward, switchScene, saveNow } = api;
+  const FIXED_DT = 1 / 120;
+  const MAX_PHYSICS_STEPS = 12;
 
+  function create(api) {
+    const { config, elements, getState, applyMarbleReward, switchScene, saveNow } = api;
     const root = elements.marbleSceneRoot;
+    const replayStorageKey = `${config.meta.saveKey}.marble.lastReplay.v1`;
+
     let runtime = null;
     let input = null;
+    let playback = null;
     let built = false;
     let levelStripSignature = '';
 
@@ -48,7 +53,7 @@
             <div class="marble-level-strip" data-marble-level-strip></div>
           </div>
 
-          <div class="marble-help">WASD / Arrow Keys move • Space jump • Blue above you • Gold below you • R restart • Esc return</div>
+          <div class="marble-help">WASD / Arrow Keys move • Space jump • R restart • Esc return • window.MarbleSceneDebug for fixtures, replays, and generator tests</div>
 
           <div class="marble-overlay" data-marble-overlay hidden>
             <div class="marble-overlay-card">
@@ -84,7 +89,7 @@
         const button = event.target.closest('[data-marble-level]');
         if (!button) return;
         if (button.disabled) return;
-        loadLevel(button.dataset.marbleLevel);
+        openLevel(button.dataset.marbleLevel);
       });
     }
 
@@ -92,6 +97,30 @@
       if (!input) {
         input = window.MarbleInput.createInput();
       }
+    }
+
+    function saveReplayToStorage(replayData) {
+      localStorage.setItem(replayStorageKey, JSON.stringify(replayData));
+      return replayData;
+    }
+
+    function loadReplayFromStorage() {
+      try {
+        const raw = localStorage.getItem(replayStorageKey);
+        if (!raw) return null;
+        return JSON.parse(raw);
+      } catch (error) {
+        console.error(error);
+        return null;
+      }
+    }
+
+    function serializeReplay(result = null) {
+      if (!runtime?.replay) return null;
+      return {
+        ...runtime.replay,
+        result: result || runtime.replay.result || null
+      };
     }
 
     function getLevelStripSignature() {
@@ -110,7 +139,6 @@
       }
 
       levelStripSignature = signature;
-
       const slice = marbleSlice();
 
       refs.levelStrip.innerHTML = window.MarbleLevels.LEVELS.map((level, index) => {
@@ -131,13 +159,24 @@
       }).join('');
     }
 
-    function loadLevel(levelId, options = {}) {
-      buildDom();
-      ensureInput();
-
-      const level = window.MarbleLevels.getLevelById(levelId);
+    function applyRuntimeLevel(levelRef, options = {}) {
+      const level = typeof levelRef === 'string' ? window.MarbleLevels.getLevelById(levelRef) : levelRef;
       marbleSlice().currentLevelId = level.id;
-      runtime = window.MarbleState.createRuntime(level.id);
+      runtime = window.MarbleState.createRuntime(level);
+      runtime.fixedStep = FIXED_DT;
+      runtime.accumulator = 0;
+      playback = options.playReplayData
+        ? {
+            data: options.playReplayData,
+            cursor: 0
+          }
+        : null;
+
+      if (playback?.data?.radii) {
+        runtime.marble.renderRadius = playback.data.radii.renderRadius ?? runtime.marble.renderRadius;
+        runtime.marble.collisionRadius = playback.data.radii.collisionRadius ?? runtime.marble.collisionRadius;
+        runtime.marble.supportRadius = playback.data.radii.supportRadius ?? runtime.marble.supportRadius;
+      }
 
       hideOverlay();
       renderLevelStrip(true);
@@ -150,26 +189,41 @@
       return runtime;
     }
 
+    function openLevel(levelRef, options = {}) {
+      buildDom();
+      ensureInput();
+      return applyRuntimeLevel(levelRef, options);
+    }
+
     function ensureRuntime() {
       if (!runtime) {
-        loadLevel(currentLevelId(), { silentSave: true });
+        openLevel(currentLevelId(), { silentSave: true });
       } else {
         ensureInput();
       }
     }
 
-    function prepare(source = elements.sceneHost) {
+    function prepare() {
       buildDom();
       ensureRuntime();
 
       if (window.MarbleRenderer && typeof window.MarbleRenderer.prepare === 'function') {
-        window.MarbleRenderer.prepare(runtime, source);
+        window.MarbleRenderer.prepare(runtime, refs.canvas);
       }
     }
 
     function restartRun(options = {}) {
       ensureRuntime();
+      playback = options.playReplayData
+        ? {
+            data: options.playReplayData,
+            cursor: 0
+          }
+        : playback;
+
       window.MarbleState.restartRuntime(runtime);
+      runtime.fixedStep = FIXED_DT;
+      runtime.accumulator = 0;
       hideOverlay();
       renderLevelStrip(true);
       render();
@@ -197,34 +251,48 @@
       const nextLevelId = window.MarbleLevels.getNextLevelId(currentLevelId());
       if (!nextLevelId) return;
       if (!window.MarbleLevels.isLevelUnlocked(marbleSlice().clearedLevels, nextLevelId)) return;
+      openLevel(nextLevelId);
+    }
 
-      loadLevel(nextLevelId);
+    function persistCompletedReplay(result) {
+      if (!runtime?.replay) return null;
+      runtime.replay.result = result;
+      return saveReplayToStorage(serializeReplay(result));
     }
 
     function applyCompletion(result) {
+      const mainLevelIndex = window.MarbleLevels.getLevelIndex(result.levelId);
       const slice = marbleSlice();
-      const nextLevelId = window.MarbleLevels.getNextLevelId(result.levelId);
-      const nextWasUnlocked = nextLevelId
-        ? window.MarbleLevels.isLevelUnlocked(slice.clearedLevels, nextLevelId)
-        : false;
+      let nextLevelId = null;
+      let nextWasUnlocked = false;
+
+      if (mainLevelIndex >= 0) {
+        nextLevelId = window.MarbleLevels.getNextLevelId(result.levelId);
+        nextWasUnlocked = nextLevelId
+          ? window.MarbleLevels.isLevelUnlocked(slice.clearedLevels, nextLevelId)
+          : false;
+      }
 
       const claimKey = result.reward?.claimKey;
       const alreadyClaimed = claimKey ? !!slice.rewardClaims[claimKey] : false;
 
-      if (!alreadyClaimed) {
-        applyMarbleReward(result);
-      } else {
-        if (!slice.clearedLevels.includes(result.levelId)) {
-          slice.clearedLevels.push(result.levelId);
-        }
+      if (mainLevelIndex >= 0) {
+        if (!alreadyClaimed) {
+          applyMarbleReward(result);
+        } else {
+          if (!slice.clearedLevels.includes(result.levelId)) {
+            slice.clearedLevels.push(result.levelId);
+          }
 
-        const existingBest = slice.bestTimes[result.levelId];
-        if (!existingBest || result.bestTimeMs < existingBest) {
-          slice.bestTimes[result.levelId] = result.bestTimeMs;
+          const existingBest = slice.bestTimes[result.levelId];
+          if (!existingBest || result.bestTimeMs < existingBest) {
+            slice.bestTimes[result.levelId] = result.bestTimeMs;
+          }
         }
       }
 
       runtime.resultApplied = true;
+      persistCompletedReplay(result);
 
       const nextIsUnlocked = nextLevelId
         ? window.MarbleLevels.isLevelUnlocked(slice.clearedLevels, nextLevelId)
@@ -232,9 +300,11 @@
 
       renderLevelStrip(true);
 
-      const rewardText = alreadyClaimed
-        ? 'Reward already claimed. Best time updated if improved.'
-        : `Reward granted: ${result.reward?.presses || 0} presses.`;
+      const rewardText = mainLevelIndex < 0
+        ? 'Fixture or generated course complete. Replay saved for inspection.'
+        : alreadyClaimed
+          ? 'Reward already claimed. Best time updated if improved.'
+          : `Reward granted: ${result.reward?.presses || 0} presses.`;
 
       const unlockText =
         nextLevelId && !nextWasUnlocked && nextIsUnlocked
@@ -242,49 +312,85 @@
           : '';
 
       showOverlay(
-        'Stage Cleared',
+        playback ? 'Replay Complete' : 'Stage Cleared',
         `${runtime.level.name} complete in ${(result.bestTimeMs / 1000).toFixed(2)}s. ${rewardText}${unlockText}`,
-        { showNext: !!(nextLevelId && nextIsUnlocked) }
+        { showNext: !playback && !!(nextLevelId && nextIsUnlocked) }
       );
+    }
+
+    function applyFailure(result) {
+      persistCompletedReplay(result);
+
+      let reasonText = 'Run failed. Restart and try again.';
+      if (result.reason === 'fall') {
+        reasonText = 'You fell off the course. Restart and try again.';
+      } else if (result.reason === 'hazard') {
+        reasonText = 'You hit a hazard. Restart and try again.';
+      }
+
+      showOverlay(playback ? 'Replay Failed' : 'Course Failed', reasonText);
+    }
+
+    function buildLiveStepInput() {
+      return input.buildStepInput();
+    }
+
+    function buildPlaybackStepInput() {
+      const frame = playback?.data?.frames?.[playback.cursor] || { x: 0, y: 0, j: 0 };
+      playback.cursor += 1;
+      return input.applyReplayFrame(frame);
+    }
+
+    function recordStepInput(stepInput) {
+      if (playback || !runtime?.replay) return;
+      runtime.replay.frames.push({
+        x: Number(stepInput.axis.x.toFixed(4)),
+        y: Number(stepInput.axis.y.toFixed(4)),
+        j: stepInput.jumpPressed ? 1 : 0
+      });
+    }
+
+    function stepSimulation(dt) {
+      const stepInput = playback ? buildPlaybackStepInput() : buildLiveStepInput();
+      recordStepInput(stepInput);
+      const result = window.MarblePhysics.updatePhysics(runtime, stepInput, dt);
+      runtime.simTick += 1;
+      return result;
     }
 
     function update(dt) {
       if (!runtime || !input) return;
 
-      if (input.consumePressed('Escape')) {
+      if (!playback && input.consumeBufferedPress('Escape')) {
         switchScene('button_idle', { force: true });
         input.endFrame();
         return;
       }
 
-      if (input.consumePressed('KeyR')) {
+      if (!playback && input.consumeBufferedPress('KeyR')) {
         restartRun();
         input.endFrame();
         return;
       }
 
       if (runtime.status === 'running') {
-        const result = window.MarblePhysics.updatePhysics(
-          runtime,
-          {
-            axis: input.getAxis(),
-            jumpPressed: input.consumePressed('Space')
-          },
-          dt
-        );
+        runtime.accumulator = Math.min(runtime.accumulator + dt, runtime.fixedStep * MAX_PHYSICS_STEPS);
 
-        if (result?.type === 'failed') {
-          let reasonText = 'Run failed. Restart and try again.';
+        let steps = 0;
+        while (runtime.accumulator >= runtime.fixedStep && steps < MAX_PHYSICS_STEPS) {
+          const result = stepSimulation(runtime.fixedStep);
+          runtime.accumulator -= runtime.fixedStep;
+          steps += 1;
 
-          if (result.reason === 'fall') {
-            reasonText = 'You fell off the course. Restart and try again.';
-          } else if (result.reason === 'hazard') {
-            reasonText = 'You hit a hazard. Restart and try again.';
+          if (result?.type === 'failed') {
+            applyFailure(result);
+            break;
           }
 
-          showOverlay('Course Failed', reasonText);
-        } else if (result?.type === 'completed' && !runtime.resultApplied) {
-          applyCompletion(result);
+          if (result?.type === 'completed' && !runtime.resultApplied) {
+            applyCompletion(result);
+            break;
+          }
         }
       }
 
@@ -304,50 +410,118 @@
       window.MarbleRenderer.render(runtime, refs.canvas);
     }
 
+    function startReplay(replayData) {
+      if (!replayData?.levelId) return null;
+      openLevel(replayData.levelId, {
+        silentSave: true,
+        playReplayData: replayData
+      });
+      hideOverlay();
+      return replayData;
+    }
+
+    function loadGeneratedSpec(spec) {
+      const level = window.MarbleLevels.registerGeneratedLevel(
+        window.MarbleLevels.generateCourseFromSpec(spec)
+      );
+      openLevel(level, { silentSave: true });
+      return level;
+    }
+
+    function exposeDebugApi() {
+      window.MarbleSceneDebug = {
+        listFixtures() {
+          return window.MarbleLevels.FIXTURE_LEVELS.map(({ id, name }) => ({ id, name }));
+        },
+        loadFixture(id) {
+          const level = window.MarbleLevels.getLevelById(id);
+          switchScene('marble', { force: true, silentSave: true, startLevelId: level.id });
+          openLevel(level, { silentSave: true });
+          return level;
+        },
+        generate(spec) {
+          const level = loadGeneratedSpec(spec);
+          switchScene('marble', { force: true, silentSave: true, startLevelId: level.id });
+          return level;
+        },
+        exportLastReplay() {
+          const replay = loadReplayFromStorage();
+          return replay ? JSON.stringify(replay, null, 2) : null;
+        },
+        importReplay(replayInput) {
+          const replay = typeof replayInput === 'string' ? JSON.parse(replayInput) : replayInput;
+          switchScene('marble', {
+            force: true,
+            silentSave: true,
+            startLevelId: replay.levelId,
+            playReplayData: replay
+          });
+          startReplay(replay);
+          return replay;
+        },
+        startSavedReplay() {
+          const replay = loadReplayFromStorage();
+          if (!replay) return null;
+          switchScene('marble', {
+            force: true,
+            silentSave: true,
+            startLevelId: replay.levelId,
+            playReplayData: replay
+          });
+          startReplay(replay);
+          return replay;
+        }
+      };
+    }
+
     function onStateLoaded() {
       const slice = marbleSlice();
-
       if (!slice.currentLevelId) {
         slice.currentLevelId = 'training_run';
       }
-
-      prepare(elements.sceneHost);
+      prepare();
       renderLevelStrip(true);
       render();
+      exposeDebugApi();
     }
 
     return {
       id: 'marble',
       root,
-
       enter(context = {}) {
-        prepare(elements.sceneHost);
+        prepare();
         ensureInput();
         input.attach();
 
         if (!runtime || (context.startLevelId && context.startLevelId !== runtime.level.id)) {
-          loadLevel(context.startLevelId || currentLevelId(), { silentSave: true });
+          openLevel(context.startLevelId || currentLevelId(), {
+            silentSave: true,
+            playReplayData: context.playReplayData || null
+          });
+        } else if (context.playReplayData) {
+          startReplay(context.playReplayData);
         }
 
         if (context.restartLevel) {
-          restartRun({ silentSave: true });
+          restartRun({ silentSave: true, playReplayData: context.playReplayData || null });
         }
 
         hideOverlay();
         renderLevelStrip(true);
         render();
+        exposeDebugApi();
       },
-
       exit() {
         if (input) {
           input.detach();
         }
       },
-
       update,
       render,
       onStateLoaded,
-      prepare
+      prepare,
+      startReplay,
+      loadGeneratedSpec
     };
   }
 

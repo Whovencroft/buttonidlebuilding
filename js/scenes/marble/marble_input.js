@@ -1,12 +1,12 @@
 (() => {
   function createInput() {
     const held = new Set();
-    const pressedThisFrame = new Set();
+    const bufferedPresses = new Set();
     let attached = false;
 
     function onKeyDown(event) {
       if (!held.has(event.code)) {
-        pressedThisFrame.add(event.code);
+        bufferedPresses.add(event.code);
       }
       held.add(event.code);
     }
@@ -17,7 +17,7 @@
 
     function onBlur() {
       held.clear();
-      pressedThisFrame.clear();
+      bufferedPresses.clear();
     }
 
     function attach() {
@@ -52,24 +52,49 @@
         y /= length;
       }
 
-      return { x, y };
+      return {
+        x: Number(x.toFixed(4)),
+        y: Number(y.toFixed(4))
+      };
     }
 
-    function consumePressed(code) {
-      const had = pressedThisFrame.has(code);
-      pressedThisFrame.delete(code);
+    function consumeBufferedPress(code) {
+      const had = bufferedPresses.has(code);
+      bufferedPresses.delete(code);
       return had;
     }
 
-    function endFrame() {
-      pressedThisFrame.clear();
+    function isHeld(code) {
+      return held.has(code);
     }
+
+    function buildStepInput() {
+      return {
+        axis: getAxis(),
+        jumpPressed: consumeBufferedPress('Space')
+      };
+    }
+
+    function applyReplayFrame(frame) {
+      return {
+        axis: {
+          x: Number(frame?.x ?? 0),
+          y: Number(frame?.y ?? 0)
+        },
+        jumpPressed: !!frame?.j
+      };
+    }
+
+    function endFrame() {}
 
     return {
       attach,
       detach,
       getAxis,
-      consumePressed,
+      isHeld,
+      consumeBufferedPress,
+      buildStepInput,
+      applyReplayFrame,
       endFrame
     };
   }
