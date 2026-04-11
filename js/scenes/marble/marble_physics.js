@@ -7,8 +7,12 @@
 
   const MAX_STEP_UP = 0.52;
   const MAX_STEP_DOWN = 1.15;
-  const GROUND_SNAP = 0.22;
-  const LEDGE_FALL_HORIZONTAL_DAMPING = 0.38;
+  const GROUND_SNAP = 0.14;
+  const LEDGE_FALL_HORIZONTAL_DAMPING = 0.18;
+  const LEDGE_FALL_DOWNWARD_KICK = -0.75;
+  const AIR_IDLE_DRAG = 0.968;
+  const AIR_ACTIVE_DRAG = 0.985;
+  const HAZARD_TRIGGER_RADIUS = 0.28;
 
   const VERTICAL_GRAVITY = -22.5;
   const MOVE_STEP = 0.05;
@@ -289,18 +293,21 @@
   }
 
   function applyAirForces(runtime, inputAxis, dt) {
-    const marble = runtime.marble;
-    const worldInput = mapScreenInputToWorld(inputAxis);
-    marble.vx += worldInput.x * AIR_STEER_ACCEL * dt;
-    marble.vy += worldInput.y * AIR_STEER_ACCEL * dt;
-    marble.vz += VERTICAL_GRAVITY * dt;
-    const inputMag = Math.hypot(worldInput.x, worldInput.y);
-    const airDragBase = inputMag < 0.05 ? 0.976 : 0.986;
-    const airDrag = Math.pow(airDragBase, dt * 60);
-    marble.vx *= airDrag;
-    marble.vy *= airDrag;
-    clampSpeed(marble, MAX_AIR_SPEED);
-  }
+  const marble = runtime.marble;
+  const worldInput = mapScreenInputToWorld(inputAxis);
+
+  marble.vx += worldInput.x * AIR_STEER_ACCEL * dt;
+  marble.vy += worldInput.y * AIR_STEER_ACCEL * dt;
+  marble.vz += VERTICAL_GRAVITY * dt;
+
+  const inputMag = Math.hypot(worldInput.x, worldInput.y);
+  const airDrag = Math.pow(inputMag < 0.05 ? AIR_IDLE_DRAG : AIR_ACTIVE_DRAG, dt * 60);
+
+  marble.vx *= airDrag;
+  marble.vy *= airDrag;
+
+  clampSpeed(marble, MAX_AIR_SPEED);
+}
 
   function moveGrounded(runtime, dt) {
     const marble = runtime.marble;
@@ -343,12 +350,12 @@
       }
 
       if (landedTransition === 'air') {
-        marble.vx *= LEDGE_FALL_HORIZONTAL_DAMPING;
-        marble.vy *= LEDGE_FALL_HORIZONTAL_DAMPING;
-        marble.vz = Math.min(marble.vz, -0.35);
-        marble.grounded = false;
-        return null;
-      }
+    marble.vx *= LEDGE_FALL_HORIZONTAL_DAMPING;
+    marble.vy *= LEDGE_FALL_HORIZONTAL_DAMPING;
+    marble.vz = Math.min(marble.vz, LEDGE_FALL_DOWNWARD_KICK);
+    marble.grounded = false;
+    return null;
+  }
 
       marble.grounded = true;
       marble.z = currentSurface.z + marble.collisionRadius;
@@ -472,8 +479,16 @@
 
     const trigger = window.MarbleLevels.getTriggerCell(runtime.level, groundSurface.tx, groundSurface.ty);
     if (trigger?.kind === 'hazard') {
-      return fail(runtime, trigger.data?.type || 'hazard');
-    }
+  const cx = groundSurface.tx + 0.5;
+  const cy = groundSurface.ty + 0.5;
+  const dx = runtime.marble.x - cx;
+  const dy = runtime.marble.y - cy;
+  const radius = trigger.radius ?? HAZARD_TRIGGER_RADIUS;
+
+  if (Math.hypot(dx, dy) <= radius) {
+    return fail(runtime, trigger.data?.type || 'hazard');
+  }
+}
 
     if (trigger?.kind === 'goal') {
       const cx = groundSurface.tx + 0.5;

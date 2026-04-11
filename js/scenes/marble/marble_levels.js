@@ -590,62 +590,106 @@
   }
 
   function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, options = {}) {
-    const minRatio = options.minRatio ?? 0.45;
-    const runtime = options.runtime ?? null;
-    const r = radius * clearance;
-    const d = r * 0.7071;
-    const offsets = [
-      [0, 0],
-      [r, 0],
-      [-r, 0],
-      [0, r],
-      [0, -r],
-      [d, d],
-      [d, -d],
-      [-d, d],
-      [-d, -d]
-    ];
+  const minRatio = options.minRatio ?? 0.45;
+  const runtime = options.runtime ?? null;
 
-    const samples = [];
-    let center = null;
+  const outer = radius * clearance;
+  const inner = outer * 0.62;
+  const dOuter = outer * 0.7071;
+  const dInner = inner * 0.7071;
 
-    for (const [ox, oy] of offsets) {
-      const sample = sampleWalkableSurface(level, x + ox, y + oy, { runtime });
-      if (ox === 0 && oy === 0) {
-        center = sample;
-      }
-      if (sample) {
-        samples.push(sample);
-      }
+  const offsets = [
+    [0, 0, 2.4],
+
+    [inner, 0, 1.5],
+    [-inner, 0, 1.5],
+    [0, inner, 1.5],
+    [0, -inner, 1.5],
+
+    [dInner, dInner, 1.15],
+    [dInner, -dInner, 1.15],
+    [-dInner, dInner, 1.15],
+    [-dInner, -dInner, 1.15],
+
+    [outer, 0, 0.8],
+    [-outer, 0, 0.8],
+    [0, outer, 0.8],
+    [0, -outer, 0.8],
+
+    [dOuter, dOuter, 0.65],
+    [dOuter, -dOuter, 0.65],
+    [-dOuter, dOuter, 0.65],
+    [-dOuter, -dOuter, 0.65]
+  ];
+
+  const samples = [];
+  let center = null;
+  let hitWeight = 0;
+  let totalWeight = 0;
+
+  for (const [ox, oy, weight] of offsets) {
+    totalWeight += weight;
+    const sample = sampleWalkableSurface(level, x + ox, y + oy, { runtime });
+
+    if (ox === 0 && oy === 0) {
+      center = sample;
     }
 
-    if (!samples.length) return null;
-    const supportRatio = samples.length / offsets.length;
-    if (supportRatio < minRatio) return null;
-
-    const bestSample = center || samples.reduce((best, sample) => (!best || sample.z > best.z ? sample : best), null);
-
-    let gx = 0;
-    let gy = 0;
-    for (const sample of samples) {
-      gx += sample.gradient?.gx ?? 0;
-      gy += sample.gradient?.gy ?? 0;
+    if (sample) {
+      hitWeight += weight;
+      samples.push({
+        ...sample,
+        _weight: weight
+      });
     }
-
-    return {
-      ...bestSample,
-      centerSample: center,
-      supportSamples: samples,
-      supportRatio,
-      minSupportZ: Math.min(...samples.map((sample) => sample.z)),
-      maxSupportZ: Math.max(...samples.map((sample) => sample.z)),
-      z: center ? center.z : bestSample.z,
-      gradient: {
-        gx: gx / samples.length,
-        gy: gy / samples.length
-      }
-    };
   }
+
+  if (!samples.length) return null;
+
+  const supportRatio = hitWeight / totalWeight;
+  if (supportRatio < minRatio) return null;
+
+  if (!center && supportRatio < Math.max(minRatio, 0.62)) {
+    return null;
+  }
+
+  const anchorZ = center
+    ? center.z
+    : samples.reduce((sum, sample) => sum + sample.z * sample._weight, 0) /
+      samples.reduce((sum, sample) => sum + sample._weight, 0);
+
+  const coherentSamples = samples.filter((sample) => Math.abs(sample.z - anchorZ) <= 0.9);
+  if (!coherentSamples.length) return null;
+
+  let gx = 0;
+  let gy = 0;
+  let weightSum = 0;
+
+  for (const sample of coherentSamples) {
+    gx += (sample.gradient?.gx ?? 0) * sample._weight;
+    gy += (sample.gradient?.gy ?? 0) * sample._weight;
+    weightSum += sample._weight;
+  }
+
+  const bestSample = center || coherentSamples.reduce((best, sample) => {
+    if (!best) return sample;
+    return sample._weight > best._weight ? sample : best;
+  }, null);
+
+  return {
+    ...bestSample,
+    centerSample: center,
+    supportSamples: coherentSamples,
+    supportRatio,
+    minSupportZ: Math.min(...coherentSamples.map((sample) => sample.z)),
+    maxSupportZ: Math.max(...coherentSamples.map((sample) => sample.z)),
+    z: center ? center.z : anchorZ,
+    gradient: {
+      gx: weightSum > 0 ? gx / weightSum : 0,
+      gy: weightSum > 0 ? gy / weightSum : 0
+    }
+  };
+}
 
   function getBlockerTop(level, tx, ty) {
     const blocker = getBlockerCell(level, tx, ty);

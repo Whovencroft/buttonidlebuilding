@@ -1,5 +1,6 @@
 (() => {
   const SURFACE_SAMPLE_EPSILON = 0.0001;
+  const HEIGHT_AXIS_SCREEN_X_FACTOR = 0.32;
 
   function clamp(value, min, max) {
     return Math.max(min, Math.min(max, value));
@@ -38,11 +39,12 @@
   }
 
   function worldProject(x, y, z, view) {
-    return {
-      x: (x - y) * (view.tileW * 0.5),
-      y: (x + y) * (view.tileH * 0.5) - z * view.heightScale
-    };
-  }
+  const zScreenX = z * view.heightScale * HEIGHT_AXIS_SCREEN_X_FACTOR;
+  return {
+    x: (x - y) * (view.tileW * 0.5) + zScreenX,
+    y: (x + y) * (view.tileH * 0.5) - z * view.heightScale
+  };
+}
 
   function project(x, y, z, view) {
     const p = worldProject(x, y, z, view);
