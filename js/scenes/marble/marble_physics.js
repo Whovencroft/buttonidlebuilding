@@ -8,6 +8,7 @@
   const MAX_STEP_UP = 0.52;
   const MAX_STEP_DOWN = 1.15;
   const GROUND_SNAP = 0.22;
+  const LEDGE_FALL_HORIZONTAL_DAMPING = 0.38;
 
   const VERTICAL_GRAVITY = -22.5;
   const MOVE_STEP = 0.05;
@@ -293,7 +294,9 @@
     marble.vx += worldInput.x * AIR_STEER_ACCEL * dt;
     marble.vy += worldInput.y * AIR_STEER_ACCEL * dt;
     marble.vz += VERTICAL_GRAVITY * dt;
-    const airDrag = Math.pow(0.992, dt * 60);
+    const inputMag = Math.hypot(worldInput.x, worldInput.y);
+    const airDragBase = inputMag < 0.05 ? 0.976 : 0.986;
+    const airDrag = Math.pow(airDragBase, dt * 60);
     marble.vx *= airDrag;
     marble.vy *= airDrag;
     clampSpeed(marble, MAX_AIR_SPEED);
@@ -340,6 +343,9 @@
       }
 
       if (landedTransition === 'air') {
+        marble.vx *= LEDGE_FALL_HORIZONTAL_DAMPING;
+        marble.vy *= LEDGE_FALL_HORIZONTAL_DAMPING;
+        marble.vz = Math.min(marble.vz, -0.35);
         marble.grounded = false;
         return null;
       }

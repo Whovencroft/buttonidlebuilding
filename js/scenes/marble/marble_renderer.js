@@ -94,6 +94,7 @@
   function getSurfaceBaseColor(cell, trigger) {
     if (!cell || cell.kind === 'void') return '#374151';
     if (trigger?.kind === 'goal') return '#22c55e';
+    if (trigger?.kind === 'hazard') return '#ef4444';
     if (cell.landingPad) return '#16a34a';
     if (cell.bounce > 0) return '#38bdf8';
     if (cell.conveyor) return '#0891b2';
@@ -265,6 +266,18 @@
     ctx.strokeStyle = 'rgba(241,245,249,0.16)';
     ctx.lineWidth = 1.1;
     ctx.stroke();
+
+    if (trigger?.kind === 'hazard') {
+      const center = project(tx + 0.5, ty + 0.5, window.MarbleLevels.getSurfaceTopZ(cell) + 0.02, view);
+      ctx.beginPath();
+      ctx.moveTo(center.x - 6, center.y - 4);
+      ctx.lineTo(center.x + 6, center.y + 4);
+      ctx.moveTo(center.x + 6, center.y - 4);
+      ctx.lineTo(center.x - 6, center.y + 4);
+      ctx.strokeStyle = 'rgba(255,255,255,0.75)';
+      ctx.lineWidth = 1.4;
+      ctx.stroke();
+    }
 
     if (cell.conveyor) {
       const center = project(tx + 0.5, ty + 0.5, window.MarbleLevels.getSurfaceTopZ(cell) + 0.02, view);

@@ -976,8 +976,9 @@
     setSurface(level, 15, 12, { baseHeight: 4, shape: SHAPES.FLAT, bounce: 4.2 });
     setSurface(level, 21, 9, { baseHeight: 4, shape: SHAPES.LANDING_PAD, landingPad: true, friction: 1.25 });
 
-    setTrigger(level, 11, 5, { kind: 'hazard', data: { type: 'spike_strip' } });
-    setTrigger(level, 12, 5, { kind: 'hazard', data: { type: 'spike_strip' } });
+    setTrigger(level, 14, 11, { kind: 'hazard', data: { type: 'spike_strip' } });
+    setTrigger(level, 15, 11, { kind: 'hazard', data: { type: 'spike_strip' } });
+
     setGoal(level, 24, 9, 0.42);
 
     addGraphNode(level, { id: 'start', type: 'entry', x: 2.5, y: 9.5, z: 4 });
@@ -996,46 +997,65 @@
     return registerLevel(level);
   }
 
-  function buildSwitchbackDescent() {
-    const level = createLevelShell({
-      id: 'switchback_descent',
-      name: 'Switchback Descent',
-      width: 24,
-      height: 20,
-      killZ: -6,
-      voidFloor: -4,
-      start: { x: 3.5, y: 3.5 },
-      reward: { presses: 9000, unlocks: ['marble_drop_complete'], claimKey: 'switchback_descent' },
-      templates: ['switchback_slope', 'curve_corner', 'drop_ramp']
-    });
+function buildSwitchbackDescent() {
+  const level = createLevelShell({
+    id: 'switchback_descent',
+    name: 'Switchback Descent',
+    width: 24,
+    height: 20,
+    killZ: -6,
+    voidFloor: -4,
+    start: { x: 3.5, y: 3.5 },
+    reward: { presses: 9000, unlocks: ['marble_drop_complete'], claimKey: 'switchback_descent' },
+    templates: ['switchback_slope', 'curve_corner', 'drop_ramp']
+  });
 
-    fillSurfaceRect(level, 2, 2, 3, 3, { baseHeight: 8 });
-    applyPath(level, [{ x: 4, y: 3 }, { x: 14, y: 3 }], { baseHeight: 8 }, 1);
-    placeCurve(level, 14, 3, 'convex_se', { baseHeight: 8 });
-    for (let y = 4; y <= 7; y += 1) setSurface(level, 14, y, { baseHeight: 8 - (y - 3), shape: SHAPES.SLOPE_S });
-    applyPath(level, [{ x: 13, y: 7 }, { x: 6, y: 7 }], { baseHeight: 5 }, 1);
-    placeCurve(level, 6, 7, 'convex_sw', { baseHeight: 5 });
-    for (let y = 8; y <= 11; y += 1) setSurface(level, 6, y, { baseHeight: 5 - (y - 7), shape: SHAPES.SLOPE_S });
-    applyPath(level, [{ x: 7, y: 11 }, { x: 18, y: 11 }], { baseHeight: 2 }, 1);
-    setSurface(level, 18, 11, { baseHeight: 2, shape: SHAPES.DROP_RAMP_S, rise: -1.8 });
-    fillSurfaceRect(level, 18, 13, 3, 3, { baseHeight: 0, shape: SHAPES.LANDING_PAD, landingPad: true, friction: 1.3 });
-    setGoal(level, 19, 14, 0.44);
+  fillSurfaceRect(level, 2, 2, 4, 4, { baseHeight: 8 });
+  applyPath(level, [{ x: 4, y: 3 }, { x: 14, y: 3 }], { baseHeight: 8 }, 2);
+  placeCurve(level, 14, 3, 'convex_se', { baseHeight: 8 });
+  placeCurve(level, 15, 3, 'convex_se', { baseHeight: 8 });
 
-    setSurface(level, 9, 3, { baseHeight: 8, shape: SHAPES.FLAT, conveyor: { x: 0.45, y: 0.2, strength: 1.1 } });
-    setSurface(level, 10, 7, { baseHeight: 5, shape: SHAPES.FLAT, crumble: { delay: 0.28, downtime: 1.9 } });
-    setSurface(level, 11, 11, { baseHeight: 2, shape: SHAPES.FLAT, bounce: 4.8 });
-
-    addGraphNode(level, { id: 'entry', type: 'entry', x: 3.5, y: 3.5, z: 8 });
-    addGraphNode(level, { id: 'turn_1', type: 'corner', x: 14.5, y: 3.5, z: 8 });
-    addGraphNode(level, { id: 'turn_2', type: 'corner', x: 6.5, y: 7.5, z: 5 });
-    addGraphNode(level, { id: 'drop', type: 'drop', x: 18.5, y: 11.5, z: 2 });
-    addGraphNode(level, { id: 'goal', type: 'goal', x: 19.5, y: 14.5, z: 0 });
-    addGraphEdge(level, { from: 'entry', to: 'turn_1', kind: 'roll' });
-    addGraphEdge(level, { from: 'turn_1', to: 'turn_2', kind: 'switchback' });
-    addGraphEdge(level, { from: 'turn_2', to: 'drop', kind: 'switchback' });
-    addGraphEdge(level, { from: 'drop', to: 'goal', kind: 'jump_drop' });
-    return registerLevel(level);
+  for (let y = 4; y <= 7; y += 1) {
+    setSurface(level, 14, y, { baseHeight: 8 - (y - 3), shape: SHAPES.SLOPE_S });
+    setSurface(level, 15, y, { baseHeight: 8 - (y - 3), shape: SHAPES.SLOPE_S });
   }
+
+  applyPath(level, [{ x: 13, y: 7 }, { x: 6, y: 7 }], { baseHeight: 5 }, 2);
+  placeCurve(level, 6, 7, 'convex_sw', { baseHeight: 5 });
+  placeCurve(level, 7, 7, 'convex_sw', { baseHeight: 5 });
+
+  for (let y = 8; y <= 11; y += 1) {
+    setSurface(level, 6, y, { baseHeight: 5 - (y - 7), shape: SHAPES.SLOPE_S });
+    setSurface(level, 7, y, { baseHeight: 5 - (y - 7), shape: SHAPES.SLOPE_S });
+  }
+
+  applyPath(level, [{ x: 7, y: 11 }, { x: 18, y: 11 }], { baseHeight: 2 }, 2);
+  setSurface(level, 18, 11, { baseHeight: 2, shape: SHAPES.DROP_RAMP_S, rise: -1.5 });
+  setSurface(level, 19, 11, { baseHeight: 2, shape: SHAPES.DROP_RAMP_S, rise: -1.5 });
+
+  fillSurfaceRect(level, 18, 13, 4, 4, {
+    baseHeight: 0,
+    shape: SHAPES.LANDING_PAD,
+    landingPad: true,
+    friction: 1.3
+  });
+  setGoal(level, 19, 14, 0.44);
+
+  setSurface(level, 9, 3, { baseHeight: 8, shape: SHAPES.FLAT, conveyor: { x: 0.45, y: 0.2, strength: 1.1 } });
+  setSurface(level, 10, 7, { baseHeight: 5, shape: SHAPES.FLAT, crumble: { delay: 0.28, downtime: 1.9 } });
+  setSurface(level, 11, 11, { baseHeight: 2, shape: SHAPES.FLAT, bounce: 4.2 });
+
+  addGraphNode(level, { id: 'entry', type: 'entry', x: 3.5, y: 3.5, z: 8 });
+  addGraphNode(level, { id: 'turn_1', type: 'corner', x: 14.5, y: 3.5, z: 8 });
+  addGraphNode(level, { id: 'turn_2', type: 'corner', x: 6.5, y: 7.5, z: 5 });
+  addGraphNode(level, { id: 'drop', type: 'drop', x: 18.5, y: 11.5, z: 2 });
+  addGraphNode(level, { id: 'goal', type: 'goal', x: 19.5, y: 14.5, z: 0 });
+  addGraphEdge(level, { from: 'entry', to: 'turn_1', kind: 'roll' });
+  addGraphEdge(level, { from: 'turn_1', to: 'turn_2', kind: 'switchback' });
+  addGraphEdge(level, { from: 'turn_2', to: 'drop', kind: 'switchback' });
+  addGraphEdge(level, { from: 'drop', to: 'goal', kind: 'jump_drop' });
+  return registerLevel(level);
+}
 
   function buildDropNetwork() {
     const level = createLevelShell({
