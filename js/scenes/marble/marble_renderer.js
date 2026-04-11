@@ -1,6 +1,10 @@
 (() => {
   const SURFACE_SAMPLE_EPSILON = 0.0001;
   const HEIGHT_AXIS_SCREEN_X_FACTOR = 0.32;
+  const TILE_DRAW_ORDER_CACHE = new WeakMap();
+const HEIGHT_CUE_THRESHOLD = 0.35;
+const ABOVE_TINT_BASE = 'rgba(250, 204, 21, ';
+const BELOW_TINT_BASE = 'rgba(96, 165, 250, ';
 
   function clamp(value, min, max) {
     return Math.max(min, Math.min(max, value));
@@ -70,6 +74,37 @@
     const b = parseInt(raw.slice(4, 6), 16);
     return `rgb(${Math.round(r * amount)}, ${Math.round(g * amount)}, ${Math.round(b * amount)})`;
   }
+
+  function getCueAlpha(diff) {
+  return Math.min(0.22, 0.07 + Math.abs(diff) * 0.04);
+}
+
+function renderRelativeHeightCue(ctx, points, featureZ, playerReferenceZ) {
+  const diff = featureZ - playerReferenceZ;
+  if (Math.abs(diff) < HEIGHT_CUE_THRESHOLD) return;
+
+  ctx.save();
+  beginPoly(ctx, points);
+
+  if (diff > 0) {
+    ctx.fillStyle = `${ABOVE_TINT_BASE}${getCueAlpha(diff)})`;
+  } else {
+    ctx.fillStyle = `${BELOW_TINT_BASE}${getCueAlpha(diff)})`;
+  }
+
+  ctx.fill();
+  ctx.restore();
+}
+
+function getPlayerReferenceZ(runtime) {
+  return getVisualSupportZ(
+    runtime,
+    runtime.marble.x,
+    runtime.marble.y,
+    runtime.marble.supportRadius,
+    runtime.marble.z - runtime.marble.collisionRadius
+  );
+}
 
   function renderBackground(ctx, cssWidth, cssHeight) {
     const gradient = ctx.createLinearGradient(0, 0, 0, cssHeight);
@@ -228,7 +263,7 @@
     return points.length >= 3 ? points : null;
   }
 
-  function renderSurfaceTile(ctx, runtime, tx, ty, view) {
+  function renderSurfaceTile(ctx, runtime, tx, ty, view, playerReferenceZ) {
     const cell = window.MarbleLevels.getSurfaceCell(runtime.level, tx, ty);
     if (!cell || cell.kind === 'void') return;
 
@@ -263,11 +298,14 @@
     }
 
     beginPoly(ctx, top);
-    ctx.fillStyle = baseColor;
-    ctx.fill();
-    ctx.strokeStyle = 'rgba(241,245,249,0.16)';
-    ctx.lineWidth = 1.1;
-    ctx.stroke();
+ctx.fillStyle = color;
+ctx.fill();
+
+renderRelativeHeightCue(ctx, top, z, playerReferenceZ);
+
+ctx.strokeStyle = 'rgba(241,245,249,0.2)';
+ctx.lineWidth = 1.1;
+ctx.stroke();
 
     if (trigger?.kind === 'hazard') {
       const center = project(tx + 0.5, ty + 0.5, window.MarbleLevels.getSurfaceTopZ(cell) + 0.02, view);
@@ -415,23 +453,20 @@
   }
 
   function getTileDrawOrder(level) {
-    const tiles = [];
-    for (let ty = 0; ty < level.height; ty += 1) {
-      for (let tx = 0; tx < level.width; tx += 1) {
-        tiles.push({ tx, ty, depth: tx + ty });
-      }
+  const cached = TILE_DRAW_ORDER_CACHE.get(level);
+  if (cached) return cached;
+
+  const tiles = [];
+  for (let ty = 0; ty < level.height; ty += 1) {
+    for (let tx = 0; tx < level.width; tx += 1) {
+      tiles.push({ tx, ty, depth: tx + ty });
     }
-    tiles.sort((a, b) => a.depth - b.depth || a.ty - b.ty || a.tx - b.tx);
-    return tiles;
   }
 
-  function renderTerrain(ctx, runtime, view) {
-    const tiles = getTileDrawOrder(runtime.level);
-    for (const { tx, ty } of tiles) {
-      renderSurfaceTile(ctx, runtime, tx, ty, view);
-      renderBlockerTile(ctx, runtime, tx, ty, view);
-    }
-  }
+  tiles.sort((a, b) => a.depth - b.depth || a.ty - b.ty || a.tx - b.tx);
+  TILE_DRAW_ORDER_CACHE.set(level, tiles);
+  return tiles;
+}
 
   function renderActors(ctx, runtime, view) {
     const actors = [...runtime.level.actors];
@@ -461,7 +496,7 @@
 
     ctx.beginPath();
     ctx.ellipse(shadow.x, shadow.y + radius * 0.35, radius * 0.95, radius * 0.48, 0, 0, Math.PI * 2);
-    ctx.fillStyle = 'rgba(0,0,0,rgba(0,0,0,0.26)';
+    ctx.fillStyle = 'rgba(0,0,0,0.26)';
     ctx.fill();
 
     const gradient = ctx.createRadialGradient(ball.x - radius * 0.35, ball.y - radius * 0.48, radius * 0.14, ball.x, ball.y, radius);
@@ -538,14 +573,16 @@
     if (!runtime || !canvas) return;
     const { ctx, cssWidth, cssHeight } = fitCanvasToDisplay(canvas);
     const view = createView(runtime, cssWidth, cssHeight);
-    ctx.clearRect(0, 0, cssWidth, cssHeight);
-    renderBackground(ctx, cssWidth, cssHeight);
-    renderTerrain(ctx, runtime, view);
-    renderActors(ctx, runtime, view);
-    renderGoal(ctx, runtime, view);
-    renderMarble(ctx, runtime, view);
-    renderRouteGraph(ctx, runtime, view);
-    renderStatus(ctx, runtime, cssWidth);
+const playerReferenceZ = getPlayerReferenceZ(runtime);
+
+ctx.clearRect(0, 0, cssWidth, cssHeight);
+renderBackground(ctx, cssWidth, cssHeight);
+renderTerrain(ctx, runtime, view, playerReferenceZ);
+renderActors(ctx, runtime, view, playerReferenceZ);
+renderGoal(ctx, runtime, view);
+renderMarble(ctx, runtime, view);
+renderRouteGraph(ctx, runtime, view);
+renderStatus(ctx, runtime, cssWidth);
   }
 
   function prepare(runtime) {
@@ -556,4 +593,23 @@
     prepare,
     render: draw
   };
+
+  function renderTerrain(ctx, runtime, view, playerReferenceZ) {
+  const tiles = getTileDrawOrder(runtime.level);
+  for (const { tx, ty } of tiles) {
+    renderSurfaceTile(ctx, runtime, tx, ty, view, playerReferenceZ);
+    renderBlockerTile(ctx, runtime, tx, ty, view);
+  }
+}
+
+  function renderActors(ctx, runtime, view, playerReferenceZ) {
+  const actors = [...runtime.level.actors];
+  actors.sort((a, b) => {
+    const sa = runtime.dynamicState.actors[a.id];
+    const sb = runtime.dynamicState.actors[b.id];
+    return (sa.x + sa.y) - (sb.x + sb.y);
+  });
+  for (const actor of actors) renderActor(ctx, runtime, actor, view, playerReferenceZ);
+}
+
 })();
