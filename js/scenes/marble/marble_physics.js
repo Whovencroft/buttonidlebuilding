@@ -56,6 +56,22 @@
     return { gx: gx / samples.length, gy: gy / samples.length };
   }
 
+  function mapScreenInputToWorld(axis) {
+    const sx = axis?.x ?? 0;
+    const sy = axis?.y ?? 0;
+
+    let wx = (sx + sy) * 0.5;
+    let wy = (sy - sx) * 0.5;
+
+    const length = Math.hypot(wx, wy);
+    if (length > 1) {
+      wx /= length;
+      wy /= length;
+    }
+
+    return { x: wx, y: wy };
+  }
+
   function sampleSupport(runtime, x, y, radius, clearance, minRatio) {
     const support = window.MarbleLevels.sampleSupportSurface(
       runtime.level,
@@ -250,13 +266,14 @@
 
   function applyGroundForces(runtime, inputAxis, dt, surface) {
     const marble = runtime.marble;
+    const worldInput = mapScreenInputToWorld(inputAxis);
     const downhillX = -(surface.gradient?.gx ?? 0);
     const downhillY = -(surface.gradient?.gy ?? 0);
     const friction = surface.friction ?? 1;
     const conveyor = surface.conveyor ?? null;
 
-    marble.vx += (inputAxis.x * GROUND_STEER_ACCEL + downhillX * SLOPE_ACCEL) * dt;
-    marble.vy += (inputAxis.y * GROUND_STEER_ACCEL + downhillY * SLOPE_ACCEL) * dt;
+    marble.vx += (worldInput.x * GROUND_STEER_ACCEL + downhillX * SLOPE_ACCEL) * dt;
+    marble.vy += (worldInput.y * GROUND_STEER_ACCEL + downhillY * SLOPE_ACCEL) * dt;
 
     if (conveyor) {
       marble.vx += conveyor.x * conveyor.strength * 1.1 * dt;
@@ -272,8 +289,9 @@
 
   function applyAirForces(runtime, inputAxis, dt) {
     const marble = runtime.marble;
-    marble.vx += inputAxis.x * AIR_STEER_ACCEL * dt;
-    marble.vy += inputAxis.y * AIR_STEER_ACCEL * dt;
+    const worldInput = mapScreenInputToWorld(inputAxis);
+    marble.vx += worldInput.x * AIR_STEER_ACCEL * dt;
+    marble.vy += worldInput.y * AIR_STEER_ACCEL * dt;
     marble.vz += VERTICAL_GRAVITY * dt;
     const airDrag = Math.pow(0.992, dt * 60);
     marble.vx *= airDrag;

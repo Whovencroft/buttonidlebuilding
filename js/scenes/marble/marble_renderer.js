@@ -1,4 +1,6 @@
 (() => {
+  const SURFACE_SAMPLE_EPSILON = 0.0001;
+
   function fitCanvasToDisplay(canvas) {
     const rect = canvas.getBoundingClientRect();
     const dpr = window.devicePixelRatio || 1;
@@ -129,7 +131,6 @@
       return points;
     }
     if (cell.shape === S.CURVE_CONVEX_NW) {
-      points.push([0, 0], [1, 1], [0, 1]);
       const curve = [];
       for (let i = 0; i <= segments; i += 1) {
         const angle = Math.PI * 0.5 * (i / segments);
@@ -192,16 +193,31 @@
     return [[0, 0], [1, 0], [1, 1], [0, 1]];
   }
 
+  function sampleLocalTilePoint(level, runtime, tx, ty, u, v) {
+    const localU = clamp(u, SURFACE_SAMPLE_EPSILON, 1 - SURFACE_SAMPLE_EPSILON);
+    const localV = clamp(v, SURFACE_SAMPLE_EPSILON, 1 - SURFACE_SAMPLE_EPSILON);
+    const sample = window.MarbleLevels.sampleWalkableSurface(level, tx + localU, ty + localV, {
+      runtime: runtime.dynamicState
+    });
+
+    if (!sample || sample.source !== 'surface' || sample.tx !== tx || sample.ty !== ty) {
+      return null;
+    }
+
+    return sample;
+  }
+
   function buildSurfaceTopPolygon(level, runtime, tx, ty, view) {
     const cell = window.MarbleLevels.getSurfaceCell(level, tx, ty);
     if (!cell || cell.kind === 'void') return null;
-    const runtimeState = runtime.dynamicState;
+
     const points = [];
     for (const [u, v] of getShapeSamplePoints(cell, 12)) {
-      const sample = window.MarbleLevels.sampleWalkableSurface(level, tx + u, ty + v, { runtime: runtimeState });
-      if (!sample || sample.source !== 'surface' || sample.tx !== tx || sample.ty !== ty) continue;
+      const sample = sampleLocalTilePoint(level, runtime, tx, ty, u, v);
+      if (!sample) continue;
       points.push(project(tx + u, ty + v, sample.z, view));
     }
+
     return points.length >= 3 ? points : null;
   }
 
@@ -211,6 +227,7 @@
 
     const top = buildSurfaceTopPolygon(runtime.level, runtime, tx, ty, view);
     if (!top) return;
+
     const trigger = window.MarbleLevels.getTriggerCell(runtime.level, tx, ty);
     const baseColor = getSurfaceBaseColor(cell, trigger);
 
