@@ -264,94 +264,94 @@ function getPlayerReferenceZ(runtime) {
   }
 
   function renderSurfaceTile(ctx, runtime, tx, ty, view, playerReferenceZ) {
-    const cell = window.MarbleLevels.getSurfaceCell(runtime.level, tx, ty);
-    if (!cell || cell.kind === 'void') return;
+  const cell = window.MarbleLevels.getSurfaceCell(runtime.level, tx, ty);
+  if (!cell || cell.kind === 'void') return;
 
-    const top = buildSurfaceTopPolygon(runtime.level, runtime, tx, ty, view);
-    if (!top) return;
+  const top = buildSurfaceTopPolygon(runtime.level, runtime, tx, ty, view);
+  if (!top) return;
 
-    const trigger = window.MarbleLevels.getTriggerCell(runtime.level, tx, ty);
-    const baseColor = getSurfaceBaseColor(cell, trigger);
+  const trigger = window.MarbleLevels.getTriggerCell(runtime.level, tx, ty);
+  const baseColor = getSurfaceBaseColor(cell, trigger);
 
-    const fillTop = window.MarbleLevels.getFillTopAtCell(runtime.level, tx, ty, { runtime: runtime.dynamicState });
-    const southFill = window.MarbleLevels.getFillTopAtCell(runtime.level, tx, ty + 1, { runtime: runtime.dynamicState });
-    const eastFill = window.MarbleLevels.getFillTopAtCell(runtime.level, tx + 1, ty, { runtime: runtime.dynamicState });
+  const fillTop = window.MarbleLevels.getFillTopAtCell(runtime.level, tx, ty, { runtime: runtime.dynamicState });
+  const southFill = window.MarbleLevels.getFillTopAtCell(runtime.level, tx, ty + 1, { runtime: runtime.dynamicState });
+  const eastFill = window.MarbleLevels.getFillTopAtCell(runtime.level, tx + 1, ty, { runtime: runtime.dynamicState });
 
-    if (fillTop > southFill + 0.01) {
-      const p1 = project(tx, ty + 1, fillTop, view);
-      const p2 = project(tx + 1, ty + 1, fillTop, view);
-      const p3 = project(tx + 1, ty + 1, southFill, view);
-      const p4 = project(tx, ty + 1, southFill, view);
-      beginPoly(ctx, [p1, p2, p3, p4]);
-      ctx.fillStyle = darken(baseColor, 0.58);
-      ctx.fill();
-    }
-
-    if (fillTop > eastFill + 0.01) {
-      const p1 = project(tx + 1, ty, fillTop, view);
-      const p2 = project(tx + 1, ty + 1, fillTop, view);
-      const p3 = project(tx + 1, ty + 1, eastFill, view);
-      const p4 = project(tx + 1, ty, eastFill, view);
-      beginPoly(ctx, [p1, p2, p3, p4]);
-      ctx.fillStyle = darken(baseColor, 0.72);
-      ctx.fill();
-    }
-
-    beginPoly(ctx, top);
-ctx.fillStyle = color;
-ctx.fill();
-
-renderRelativeHeightCue(ctx, top, z, playerReferenceZ);
-
-ctx.strokeStyle = 'rgba(241,245,249,0.2)';
-ctx.lineWidth = 1.1;
-ctx.stroke();
-
-    if (trigger?.kind === 'hazard') {
-      const center = project(tx + 0.5, ty + 0.5, window.MarbleLevels.getSurfaceTopZ(cell) + 0.02, view);
-      ctx.beginPath();
-      ctx.moveTo(center.x - 6, center.y - 4);
-      ctx.lineTo(center.x + 6, center.y + 4);
-      ctx.moveTo(center.x + 6, center.y - 4);
-      ctx.lineTo(center.x - 6, center.y + 4);
-      ctx.strokeStyle = 'rgba(255,255,255,0.75)';
-      ctx.lineWidth = 1.4;
-      ctx.stroke();
-    }
-
-    if (cell.conveyor) {
-      const center = project(tx + 0.5, ty + 0.5, window.MarbleLevels.getSurfaceTopZ(cell) + 0.02, view);
-      const dx = cell.conveyor.x * 8;
-      const dy = cell.conveyor.y * 8;
-      ctx.beginPath();
-      ctx.moveTo(center.x - dx, center.y - dy);
-      ctx.lineTo(center.x + dx, center.y + dy);
-      ctx.strokeStyle = 'rgba(224,242,254,0.85)';
-      ctx.lineWidth = 1.6;
-      ctx.stroke();
-    }
-
-    if (cell.crumble) {
-      const center = project(tx + 0.5, ty + 0.5, window.MarbleLevels.getSurfaceTopZ(cell) + 0.02, view);
-      ctx.beginPath();
-      ctx.moveTo(center.x - 5, center.y - 3);
-      ctx.lineTo(center.x + 4, center.y + 1);
-      ctx.moveTo(center.x - 2, center.y + 4);
-      ctx.lineTo(center.x + 6, center.y - 4);
-      ctx.strokeStyle = 'rgba(255,237,213,0.88)';
-      ctx.lineWidth = 1.1;
-      ctx.stroke();
-    }
-
-    if (cell.bounce > 0) {
-      const center = project(tx + 0.5, ty + 0.5, window.MarbleLevels.getSurfaceTopZ(cell) + 0.03, view);
-      ctx.beginPath();
-      ctx.arc(center.x, center.y, 6, 0, Math.PI * 2);
-      ctx.strokeStyle = 'rgba(186,230,253,0.92)';
-      ctx.lineWidth = 1.2;
-      ctx.stroke();
-    }
+  if (fillTop > southFill + 0.01) {
+    const p1 = project(tx, ty + 1, fillTop, view);
+    const p2 = project(tx + 1, ty + 1, fillTop, view);
+    const p3 = project(tx + 1, ty + 1, southFill, view);
+    const p4 = project(tx, ty + 1, southFill, view);
+    beginPoly(ctx, [p1, p2, p3, p4]);
+    ctx.fillStyle = darken(baseColor, 0.58);
+    ctx.fill();
   }
+
+  if (fillTop > eastFill + 0.01) {
+    const p1 = project(tx + 1, ty, fillTop, view);
+    const p2 = project(tx + 1, ty + 1, fillTop, view);
+    const p3 = project(tx + 1, ty + 1, eastFill, view);
+    const p4 = project(tx + 1, ty, eastFill, view);
+    beginPoly(ctx, [p1, p2, p3, p4]);
+    ctx.fillStyle = darken(baseColor, 0.72);
+    ctx.fill();
+  }
+
+  beginPoly(ctx, top);
+  ctx.fillStyle = baseColor;
+  ctx.fill();
+
+  renderRelativeHeightCue(ctx, top, fillTop, playerReferenceZ);
+
+  ctx.strokeStyle = 'rgba(241,245,249,0.16)';
+  ctx.lineWidth = 1.1;
+  ctx.stroke();
+
+  if (trigger?.kind === 'hazard') {
+    const center = project(tx + 0.5, ty + 0.5, window.MarbleLevels.getSurfaceTopZ(cell) + 0.02, view);
+    ctx.beginPath();
+    ctx.moveTo(center.x - 6, center.y - 4);
+    ctx.lineTo(center.x + 6, center.y + 4);
+    ctx.moveTo(center.x + 6, center.y - 4);
+    ctx.lineTo(center.x - 6, center.y + 4);
+    ctx.strokeStyle = 'rgba(255,255,255,0.75)';
+    ctx.lineWidth = 1.4;
+    ctx.stroke();
+  }
+
+  if (cell.conveyor) {
+    const center = project(tx + 0.5, ty + 0.5, window.MarbleLevels.getSurfaceTopZ(cell) + 0.02, view);
+    const dx = cell.conveyor.x * 8;
+    const dy = cell.conveyor.y * 8;
+    ctx.beginPath();
+    ctx.moveTo(center.x - dx, center.y - dy);
+    ctx.lineTo(center.x + dx, center.y + dy);
+    ctx.strokeStyle = 'rgba(224,242,254,0.85)';
+    ctx.lineWidth = 1.6;
+    ctx.stroke();
+  }
+
+  if (cell.crumble) {
+    const center = project(tx + 0.5, ty + 0.5, window.MarbleLevels.getSurfaceTopZ(cell) + 0.02, view);
+    ctx.beginPath();
+    ctx.moveTo(center.x - 5, center.y - 3);
+    ctx.lineTo(center.x + 4, center.y + 1);
+    ctx.moveTo(center.x - 2, center.y + 4);
+    ctx.lineTo(center.x + 6, center.y - 4);
+    ctx.strokeStyle = 'rgba(255,237,213,0.88)';
+    ctx.lineWidth = 1.1;
+    ctx.stroke();
+  }
+
+  if (cell.bounce > 0) {
+    const center = project(tx + 0.5, ty + 0.5, window.MarbleLevels.getSurfaceTopZ(cell) + 0.03, view);
+    ctx.beginPath();
+    ctx.arc(center.x, center.y, 6, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(186,230,253,0.92)';
+    ctx.lineWidth = 1.2;
+    ctx.stroke();
+  }
+}
 
   function renderBlockerTile(ctx, runtime, tx, ty, view) {
     const blocker = window.MarbleLevels.getBlockerCell(runtime.level, tx, ty);
@@ -396,61 +396,65 @@ ctx.stroke();
     ctx.stroke();
   }
 
-  function renderActor(ctx, runtime, actor, view) {
-    const actorState = runtime.dynamicState.actors[actor.id];
-    if (!actorState || actorState.active === false) return;
-    const color = getActorColor(actor);
+  function renderActor(ctx, runtime, actor, view, playerReferenceZ) {
+  const actorState = runtime.dynamicState.actors[actor.id];
+  if (!actorState || actorState.active === false) return;
+  const color = getActorColor(actor);
 
-    if (actor.kind === window.MarbleLevels.ACTOR_KINDS.MOVING_PLATFORM || actor.kind === window.MarbleLevels.ACTOR_KINDS.ELEVATOR) {
-      const x = actorState.x;
-      const y = actorState.y;
-      const z = actorState.topHeight;
-      const top = [
-        project(x, y, z, view),
-        project(x + actor.width, y, z, view),
-        project(x + actor.width, y + actor.height, z, view),
-        project(x, y + actor.height, z, view)
-      ];
-      beginPoly(ctx, top);
-      ctx.fillStyle = color;
-      ctx.fill();
-      ctx.strokeStyle = 'rgba(241,245,249,0.2)';
-      ctx.lineWidth = 1.1;
-      ctx.stroke();
-    } else if (actor.kind === window.MarbleLevels.ACTOR_KINDS.TIMED_GATE) {
-      const x = actorState.x;
-      const y = actorState.y;
-      const z = actor.topHeight;
-      beginPoly(ctx, [
-        project(x, y, z, view),
-        project(x + actor.width, y, z, view),
-        project(x + actor.width, y + actor.height, z, view),
-        project(x, y + actor.height, z, view)
-      ]);
-      ctx.fillStyle = color;
-      ctx.fill();
-      ctx.strokeStyle = 'rgba(254,215,170,0.4)';
-      ctx.lineWidth = 1;
-      ctx.stroke();
-    } else {
-      const cx = actorState.x + actor.width * 0.5;
-      const cy = actorState.y + actor.height * 0.5;
-      const ex = cx + Math.cos(actorState.angle) * actor.armLength;
-      const ey = cy + Math.sin(actorState.angle) * actor.armLength;
-      const center = project(cx, cy, actor.topHeight + 0.1, view);
-      const end = project(ex, ey, actor.topHeight + 0.1, view);
-      ctx.beginPath();
-      ctx.moveTo(center.x, center.y);
-      ctx.lineTo(end.x, end.y);
-      ctx.strokeStyle = color;
-      ctx.lineWidth = Math.max(3, actor.armWidth * view.tileW * 0.6);
-      ctx.stroke();
-      ctx.beginPath();
-      ctx.arc(center.x, center.y, 5, 0, Math.PI * 2);
-      ctx.fillStyle = '#fecaca';
-      ctx.fill();
-    }
+  if (actor.kind === window.MarbleLevels.ACTOR_KINDS.MOVING_PLATFORM || actor.kind === window.MarbleLevels.ACTOR_KINDS.ELEVATOR) {
+    const x = actorState.x;
+    const y = actorState.y;
+    const z = actorState.topHeight;
+    const top = [
+      project(x, y, z, view),
+      project(x + actor.width, y, z, view),
+      project(x + actor.width, y + actor.height, z, view),
+      project(x, y + actor.height, z, view)
+    ];
+
+    beginPoly(ctx, top);
+    ctx.fillStyle = color;
+    ctx.fill();
+
+    renderRelativeHeightCue(ctx, top, z, playerReferenceZ);
+
+    ctx.strokeStyle = 'rgba(241,245,249,0.2)';
+    ctx.lineWidth = 1.1;
+    ctx.stroke();
+  } else if (actor.kind === window.MarbleLevels.ACTOR_KINDS.TIMED_GATE) {
+    const x = actorState.x;
+    const y = actorState.y;
+    const z = actor.topHeight;
+    beginPoly(ctx, [
+      project(x, y, z, view),
+      project(x + actor.width, y, z, view),
+      project(x + actor.width, y + actor.height, z, view),
+      project(x, y + actor.height, z, view)
+    ]);
+    ctx.fillStyle = color;
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(254,215,170,0.4)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  } else {
+    const cx = actorState.x + actor.width * 0.5;
+    const cy = actorState.y + actor.height * 0.5;
+    const ex = cx + Math.cos(actorState.angle) * actor.armLength;
+    const ey = cy + Math.sin(actorState.angle) * actor.armLength;
+    const center = project(cx, cy, actor.topHeight + 0.1, view);
+    const end = project(ex, ey, actor.topHeight + 0.1, view);
+    ctx.beginPath();
+    ctx.moveTo(center.x, center.y);
+    ctx.lineTo(end.x, end.y);
+    ctx.strokeStyle = color;
+    ctx.lineWidth = Math.max(3, actor.armWidth * view.tileW * 0.6);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(center.x, center.y, 5, 0, Math.PI * 2);
+    ctx.fillStyle = '#fecaca';
+    ctx.fill();
   }
+}
 
   function getTileDrawOrder(level) {
   const cached = TILE_DRAW_ORDER_CACHE.get(level);
@@ -467,16 +471,6 @@ ctx.stroke();
   TILE_DRAW_ORDER_CACHE.set(level, tiles);
   return tiles;
 }
-
-  function renderActors(ctx, runtime, view) {
-    const actors = [...runtime.level.actors];
-    actors.sort((a, b) => {
-      const sa = runtime.dynamicState.actors[a.id];
-      const sb = runtime.dynamicState.actors[b.id];
-      return (sa.x + sa.y) - (sb.x + sb.y);
-    });
-    for (const actor of actors) renderActor(ctx, runtime, actor, view);
-  }
 
   function getVisualSupportZ(runtime, x, y, radius, fallbackZ) {
     const offsets = [[0, 0], [radius, 0], [-radius, 0], [0, radius], [0, -radius]];
