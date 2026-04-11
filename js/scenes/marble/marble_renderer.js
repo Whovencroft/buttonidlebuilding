@@ -1,6 +1,10 @@
 (() => {
   const SURFACE_SAMPLE_EPSILON = 0.0001;
 
+  function clamp(value, min, max) {
+    return Math.max(min, Math.min(max, value));
+  }
+
   function fitCanvasToDisplay(canvas) {
     const rect = canvas.getBoundingClientRect();
     const dpr = window.devicePixelRatio || 1;
@@ -442,7 +446,7 @@
 
     ctx.beginPath();
     ctx.ellipse(shadow.x, shadow.y + radius * 0.35, radius * 0.95, radius * 0.48, 0, 0, Math.PI * 2);
-    ctx.fillStyle = 'rgba(0,0,0,0.26)';
+    ctx.fillStyle = 'rgba(0,0,0,rgba(0,0,0,0.26)';
     ctx.fill();
 
     const gradient = ctx.createRadialGradient(ball.x - radius * 0.35, ball.y - radius * 0.48, radius * 0.14, ball.x, ball.y, radius);
