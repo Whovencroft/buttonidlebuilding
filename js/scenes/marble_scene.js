@@ -1,7 +1,7 @@
 (() => {
   const DEFAULT_RENDER_RADIUS = 0.26;
   const DEFAULT_COLLISION_RADIUS = 0.225;
-  const DEFAULT_SUPPORT_RADIUS = 0.155;
+  const DEFAULT_SUPPORT_RADIUS = 0.12;
   const DEFAULT_SEED = 0x5f3759df;
 
   function resolveLevel(levelOrId = 'fork_rejoin_test') {
