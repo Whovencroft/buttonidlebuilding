@@ -661,7 +661,7 @@
   function collectMarbleOccluders(runtime, view, targetX, targetY, radiusX, radiusY, marbleZ) {
     const occluders = [];
     const tiles = getTileDrawOrder(runtime.level);
-    const topFaceMargin = runtime.marble.collisionRadius * 1.05;
+    const topFaceMargin = runtime.marble.collisionRadius * 1.25;
     const sideFaceMargin = runtime.marble.collisionRadius * 0.35;
 
     for (const { tx, ty } of tiles) {
