@@ -658,7 +658,9 @@
     occluders.push(polygon);
   }
 
-  function collectMarbleOccluders(runtime, view, targetX, targetY, radiusX, radiusY, marbleZ) {
+    function collectMarbleOccluders(runtime, view, targetX, targetY, radiusX, radiusY, marbleZ) {
+    if (!Number.isFinite(marbleZ)) return [];
+
     const occluders = [];
     const tiles = getTileDrawOrder(runtime.level);
     const topFaceMargin = runtime.marble.collisionRadius * 1.25;
@@ -856,7 +858,7 @@
     };
   }
 
-  function renderMarble(ctx, runtime, view) {
+    function renderMarble(ctx, runtime, view) {
     const marbleRender = getMarbleRenderData(runtime, view);
 
     const ballOccluders = collectMarbleOccluders(
@@ -879,35 +881,20 @@
       marbleRender.shadowZ
     );
 
-    drawOccludedShadow(ctx, marbleRender.shadow.x, marbleRender.shadow.y, marbleRender.radius, shadowOccluders);
-    drawOccludedBall(ctx, marbleRender.ball, marbleRender.radius, ballOccluders);
-  }
-
-  function renderMarble(ctx, runtime, view) {
-    const marbleRender = getMarbleRenderData(runtime, view);
-
-    const ballOccluders = collectMarbleOccluders(
-      runtime,
-      view,
-      marbleRender.ball.x,
-      marbleRender.ball.y,
-      marbleRender.radius,
-      marbleRender.radius,
-      marbleRender.occlusionZ
-    );
-
-    const shadowOccluders = collectMarbleOccluders(
-      runtime,
-      view,
+    drawOccludedShadow(
+      ctx,
       marbleRender.shadow.x,
-      marbleRender.shadow.y + marbleRender.radius * 0.35,
-      marbleRender.radius * 0.95,
-      marbleRender.radius * 0.48,
-      marbleRender.shadowZ
+      marbleRender.shadow.y,
+      marbleRender.radius,
+      shadowOccluders
     );
 
-    drawOccludedShadow(ctx, marbleRender.shadow.x, marbleRender.shadow.y, marbleRender.radius, shadowOccluders);
-    drawOccludedBall(ctx, marbleRender.ball, marbleRender.radius, ballOccluders);
+    drawOccludedBall(
+      ctx,
+      marbleRender.ball,
+      marbleRender.radius,
+      ballOccluders
+    );
   }
 
   function renderGoal(ctx, runtime, view) {

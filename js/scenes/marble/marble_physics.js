@@ -32,10 +32,12 @@
   const JUMP_COOLDOWN = 0.12;
   const JUMP_LIFT = 0.08;
 
+  const LOWEST_PLAYABLE_Z_CACHE = new WeakMap();
   const VOID_FAIL_SEARCH_RADIUS = 1.35;
   const VOID_FAIL_SAMPLE_STEP = 0.35;
+  const VOID_FAIL_BELOW_LOWEST_PLAYABLE = 3.5;
   const VOID_FAIL_BELOW_NEARBY_FLOOR = 4.5;
-  const VOID_FAIL_BELOW_VOID_FLOOR = 2.75;
+  const VOID_FAIL_BELOW_VOID_FLOOR = 1.5;
 
   function ensureJumpState(marble) {
     if (typeof marble.coyoteTime !== 'number') marble.coyoteTime = 0;
@@ -522,7 +524,54 @@
     };
   }
 
-    function getNearbyWalkableFloorZ(runtime, x, y, currentZ) {
+  function getLevelLowestPlayableZ(level) {
+    const cached = LOWEST_PLAYABLE_Z_CACHE.get(level);
+    if (typeof cached === 'number') return cached;
+
+    let lowest = Infinity;
+
+    for (let ty = 0; ty < level.height; ty += 1) {
+      for (let tx = 0; tx < level.width; tx += 1) {
+        const surface = window.MarbleLevels.getSurfaceCell(level, tx, ty);
+        if (surface && surface.kind !== 'void') {
+          lowest = Math.min(lowest, window.MarbleLevels.getSurfaceTopZ(surface));
+        }
+
+        const blocker = window.MarbleLevels.getBlockerCell(level, tx, ty);
+        if (blocker?.walkableTop) {
+          lowest = Math.min(lowest, blocker.top);
+        }
+      }
+    }
+
+    for (const actor of level.actors || []) {
+      if (
+        actor.kind !== window.MarbleLevels.ACTOR_KINDS.MOVING_PLATFORM &&
+        actor.kind !== window.MarbleLevels.ACTOR_KINDS.ELEVATOR
+      ) {
+        continue;
+      }
+
+      if (actor.path?.points?.length) {
+        for (const point of actor.path.points) {
+          lowest = Math.min(lowest, point.z ?? actor.z ?? actor.topHeight ?? 0);
+        }
+      } else if (actor.travel) {
+        lowest = Math.min(lowest, actor.travel.min ?? actor.z ?? actor.topHeight ?? 0);
+      } else {
+        lowest = Math.min(lowest, actor.z ?? actor.topHeight ?? 0);
+      }
+    }
+
+    if (!Number.isFinite(lowest)) {
+      lowest = level.voidFloor ?? level.killZ ?? -5;
+    }
+
+    LOWEST_PLAYABLE_Z_CACHE.set(level, lowest);
+    return lowest;
+  }
+
+  function getNearbyWalkableFloorZ(runtime, x, y) {
     let best = null;
     const radius = VOID_FAIL_SEARCH_RADIUS;
     const step = VOID_FAIL_SAMPLE_STEP;
@@ -538,8 +587,6 @@
         });
 
         if (!sample) continue;
-        if (sample.z > currentZ + 0.75) continue;
-
         if (best === null || sample.z > best) {
           best = sample.z;
         }
@@ -551,14 +598,20 @@
 
   function shouldFailFromVoidFall(runtime) {
     const marble = runtime.marble;
-    if (marble.z >= runtime.level.killZ) return false;
+    if (marble.grounded) return false;
 
-    const nearbyFloorZ = getNearbyWalkableFloorZ(runtime, marble.x, marble.y, marble.z);
-    if (nearbyFloorZ !== null) {
-      return marble.z < nearbyFloorZ - VOID_FAIL_BELOW_NEARBY_FLOOR;
+    const nearbyFloorZ = getNearbyWalkableFloorZ(runtime, marble.x, marble.y);
+    if (nearbyFloorZ !== null && marble.z >= nearbyFloorZ - 1.5) {
+      return false;
     }
 
-    return marble.z < (runtime.level.voidFloor - VOID_FAIL_BELOW_VOID_FLOOR);
+    const lowestPlayableZ = getLevelLowestPlayableZ(runtime.level);
+    const voidFloorZ = runtime.level.voidFloor ?? lowestPlayableZ;
+
+    return (
+      marble.z < lowestPlayableZ - VOID_FAIL_BELOW_LOWEST_PLAYABLE &&
+      marble.z < voidFloorZ - VOID_FAIL_BELOW_VOID_FLOOR
+    );
   }
 
   function updatePhysics(runtime, inputState, dt) {
