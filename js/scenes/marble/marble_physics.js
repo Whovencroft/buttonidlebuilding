@@ -32,6 +32,11 @@
   const JUMP_COOLDOWN = 0.12;
   const JUMP_LIFT = 0.08;
 
+  const VOID_FAIL_SEARCH_RADIUS = 1.35;
+  const VOID_FAIL_SAMPLE_STEP = 0.35;
+  const VOID_FAIL_BELOW_NEARBY_FLOOR = 4.5;
+  const VOID_FAIL_BELOW_VOID_FLOOR = 2.75;
+
   function ensureJumpState(marble) {
     if (typeof marble.coyoteTime !== 'number') marble.coyoteTime = 0;
     if (typeof marble.jumpBufferTime !== 'number') marble.jumpBufferTime = 0;
@@ -517,6 +522,45 @@
     };
   }
 
+    function getNearbyWalkableFloorZ(runtime, x, y, currentZ) {
+    let best = null;
+    const radius = VOID_FAIL_SEARCH_RADIUS;
+    const step = VOID_FAIL_SAMPLE_STEP;
+
+    for (let sy = y - radius; sy <= y + radius + 0.0001; sy += step) {
+      for (let sx = x - radius; sx <= x + radius + 0.0001; sx += step) {
+        const dx = sx - x;
+        const dy = sy - y;
+        if ((dx * dx) + (dy * dy) > radius * radius) continue;
+
+        const sample = window.MarbleLevels.sampleWalkableSurface(runtime.level, sx, sy, {
+          runtime: runtime.dynamicState
+        });
+
+        if (!sample) continue;
+        if (sample.z > currentZ + 0.75) continue;
+
+        if (best === null || sample.z > best) {
+          best = sample.z;
+        }
+      }
+    }
+
+    return best;
+  }
+
+  function shouldFailFromVoidFall(runtime) {
+    const marble = runtime.marble;
+    if (marble.z >= runtime.level.killZ) return false;
+
+    const nearbyFloorZ = getNearbyWalkableFloorZ(runtime, marble.x, marble.y, marble.z);
+    if (nearbyFloorZ !== null) {
+      return marble.z < nearbyFloorZ - VOID_FAIL_BELOW_NEARBY_FLOOR;
+    }
+
+    return marble.z < (runtime.level.voidFloor - VOID_FAIL_BELOW_VOID_FLOOR);
+  }
+
   function updatePhysics(runtime, inputState, dt) {
     if (runtime.status !== 'running') return runtime.lastResult;
     const marble = runtime.marble;
@@ -559,7 +603,7 @@
 
     const triggerResult = evaluateTriggers(runtime, groundSurface);
     if (triggerResult) return triggerResult;
-    if (marble.z < runtime.level.killZ) return fail(runtime, 'fall');
+        if (shouldFailFromVoidFall(runtime)) return fail(runtime, 'fall');
 
     runtime.lastResult = null;
     return null;
