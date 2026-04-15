@@ -67,6 +67,13 @@
     ctx.closePath();
   }
 
+  function addPolyPath(ctx, points) {
+    if (!points?.length) return;
+    ctx.moveTo(points[0].x, points[0].y);
+    for (let i = 1; i < points.length; i += 1) ctx.lineTo(points[i].x, points[i].y);
+    ctx.closePath();
+  }
+
   function darken(hex, amount = 0.8) {
     const raw = hex.replace('#', '');
     const r = parseInt(raw.slice(0, 2), 16);
@@ -264,24 +271,7 @@
     return points.length >= 3 ? points : null;
   }
 
-  function getPolygonSortY(points) {
-    if (!points?.length) return -Infinity;
-    let maxY = -Infinity;
-    for (const point of points) {
-      if (point.y > maxY) maxY = point.y;
-    }
-    return maxY;
-  }
-
-  function queuePolygon(queue, points, draw, bias = 0) {
-    if (!points || points.length < 3) return;
-    queue.push({
-      sortY: getPolygonSortY(points) + bias,
-      draw
-    });
-  }
-
-  function queueSurfaceTile(queue, runtime, tx, ty, view, playerReferenceZ) {
+  function renderSurfaceTile(ctx, runtime, tx, ty, view, playerReferenceZ) {
     const cell = window.MarbleLevels.getSurfaceCell(runtime.level, tx, ty);
     if (!cell || cell.kind === 'void') return;
 
@@ -296,145 +286,125 @@
     const eastFill = window.MarbleLevels.getFillTopAtCell(runtime.level, tx + 1, ty, { runtime: runtime.dynamicState });
 
     if (fillTop > southFill + 0.01) {
-      const points = [
-        project(tx, ty + 1, fillTop, view),
-        project(tx + 1, ty + 1, fillTop, view),
-        project(tx + 1, ty + 1, southFill, view),
-        project(tx, ty + 1, southFill, view)
-      ];
-      queuePolygon(queue, points, (ctx) => {
-        beginPoly(ctx, points);
-        ctx.fillStyle = darken(baseColor, 0.58);
-        ctx.fill();
-      }, -0.04);
+      const p1 = project(tx, ty + 1, fillTop, view);
+      const p2 = project(tx + 1, ty + 1, fillTop, view);
+      const p3 = project(tx + 1, ty + 1, southFill, view);
+      const p4 = project(tx, ty + 1, southFill, view);
+      beginPoly(ctx, [p1, p2, p3, p4]);
+      ctx.fillStyle = darken(baseColor, 0.58);
+      ctx.fill();
     }
 
     if (fillTop > eastFill + 0.01) {
-      const points = [
-        project(tx + 1, ty, fillTop, view),
-        project(tx + 1, ty + 1, fillTop, view),
-        project(tx + 1, ty + 1, eastFill, view),
-        project(tx + 1, ty, eastFill, view)
-      ];
-      queuePolygon(queue, points, (ctx) => {
-        beginPoly(ctx, points);
-        ctx.fillStyle = darken(baseColor, 0.72);
-        ctx.fill();
-      }, -0.02);
+      const p1 = project(tx + 1, ty, fillTop, view);
+      const p2 = project(tx + 1, ty + 1, fillTop, view);
+      const p3 = project(tx + 1, ty + 1, eastFill, view);
+      const p4 = project(tx + 1, ty, eastFill, view);
+      beginPoly(ctx, [p1, p2, p3, p4]);
+      ctx.fillStyle = darken(baseColor, 0.72);
+      ctx.fill();
     }
 
-    queuePolygon(queue, top, (ctx) => {
-      beginPoly(ctx, top);
-      ctx.fillStyle = baseColor;
-      ctx.fill();
+    beginPoly(ctx, top);
+    ctx.fillStyle = baseColor;
+    ctx.fill();
 
-      renderRelativeHeightCue(ctx, top, fillTop, playerReferenceZ);
+    renderRelativeHeightCue(ctx, top, fillTop, playerReferenceZ);
 
-      ctx.strokeStyle = 'rgba(241,245,249,0.16)';
+    ctx.strokeStyle = 'rgba(241,245,249,0.16)';
+    ctx.lineWidth = 1.1;
+    ctx.stroke();
+
+    if (trigger?.kind === 'hazard') {
+      const center = project(tx + 0.5, ty + 0.5, window.MarbleLevels.getSurfaceTopZ(cell) + 0.02, view);
+      ctx.beginPath();
+      ctx.moveTo(center.x - 6, center.y - 4);
+      ctx.lineTo(center.x + 6, center.y + 4);
+      ctx.moveTo(center.x + 6, center.y - 4);
+      ctx.lineTo(center.x - 6, center.y + 4);
+      ctx.strokeStyle = 'rgba(255,255,255,0.75)';
+      ctx.lineWidth = 1.4;
+      ctx.stroke();
+    }
+
+    if (cell.conveyor) {
+      const center = project(tx + 0.5, ty + 0.5, window.MarbleLevels.getSurfaceTopZ(cell) + 0.02, view);
+      const dx = cell.conveyor.x * 8;
+      const dy = cell.conveyor.y * 8;
+      ctx.beginPath();
+      ctx.moveTo(center.x - dx, center.y - dy);
+      ctx.lineTo(center.x + dx, center.y + dy);
+      ctx.strokeStyle = 'rgba(224,242,254,0.85)';
+      ctx.lineWidth = 1.6;
+      ctx.stroke();
+    }
+
+    if (cell.crumble) {
+      const center = project(tx + 0.5, ty + 0.5, window.MarbleLevels.getSurfaceTopZ(cell) + 0.02, view);
+      ctx.beginPath();
+      ctx.moveTo(center.x - 5, center.y - 3);
+      ctx.lineTo(center.x + 4, center.y + 1);
+      ctx.moveTo(center.x - 2, center.y + 4);
+      ctx.lineTo(center.x + 6, center.y - 4);
+      ctx.strokeStyle = 'rgba(255,237,213,0.88)';
       ctx.lineWidth = 1.1;
       ctx.stroke();
+    }
 
-      if (trigger?.kind === 'hazard') {
-        const center = project(tx + 0.5, ty + 0.5, window.MarbleLevels.getSurfaceTopZ(cell) + 0.02, view);
-        ctx.beginPath();
-        ctx.moveTo(center.x - 6, center.y - 4);
-        ctx.lineTo(center.x + 6, center.y + 4);
-        ctx.moveTo(center.x + 6, center.y - 4);
-        ctx.lineTo(center.x - 6, center.y + 4);
-        ctx.strokeStyle = 'rgba(255,255,255,0.75)';
-        ctx.lineWidth = 1.4;
-        ctx.stroke();
-      }
-
-      if (cell.conveyor) {
-        const center = project(tx + 0.5, ty + 0.5, window.MarbleLevels.getSurfaceTopZ(cell) + 0.02, view);
-        const dx = cell.conveyor.x * 8;
-        const dy = cell.conveyor.y * 8;
-        ctx.beginPath();
-        ctx.moveTo(center.x - dx, center.y - dy);
-        ctx.lineTo(center.x + dx, center.y + dy);
-        ctx.strokeStyle = 'rgba(224,242,254,0.85)';
-        ctx.lineWidth = 1.6;
-        ctx.stroke();
-      }
-
-      if (cell.crumble) {
-        const center = project(tx + 0.5, ty + 0.5, window.MarbleLevels.getSurfaceTopZ(cell) + 0.02, view);
-        ctx.beginPath();
-        ctx.moveTo(center.x - 5, center.y - 3);
-        ctx.lineTo(center.x + 4, center.y + 1);
-        ctx.moveTo(center.x - 2, center.y + 4);
-        ctx.lineTo(center.x + 6, center.y - 4);
-        ctx.strokeStyle = 'rgba(255,237,213,0.88)';
-        ctx.lineWidth = 1.1;
-        ctx.stroke();
-      }
-
-      if (cell.bounce > 0) {
-        const center = project(tx + 0.5, ty + 0.5, window.MarbleLevels.getSurfaceTopZ(cell) + 0.03, view);
-        ctx.beginPath();
-        ctx.arc(center.x, center.y, 6, 0, Math.PI * 2);
-        ctx.strokeStyle = 'rgba(186,230,253,0.92)';
-        ctx.lineWidth = 1.2;
-        ctx.stroke();
-      }
-    }, 0);
+    if (cell.bounce > 0) {
+      const center = project(tx + 0.5, ty + 0.5, window.MarbleLevels.getSurfaceTopZ(cell) + 0.03, view);
+      ctx.beginPath();
+      ctx.arc(center.x, center.y, 6, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(186,230,253,0.92)';
+      ctx.lineWidth = 1.2;
+      ctx.stroke();
+    }
   }
 
-  function queueBlockerTile(queue, runtime, tx, ty, view) {
+  function renderBlockerTile(ctx, runtime, tx, ty, view) {
     const blocker = window.MarbleLevels.getBlockerCell(runtime.level, tx, ty);
     if (!blocker) return;
-
     const baseColor = blocker.transparent ? '#64748b' : '#334155';
     const top = blocker.top;
     const southFill = window.MarbleLevels.getFillTopAtCell(runtime.level, tx, ty + 1, { runtime: runtime.dynamicState });
     const eastFill = window.MarbleLevels.getFillTopAtCell(runtime.level, tx + 1, ty, { runtime: runtime.dynamicState });
 
     if (top > southFill + 0.01) {
-      const points = [
+      beginPoly(ctx, [
         project(tx, ty + 1, top, view),
         project(tx + 1, ty + 1, top, view),
         project(tx + 1, ty + 1, southFill, view),
         project(tx, ty + 1, southFill, view)
-      ];
-      queuePolygon(queue, points, (ctx) => {
-        beginPoly(ctx, points);
-        ctx.fillStyle = darken(baseColor, 0.55);
-        ctx.fill();
-      }, -0.04);
+      ]);
+      ctx.fillStyle = darken(baseColor, 0.55);
+      ctx.fill();
     }
 
     if (top > eastFill + 0.01) {
-      const points = [
+      beginPoly(ctx, [
         project(tx + 1, ty, top, view),
         project(tx + 1, ty + 1, top, view),
         project(tx + 1, ty + 1, eastFill, view),
         project(tx + 1, ty, eastFill, view)
-      ];
-      queuePolygon(queue, points, (ctx) => {
-        beginPoly(ctx, points);
-        ctx.fillStyle = darken(baseColor, 0.7);
-        ctx.fill();
-      }, -0.02);
+      ]);
+      ctx.fillStyle = darken(baseColor, 0.7);
+      ctx.fill();
     }
 
-    const topPoints = [
+    beginPoly(ctx, [
       project(tx, ty, top, view),
       project(tx + 1, ty, top, view),
       project(tx + 1, ty + 1, top, view),
       project(tx, ty + 1, top, view)
-    ];
-    queuePolygon(queue, topPoints, (ctx) => {
-      beginPoly(ctx, topPoints);
-      ctx.fillStyle = baseColor;
-      ctx.fill();
-      ctx.strokeStyle = 'rgba(241,245,249,0.12)';
-      ctx.lineWidth = 1;
-      ctx.stroke();
-    }, 0);
+    ]);
+    ctx.fillStyle = baseColor;
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(241,245,249,0.12)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
   }
 
-  function queueActor(queue, runtime, actor, view, playerReferenceZ) {
+  function renderActor(ctx, runtime, actor, view, playerReferenceZ) {
     const actorState = runtime.dynamicState.actors[actor.id];
     if (!actorState || actorState.active === false) return;
     const color = getActorColor(actor);
@@ -450,65 +420,48 @@
         project(x, y + actor.height, z, view)
       ];
 
-      queuePolygon(queue, top, (ctx) => {
-        beginPoly(ctx, top);
-        ctx.fillStyle = color;
-        ctx.fill();
+      beginPoly(ctx, top);
+      ctx.fillStyle = color;
+      ctx.fill();
 
-        renderRelativeHeightCue(ctx, top, z, playerReferenceZ);
+      renderRelativeHeightCue(ctx, top, z, playerReferenceZ);
 
-        ctx.strokeStyle = 'rgba(241,245,249,0.2)';
-        ctx.lineWidth = 1.1;
-        ctx.stroke();
-      }, 0.01);
-      return;
-    }
-
-    if (actor.kind === window.MarbleLevels.ACTOR_KINDS.TIMED_GATE) {
+      ctx.strokeStyle = 'rgba(241,245,249,0.2)';
+      ctx.lineWidth = 1.1;
+      ctx.stroke();
+    } else if (actor.kind === window.MarbleLevels.ACTOR_KINDS.TIMED_GATE) {
       const x = actorState.x;
       const y = actorState.y;
       const z = actor.topHeight;
-      const points = [
+      beginPoly(ctx, [
         project(x, y, z, view),
         project(x + actor.width, y, z, view),
         project(x + actor.width, y + actor.height, z, view),
         project(x, y + actor.height, z, view)
-      ];
-
-      queuePolygon(queue, points, (ctx) => {
-        beginPoly(ctx, points);
-        ctx.fillStyle = color;
-        ctx.fill();
-        ctx.strokeStyle = 'rgba(254,215,170,0.4)';
-        ctx.lineWidth = 1;
-        ctx.stroke();
-      }, 0.01);
-      return;
+      ]);
+      ctx.fillStyle = color;
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(254,215,170,0.4)';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    } else {
+      const cx = actorState.x + actor.width * 0.5;
+      const cy = actorState.y + actor.height * 0.5;
+      const ex = cx + Math.cos(actorState.angle) * actor.armLength;
+      const ey = cy + Math.sin(actorState.angle) * actor.armLength;
+      const center = project(cx, cy, actor.topHeight + 0.1, view);
+      const end = project(ex, ey, actor.topHeight + 0.1, view);
+      ctx.beginPath();
+      ctx.moveTo(center.x, center.y);
+      ctx.lineTo(end.x, end.y);
+      ctx.strokeStyle = color;
+      ctx.lineWidth = Math.max(3, actor.armWidth * view.tileW * 0.6);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(center.x, center.y, 5, 0, Math.PI * 2);
+      ctx.fillStyle = '#fecaca';
+      ctx.fill();
     }
-
-    const cx = actorState.x + actor.width * 0.5;
-    const cy = actorState.y + actor.height * 0.5;
-    const ex = cx + Math.cos(actorState.angle) * actor.armLength;
-    const ey = cy + Math.sin(actorState.angle) * actor.armLength;
-    const center = project(cx, cy, actor.topHeight + 0.1, view);
-    const end = project(ex, ey, actor.topHeight + 0.1, view);
-
-    queue.push({
-      sortY: Math.max(center.y, end.y) + 0.03,
-      draw(ctx) {
-        ctx.beginPath();
-        ctx.moveTo(center.x, center.y);
-        ctx.lineTo(end.x, end.y);
-        ctx.strokeStyle = color;
-        ctx.lineWidth = Math.max(3, actor.armWidth * view.tileW * 0.6);
-        ctx.stroke();
-
-        ctx.beginPath();
-        ctx.arc(center.x, center.y, 5, 0, Math.PI * 2);
-        ctx.fillStyle = '#fecaca';
-        ctx.fill();
-      }
-    });
   }
 
   function getTileDrawOrder(level) {
@@ -536,75 +489,295 @@
     return fallbackZ;
   }
 
-  function queueGoal(queue, runtime, view) {
-    const goal = runtime.level.goal;
-    if (!goal) return;
+  function getPolygonBounds(points) {
+    let minX = Infinity;
+    let minY = Infinity;
+    let maxX = -Infinity;
+    let maxY = -Infinity;
 
-    const support = window.MarbleLevels.sampleVisualSurface(runtime.level, goal.x, goal.y, runtime.dynamicState);
-    const z = (support ? support.z : 0) + 0.22;
-    const p = project(goal.x, goal.y, z, view);
-    const radius = Math.max(8, view.tileW * goal.radius * 0.42);
+    for (const point of points) {
+      if (point.x < minX) minX = point.x;
+      if (point.y < minY) minY = point.y;
+      if (point.x > maxX) maxX = point.x;
+      if (point.y > maxY) maxY = point.y;
+    }
 
-    queue.push({
-      sortY: p.y + radius + 0.015,
-      draw(ctx) {
-        const gradient = ctx.createRadialGradient(p.x - radius * 0.25, p.y - radius * 0.3, radius * 0.15, p.x, p.y, radius);
-        gradient.addColorStop(0, 'rgba(255,255,255,0.95)');
-        gradient.addColorStop(0.35, 'rgba(110,231,183,0.95)');
-        gradient.addColorStop(1, 'rgba(34,197,94,0.42)');
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, radius, 0, Math.PI * 2);
-        ctx.fillStyle = gradient;
-        ctx.fill();
-      }
-    });
+    return { minX, minY, maxX, maxY };
   }
 
-  function queueMarble(queue, runtime, view) {
+  function boundsOverlapEllipse(points, cx, cy, rx, ry) {
+    const bounds = getPolygonBounds(points);
+    if (bounds.maxX < cx - rx) return false;
+    if (bounds.minX > cx + rx) return false;
+    if (bounds.maxY < cy - ry) return false;
+    if (bounds.minY > cy + ry) return false;
+    return true;
+  }
+
+  function getSurfaceOccluderPolygons(runtime, tx, ty, view) {
+    const cell = window.MarbleLevels.getSurfaceCell(runtime.level, tx, ty);
+    if (!cell || cell.kind === 'void') return null;
+
+    const top = buildSurfaceTopPolygon(runtime.level, runtime, tx, ty, view);
+    if (!top) return null;
+
+    const fillTop = window.MarbleLevels.getFillTopAtCell(runtime.level, tx, ty, { runtime: runtime.dynamicState });
+    const southFill = window.MarbleLevels.getFillTopAtCell(runtime.level, tx, ty + 1, { runtime: runtime.dynamicState });
+    const eastFill = window.MarbleLevels.getFillTopAtCell(runtime.level, tx + 1, ty, { runtime: runtime.dynamicState });
+
+    return {
+      top,
+      topZ: fillTop,
+      south: fillTop > southFill + 0.01 ? [
+        project(tx, ty + 1, fillTop, view),
+        project(tx + 1, ty + 1, fillTop, view),
+        project(tx + 1, ty + 1, southFill, view),
+        project(tx, ty + 1, southFill, view)
+      ] : null,
+      east: fillTop > eastFill + 0.01 ? [
+        project(tx + 1, ty, fillTop, view),
+        project(tx + 1, ty + 1, fillTop, view),
+        project(tx + 1, ty + 1, eastFill, view),
+        project(tx + 1, ty, eastFill, view)
+      ] : null
+    };
+  }
+
+  function getBlockerOccluderPolygons(runtime, tx, ty, view) {
+    const blocker = window.MarbleLevels.getBlockerCell(runtime.level, tx, ty);
+    if (!blocker) return null;
+
+    const top = blocker.top;
+    const southFill = window.MarbleLevels.getFillTopAtCell(runtime.level, tx, ty + 1, { runtime: runtime.dynamicState });
+    const eastFill = window.MarbleLevels.getFillTopAtCell(runtime.level, tx + 1, ty, { runtime: runtime.dynamicState });
+
+    return {
+      top: [
+        project(tx, ty, top, view),
+        project(tx + 1, ty, top, view),
+        project(tx + 1, ty + 1, top, view),
+        project(tx, ty + 1, top, view)
+      ],
+      topZ: top,
+      south: top > southFill + 0.01 ? [
+        project(tx, ty + 1, top, view),
+        project(tx + 1, ty + 1, top, view),
+        project(tx + 1, ty + 1, southFill, view),
+        project(tx, ty + 1, southFill, view)
+      ] : null,
+      east: top > eastFill + 0.01 ? [
+        project(tx + 1, ty, top, view),
+        project(tx + 1, ty + 1, top, view),
+        project(tx + 1, ty + 1, eastFill, view),
+        project(tx + 1, ty, eastFill, view)
+      ] : null
+    };
+  }
+
+  function collectMarbleOccluders(runtime, view, targetX, targetY, radiusX, radiusY, marbleZ) {
+    const occluders = [];
+    const marbleFrontThresholdY = targetY - radiusY * 0.8;
+    const marbleTopThresholdZ = marbleZ - runtime.marble.collisionRadius * 0.25;
+    const tiles = getTileDrawOrder(runtime.level);
+
+    for (const { tx, ty } of tiles) {
+      const surfacePolys = getSurfaceOccluderPolygons(runtime, tx, ty, view);
+      if (surfacePolys) {
+        if (
+          surfacePolys.south &&
+          boundsOverlapEllipse(surfacePolys.south, targetX, targetY, radiusX, radiusY) &&
+          getPolygonBounds(surfacePolys.south).maxY >= marbleFrontThresholdY
+        ) {
+          occluders.push(surfacePolys.south);
+        }
+
+        if (
+          surfacePolys.east &&
+          boundsOverlapEllipse(surfacePolys.east, targetX, targetY, radiusX, radiusY) &&
+          getPolygonBounds(surfacePolys.east).maxY >= marbleFrontThresholdY
+        ) {
+          occluders.push(surfacePolys.east);
+        }
+
+        if (
+          surfacePolys.top &&
+          surfacePolys.topZ >= marbleTopThresholdZ &&
+          boundsOverlapEllipse(surfacePolys.top, targetX, targetY, radiusX, radiusY) &&
+          getPolygonBounds(surfacePolys.top).maxY >= marbleFrontThresholdY
+        ) {
+          occluders.push(surfacePolys.top);
+        }
+      }
+
+      const blockerPolys = getBlockerOccluderPolygons(runtime, tx, ty, view);
+      if (blockerPolys) {
+        if (
+          blockerPolys.south &&
+          boundsOverlapEllipse(blockerPolys.south, targetX, targetY, radiusX, radiusY) &&
+          getPolygonBounds(blockerPolys.south).maxY >= marbleFrontThresholdY
+        ) {
+          occluders.push(blockerPolys.south);
+        }
+
+        if (
+          blockerPolys.east &&
+          boundsOverlapEllipse(blockerPolys.east, targetX, targetY, radiusX, radiusY) &&
+          getPolygonBounds(blockerPolys.east).maxY >= marbleFrontThresholdY
+        ) {
+          occluders.push(blockerPolys.east);
+        }
+
+        if (
+          blockerPolys.top &&
+          blockerPolys.topZ >= marbleTopThresholdZ &&
+          boundsOverlapEllipse(blockerPolys.top, targetX, targetY, radiusX, radiusY) &&
+          getPolygonBounds(blockerPolys.top).maxY >= marbleFrontThresholdY
+        ) {
+          occluders.push(blockerPolys.top);
+        }
+      }
+    }
+
+    for (const actor of runtime.level.actors) {
+      const actorState = runtime.dynamicState.actors[actor.id];
+      if (!actorState || actorState.active === false) continue;
+
+      if (
+        actor.kind === window.MarbleLevels.ACTOR_KINDS.MOVING_PLATFORM ||
+        actor.kind === window.MarbleLevels.ACTOR_KINDS.ELEVATOR ||
+        actor.kind === window.MarbleLevels.ACTOR_KINDS.TIMED_GATE
+      ) {
+        const topZ = actor.kind === window.MarbleLevels.ACTOR_KINDS.TIMED_GATE ? actor.topHeight : actorState.topHeight;
+        const top = [
+          project(actorState.x, actorState.y, topZ, view),
+          project(actorState.x + actor.width, actorState.y, topZ, view),
+          project(actorState.x + actor.width, actorState.y + actor.height, topZ, view),
+          project(actorState.x, actorState.y + actor.height, topZ, view)
+        ];
+
+        if (
+          topZ >= marbleTopThresholdZ &&
+          boundsOverlapEllipse(top, targetX, targetY, radiusX, radiusY) &&
+          getPolygonBounds(top).maxY >= marbleFrontThresholdY
+        ) {
+          occluders.push(top);
+        }
+      }
+    }
+
+    return occluders;
+  }
+
+  function drawOccludedBall(ctx, ball, radius, occluders) {
+    if (!occluders.length) {
+      const gradient = ctx.createRadialGradient(ball.x - radius * 0.35, ball.y - radius * 0.48, radius * 0.14, ball.x, ball.y, radius);
+      gradient.addColorStop(0, '#ffffff');
+      gradient.addColorStop(0.22, '#dbeafe');
+      gradient.addColorStop(1, '#475569');
+      ctx.beginPath();
+      ctx.arc(ball.x, ball.y, radius, 0, Math.PI * 2);
+      ctx.fillStyle = gradient;
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(255,255,255,0.65)';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      return;
+    }
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(ball.x, ball.y, radius, 0, Math.PI * 2);
+    for (const poly of occluders) addPolyPath(ctx, poly);
+    ctx.clip('evenodd');
+
+    const gradient = ctx.createRadialGradient(ball.x - radius * 0.35, ball.y - radius * 0.48, radius * 0.14, ball.x, ball.y, radius);
+    gradient.addColorStop(0, '#ffffff');
+    gradient.addColorStop(0.22, '#dbeafe');
+    gradient.addColorStop(1, '#475569');
+    ctx.beginPath();
+    ctx.arc(ball.x, ball.y, radius, 0, Math.PI * 2);
+    ctx.fillStyle = gradient;
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,0.65)';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    ctx.restore();
+  }
+
+  function drawOccludedShadow(ctx, shadowX, shadowY, radius, occluders) {
+    const ellipseY = shadowY + radius * 0.35;
+    const rx = radius * 0.95;
+    const ry = radius * 0.48;
+
+    if (!occluders.length) {
+      ctx.beginPath();
+      ctx.ellipse(shadowX, ellipseY, rx, ry, 0, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(0,0,0,0.26)';
+      ctx.fill();
+      return;
+    }
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.ellipse(shadowX, ellipseY, rx, ry, 0, 0, Math.PI * 2);
+    for (const poly of occluders) addPolyPath(ctx, poly);
+    ctx.clip('evenodd');
+
+    ctx.beginPath();
+    ctx.ellipse(shadowX, ellipseY, rx, ry, 0, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(0,0,0,0.26)';
+    ctx.fill();
+
+    ctx.restore();
+  }
+
+  function renderMarble(ctx, runtime, view) {
     const marble = runtime.marble;
     const shadowZ = getVisualSupportZ(runtime, marble.x, marble.y, marble.supportRadius, runtime.level.voidFloor ?? -1.5);
     const shadow = project(marble.x, marble.y, shadowZ, view);
     const ball = project(marble.x, marble.y, marble.z, view);
     const radius = Math.max(8, view.tileW * marble.renderRadius * 0.9);
 
-    queue.push({
-      sortY: shadow.y - 0.03,
-      draw(ctx) {
-        ctx.beginPath();
-        ctx.ellipse(shadow.x, shadow.y + radius * 0.35, radius * 0.95, radius * 0.48, 0, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(0,0,0,0.26)';
-        ctx.fill();
-      }
-    });
+    const ballOccluders = collectMarbleOccluders(runtime, view, ball.x, ball.y, radius, radius, marble.z);
+    const shadowOccluders = collectMarbleOccluders(
+      runtime,
+      view,
+      shadow.x,
+      shadow.y + radius * 0.35,
+      radius * 0.95,
+      radius * 0.48,
+      shadowZ
+    );
 
-    queue.push({
-      sortY: ball.y + radius,
-      draw(ctx) {
-        const gradient = ctx.createRadialGradient(ball.x - radius * 0.35, ball.y - radius * 0.48, radius * 0.14, ball.x, ball.y, radius);
-        gradient.addColorStop(0, '#ffffff');
-        gradient.addColorStop(0.22, '#dbeafe');
-        gradient.addColorStop(1, '#475569');
+    drawOccludedShadow(ctx, shadow.x, shadow.y, radius, shadowOccluders);
+    drawOccludedBall(ctx, ball, radius, ballOccluders);
+  }
 
-        ctx.beginPath();
-        ctx.arc(ball.x, ball.y, radius, 0, Math.PI * 2);
-        ctx.fillStyle = gradient;
-        ctx.fill();
-        ctx.strokeStyle = 'rgba(255,255,255,0.65)';
-        ctx.lineWidth = 2;
-        ctx.stroke();
-      }
-    });
+  function renderGoal(ctx, runtime, view) {
+    const goal = runtime.level.goal;
+    if (!goal) return;
+    const support = window.MarbleLevels.sampleVisualSurface(runtime.level, goal.x, goal.y, runtime.dynamicState);
+    const z = (support ? support.z : 0) + 0.22;
+    const p = project(goal.x, goal.y, z, view);
+    const radius = Math.max(8, view.tileW * goal.radius * 0.42);
+    const gradient = ctx.createRadialGradient(p.x - radius * 0.25, p.y - radius * 0.3, radius * 0.15, p.x, p.y, radius);
+    gradient.addColorStop(0, 'rgba(255,255,255,0.95)');
+    gradient.addColorStop(0.35, 'rgba(110,231,183,0.95)');
+    gradient.addColorStop(1, 'rgba(34,197,94,0.42)');
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, radius, 0, Math.PI * 2);
+    ctx.fillStyle = gradient;
+    ctx.fill();
   }
 
   function renderRouteGraph(ctx, runtime, view) {
     if (!runtime.debug.showRouteGraph || !runtime.level.routeGraph) return;
     const nodes = runtime.level.routeGraph.nodes || [];
     const nodeById = Object.fromEntries(nodes.map((node) => [node.id, node]));
-
     ctx.save();
     ctx.strokeStyle = 'rgba(250,204,21,0.6)';
     ctx.lineWidth = 1.4;
-
     for (const edge of runtime.level.routeGraph.edges || []) {
       const a = nodeById[edge.from];
       const b = nodeById[edge.to];
@@ -616,7 +789,6 @@
       ctx.lineTo(p2.x, p2.y);
       ctx.stroke();
     }
-
     for (const node of nodes) {
       if (typeof node.x !== 'number') continue;
       const p = project(node.x, node.y, (node.z ?? 0) + 0.14, view);
@@ -625,7 +797,6 @@
       ctx.fillStyle = 'rgba(253,224,71,0.88)';
       ctx.fill();
     }
-
     ctx.restore();
   }
 
@@ -640,33 +811,6 @@
     ctx.restore();
   }
 
-  function buildRenderQueue(runtime, view, playerReferenceZ) {
-    const queue = [];
-    const tiles = getTileDrawOrder(runtime.level);
-
-    for (const { tx, ty } of tiles) {
-      queueSurfaceTile(queue, runtime, tx, ty, view, playerReferenceZ);
-      queueBlockerTile(queue, runtime, tx, ty, view);
-    }
-
-    const actors = [...runtime.level.actors];
-    actors.sort((a, b) => {
-      const sa = runtime.dynamicState.actors[a.id];
-      const sb = runtime.dynamicState.actors[b.id];
-      return (sa.x + sa.y) - (sb.x + sb.y);
-    });
-
-    for (const actor of actors) {
-      queueActor(queue, runtime, actor, view, playerReferenceZ);
-    }
-
-    queueGoal(queue, runtime, view);
-    queueMarble(queue, runtime, view);
-
-    queue.sort((a, b) => a.sortY - b.sortY);
-    return queue;
-  }
-
   function draw(runtime, canvas) {
     if (!runtime || !canvas) return;
     const { ctx, cssWidth, cssHeight } = fitCanvasToDisplay(canvas);
@@ -675,10 +819,10 @@
 
     ctx.clearRect(0, 0, cssWidth, cssHeight);
     renderBackground(ctx, cssWidth, cssHeight);
-
-    const queue = buildRenderQueue(runtime, view, playerReferenceZ);
-    for (const item of queue) item.draw(ctx);
-
+    renderTerrain(ctx, runtime, view, playerReferenceZ);
+    renderActors(ctx, runtime, view, playerReferenceZ);
+    renderGoal(ctx, runtime, view);
+    renderMarble(ctx, runtime, view);
     renderRouteGraph(ctx, runtime, view);
     renderStatus(ctx, runtime, cssWidth);
   }
@@ -691,4 +835,22 @@
     prepare,
     render: draw
   };
+
+  function renderTerrain(ctx, runtime, view, playerReferenceZ) {
+    const tiles = getTileDrawOrder(runtime.level);
+    for (const { tx, ty } of tiles) {
+      renderSurfaceTile(ctx, runtime, tx, ty, view, playerReferenceZ);
+      renderBlockerTile(ctx, runtime, tx, ty, view);
+    }
+  }
+
+  function renderActors(ctx, runtime, view, playerReferenceZ) {
+    const actors = [...runtime.level.actors];
+    actors.sort((a, b) => {
+      const sa = runtime.dynamicState.actors[a.id];
+      const sb = runtime.dynamicState.actors[b.id];
+      return (sa.x + sa.y) - (sb.x + sb.y);
+    });
+    for (const actor of actors) renderActor(ctx, runtime, actor, view, playerReferenceZ);
+  }
 })();
