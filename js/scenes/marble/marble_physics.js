@@ -33,7 +33,7 @@
   const JUMP_LIFT = 0.08;
 
   const LOWEST_PLAYABLE_Z_CACHE = new WeakMap();
-  const VOID_FAIL_BELOW_LOWEST_PLAYABLE = 3.5;
+  const VOID_FAIL_BELOW_LOWEST_PLAYABLE = 4.5;
 
   function ensureJumpState(marble) {
     if (typeof marble.coyoteTime !== 'number') marble.coyoteTime = 0;

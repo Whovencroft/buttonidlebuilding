@@ -9,7 +9,9 @@
   const TOP_OCCLUDER_CENTER_OFFSET = 0.12;
   const AIRBORNE_RENDER_LIFT_FACTOR = 0.18;
   const AIRBORNE_RENDER_LIFT_MAX = 0.22;
-
+  const SHADOW_MODE = 'under'; // 'under' or 'light'
+  const SHADOW_LIGHT_DIR = { x: 0.82, y: 0.57 };
+  const SHADOW_OFFSET_FACTOR = 0.34;
   function clamp(value, min, max) {
     return Math.max(min, Math.min(max, value));
   }
@@ -651,66 +653,69 @@ function getBlockerOccluderPolygons(runtime, tx, ty, view) {
   };
 }
 
-  function polygonFrontEnough(points, targetY, radiusY) {
-  return getPolygonBounds(points).maxY >= (targetY - radiusY * 0.12);
-}
-
-function worldFootprintContains(tx, ty, marbleX, marbleY, margin = 0) {
-  return (
-    marbleX >= tx - margin &&
-    marbleX <= tx + 1 + margin &&
-    marbleY >= ty - margin &&
-    marbleY <= ty + 1 + margin
-  );
-}
-
-function rectFootprintContains(minX, minY, maxX, maxY, marbleX, marbleY, margin = 0) {
-  return (
-    marbleX >= minX - margin &&
-    marbleX <= maxX + margin &&
-    marbleY >= minY - margin &&
-    marbleY <= maxY + margin
-  );
+   function rangesOverlap(minA, maxA, minB, maxB) {
+  return maxA >= minB && minA <= maxB;
 }
 
 function shouldOccludeSouthFace(meta, marbleX, marbleY, marbleZ, marbleRadius) {
   if (!meta?.south) return false;
-  if (meta.southTopZ < marbleZ + marbleRadius * 0.2) return false;
-  if (marbleX < meta.tx - marbleRadius || marbleX > meta.tx + 1 + marbleRadius) return false;
-  if (marbleY > meta.ty + 1 - marbleRadius * FRONT_FACE_OCCLUSION_Y_MARGIN) return false;
-  return true;
+  if (meta.southTopZ <= marbleZ + 0.04) return false;
+
+  const ballMinX = marbleX - marbleRadius;
+  const ballMaxX = marbleX + marbleRadius;
+  if (!rangesOverlap(ballMinX, ballMaxX, meta.tx, meta.tx + 1)) return false;
+
+  const faceY = meta.ty + 1;
+  const ballBackY = marbleY - marbleRadius;
+
+  return ballBackY <= faceY + 0.02;
 }
 
 function shouldOccludeEastFace(meta, marbleX, marbleY, marbleZ, marbleRadius) {
   if (!meta?.east) return false;
-  if (meta.eastTopZ < marbleZ + marbleRadius * 0.2) return false;
-  if (marbleY < meta.ty - marbleRadius || marbleY > meta.ty + 1 + marbleRadius) return false;
-  if (marbleX > meta.tx + 1 - marbleRadius * FRONT_FACE_OCCLUSION_Y_MARGIN) return false;
-  return true;
+  if (meta.eastTopZ <= marbleZ + 0.04) return false;
+
+  const ballMinY = marbleY - marbleRadius;
+  const ballMaxY = marbleY + marbleRadius;
+  if (!rangesOverlap(ballMinY, ballMaxY, meta.ty, meta.ty + 1)) return false;
+
+  const faceX = meta.tx + 1;
+  const ballBackX = marbleX - marbleRadius;
+
+  return ballBackX <= faceX + 0.02;
 }
 
 function shouldOccludeTopFace(meta, marbleX, marbleY, marbleZ, marbleRadius) {
   if (!meta?.top) return false;
-  if (meta.topZ < marbleZ + marbleRadius * 1.1) return false;
-  return worldFootprintContains(meta.tx, meta.ty, marbleX, marbleY, marbleRadius * TOP_OCCLUDER_CENTER_OFFSET);
+  if (meta.topZ <= marbleZ + 0.02) return false;
+
+  const ballMinX = marbleX - marbleRadius;
+  const ballMaxX = marbleX + marbleRadius;
+  const ballMinY = marbleY - marbleRadius;
+  const ballMaxY = marbleY + marbleRadius;
+
+  return (
+    rangesOverlap(ballMinX, ballMaxX, meta.tx, meta.tx + 1) &&
+    rangesOverlap(ballMinY, ballMaxY, meta.ty, meta.ty + 1)
+  );
 }
 
 function shouldOccludeActorTopFace(actorState, actor, marbleX, marbleY, marbleZ, marbleRadius, topZ) {
-  if (topZ < marbleZ + marbleRadius * 1.1) return false;
-  return rectFootprintContains(
-    actorState.x,
-    actorState.y,
-    actorState.x + actor.width,
-    actorState.y + actor.height,
-    marbleX,
-    marbleY,
-    marbleRadius * TOP_OCCLUDER_CENTER_OFFSET
+  if (topZ <= marbleZ + 0.02) return false;
+
+  const ballMinX = marbleX - marbleRadius;
+  const ballMaxX = marbleX + marbleRadius;
+  const ballMinY = marbleY - marbleRadius;
+  const ballMaxY = marbleY + marbleRadius;
+
+  return (
+    rangesOverlap(ballMinX, ballMaxX, actorState.x, actorState.x + actor.width) &&
+    rangesOverlap(ballMinY, ballMaxY, actorState.y, actorState.y + actor.height)
   );
 }
 
 function maybeAddOccluder(occluders, polygon, targetX, targetY, radiusX, radiusY) {
   if (!polygon) return;
-  if (!polygonFrontEnough(polygon, targetY, radiusY)) return;
   if (!ellipseIntersectsPolygon(polygon, targetX, targetY, radiusX, radiusY)) return;
   occluders.push(polygon);
 }
@@ -837,6 +842,22 @@ function collectMarbleOccluders(runtime, view, marbleX, marbleY, targetX, target
     ctx.restore();
   }
 
+function getShadowScreenPosition(baseShadow, heightAboveSurface, view) {
+  if (SHADOW_MODE !== 'light' || heightAboveSurface <= 0.0001) {
+    return baseShadow;
+  }
+
+  const len = Math.hypot(SHADOW_LIGHT_DIR.x, SHADOW_LIGHT_DIR.y) || 1;
+  const dirX = SHADOW_LIGHT_DIR.x / len;
+  const dirY = SHADOW_LIGHT_DIR.y / len;
+  const offset = heightAboveSurface * view.heightScale * SHADOW_OFFSET_FACTOR;
+
+  return {
+    x: baseShadow.x + dirX * offset,
+    y: baseShadow.y + dirY * offset
+  };
+}
+
   function getMarbleRenderData(runtime, view) {
   const marble = runtime.marble;
   const shadowZ = getVisualSupportZ(runtime, marble.x, marble.y, marble.supportRadius, runtime.level.voidFloor ?? -1.5);
@@ -845,12 +866,16 @@ function collectMarbleOccluders(runtime, view, marbleX, marbleY, targetX, target
     ? marble.z
     : marble.z + Math.min(depthBelowSupport * AIRBORNE_RENDER_LIFT_FACTOR, AIRBORNE_RENDER_LIFT_MAX);
 
+  const baseShadow = project(marble.x, marble.y, shadowZ, view);
+  const heightAboveSurface = Math.max(0, marble.z - shadowZ);
+  const shadow = getShadowScreenPosition(baseShadow, heightAboveSurface, view);
+
   return {
     worldX: marble.x,
     worldY: marble.y,
     shadowZ,
     ballOcclusionZ: marble.z,
-    shadow: project(marble.x, marble.y, shadowZ, view),
+    shadow,
     ball: project(marble.x, marble.y, liftedRenderZ, view),
     radius: Math.max(8, view.tileW * marble.renderRadius * 0.9)
   };
