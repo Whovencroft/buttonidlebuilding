@@ -33,11 +33,7 @@
   const JUMP_LIFT = 0.08;
 
   const LOWEST_PLAYABLE_Z_CACHE = new WeakMap();
-  const VOID_FAIL_SEARCH_RADIUS = 1.35;
-  const VOID_FAIL_SAMPLE_STEP = 0.35;
   const VOID_FAIL_BELOW_LOWEST_PLAYABLE = 3.5;
-  const VOID_FAIL_BELOW_NEARBY_FLOOR = 4.5;
-  const VOID_FAIL_BELOW_VOID_FLOOR = 1.5;
 
   function ensureJumpState(marble) {
     if (typeof marble.coyoteTime !== 'number') marble.coyoteTime = 0;
@@ -601,48 +597,14 @@
     return lowest;
   }
 
-  function getNearbyWalkableFloorZ(runtime, x, y) {
-    let best = null;
-    const radius = VOID_FAIL_SEARCH_RADIUS;
-    const step = VOID_FAIL_SAMPLE_STEP;
+  
 
-    for (let sy = y - radius; sy <= y + radius + 0.0001; sy += step) {
-      for (let sx = x - radius; sx <= x + radius + 0.0001; sx += step) {
-        const dx = sx - x;
-        const dy = sy - y;
-        if ((dx * dx) + (dy * dy) > radius * radius) continue;
-
-        const sample = window.MarbleLevels.sampleWalkableSurface(runtime.level, sx, sy, {
-          runtime: runtime.dynamicState
-        });
-
-        if (!sample) continue;
-        if (best === null || sample.z > best) {
-          best = sample.z;
-        }
-      }
-    }
-
-    return best;
-  }
-
- function shouldFailFromVoidFall(runtime) {
+function shouldFailFromVoidFall(runtime) {
   const marble = runtime.marble;
   if (marble.grounded) return false;
 
   const lowestPlayableZ = getLevelLowestPlayableZ(runtime.level);
-  const nearbyFloorZ = getNearbyWalkableFloorZ(runtime, marble.x, marble.y);
-  const voidFloorZ = runtime.level.voidFloor ?? runtime.level.killZ ?? (lowestPlayableZ - VOID_FAIL_BELOW_VOID_FLOOR);
-
-  const belowLowestPlayable = marble.z < lowestPlayableZ - VOID_FAIL_BELOW_LOWEST_PLAYABLE;
-  const belowVoidFloor = marble.z < voidFloorZ - VOID_FAIL_BELOW_VOID_FLOOR;
-  const belowNearbyFloor = nearbyFloorZ !== null && marble.z < nearbyFloorZ - VOID_FAIL_BELOW_NEARBY_FLOOR;
-
-  if (nearbyFloorZ !== null) {
-    return belowNearbyFloor || (belowVoidFloor && belowLowestPlayable);
-  }
-
-  return belowVoidFloor && belowLowestPlayable;
+  return marble.z < (lowestPlayableZ - VOID_FAIL_BELOW_LOWEST_PLAYABLE);
 }
 
   function updatePhysics(runtime, inputState, dt) {
