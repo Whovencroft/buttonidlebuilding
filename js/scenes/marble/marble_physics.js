@@ -374,22 +374,46 @@
 
   function moveAirborne(runtime, dt) {
     const marble = runtime.marble;
-    const distance = Math.max(Math.hypot(marble.vx * dt, marble.vy * dt), Math.abs(marble.vz * dt) * 0.25);
-    const steps = Math.max(1, Math.ceil(distance / MOVE_STEP));
+    const totalDx = marble.vx * dt;
+    const totalDy = marble.vy * dt;
+    const totalDz = marble.vz * dt;
+
+    const horizontalSteps = Math.ceil(Math.hypot(totalDx, totalDy) / MOVE_STEP);
+    const verticalStepSize = Math.max(0.12, marble.collisionRadius * 0.6);
+    const verticalSteps = Math.ceil(Math.abs(totalDz) / verticalStepSize);
+    const steps = Math.max(1, horizontalSteps, verticalSteps);
     const stepDt = dt / steps;
 
     for (let i = 0; i < steps; i += 1) {
+      const startZ = marble.z;
       const stepDx = marble.vx * stepDt;
       const stepDy = marble.vy * stepDt;
       const targetZ = marble.z + marble.vz * stepDt;
-      const previewSupport = getLandingSupport(runtime, marble.x + stepDx, marble.y + stepDy, marble.supportRadius);
+
+      const previewSupport = getLandingSupport(
+        runtime,
+        marble.x + stepDx,
+        marble.y + stepDy,
+        marble.supportRadius
+      );
+
       const collisionSupportZ = previewSupport ? previewSupport.z : null;
-      const zCheck = Math.min(marble.z, targetZ);
-      const resolved = resolveSweptBlockerMovement(runtime, marble.x, marble.y, stepDx, stepDy, zCheck, collisionSupportZ);
+      const zCheck = Math.min(startZ, targetZ);
+
+      const resolved = resolveSweptBlockerMovement(
+        runtime,
+        marble.x,
+        marble.y,
+        stepDx,
+        stepDy,
+        zCheck,
+        collisionSupportZ
+      );
 
       marble.x = resolved.x;
       marble.y = resolved.y;
       marble.z = targetZ;
+
       if (resolved.collided && resolved.normal) {
         const adjusted = removeIntoWallComponent(marble.vx, marble.vy, resolved.normal);
         marble.vx = adjusted.vx;
@@ -397,11 +421,17 @@
       }
 
       const surface = getLandingSupport(runtime, marble.x, marble.y, marble.supportRadius);
-      if (surface && marble.z <= surface.z + marble.collisionRadius + (surface.landingPad ? 0.35 : GROUND_SNAP) && marble.vz <= 0) {
-        marble.grounded = true;
-        marble.z = surface.z + marble.collisionRadius;
-        marble.vz = 0;
-        return surface;
+      if (surface && marble.vz <= 0) {
+        const landingZ = surface.z + marble.collisionRadius + (surface.landingPad ? 0.35 : GROUND_SNAP);
+        const crossedLandingPlane = startZ > landingZ && marble.z <= landingZ;
+        const endedBelowLandingPlane = marble.z <= landingZ;
+
+        if (crossedLandingPlane || endedBelowLandingPlane) {
+          marble.grounded = true;
+          marble.z = surface.z + marble.collisionRadius;
+          marble.vz = 0;
+          return surface;
+        }
       }
     }
 
@@ -596,22 +626,12 @@
     return best;
   }
 
-  function shouldFailFromVoidFall(runtime) {
+    function shouldFailFromVoidFall(runtime) {
     const marble = runtime.marble;
     if (marble.grounded) return false;
 
-    const nearbyFloorZ = getNearbyWalkableFloorZ(runtime, marble.x, marble.y);
-    if (nearbyFloorZ !== null && marble.z >= nearbyFloorZ - 1.5) {
-      return false;
-    }
-
-    const lowestPlayableZ = getLevelLowestPlayableZ(runtime.level);
-    const voidFloorZ = runtime.level.voidFloor ?? lowestPlayableZ;
-
-    return (
-      marble.z < lowestPlayableZ - VOID_FAIL_BELOW_LOWEST_PLAYABLE &&
-      marble.z < voidFloorZ - VOID_FAIL_BELOW_VOID_FLOOR
-    );
+    const voidFloorZ = runtime.level.voidFloor ?? runtime.level.killZ ?? -6;
+    return marble.z < voidFloorZ - 1.25;
   }
 
   function updatePhysics(runtime, inputState, dt) {
