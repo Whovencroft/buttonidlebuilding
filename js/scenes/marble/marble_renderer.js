@@ -7,7 +7,8 @@
   const BELOW_TINT_BASE = 'rgba(96, 165, 250, ';
   const FRONT_FACE_OCCLUSION_Y_MARGIN = 0.08;
   const TOP_OCCLUDER_CENTER_OFFSET = 0.12;
-  const AIRBORNE_RENDER_LIFT_FACTOR = 0.9;
+  const AIRBORNE_RENDER_LIFT_FACTOR = 0.18;
+  const AIRBORNE_RENDER_LIFT_MAX = 0.22;
 
   function clamp(value, min, max) {
     return Math.max(min, Math.min(max, value));
@@ -583,202 +584,197 @@
   }
 
   function getSurfaceOccluderPolygons(runtime, tx, ty, view) {
-    const cell = window.MarbleLevels.getSurfaceCell(runtime.level, tx, ty);
-    if (!cell || cell.kind === 'void') return null;
+  const cell = window.MarbleLevels.getSurfaceCell(runtime.level, tx, ty);
+  if (!cell || cell.kind === 'void') return null;
 
-    const top = buildSurfaceTopPolygon(runtime.level, runtime, tx, ty, view);
-    if (!top) return null;
+  const top = buildSurfaceTopPolygon(runtime.level, runtime, tx, ty, view);
+  if (!top) return null;
 
-    const fillTop = window.MarbleLevels.getFillTopAtCell(runtime.level, tx, ty, { runtime: runtime.dynamicState });
-    const southFill = window.MarbleLevels.getFillTopAtCell(runtime.level, tx, ty + 1, { runtime: runtime.dynamicState });
-    const eastFill = window.MarbleLevels.getFillTopAtCell(runtime.level, tx + 1, ty, { runtime: runtime.dynamicState });
+  const fillTop = window.MarbleLevels.getFillTopAtCell(runtime.level, tx, ty, { runtime: runtime.dynamicState });
+  const southFill = window.MarbleLevels.getFillTopAtCell(runtime.level, tx, ty + 1, { runtime: runtime.dynamicState });
+  const eastFill = window.MarbleLevels.getFillTopAtCell(runtime.level, tx + 1, ty, { runtime: runtime.dynamicState });
 
-    return {
-      top,
-      topZ: fillTop,
-      southTopZ: fillTop,
-      eastTopZ: fillTop,
-      south: fillTop > southFill + 0.01 ? [
-        project(tx, ty + 1, fillTop, view),
-        project(tx + 1, ty + 1, fillTop, view),
-        project(tx + 1, ty + 1, southFill, view),
-        project(tx, ty + 1, southFill, view)
-      ] : null,
-      east: fillTop > eastFill + 0.01 ? [
-        project(tx + 1, ty, fillTop, view),
-        project(tx + 1, ty + 1, fillTop, view),
-        project(tx + 1, ty + 1, eastFill, view),
-        project(tx + 1, ty, eastFill, view)
-      ] : null
-    };
-  }
+  return {
+    tx,
+    ty,
+    top,
+    topZ: fillTop,
+    southTopZ: fillTop,
+    eastTopZ: fillTop,
+    south: fillTop > southFill + 0.01 ? [
+      project(tx, ty + 1, fillTop, view),
+      project(tx + 1, ty + 1, fillTop, view),
+      project(tx + 1, ty + 1, southFill, view),
+      project(tx, ty + 1, southFill, view)
+    ] : null,
+    east: fillTop > eastFill + 0.01 ? [
+      project(tx + 1, ty, fillTop, view),
+      project(tx + 1, ty + 1, fillTop, view),
+      project(tx + 1, ty + 1, eastFill, view),
+      project(tx + 1, ty, eastFill, view)
+    ] : null
+  };
+}
 
-  function getBlockerOccluderPolygons(runtime, tx, ty, view) {
-    const blocker = window.MarbleLevels.getBlockerCell(runtime.level, tx, ty);
-    if (!blocker) return null;
+function getBlockerOccluderPolygons(runtime, tx, ty, view) {
+  const blocker = window.MarbleLevels.getBlockerCell(runtime.level, tx, ty);
+  if (!blocker) return null;
 
-    const top = blocker.top;
-    const southFill = window.MarbleLevels.getFillTopAtCell(runtime.level, tx, ty + 1, { runtime: runtime.dynamicState });
-    const eastFill = window.MarbleLevels.getFillTopAtCell(runtime.level, tx + 1, ty, { runtime: runtime.dynamicState });
+  const top = blocker.top;
+  const southFill = window.MarbleLevels.getFillTopAtCell(runtime.level, tx, ty + 1, { runtime: runtime.dynamicState });
+  const eastFill = window.MarbleLevels.getFillTopAtCell(runtime.level, tx + 1, ty, { runtime: runtime.dynamicState });
 
-    return {
-      top: [
-        project(tx, ty, top, view),
-        project(tx + 1, ty, top, view),
-        project(tx + 1, ty + 1, top, view),
-        project(tx, ty + 1, top, view)
-      ],
-      topZ: top,
-      southTopZ: top,
-      eastTopZ: top,
-      south: top > southFill + 0.01 ? [
-        project(tx, ty + 1, top, view),
-        project(tx + 1, ty + 1, top, view),
-        project(tx + 1, ty + 1, southFill, view),
-        project(tx, ty + 1, southFill, view)
-      ] : null,
-      east: top > eastFill + 0.01 ? [
-        project(tx + 1, ty, top, view),
-        project(tx + 1, ty + 1, top, view),
-        project(tx + 1, ty + 1, eastFill, view),
-        project(tx + 1, ty, eastFill, view)
-      ] : null
-    };
-  }
+  return {
+    tx,
+    ty,
+    top: [
+      project(tx, ty, top, view),
+      project(tx + 1, ty, top, view),
+      project(tx + 1, ty + 1, top, view),
+      project(tx, ty + 1, top, view)
+    ],
+    topZ: top,
+    southTopZ: top,
+    eastTopZ: top,
+    south: top > southFill + 0.01 ? [
+      project(tx, ty + 1, top, view),
+      project(tx + 1, ty + 1, top, view),
+      project(tx + 1, ty + 1, southFill, view),
+      project(tx, ty + 1, southFill, view)
+    ] : null,
+    east: top > eastFill + 0.01 ? [
+      project(tx + 1, ty, top, view),
+      project(tx + 1, ty + 1, top, view),
+      project(tx + 1, ty + 1, eastFill, view),
+      project(tx + 1, ty, eastFill, view)
+    ] : null
+  };
+}
 
   function polygonFrontEnough(points, targetY, radiusY) {
-    return getPolygonBounds(points).maxY >= (targetY - radiusY * 0.05);
-  }
+  return getPolygonBounds(points).maxY >= (targetY - radiusY * 0.12);
+}
 
-  function maybeAddOccluder(occluders, polygon, faceTopZ, targetX, targetY, radiusX, radiusY, marbleZ, zMargin = 0) {
-    if (!polygon) return;
-    if (faceTopZ < marbleZ + zMargin) return;
-    if (!polygonFrontEnough(polygon, targetY, radiusY)) return;
-    if (!ellipseIntersectsPolygon(polygon, targetX, targetY, radiusX, radiusY)) return;
-    occluders.push(polygon);
-  }
+function worldFootprintContains(tx, ty, marbleX, marbleY, margin = 0) {
+  return (
+    marbleX >= tx - margin &&
+    marbleX <= tx + 1 + margin &&
+    marbleY >= ty - margin &&
+    marbleY <= ty + 1 + margin
+  );
+}
 
-    function collectMarbleOccluders(runtime, view, targetX, targetY, radiusX, radiusY, marbleZ) {
-    if (!Number.isFinite(marbleZ)) return [];
+function rectFootprintContains(minX, minY, maxX, maxY, marbleX, marbleY, margin = 0) {
+  return (
+    marbleX >= minX - margin &&
+    marbleX <= maxX + margin &&
+    marbleY >= minY - margin &&
+    marbleY <= maxY + margin
+  );
+}
 
-    const occluders = [];
-    const tiles = getTileDrawOrder(runtime.level);
-    const topFaceMargin = runtime.marble.collisionRadius * 1.25;
-    const sideFaceMargin = runtime.marble.collisionRadius * 0.35;
+function shouldOccludeSouthFace(meta, marbleX, marbleY, marbleZ, marbleRadius) {
+  if (!meta?.south) return false;
+  if (meta.southTopZ < marbleZ + marbleRadius * 0.2) return false;
+  if (marbleX < meta.tx - marbleRadius || marbleX > meta.tx + 1 + marbleRadius) return false;
+  if (marbleY > meta.ty + 1 - marbleRadius * FRONT_FACE_OCCLUSION_Y_MARGIN) return false;
+  return true;
+}
 
-    for (const { tx, ty } of tiles) {
-      const surfacePolys = getSurfaceOccluderPolygons(runtime, tx, ty, view);
-      if (surfacePolys) {
-        maybeAddOccluder(
-          occluders,
-          surfacePolys.south,
-          surfacePolys.southTopZ,
-          targetX,
-          targetY,
-          radiusX,
-          radiusY,
-          marbleZ,
-          sideFaceMargin
-        );
+function shouldOccludeEastFace(meta, marbleX, marbleY, marbleZ, marbleRadius) {
+  if (!meta?.east) return false;
+  if (meta.eastTopZ < marbleZ + marbleRadius * 0.2) return false;
+  if (marbleY < meta.ty - marbleRadius || marbleY > meta.ty + 1 + marbleRadius) return false;
+  if (marbleX > meta.tx + 1 - marbleRadius * FRONT_FACE_OCCLUSION_Y_MARGIN) return false;
+  return true;
+}
 
-        maybeAddOccluder(
-          occluders,
-          surfacePolys.east,
-          surfacePolys.eastTopZ,
-          targetX,
-          targetY,
-          radiusX,
-          radiusY,
-          marbleZ,
-          sideFaceMargin
-        );
+function shouldOccludeTopFace(meta, marbleX, marbleY, marbleZ, marbleRadius) {
+  if (!meta?.top) return false;
+  if (meta.topZ < marbleZ + marbleRadius * 1.1) return false;
+  return worldFootprintContains(meta.tx, meta.ty, marbleX, marbleY, marbleRadius * TOP_OCCLUDER_CENTER_OFFSET);
+}
 
-        maybeAddOccluder(
-          occluders,
-          surfacePolys.top,
-          surfacePolys.topZ,
-          targetX,
-          targetY,
-          radiusX,
-          radiusY,
-          marbleZ,
-          topFaceMargin
-        );
+function shouldOccludeActorTopFace(actorState, actor, marbleX, marbleY, marbleZ, marbleRadius, topZ) {
+  if (topZ < marbleZ + marbleRadius * 1.1) return false;
+  return rectFootprintContains(
+    actorState.x,
+    actorState.y,
+    actorState.x + actor.width,
+    actorState.y + actor.height,
+    marbleX,
+    marbleY,
+    marbleRadius * TOP_OCCLUDER_CENTER_OFFSET
+  );
+}
+
+function maybeAddOccluder(occluders, polygon, targetX, targetY, radiusX, radiusY) {
+  if (!polygon) return;
+  if (!polygonFrontEnough(polygon, targetY, radiusY)) return;
+  if (!ellipseIntersectsPolygon(polygon, targetX, targetY, radiusX, radiusY)) return;
+  occluders.push(polygon);
+}
+
+function collectMarbleOccluders(runtime, view, marbleX, marbleY, targetX, targetY, radiusX, radiusY, marbleZ) {
+  if (!Number.isFinite(marbleZ)) return [];
+
+  const occluders = [];
+  const marbleRadius = runtime.marble.collisionRadius;
+  const tiles = getTileDrawOrder(runtime.level);
+
+  for (const { tx, ty } of tiles) {
+    const surfacePolys = getSurfaceOccluderPolygons(runtime, tx, ty, view);
+    if (surfacePolys) {
+      if (shouldOccludeSouthFace(surfacePolys, marbleX, marbleY, marbleZ, marbleRadius)) {
+        maybeAddOccluder(occluders, surfacePolys.south, targetX, targetY, radiusX, radiusY);
       }
-
-      const blockerPolys = getBlockerOccluderPolygons(runtime, tx, ty, view);
-      if (blockerPolys) {
-        maybeAddOccluder(
-          occluders,
-          blockerPolys.south,
-          blockerPolys.southTopZ,
-          targetX,
-          targetY,
-          radiusX,
-          radiusY,
-          marbleZ,
-          sideFaceMargin
-        );
-
-        maybeAddOccluder(
-          occluders,
-          blockerPolys.east,
-          blockerPolys.eastTopZ,
-          targetX,
-          targetY,
-          radiusX,
-          radiusY,
-          marbleZ,
-          sideFaceMargin
-        );
-
-        maybeAddOccluder(
-          occluders,
-          blockerPolys.top,
-          blockerPolys.topZ,
-          targetX,
-          targetY,
-          radiusX,
-          radiusY,
-          marbleZ,
-          topFaceMargin
-        );
+      if (shouldOccludeEastFace(surfacePolys, marbleX, marbleY, marbleZ, marbleRadius)) {
+        maybeAddOccluder(occluders, surfacePolys.east, targetX, targetY, radiusX, radiusY);
+      }
+      if (shouldOccludeTopFace(surfacePolys, marbleX, marbleY, marbleZ, marbleRadius)) {
+        maybeAddOccluder(occluders, surfacePolys.top, targetX, targetY, radiusX, radiusY);
       }
     }
 
-    for (const actor of runtime.level.actors) {
-      const actorState = runtime.dynamicState.actors[actor.id];
-      if (!actorState || actorState.active === false) continue;
-
-      if (
-        actor.kind === window.MarbleLevels.ACTOR_KINDS.MOVING_PLATFORM ||
-        actor.kind === window.MarbleLevels.ACTOR_KINDS.ELEVATOR ||
-        actor.kind === window.MarbleLevels.ACTOR_KINDS.TIMED_GATE
-      ) {
-        const topZ = actor.kind === window.MarbleLevels.ACTOR_KINDS.TIMED_GATE ? actor.topHeight : actorState.topHeight;
-        const top = [
-          project(actorState.x, actorState.y, topZ, view),
-          project(actorState.x + actor.width, actorState.y, topZ, view),
-          project(actorState.x + actor.width, actorState.y + actor.height, topZ, view),
-          project(actorState.x, actorState.y + actor.height, topZ, view)
-        ];
-
-        maybeAddOccluder(
-          occluders,
-          top,
-          topZ,
-          targetX,
-          targetY,
-          radiusX,
-          radiusY,
-          marbleZ,
-          topFaceMargin
-        );
+    const blockerPolys = getBlockerOccluderPolygons(runtime, tx, ty, view);
+    if (blockerPolys) {
+      if (shouldOccludeSouthFace(blockerPolys, marbleX, marbleY, marbleZ, marbleRadius)) {
+        maybeAddOccluder(occluders, blockerPolys.south, targetX, targetY, radiusX, radiusY);
+      }
+      if (shouldOccludeEastFace(blockerPolys, marbleX, marbleY, marbleZ, marbleRadius)) {
+        maybeAddOccluder(occluders, blockerPolys.east, targetX, targetY, radiusX, radiusY);
+      }
+      if (shouldOccludeTopFace(blockerPolys, marbleX, marbleY, marbleZ, marbleRadius)) {
+        maybeAddOccluder(occluders, blockerPolys.top, targetX, targetY, radiusX, radiusY);
       }
     }
-
-    return occluders;
   }
+
+  for (const actor of runtime.level.actors) {
+    const actorState = runtime.dynamicState.actors[actor.id];
+    if (!actorState || actorState.active === false) continue;
+
+    if (
+      actor.kind === window.MarbleLevels.ACTOR_KINDS.MOVING_PLATFORM ||
+      actor.kind === window.MarbleLevels.ACTOR_KINDS.ELEVATOR ||
+      actor.kind === window.MarbleLevels.ACTOR_KINDS.TIMED_GATE
+    ) {
+      const topZ = actor.kind === window.MarbleLevels.ACTOR_KINDS.TIMED_GATE ? actor.topHeight : actorState.topHeight;
+      if (!shouldOccludeActorTopFace(actorState, actor, marbleX, marbleY, marbleZ, marbleRadius, topZ)) continue;
+
+      const top = [
+        project(actorState.x, actorState.y, topZ, view),
+        project(actorState.x + actor.width, actorState.y, topZ, view),
+        project(actorState.x + actor.width, actorState.y + actor.height, topZ, view),
+        project(actorState.x, actorState.y + actor.height, topZ, view)
+      ];
+
+      maybeAddOccluder(occluders, top, targetX, targetY, radiusX, radiusY);
+    }
+  }
+
+  return occluders;
+}
 
   function drawOccludedBall(ctx, ball, radius, occluders) {
     if (!occluders.length) {
@@ -842,60 +838,66 @@
   }
 
   function getMarbleRenderData(runtime, view) {
-    const marble = runtime.marble;
-    const shadowZ = getVisualSupportZ(runtime, marble.x, marble.y, marble.supportRadius, runtime.level.voidFloor ?? -1.5);
-    const voidDepth = Math.max(0, shadowZ - marble.z);
-    const liftedRenderZ = marble.grounded
-      ? marble.z
-      : marble.z + voidDepth * AIRBORNE_RENDER_LIFT_FACTOR;
+  const marble = runtime.marble;
+  const shadowZ = getVisualSupportZ(runtime, marble.x, marble.y, marble.supportRadius, runtime.level.voidFloor ?? -1.5);
+  const depthBelowSupport = Math.max(0, shadowZ - marble.z);
+  const liftedRenderZ = marble.grounded
+    ? marble.z
+    : marble.z + Math.min(depthBelowSupport * AIRBORNE_RENDER_LIFT_FACTOR, AIRBORNE_RENDER_LIFT_MAX);
 
-    return {
-      shadowZ,
-      ballOcclusionZ: marble.z,
-      shadow: project(marble.x, marble.y, shadowZ, view),
-      ball: project(marble.x, marble.y, liftedRenderZ, view),
-      radius: Math.max(8, view.tileW * marble.renderRadius * 0.9)
-    };
-  }
+  return {
+    worldX: marble.x,
+    worldY: marble.y,
+    shadowZ,
+    ballOcclusionZ: marble.z,
+    shadow: project(marble.x, marble.y, shadowZ, view),
+    ball: project(marble.x, marble.y, liftedRenderZ, view),
+    radius: Math.max(8, view.tileW * marble.renderRadius * 0.9)
+  };
+}
 
-    function renderMarble(ctx, runtime, view) {
-    const marbleRender = getMarbleRenderData(runtime, view);
+function renderMarble(ctx, runtime, view) {
+  const marbleRender = getMarbleRenderData(runtime, view);
 
-    const ballOccluders = collectMarbleOccluders(
-      runtime,
-      view,
-      marbleRender.ball.x,
-      marbleRender.ball.y,
-      marbleRender.radius,
-      marbleRender.radius,
-      marbleRender.ballOcclusionZ
-    );
+  const ballOccluders = collectMarbleOccluders(
+    runtime,
+    view,
+    marbleRender.worldX,
+    marbleRender.worldY,
+    marbleRender.ball.x,
+    marbleRender.ball.y,
+    marbleRender.radius,
+    marbleRender.radius,
+    marbleRender.ballOcclusionZ
+  );
 
-    const shadowOccluders = collectMarbleOccluders(
-      runtime,
-      view,
-      marbleRender.shadow.x,
-      marbleRender.shadow.y + marbleRender.radius * 0.35,
-      marbleRender.radius * 0.95,
-      marbleRender.radius * 0.48,
-      marbleRender.shadowZ
-    );
+  const shadowOccluders = collectMarbleOccluders(
+    runtime,
+    view,
+    marbleRender.worldX,
+    marbleRender.worldY,
+    marbleRender.shadow.x,
+    marbleRender.shadow.y + marbleRender.radius * 0.35,
+    marbleRender.radius * 0.95,
+    marbleRender.radius * 0.48,
+    marbleRender.shadowZ
+  );
 
-    drawOccludedShadow(
-      ctx,
-      marbleRender.shadow.x,
-      marbleRender.shadow.y,
-      marbleRender.radius,
-      shadowOccluders
-    );
+  drawOccludedShadow(
+    ctx,
+    marbleRender.shadow.x,
+    marbleRender.shadow.y,
+    marbleRender.radius,
+    shadowOccluders
+  );
 
-    drawOccludedBall(
-      ctx,
-      marbleRender.ball,
-      marbleRender.radius,
-      ballOccluders
-    );
-  }
+  drawOccludedBall(
+    ctx,
+    marbleRender.ball,
+    marbleRender.radius,
+    ballOccluders
+  );
+}
 
   function renderGoal(ctx, runtime, view) {
     const goal = runtime.level.goal;

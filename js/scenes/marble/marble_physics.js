@@ -626,13 +626,24 @@
     return best;
   }
 
-    function shouldFailFromVoidFall(runtime) {
-    const marble = runtime.marble;
-    if (marble.grounded) return false;
+ function shouldFailFromVoidFall(runtime) {
+  const marble = runtime.marble;
+  if (marble.grounded) return false;
 
-    const voidFloorZ = runtime.level.voidFloor ?? runtime.level.killZ ?? -6;
-    return marble.z < voidFloorZ - 1.25;
+  const lowestPlayableZ = getLevelLowestPlayableZ(runtime.level);
+  const nearbyFloorZ = getNearbyWalkableFloorZ(runtime, marble.x, marble.y);
+  const voidFloorZ = runtime.level.voidFloor ?? runtime.level.killZ ?? (lowestPlayableZ - VOID_FAIL_BELOW_VOID_FLOOR);
+
+  const belowLowestPlayable = marble.z < lowestPlayableZ - VOID_FAIL_BELOW_LOWEST_PLAYABLE;
+  const belowVoidFloor = marble.z < voidFloorZ - VOID_FAIL_BELOW_VOID_FLOOR;
+  const belowNearbyFloor = nearbyFloorZ !== null && marble.z < nearbyFloorZ - VOID_FAIL_BELOW_NEARBY_FLOOR;
+
+  if (nearbyFloorZ !== null) {
+    return belowNearbyFloor || (belowVoidFloor && belowLowestPlayable);
   }
+
+  return belowVoidFloor && belowLowestPlayable;
+}
 
   function updatePhysics(runtime, inputState, dt) {
     if (runtime.status !== 'running') return runtime.lastResult;
