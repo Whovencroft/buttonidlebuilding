@@ -1155,7 +1155,7 @@ function buildSwitchbackDescent() {
     });
 
     fillSurfaceRect(level, 2, 7, 4, 4, { baseHeight: 5 });
-    fillSurfaceRect(level, 22, 7, 4, 4, { baseHeight: 5 });
+    fillSurfaceRect(level, 20, 5, 4, 3, { baseHeight: 5 });
     fillSurfaceRect(level, 26, 7, 2, 4, { baseHeight: 5, shape: SHAPES.FLAT, bounce: 4.2 });
     setGoal(level, 27, 8, 0.42);
 
