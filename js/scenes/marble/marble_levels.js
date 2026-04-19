@@ -1200,7 +1200,7 @@ function buildSwitchbackDescent() {
       width: 2,
       height: 2,
       topHeight: 5,
-      friction: 0.9,
+      // friction: 0.9,
       conveyor: { x: 0.25, y: 0, strength: 0.5 },
       path: {
         type: 'loop',
