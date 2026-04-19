@@ -1206,10 +1206,10 @@ function buildSwitchbackDescent() {
         type: 'loop',
         speed: 0.7,
         points: [
-          { x: 16, y: 8, z: 5 },
+          { x: 14, y: 8, z: 4 },
           { x: 19, y: 8, z: 5 },
           { x: 19, y: 11, z: 5 },
-          { x: 16, y: 11, z: 5 }
+          { x: 16, y: 11, z: 6 }
         ]
       }
     });

@@ -947,44 +947,37 @@ function getShadowScreenPosition(baseShadow, heightAboveSurface, view) {
 function renderMarble(ctx, runtime, view) {
   const marbleRender = getMarbleRenderData(runtime, view);
 
-  const ballOccluders = collectMarbleOccluders(
-    runtime,
-    view,
-    marbleRender.worldX,
-    marbleRender.worldY,
-    marbleRender.ball.x,
-    marbleRender.ball.y,
-    marbleRender.radius,
-    marbleRender.radius,
-    marbleRender.ballOcclusionZ
-  );
+  const shadowX = marbleRender.shadow.x;
+  const shadowY = marbleRender.shadow.y + marbleRender.radius * 0.35;
+  const shadowRx = marbleRender.radius * 0.95;
+  const shadowRy = marbleRender.radius * 0.48;
 
-  const shadowOccluders = collectMarbleOccluders(
-    runtime,
-    view,
-    marbleRender.worldX,
-    marbleRender.worldY,
-    marbleRender.shadow.x,
-    marbleRender.shadow.y + marbleRender.radius * 0.35,
-    marbleRender.radius * 0.95,
-    marbleRender.radius * 0.48,
-    marbleRender.shadowZ
-  );
+  ctx.beginPath();
+  ctx.ellipse(shadowX, shadowY, shadowRx, shadowRy, 0, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(0,0,0,0.26)';
+  ctx.fill();
 
-  drawOccludedShadow(
-    ctx,
-    marbleRender.shadow.x,
-    marbleRender.shadow.y,
-    marbleRender.radius,
-    shadowOccluders
+  const ball = marbleRender.ball;
+  const radius = marbleRender.radius;
+  const gradient = ctx.createRadialGradient(
+    ball.x - radius * 0.35,
+    ball.y - radius * 0.48,
+    radius * 0.14,
+    ball.x,
+    ball.y,
+    radius
   );
+  gradient.addColorStop(0, '#ffffff');
+  gradient.addColorStop(0.22, '#dbeafe');
+  gradient.addColorStop(1, '#475569');
 
-  drawOccludedBall(
-    ctx,
-    marbleRender.ball,
-    marbleRender.radius,
-    ballOccluders
-  );
+  ctx.beginPath();
+  ctx.arc(ball.x, ball.y, radius, 0, Math.PI * 2);
+  ctx.fillStyle = gradient;
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(255,255,255,0.65)';
+  ctx.lineWidth = 2;
+  ctx.stroke();
 }
 
   function renderGoal(ctx, runtime, view) {
@@ -1045,20 +1038,21 @@ function renderMarble(ctx, runtime, view) {
   }
 
   function draw(runtime, canvas) {
-    if (!runtime || !canvas) return;
-    const { ctx, cssWidth, cssHeight } = fitCanvasToDisplay(canvas);
-    const view = createView(runtime, cssWidth, cssHeight);
-    const playerReferenceZ = getPlayerReferenceZ(runtime);
+  if (!runtime || !canvas) return;
+  const { ctx, cssWidth, cssHeight } = fitCanvasToDisplay(canvas);
+  const view = createView(runtime, cssWidth, cssHeight);
+  const playerReferenceZ = getPlayerReferenceZ(runtime);
 
-    ctx.clearRect(0, 0, cssWidth, cssHeight);
-    renderBackground(ctx, cssWidth, cssHeight);
-    renderTerrain(ctx, runtime, view, playerReferenceZ);
-    renderActors(ctx, runtime, view, playerReferenceZ);
-    renderGoal(ctx, runtime, view);
-    renderMarble(ctx, runtime, view);
-    renderRouteGraph(ctx, runtime, view);
-    renderStatus(ctx, runtime, cssWidth);
-  }
+  ctx.clearRect(0, 0, cssWidth, cssHeight);
+  renderBackground(ctx, cssWidth, cssHeight);
+  renderTerrain(ctx, runtime, view, playerReferenceZ);
+  renderActors(ctx, runtime, view, playerReferenceZ);
+  renderGoal(ctx, runtime, view);
+  renderMarble(ctx, runtime, view);
+  renderFrontCoverPass(ctx, runtime, view);
+  renderRouteGraph(ctx, runtime, view);
+  renderStatus(ctx, runtime, cssWidth);
+}
 
 function buildSouthCoverPolygon(tx, ty, topZ, lowerZ, view) {
   return [
@@ -1135,4 +1129,217 @@ function getDynamicCoverLowerZ(baseZ, marbleZ, marbleRadius) {
     });
     for (const actor of actors) renderActor(ctx, runtime, actor, view, playerReferenceZ);
   }
+  function marbleOverlapsXSpan(marbleX, marbleRadius, minX, maxX) {
+  return (marbleX + marbleRadius) >= minX && (marbleX - marbleRadius) <= maxX;
+}
+
+function marbleOverlapsYSpan(marbleY, marbleRadius, minY, maxY) {
+  return (marbleY + marbleRadius) >= minY && (marbleY - marbleRadius) <= maxY;
+}
+
+function marbleBehindSouthFace(marble, minX, maxX, faceY) {
+  if (!marbleOverlapsXSpan(marble.x, marble.collisionRadius, minX, maxX)) return false;
+  return marble.y < faceY - 0.02;
+}
+
+function marbleBehindEastFace(marble, minY, maxY, faceX) {
+  if (!marbleOverlapsYSpan(marble.y, marble.collisionRadius, minY, maxY)) return false;
+  return marble.x < faceX - 0.02;
+}
+
+function marbleUnderTop(marble, minX, minY, maxX, maxY, topZ) {
+  if (topZ <= marble.z + 0.02) return false;
+  return (
+    marbleOverlapsXSpan(marble.x, marble.collisionRadius, minX, maxX) &&
+    marbleOverlapsYSpan(marble.y, marble.collisionRadius, minY, maxY)
+  );
+}
+
+function renderSurfaceSouthCover(ctx, runtime, tx, ty, view) {
+  const cell = window.MarbleLevels.getSurfaceCell(runtime.level, tx, ty);
+  if (!cell || cell.kind === 'void') return;
+
+  const trigger = window.MarbleLevels.getTriggerCell(runtime.level, tx, ty);
+  const baseColor = getSurfaceBaseColor(cell, trigger);
+
+  const fillTop = window.MarbleLevels.getFillTopAtCell(runtime.level, tx, ty, { runtime: runtime.dynamicState });
+  const southFill = window.MarbleLevels.getFillTopAtCell(runtime.level, tx, ty + 1, { runtime: runtime.dynamicState });
+  if (fillTop <= southFill + 0.01) return;
+
+  beginPoly(ctx, [
+    project(tx, ty + 1, fillTop, view),
+    project(tx + 1, ty + 1, fillTop, view),
+    project(tx + 1, ty + 1, southFill, view),
+    project(tx, ty + 1, southFill, view)
+  ]);
+  ctx.fillStyle = darken(baseColor, 0.58);
+  ctx.fill();
+}
+
+function renderSurfaceEastCover(ctx, runtime, tx, ty, view) {
+  const cell = window.MarbleLevels.getSurfaceCell(runtime.level, tx, ty);
+  if (!cell || cell.kind === 'void') return;
+
+  const trigger = window.MarbleLevels.getTriggerCell(runtime.level, tx, ty);
+  const baseColor = getSurfaceBaseColor(cell, trigger);
+
+  const fillTop = window.MarbleLevels.getFillTopAtCell(runtime.level, tx, ty, { runtime: runtime.dynamicState });
+  const eastFill = window.MarbleLevels.getFillTopAtCell(runtime.level, tx + 1, ty, { runtime: runtime.dynamicState });
+  if (fillTop <= eastFill + 0.01) return;
+
+  beginPoly(ctx, [
+    project(tx + 1, ty, fillTop, view),
+    project(tx + 1, ty + 1, fillTop, view),
+    project(tx + 1, ty + 1, eastFill, view),
+    project(tx + 1, ty, eastFill, view)
+  ]);
+  ctx.fillStyle = darken(baseColor, 0.72);
+  ctx.fill();
+}
+
+function renderSurfaceTopCover(ctx, runtime, tx, ty, view) {
+  const cell = window.MarbleLevels.getSurfaceCell(runtime.level, tx, ty);
+  if (!cell || cell.kind === 'void') return;
+
+  const trigger = window.MarbleLevels.getTriggerCell(runtime.level, tx, ty);
+  const baseColor = getSurfaceBaseColor(cell, trigger);
+  const top = buildSurfaceTopPolygon(runtime.level, runtime, tx, ty, view);
+  if (!top) return;
+
+  beginPoly(ctx, top);
+  ctx.fillStyle = baseColor;
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(241,245,249,0.16)';
+  ctx.lineWidth = 1.1;
+  ctx.stroke();
+}
+
+function renderBlockerSouthCover(ctx, runtime, tx, ty, view) {
+  const blocker = window.MarbleLevels.getBlockerCell(runtime.level, tx, ty);
+  if (!blocker) return;
+
+  const top = blocker.top;
+  const southFill = window.MarbleLevels.getFillTopAtCell(runtime.level, tx, ty + 1, { runtime: runtime.dynamicState });
+  if (top <= southFill + 0.01) return;
+
+  beginPoly(ctx, [
+    project(tx, ty + 1, top, view),
+    project(tx + 1, ty + 1, top, view),
+    project(tx + 1, ty + 1, southFill, view),
+    project(tx, ty + 1, southFill, view)
+  ]);
+  ctx.fillStyle = darken(blocker.transparent ? '#64748b' : '#334155', 0.55);
+  ctx.fill();
+}
+
+function renderBlockerEastCover(ctx, runtime, tx, ty, view) {
+  const blocker = window.MarbleLevels.getBlockerCell(runtime.level, tx, ty);
+  if (!blocker) return;
+
+  const top = blocker.top;
+  const eastFill = window.MarbleLevels.getFillTopAtCell(runtime.level, tx + 1, ty, { runtime: runtime.dynamicState });
+  if (top <= eastFill + 0.01) return;
+
+  beginPoly(ctx, [
+    project(tx + 1, ty, top, view),
+    project(tx + 1, ty + 1, top, view),
+    project(tx + 1, ty + 1, eastFill, view),
+    project(tx + 1, ty, eastFill, view)
+  ]);
+  ctx.fillStyle = darken(blocker.transparent ? '#64748b' : '#334155', 0.7);
+  ctx.fill();
+}
+
+function renderBlockerTopCover(ctx, runtime, tx, ty, view) {
+  const blocker = window.MarbleLevels.getBlockerCell(runtime.level, tx, ty);
+  if (!blocker) return;
+
+  beginPoly(ctx, [
+    project(tx, ty, blocker.top, view),
+    project(tx + 1, ty, blocker.top, view),
+    project(tx + 1, ty + 1, blocker.top, view),
+    project(tx, ty + 1, blocker.top, view)
+  ]);
+  ctx.fillStyle = blocker.transparent ? '#64748b' : '#334155';
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(241,245,249,0.12)';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+}
+
+function renderActorTopCover(ctx, actor, actorState, view) {
+  const color = getActorColor(actor);
+  const topZ = actor.kind === window.MarbleLevels.ACTOR_KINDS.TIMED_GATE ? actor.topHeight : actorState.topHeight;
+
+  beginPoly(ctx, [
+    project(actorState.x, actorState.y, topZ, view),
+    project(actorState.x + actor.width, actorState.y, topZ, view),
+    project(actorState.x + actor.width, actorState.y + actor.height, topZ, view),
+    project(actorState.x, actorState.y + actor.height, topZ, view)
+  ]);
+  ctx.fillStyle = color;
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(241,245,249,0.18)';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+}
+
+function renderFrontCoverPass(ctx, runtime, view) {
+  const marble = runtime.marble;
+  const tiles = getTileDrawOrder(runtime.level);
+
+  for (const { tx, ty } of tiles) {
+    const surface = window.MarbleLevels.getSurfaceCell(runtime.level, tx, ty);
+    if (surface && surface.kind !== 'void') {
+      if (marbleBehindSouthFace(marble, tx, tx + 1, ty + 1)) {
+        renderSurfaceSouthCover(ctx, runtime, tx, ty, view);
+      }
+      if (marbleBehindEastFace(marble, ty, ty + 1, tx + 1)) {
+        renderSurfaceEastCover(ctx, runtime, tx, ty, view);
+      }
+
+      const surfaceTop = window.MarbleLevels.getFillTopAtCell(runtime.level, tx, ty, { runtime: runtime.dynamicState });
+      if (marbleUnderTop(marble, tx, ty, tx + 1, ty + 1, surfaceTop)) {
+        renderSurfaceTopCover(ctx, runtime, tx, ty, view);
+      }
+    }
+
+    const blocker = window.MarbleLevels.getBlockerCell(runtime.level, tx, ty);
+    if (blocker) {
+      if (marbleBehindSouthFace(marble, tx, tx + 1, ty + 1)) {
+        renderBlockerSouthCover(ctx, runtime, tx, ty, view);
+      }
+      if (marbleBehindEastFace(marble, ty, ty + 1, tx + 1)) {
+        renderBlockerEastCover(ctx, runtime, tx, ty, view);
+      }
+      if (marbleUnderTop(marble, tx, ty, tx + 1, ty + 1, blocker.top)) {
+        renderBlockerTopCover(ctx, runtime, tx, ty, view);
+      }
+    }
+  }
+
+  const actors = [...runtime.level.actors];
+  actors.sort((a, b) => {
+    const sa = runtime.dynamicState.actors[a.id];
+    const sb = runtime.dynamicState.actors[b.id];
+    return (sa.x + sa.y) - (sb.x + sb.y);
+  });
+
+  for (const actor of actors) {
+    const actorState = runtime.dynamicState.actors[actor.id];
+    if (!actorState || actorState.active === false) continue;
+
+    if (
+      actor.kind === window.MarbleLevels.ACTOR_KINDS.MOVING_PLATFORM ||
+      actor.kind === window.MarbleLevels.ACTOR_KINDS.ELEVATOR ||
+      actor.kind === window.MarbleLevels.ACTOR_KINDS.TIMED_GATE
+    ) {
+      const topZ = actor.kind === window.MarbleLevels.ACTOR_KINDS.TIMED_GATE ? actor.topHeight : actorState.topHeight;
+
+      if (marbleUnderTop(marble, actorState.x, actorState.y, actorState.x + actor.width, actorState.y + actor.height, topZ)) {
+        renderActorTopCover(ctx, actor, actorState, view);
+      }
+    }
+  }
+}
 })();
