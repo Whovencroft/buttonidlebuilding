@@ -601,20 +601,8 @@
     ty,
     top,
     topZ: fillTop,
-    southTopZ: fillTop,
-    eastTopZ: fillTop,
-    south: fillTop > southFill + 0.01 ? [
-      project(tx, ty + 1, fillTop, view),
-      project(tx + 1, ty + 1, fillTop, view),
-      project(tx + 1, ty + 1, southFill, view),
-      project(tx, ty + 1, southFill, view)
-    ] : null,
-    east: fillTop > eastFill + 0.01 ? [
-      project(tx + 1, ty, fillTop, view),
-      project(tx + 1, ty + 1, fillTop, view),
-      project(tx + 1, ty + 1, eastFill, view),
-      project(tx + 1, ty, eastFill, view)
-    ] : null
+    southBaseZ: southFill,
+    eastBaseZ: eastFill
   };
 }
 
@@ -636,53 +624,37 @@ function getBlockerOccluderPolygons(runtime, tx, ty, view) {
       project(tx, ty + 1, top, view)
     ],
     topZ: top,
-    southTopZ: top,
-    eastTopZ: top,
-    south: top > southFill + 0.01 ? [
-      project(tx, ty + 1, top, view),
-      project(tx + 1, ty + 1, top, view),
-      project(tx + 1, ty + 1, southFill, view),
-      project(tx, ty + 1, southFill, view)
-    ] : null,
-    east: top > eastFill + 0.01 ? [
-      project(tx + 1, ty, top, view),
-      project(tx + 1, ty + 1, top, view),
-      project(tx + 1, ty + 1, eastFill, view),
-      project(tx + 1, ty, eastFill, view)
-    ] : null
+    southBaseZ: southFill,
+    eastBaseZ: eastFill
   };
 }
 
-   function rangesOverlap(minA, maxA, minB, maxB) {
+function rangesOverlap(minA, maxA, minB, maxB) {
   return maxA >= minB && minA <= maxB;
 }
 
 function shouldOccludeSouthFace(meta, marbleX, marbleY, marbleZ, marbleRadius) {
-  if (!meta?.south) return false;
-  if (meta.southTopZ <= marbleZ + 0.04) return false;
+  if (!meta) return false;
+  if (meta.topZ <= marbleZ + 0.04) return false;
 
   const ballMinX = marbleX - marbleRadius;
   const ballMaxX = marbleX + marbleRadius;
   if (!rangesOverlap(ballMinX, ballMaxX, meta.tx, meta.tx + 1)) return false;
 
   const faceY = meta.ty + 1;
-  const ballBackY = marbleY - marbleRadius;
-
-  return ballBackY <= faceY + 0.02;
+  return marbleY - marbleRadius <= faceY + 0.02;
 }
 
 function shouldOccludeEastFace(meta, marbleX, marbleY, marbleZ, marbleRadius) {
-  if (!meta?.east) return false;
-  if (meta.eastTopZ <= marbleZ + 0.04) return false;
+  if (!meta) return false;
+  if (meta.topZ <= marbleZ + 0.04) return false;
 
   const ballMinY = marbleY - marbleRadius;
   const ballMaxY = marbleY + marbleRadius;
   if (!rangesOverlap(ballMinY, ballMaxY, meta.ty, meta.ty + 1)) return false;
 
   const faceX = meta.tx + 1;
-  const ballBackX = marbleX - marbleRadius;
-
-  return ballBackX <= faceX + 0.02;
+  return marbleX - marbleRadius <= faceX + 0.02;
 }
 
 function shouldOccludeTopFace(meta, marbleX, marbleY, marbleZ, marbleRadius) {
@@ -728,29 +700,105 @@ function collectMarbleOccluders(runtime, view, marbleX, marbleY, targetX, target
   const tiles = getTileDrawOrder(runtime.level);
 
   for (const { tx, ty } of tiles) {
-    const surfacePolys = getSurfaceOccluderPolygons(runtime, tx, ty, view);
-    if (surfacePolys) {
-      if (shouldOccludeSouthFace(surfacePolys, marbleX, marbleY, marbleZ, marbleRadius)) {
-        maybeAddOccluder(occluders, surfacePolys.south, targetX, targetY, radiusX, radiusY);
+    const surfaceMeta = getSurfaceOccluderPolygons(runtime, tx, ty, view);
+    if (surfaceMeta) {
+      if (shouldOccludeSouthFace(surfaceMeta, marbleX, marbleY, marbleZ, marbleRadius)) {
+        const lowerZ = getDynamicCoverLowerZ(surfaceMeta.southBaseZ, marbleZ, marbleRadius);
+        maybeAddOccluder(
+          occluders,
+          buildSouthCoverPolygon(surfaceMeta.tx, surfaceMeta.ty, surfaceMeta.topZ, lowerZ, view),
+          targetX,
+          targetY,
+          radiusX,
+          radiusY
+        );
       }
-      if (shouldOccludeEastFace(surfacePolys, marbleX, marbleY, marbleZ, marbleRadius)) {
-        maybeAddOccluder(occluders, surfacePolys.east, targetX, targetY, radiusX, radiusY);
+
+      if (shouldOccludeEastFace(surfaceMeta, marbleX, marbleY, marbleZ, marbleRadius)) {
+        const lowerZ = getDynamicCoverLowerZ(surfaceMeta.eastBaseZ, marbleZ, marbleRadius);
+        maybeAddOccluder(
+          occluders,
+          buildEastCoverPolygon(surfaceMeta.tx, surfaceMeta.ty, surfaceMeta.topZ, lowerZ, view),
+          targetX,
+          targetY,
+          radiusX,
+          radiusY
+        );
       }
-      if (shouldOccludeTopFace(surfacePolys, marbleX, marbleY, marbleZ, marbleRadius)) {
-        maybeAddOccluder(occluders, surfacePolys.top, targetX, targetY, radiusX, radiusY);
+
+      if (shouldOccludeTopFace(surfaceMeta, marbleX, marbleY, marbleZ, marbleRadius)) {
+        maybeAddOccluder(occluders, surfaceMeta.top, targetX, targetY, radiusX, radiusY);
+
+        const lowerZ = marbleZ - marbleRadius * 0.35;
+        if (lowerZ < surfaceMeta.topZ - 0.01) {
+          maybeAddOccluder(
+            occluders,
+            buildSouthCoverPolygon(surfaceMeta.tx, surfaceMeta.ty, surfaceMeta.topZ, lowerZ, view),
+            targetX,
+            targetY,
+            radiusX,
+            radiusY
+          );
+          maybeAddOccluder(
+            occluders,
+            buildEastCoverPolygon(surfaceMeta.tx, surfaceMeta.ty, surfaceMeta.topZ, lowerZ, view),
+            targetX,
+            targetY,
+            radiusX,
+            radiusY
+          );
+        }
       }
     }
 
-    const blockerPolys = getBlockerOccluderPolygons(runtime, tx, ty, view);
-    if (blockerPolys) {
-      if (shouldOccludeSouthFace(blockerPolys, marbleX, marbleY, marbleZ, marbleRadius)) {
-        maybeAddOccluder(occluders, blockerPolys.south, targetX, targetY, radiusX, radiusY);
+    const blockerMeta = getBlockerOccluderPolygons(runtime, tx, ty, view);
+    if (blockerMeta) {
+      if (shouldOccludeSouthFace(blockerMeta, marbleX, marbleY, marbleZ, marbleRadius)) {
+        const lowerZ = getDynamicCoverLowerZ(blockerMeta.southBaseZ, marbleZ, marbleRadius);
+        maybeAddOccluder(
+          occluders,
+          buildSouthCoverPolygon(blockerMeta.tx, blockerMeta.ty, blockerMeta.topZ, lowerZ, view),
+          targetX,
+          targetY,
+          radiusX,
+          radiusY
+        );
       }
-      if (shouldOccludeEastFace(blockerPolys, marbleX, marbleY, marbleZ, marbleRadius)) {
-        maybeAddOccluder(occluders, blockerPolys.east, targetX, targetY, radiusX, radiusY);
+
+      if (shouldOccludeEastFace(blockerMeta, marbleX, marbleY, marbleZ, marbleRadius)) {
+        const lowerZ = getDynamicCoverLowerZ(blockerMeta.eastBaseZ, marbleZ, marbleRadius);
+        maybeAddOccluder(
+          occluders,
+          buildEastCoverPolygon(blockerMeta.tx, blockerMeta.ty, blockerMeta.topZ, lowerZ, view),
+          targetX,
+          targetY,
+          radiusX,
+          radiusY
+        );
       }
-      if (shouldOccludeTopFace(blockerPolys, marbleX, marbleY, marbleZ, marbleRadius)) {
-        maybeAddOccluder(occluders, blockerPolys.top, targetX, targetY, radiusX, radiusY);
+
+      if (shouldOccludeTopFace(blockerMeta, marbleX, marbleY, marbleZ, marbleRadius)) {
+        maybeAddOccluder(occluders, blockerMeta.top, targetX, targetY, radiusX, radiusY);
+
+        const lowerZ = marbleZ - marbleRadius * 0.35;
+        if (lowerZ < blockerMeta.topZ - 0.01) {
+          maybeAddOccluder(
+            occluders,
+            buildSouthCoverPolygon(blockerMeta.tx, blockerMeta.ty, blockerMeta.topZ, lowerZ, view),
+            targetX,
+            targetY,
+            radiusX,
+            radiusY
+          );
+          maybeAddOccluder(
+            occluders,
+            buildEastCoverPolygon(blockerMeta.tx, blockerMeta.ty, blockerMeta.topZ, lowerZ, view),
+            targetX,
+            targetY,
+            radiusX,
+            radiusY
+          );
+        }
       }
     }
   }
@@ -765,16 +813,31 @@ function collectMarbleOccluders(runtime, view, marbleX, marbleY, targetX, target
       actor.kind === window.MarbleLevels.ACTOR_KINDS.TIMED_GATE
     ) {
       const topZ = actor.kind === window.MarbleLevels.ACTOR_KINDS.TIMED_GATE ? actor.topHeight : actorState.topHeight;
-      if (!shouldOccludeActorTopFace(actorState, actor, marbleX, marbleY, marbleZ, marbleRadius, topZ)) continue;
 
-      const top = [
-        project(actorState.x, actorState.y, topZ, view),
-        project(actorState.x + actor.width, actorState.y, topZ, view),
-        project(actorState.x + actor.width, actorState.y + actor.height, topZ, view),
-        project(actorState.x, actorState.y + actor.height, topZ, view)
-      ];
+      if (shouldOccludeActorTopFace(actorState, actor, marbleX, marbleY, marbleZ, marbleRadius, topZ)) {
+        const top = buildRectTopPolygon(actorState.x, actorState.y, actor.width, actor.height, topZ, view);
+        maybeAddOccluder(occluders, top, targetX, targetY, radiusX, radiusY);
 
-      maybeAddOccluder(occluders, top, targetX, targetY, radiusX, radiusY);
+        const lowerZ = marbleZ - marbleRadius * 0.35;
+        if (lowerZ < topZ - 0.01) {
+          maybeAddOccluder(
+            occluders,
+            buildRectSouthCoverPolygon(actorState.x, actorState.y, actor.width, actor.height, topZ, lowerZ, view),
+            targetX,
+            targetY,
+            radiusX,
+            radiusY
+          );
+          maybeAddOccluder(
+            occluders,
+            buildRectEastCoverPolygon(actorState.x, actorState.y, actor.width, actor.height, topZ, lowerZ, view),
+            targetX,
+            targetY,
+            radiusX,
+            radiusY
+          );
+        }
+      }
     }
   }
 
@@ -996,6 +1059,55 @@ function renderMarble(ctx, runtime, view) {
     renderRouteGraph(ctx, runtime, view);
     renderStatus(ctx, runtime, cssWidth);
   }
+
+function buildSouthCoverPolygon(tx, ty, topZ, lowerZ, view) {
+  return [
+    project(tx, ty + 1, topZ, view),
+    project(tx + 1, ty + 1, topZ, view),
+    project(tx + 1, ty + 1, lowerZ, view),
+    project(tx, ty + 1, lowerZ, view)
+  ];
+}
+
+function buildEastCoverPolygon(tx, ty, topZ, lowerZ, view) {
+  return [
+    project(tx + 1, ty, topZ, view),
+    project(tx + 1, ty + 1, topZ, view),
+    project(tx + 1, ty + 1, lowerZ, view),
+    project(tx + 1, ty, lowerZ, view)
+  ];
+}
+
+function buildRectTopPolygon(x, y, width, height, z, view) {
+  return [
+    project(x, y, z, view),
+    project(x + width, y, z, view),
+    project(x + width, y + height, z, view),
+    project(x, y + height, z, view)
+  ];
+}
+
+function buildRectSouthCoverPolygon(x, y, width, height, topZ, lowerZ, view) {
+  return [
+    project(x, y + height, topZ, view),
+    project(x + width, y + height, topZ, view),
+    project(x + width, y + height, lowerZ, view),
+    project(x, y + height, lowerZ, view)
+  ];
+}
+
+function buildRectEastCoverPolygon(x, y, width, height, topZ, lowerZ, view) {
+  return [
+    project(x + width, y, topZ, view),
+    project(x + width, y + height, topZ, view),
+    project(x + width, y + height, lowerZ, view),
+    project(x + width, y, lowerZ, view)
+  ];
+}
+
+function getDynamicCoverLowerZ(baseZ, marbleZ, marbleRadius) {
+  return Math.min(baseZ, marbleZ - marbleRadius * 0.35);
+}
 
   function prepare(runtime) {
     return runtime;
