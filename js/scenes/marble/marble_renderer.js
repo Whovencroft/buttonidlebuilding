@@ -57,7 +57,7 @@ function createView(runtime, cssWidth, cssHeight) {
     tileH,
     heightScale,
     screenCx: cssWidth * 0.5,
-    screenCy: cssHeight * 0.5
+    screenCy: cssHeight * 0.45
   };
 }
 
