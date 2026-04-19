@@ -1091,19 +1091,21 @@
     }
   }
 
-  function addStaticPlatform(level, id, x, y, z, width, height, extra = {}) {
-    addActor(level, {
-      id,
-      kind: ACTOR_KINDS.MOVING_PLATFORM,
-      x,
-      y,
-      z,
-      width,
-      height,
-      topHeight: z,
-      ...extra
-    });
+function addStaticPlatform(level, id, x, y, z, width, height, extra = {}) {
+  const top = z + (extra.thickness ?? 1);
+
+  for (let yy = y; yy < y + height; yy += 1) {
+    for (let xx = x; xx < x + width; xx += 1) {
+      setBlocker(level, xx, yy, {
+        kind: 'overhang',
+        top,
+        walkableTop: false,
+        transparent: !!extra.transparent,
+        data: { id, overhang: true, ...extra.data }
+      });
+    }
   }
+}
 
   function addMovingBridge(level, id, points, width, height, speed = 0.55, extra = {}) {
     addActor(level, {
