@@ -1212,6 +1212,29 @@ function buildSwitchbackDescent() {
           { x: 16, y: 11, z: 6 }
         ]
       }
+
+    });
+    addActor(level, {
+      id: 'platform_d',
+      kind: ACTOR_KINDS.MOVING_PLATFORM,
+      x: 16,
+      y: 8,
+      z: 5,
+      width: 2,
+      height: 2,
+      topHeight: 5,
+      // friction: 0.9,
+      conveyor: { x: 0.25, y: 0, strength: 0.5 },
+      path: {
+        type: 'loop',
+        speed: 0.7,
+        points: [
+          { x: 9, y: 3, z: 4 },
+          { x: 24, y: 6, z: 4 },
+          { x: 24, y: 14, z: 4 },
+          { x: 26, y: 11, z: 4 }
+        ]
+      }
     });
 
     addActor(level, {
@@ -1235,6 +1258,8 @@ function buildSwitchbackDescent() {
     addGraphEdge(level, { from: 'entry', to: 'platform_a', kind: 'platform_transfer' });
     addGraphEdge(level, { from: 'platform_a', to: 'elevator_b', kind: 'platform_transfer' });
     addGraphEdge(level, { from: 'elevator_b', to: 'platform_c', kind: 'platform_transfer' });
+    addGraphEdge(level, { from: 'platform_b', to: 'platform_d', kind: 'platform_transfer' });
+    addGraphEdge(level, { from: 'platform_c', to: 'platform_d', kind: 'platform_transfer' });
     addGraphEdge(level, { from: 'platform_c', to: 'goal', kind: 'timed_cross' });
     return registerLevel(level);
   }
