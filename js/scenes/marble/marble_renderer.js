@@ -53,12 +53,29 @@ function createView(runtime, cssWidth, cssHeight) {
   return {
     camX: runtime.camera?.x ?? runtime.marble.x,
     camY: runtime.camera?.y ?? runtime.marble.y,
+    camZ: getCameraFocusZ(runtime),
     tileW,
     tileH,
     heightScale,
     screenCx: cssWidth * 0.5,
-    screenCy: cssHeight * 0.45
+    screenCy: cssHeight * 0.5
   };
+}
+
+function getCameraFocusZ(runtime) {
+  const marble = runtime.marble;
+  const supportZ = getVisualSupportZ(
+    runtime,
+    marble.x,
+    marble.y,
+    marble.supportRadius,
+    runtime.level.voidFloor ?? -1.5
+  );
+
+  const depthBelowSupport = Math.max(0, supportZ - marble.z);
+  return marble.grounded
+    ? marble.z
+    : marble.z + Math.min(depthBelowSupport * AIRBORNE_RENDER_LIFT_FACTOR, AIRBORNE_RENDER_LIFT_MAX);
 }
 
   function worldProject(x, y, z, view) {
@@ -69,14 +86,14 @@ function createView(runtime, cssWidth, cssHeight) {
     };
   }
 
-  function project(x, y, z, view) {
-    const p = worldProject(x, y, z, view);
-    const cam = worldProject(view.camX, view.camY, 0, view);
-    return {
-      x: view.screenCx + p.x - cam.x,
-      y: view.screenCy + p.y - cam.y
-    };
-  }
+function project(x, y, z, view) {
+  const p = worldProject(x, y, z, view);
+  const cam = worldProject(view.camX, view.camY, view.camZ ?? 0, view);
+  return {
+    x: view.screenCx + p.x - cam.x,
+    y: view.screenCy + p.y - cam.y
+  };
+}
 
   function beginPoly(ctx, points) {
     if (!points?.length) return;
