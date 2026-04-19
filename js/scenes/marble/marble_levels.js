@@ -1220,7 +1220,7 @@ function buildSwitchbackDescent() {
       x: 21,
       y: 8,
       z: 0,
-      width: 2,
+      width: 1,
       height: 2,
       topHeight: 7,
       closedDuration: 1.5,
