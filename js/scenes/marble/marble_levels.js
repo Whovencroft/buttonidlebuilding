@@ -1696,6 +1696,65 @@ function addStaticPlatform(level, id, x, y, z, width, height, extra = {}) {
     return registerLevel(level);
   }
 
+function generateCourseFromSpec(spec = {}) {
+  const width = Math.max(28, Math.floor(spec.width ?? 36));
+  const height = Math.max(20, Math.floor(spec.height ?? 24));
+  const id = spec.id || `generated_${Date.now()}`;
+  const name = spec.name || 'Generated Course';
+
+  const level = createLevelShell({
+    id,
+    name,
+    width,
+    height,
+    killZ: spec.killZ ?? -8,
+    voidFloor: spec.voidFloor ?? -5,
+    start: spec.start ?? { x: 3.5, y: Math.floor(height * 0.5) + 0.5 },
+    reward: spec.reward ?? { presses: 0 },
+    generated: true,
+    generatorSpec: { ...spec },
+    routeGraph: spec.routeGraph ?? { nodes: [], edges: [] },
+    templates: spec.templates ?? ['generated']
+  });
+
+  if (Array.isArray(spec.surface)) {
+    for (const cell of spec.surface) {
+      setSurface(level, cell.x, cell.y, cell.patch ?? cell);
+    }
+  }
+
+  if (Array.isArray(spec.blockers)) {
+    for (const cell of spec.blockers) {
+      setBlocker(level, cell.x, cell.y, cell.patch ?? cell);
+    }
+  }
+
+  if (Array.isArray(spec.triggers)) {
+    for (const cell of spec.triggers) {
+      setTrigger(level, cell.x, cell.y, cell.patch ?? cell);
+    }
+  }
+
+  if (Array.isArray(spec.actors)) {
+    for (const actor of spec.actors) {
+      addActor(level, actor);
+    }
+  }
+
+  if (spec.goal) {
+    setGoal(level, spec.goal.x, spec.goal.y, spec.goal.radius ?? 0.42);
+  }
+
+  return level;
+}
+
+function registerGeneratedLevel(level) {
+  const index = GENERATED_LEVELS.findIndex((item) => item.id === level.id);
+  if (index >= 0) GENERATED_LEVELS.splice(index, 1, level);
+  else GENERATED_LEVELS.push(level);
+  return level;
+}
+
   const LEVELS = [
     buildForkRejoinTest(),
     buildSwitchbackDescent(),
