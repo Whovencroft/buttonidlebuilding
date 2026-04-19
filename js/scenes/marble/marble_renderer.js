@@ -78,6 +78,22 @@ function getCameraFocusZ(runtime) {
     : marble.z + Math.min(depthBelowSupport * AIRBORNE_RENDER_LIFT_FACTOR, AIRBORNE_RENDER_LIFT_MAX);
 }
 
+function getMarbleCoverZ(runtime) {
+  const marble = runtime.marble;
+  const supportZ = getVisualSupportZ(
+    runtime,
+    marble.x,
+    marble.y,
+    marble.supportRadius,
+    runtime.level.voidFloor ?? -1.5
+  );
+
+  const depthBelowSupport = Math.max(0, supportZ - marble.z);
+  return marble.grounded
+    ? marble.z
+    : marble.z + Math.min(depthBelowSupport * AIRBORNE_RENDER_LIFT_FACTOR, AIRBORNE_RENDER_LIFT_MAX);
+}
+
   function worldProject(x, y, z, view) {
     const zScreenX = z * view.heightScale * HEIGHT_AXIS_SCREEN_X_FACTOR;
     return {
@@ -373,15 +389,16 @@ function project(x, y, z, view) {
   }
 
   function marbleUnderTop(marble, minX, minY, maxX, maxY, topZ) {
-    if (topZ <= marble.z + TOP_FACE_Z_EPSILON) return false;
+    if (topZ <= marbleCoverZ + TOP_FACE_Z_EPSILON) return false;
     return (
       marbleOverlapsXSpan(marble.x, marble.collisionRadius, minX, maxX) &&
       marbleOverlapsYSpan(marble.y, marble.collisionRadius, minY, maxY)
     );
   }
 
-  function buildDeferredCoverPlan(runtime) {
-    const marble = runtime.marble;
+function buildDeferredCoverPlan(runtime) {
+  const marble = runtime.marble;
+  const marbleCoverZ = getMarbleCoverZ(runtime);
     const plan = {
       surfaceSouth: new Set(),
       surfaceEast: new Set(),
@@ -413,7 +430,7 @@ function project(x, y, z, view) {
 
         if (
           topZ > southFill + 0.01 &&
-          topZ > marble.z + SIDE_FACE_Z_EPSILON &&
+          topZ > marbleCoverZ + SIDE_FACE_Z_EPSILON &&
           marbleBehindSouthFace(marble, tx, tx + 1, ty + 1)
         ) {
           plan.surfaceSouth.add(key);
@@ -421,7 +438,7 @@ function project(x, y, z, view) {
 
         if (
           topZ > eastFill + 0.01 &&
-          topZ > marble.z + SIDE_FACE_Z_EPSILON &&
+          topZ > marbleCoverZ + SIDE_FACE_Z_EPSILON &&
           marbleBehindEastFace(marble, ty, ty + 1, tx + 1)
         ) {
           plan.surfaceEast.add(key);
@@ -444,7 +461,7 @@ function project(x, y, z, view) {
 
         if (
           topZ > southFill + 0.01 &&
-          topZ > marble.z + SIDE_FACE_Z_EPSILON &&
+          topZ > marbleCoverZ + SIDE_FACE_Z_EPSILON &&
           marbleBehindSouthFace(marble, tx, tx + 1, ty + 1)
         ) {
           plan.blockerSouth.add(key);
@@ -452,7 +469,7 @@ function project(x, y, z, view) {
 
         if (
           topZ > eastFill + 0.01 &&
-          topZ > marble.z + SIDE_FACE_Z_EPSILON &&
+          topZ > marbleCoverZ + SIDE_FACE_Z_EPSILON &&
           marbleBehindEastFace(marble, ty, ty + 1, tx + 1)
         ) {
           plan.blockerEast.add(key);
@@ -479,7 +496,7 @@ function project(x, y, z, view) {
             : actorState.topHeight;
 
         if (
-          topZ > marble.z + SIDE_FACE_Z_EPSILON &&
+          topZ > marbleCoverZ + SIDE_FACE_Z_EPSILON &&
           marbleBehindSouthFace(
             marble,
             actorState.x,
@@ -491,7 +508,7 @@ function project(x, y, z, view) {
         }
 
         if (
-          topZ > marble.z + SIDE_FACE_Z_EPSILON &&
+          topZ > marbleCoverZ + SIDE_FACE_Z_EPSILON &&
           marbleBehindEastFace(
             marble,
             actorState.y,

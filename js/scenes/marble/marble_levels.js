@@ -1044,26 +1044,26 @@
     }, width);
   }
 
-  function wallRing(level, x, y, w, h, top, options = {}) {
-    const gaps = new Set((options.gaps || []).map((gap) => toKey(gap.x, gap.y)));
-    const patch = {
-      kind: options.kind ?? 'wall',
-      top,
-      walkableTop: !!options.walkableTop,
-      transparent: !!options.transparent,
-      data: options.data ?? null
-    };
+function wallRing(level, x, y, w, h, top, options = {}) {
+  const gaps = new Set((options.gaps || []).map((gap) => toKey(gap.x, gap.y)));
+  const patch = {
+    kind: options.kind ?? 'wall',
+    top,
+    walkableTop: options.walkableTop !== false,
+    transparent: !!options.transparent,
+    data: options.data ?? null
+  };
 
-    for (let xx = x; xx < x + w; xx += 1) {
-      if (!gaps.has(toKey(xx, y))) setBlocker(level, xx, y, patch);
-      if (!gaps.has(toKey(xx, y + h - 1))) setBlocker(level, xx, y + h - 1, patch);
-    }
-
-    for (let yy = y; yy < y + h; yy += 1) {
-      if (!gaps.has(toKey(x, yy))) setBlocker(level, x, yy, patch);
-      if (!gaps.has(toKey(x + w - 1, yy))) setBlocker(level, x + w - 1, yy, patch);
-    }
+  for (let xx = x; xx < x + w; xx += 1) {
+    if (!gaps.has(toKey(xx, y))) setBlocker(level, xx, y, patch);
+    if (!gaps.has(toKey(xx, y + h - 1))) setBlocker(level, xx, y + h - 1, patch);
   }
+
+  for (let yy = y; yy < y + h; yy += 1) {
+    if (!gaps.has(toKey(x, yy))) setBlocker(level, x, yy, patch);
+    if (!gaps.has(toKey(x + w - 1, yy))) setBlocker(level, x + w - 1, yy, patch);
+  }
+}
 
   function addHazardRect(level, x, y, w, h, type = 'hazard_strip') {
     for (let yy = y; yy < y + h; yy += 1) {
