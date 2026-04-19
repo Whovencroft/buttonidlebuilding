@@ -1188,7 +1188,7 @@ function buildSwitchbackDescent() {
       width: 2,
       height: 2,
       topHeight: 2,
-      travel: { axis: 'z', min: 2, max: 5, speed: 0.8, cycle: 4.2 }
+      travel: { axis: 'z', min: 2, max: 6, speed: 0.8, cycle: 4.2 }
     });
 
     addActor(level, {
@@ -1206,7 +1206,7 @@ function buildSwitchbackDescent() {
         type: 'loop',
         speed: 0.7,
         points: [
-          { x: 14, y: 8, z: 4 },
+          { x: 14, y: 6, z: 4 },
           { x: 19, y: 8, z: 5 },
           { x: 19, y: 11, z: 5 },
           { x: 16, y: 11, z: 6 }
