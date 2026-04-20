@@ -44,55 +44,52 @@
     };
   }
 
-function createView(runtime, cssWidth, cssHeight) {
-  const base = Math.min(cssWidth, cssHeight);
-  const tileW = Math.max(54, Math.min(110, Math.min(cssWidth / 10.5, cssHeight / 6.8, base / 5.8)));
-  const tileH = tileW * 0.5;
-  const heightScale = tileH * 0.92;
+  function getVisualSupportZ(runtime, x, y, radius, fallbackZ) {
+    const offsets = [[0, 0], [radius, 0], [-radius, 0], [0, radius], [0, -radius]];
+    for (const [ox, oy] of offsets) {
+      const sample = window.MarbleLevels.sampleVisualSurface(runtime.level, x + ox, y + oy, runtime.dynamicState);
+      if (sample) return sample.z;
+    }
+    return fallbackZ;
+  }
 
-  return {
-    camX: runtime.camera?.x ?? runtime.marble.x,
-    camY: runtime.camera?.y ?? runtime.marble.y,
-    camZ: getCameraFocusZ(runtime),
-    tileW,
-    tileH,
-    heightScale,
-    screenCx: cssWidth * 0.5,
-    screenCy: cssHeight * 0.5
-  };
-}
+  function getCameraFocusZ(runtime) {
+    const marble = runtime.marble;
+    const supportZ = getVisualSupportZ(
+      runtime,
+      marble.x,
+      marble.y,
+      marble.supportRadius,
+      runtime.level.voidFloor ?? -1.5
+    );
 
-function getCameraFocusZ(runtime) {
-  const marble = runtime.marble;
-  const supportZ = getVisualSupportZ(
-    runtime,
-    marble.x,
-    marble.y,
-    marble.supportRadius,
-    runtime.level.voidFloor ?? -1.5
-  );
+    const depthBelowSupport = Math.max(0, supportZ - marble.z);
+    return marble.grounded
+      ? marble.z
+      : marble.z + Math.min(depthBelowSupport * AIRBORNE_RENDER_LIFT_FACTOR, AIRBORNE_RENDER_LIFT_MAX);
+  }
 
-  const depthBelowSupport = Math.max(0, supportZ - marble.z);
-  return marble.grounded
-    ? marble.z
-    : marble.z + Math.min(depthBelowSupport * AIRBORNE_RENDER_LIFT_FACTOR, AIRBORNE_RENDER_LIFT_MAX);
-}
+  function getMarbleCoverZ(runtime) {
+    return getCameraFocusZ(runtime);
+  }
 
-function getMarbleCoverZ(runtime) {
-  const marble = runtime.marble;
-  const supportZ = getVisualSupportZ(
-    runtime,
-    marble.x,
-    marble.y,
-    marble.supportRadius,
-    runtime.level.voidFloor ?? -1.5
-  );
+  function createView(runtime, cssWidth, cssHeight) {
+    const base = Math.min(cssWidth, cssHeight);
+    const tileW = Math.max(54, Math.min(110, Math.min(cssWidth / 10.5, cssHeight / 6.8, base / 5.8)));
+    const tileH = tileW * 0.5;
+    const heightScale = tileH * 0.92;
 
-  const depthBelowSupport = Math.max(0, supportZ - marble.z);
-  return marble.grounded
-    ? marble.z
-    : marble.z + Math.min(depthBelowSupport * AIRBORNE_RENDER_LIFT_FACTOR, AIRBORNE_RENDER_LIFT_MAX);
-}
+    return {
+      camX: runtime.camera?.x ?? runtime.marble.x,
+      camY: runtime.camera?.y ?? runtime.marble.y,
+      camZ: getCameraFocusZ(runtime),
+      tileW,
+      tileH,
+      heightScale,
+      screenCx: cssWidth * 0.5,
+      screenCy: cssHeight * 0.5
+    };
+  }
 
   function worldProject(x, y, z, view) {
     const zScreenX = z * view.heightScale * HEIGHT_AXIS_SCREEN_X_FACTOR;
@@ -102,14 +99,14 @@ function getMarbleCoverZ(runtime) {
     };
   }
 
-function project(x, y, z, view) {
-  const p = worldProject(x, y, z, view);
-  const cam = worldProject(view.camX, view.camY, view.camZ ?? 0, view);
-  return {
-    x: view.screenCx + p.x - cam.x,
-    y: view.screenCy + p.y - cam.y
-  };
-}
+  function project(x, y, z, view) {
+    const p = worldProject(x, y, z, view);
+    const cam = worldProject(view.camX, view.camY, view.camZ ?? 0, view);
+    return {
+      x: view.screenCx + p.x - cam.x,
+      y: view.screenCy + p.y - cam.y
+    };
+  }
 
   function beginPoly(ctx, points) {
     if (!points?.length) return;
@@ -347,15 +344,6 @@ function project(x, y, z, view) {
     return tiles;
   }
 
-  function getVisualSupportZ(runtime, x, y, radius, fallbackZ) {
-    const offsets = [[0, 0], [radius, 0], [-radius, 0], [0, radius], [0, -radius]];
-    for (const [ox, oy] of offsets) {
-      const sample = window.MarbleLevels.sampleVisualSurface(runtime.level, x + ox, y + oy, runtime.dynamicState);
-      if (sample) return sample.z;
-    }
-    return fallbackZ;
-  }
-
   function getPlayerReferenceZ(runtime) {
     return getVisualSupportZ(
       runtime,
@@ -388,17 +376,17 @@ function project(x, y, z, view) {
     return marble.x < faceX - FACE_PLANE_EPSILON;
   }
 
-  function marbleUnderTop(marble, minX, minY, maxX, maxY, topZ) {
-    if (topZ <= marbleCoverZ + TOP_FACE_Z_EPSILON) return false;
+  function marbleUnderTop(marble, minX, minY, maxX, maxY, topZ, coverZ) {
+    if (topZ <= coverZ + TOP_FACE_Z_EPSILON) return false;
     return (
       marbleOverlapsXSpan(marble.x, marble.collisionRadius, minX, maxX) &&
       marbleOverlapsYSpan(marble.y, marble.collisionRadius, minY, maxY)
     );
   }
 
-function buildDeferredCoverPlan(runtime) {
-  const marble = runtime.marble;
-  const marbleCoverZ = getMarbleCoverZ(runtime);
+  function buildDeferredCoverPlan(runtime) {
+    const marble = runtime.marble;
+    const marbleCoverZ = getMarbleCoverZ(runtime);
     const plan = {
       surfaceSouth: new Set(),
       surfaceEast: new Set(),
@@ -444,7 +432,7 @@ function buildDeferredCoverPlan(runtime) {
           plan.surfaceEast.add(key);
         }
 
-        if (marbleUnderTop(marble, tx, ty, tx + 1, ty + 1, topZ)) {
+        if (marbleUnderTop(marble, tx, ty, tx + 1, ty + 1, topZ, marbleCoverZ)) {
           plan.surfaceTop.add(key);
         }
       }
@@ -475,7 +463,7 @@ function buildDeferredCoverPlan(runtime) {
           plan.blockerEast.add(key);
         }
 
-        if (marbleUnderTop(marble, tx, ty, tx + 1, ty + 1, topZ)) {
+        if (marbleUnderTop(marble, tx, ty, tx + 1, ty + 1, topZ, marbleCoverZ)) {
           plan.blockerTop.add(key);
         }
       }
@@ -526,7 +514,8 @@ function buildDeferredCoverPlan(runtime) {
             actorState.y,
             actorState.x + actor.width,
             actorState.y + actor.height,
-            topZ
+            topZ,
+            marbleCoverZ
           )
         ) {
           plan.actorTop.add(actor.id);
