@@ -154,6 +154,16 @@
     return { penetration, normal };
   }
 
+   function isSecurelyOnBlockerTop(x, y, radius, tx, ty) {
+    const inset = Math.min(0.24, Math.max(0.14, radius * 0.9));
+    return (
+      x >= tx + inset &&
+      x <= tx + 1 - inset &&
+      y >= ty + inset &&
+      y <= ty + 1 - inset
+    );
+  }
+
   function getStaticBlockingOverlaps(runtime, x, y, zCheck, radius, supportZ) {
     const level = runtime.level;
     const overlaps = [];
@@ -168,10 +178,20 @@
         const blocker = window.MarbleLevels.getBlockerCell(level, tx, ty);
         if (!blocker) continue;
         if (marbleBottom > blocker.top + 0.04) continue;
-        if (blocker.walkableTop && supportZ !== null && supportZ !== undefined && supportZ >= blocker.top - 0.04) continue;
+
+        const standingSecurelyOnTop =
+          blocker.walkableTop &&
+          supportZ !== null &&
+          supportZ !== undefined &&
+          supportZ >= blocker.top - 0.04 &&
+          marbleBottom >= blocker.top - 0.08 &&
+          isSecurelyOnBlockerTop(x, y, radius, tx, ty);
+
+        if (standingSecurelyOnTop) continue;
 
         const overlap = rectCircleOverlapData(tx, ty, tx + 1, ty + 1, x, y, radius);
         if (!overlap) continue;
+
         overlaps.push({
           penetration: overlap.penetration,
           normal: overlap.normal,
@@ -185,7 +205,7 @@
 
     return overlaps;
   }
-
+  
   function combineCollisionNormal(overlaps) {
     if (!overlaps.length) return null;
     let nx = 0;

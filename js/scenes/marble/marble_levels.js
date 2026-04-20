@@ -551,6 +551,17 @@
     return best;
   }
 
+  const BLOCKER_TOP_SUPPORT_INSET = 0.18;
+
+  function isPointSecurelyOnBlockerTop(tx, ty, x, y, inset = BLOCKER_TOP_SUPPORT_INSET) {
+    return (
+      x >= tx + inset &&
+      x <= tx + 1 - inset &&
+      y >= ty + inset &&
+      y <= ty + 1 - inset
+    );
+  }
+
   function sampleWalkableSurface(level, x, y, options = {}) {
     const runtime = options.runtime ?? null;
     const tx = Math.floor(x);
@@ -560,7 +571,10 @@
     const staticSurface = sampleStaticSurfaceOnly(level, runtime, x, y);
 
     let blockerSurface = null;
-    if (blocker?.walkableTop) {
+    if (
+      blocker?.walkableTop &&
+      isPointSecurelyOnBlockerTop(tx, ty, x, y, options.blockerInset ?? BLOCKER_TOP_SUPPORT_INSET)
+    ) {
       blockerSurface = {
         source: 'blocker',
         cell: blocker,
