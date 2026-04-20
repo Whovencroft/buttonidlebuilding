@@ -1065,6 +1065,17 @@ function wallRing(level, x, y, w, h, top, options = {}) {
   }
 }
 
+function addHazardRect(level, x, y, w, h, type = 'hazard_strip') {
+  for (let yy = y; yy < y + h; yy += 1) {
+    for (let xx = x; xx < x + w; xx += 1) {
+      setTrigger(level, xx, yy, {
+        kind: 'hazard',
+        data: { type }
+      });
+    }
+  }
+}
+
   function buildStairRun(level, x, y, length, dir, startHeight, step = -1, width = 3, extra = {}) {
     for (let i = 0; i < length; i += 1) {
       const h = startHeight + (step * i);
