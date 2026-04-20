@@ -384,147 +384,151 @@
     );
   }
 
-  function buildDeferredCoverPlan(runtime) {
-    const marble = runtime.marble;
-    const marbleCoverZ = getMarbleCoverZ(runtime);
-    const plan = {
-      surfaceSouth: new Set(),
-      surfaceEast: new Set(),
-      surfaceTop: new Set(),
-      blockerSouth: new Set(),
-      blockerEast: new Set(),
-      blockerTop: new Set(),
-      actorSouth: new Set(),
-      actorEast: new Set(),
-      actorTop: new Set()
-    };
+function buildDeferredCoverPlan(runtime) {
+  const marble = runtime.marble;
+  const marbleCoverZ = getMarbleCoverZ(runtime);
+  const plan = {
+    surfaceSouth: new Set(),
+    surfaceEast: new Set(),
+    surfaceTop: new Set(),
+    blockerSouth: new Set(),
+    blockerEast: new Set(),
+    blockerTop: new Set(),
+    actorSouth: new Set(),
+    actorEast: new Set(),
+    actorTop: new Set()
+  };
 
-    const tiles = getTileDrawOrder(runtime.level);
+  const tiles = getTileDrawOrder(runtime.level);
 
-    for (const { tx, ty } of tiles) {
-      const key = tileKey(tx, ty);
+  for (const { tx, ty } of tiles) {
+    const key = tileKey(tx, ty);
 
-      const surface = window.MarbleLevels.getSurfaceCell(runtime.level, tx, ty);
-      if (surface && surface.kind !== 'void') {
-        const topZ = window.MarbleLevels.getFillTopAtCell(runtime.level, tx, ty, {
-          runtime: runtime.dynamicState
-        });
-        const southFill = window.MarbleLevels.getFillTopAtCell(runtime.level, tx, ty + 1, {
-          runtime: runtime.dynamicState
-        });
-        const eastFill = window.MarbleLevels.getFillTopAtCell(runtime.level, tx + 1, ty, {
-          runtime: runtime.dynamicState
-        });
+    const surface = window.MarbleLevels.getSurfaceCell(runtime.level, tx, ty);
+    if (surface && surface.kind !== 'void') {
+      const topZ = window.MarbleLevels.getFillTopAtCell(runtime.level, tx, ty, {
+        runtime: runtime.dynamicState
+      });
+      const southFill = window.MarbleLevels.getFillTopAtCell(runtime.level, tx, ty + 1, {
+        runtime: runtime.dynamicState
+      });
+      const eastFill = window.MarbleLevels.getFillTopAtCell(runtime.level, tx + 1, ty, {
+        runtime: runtime.dynamicState
+      });
 
-        if (
-          topZ > southFill + 0.01 &&
-          topZ > marbleCoverZ + SIDE_FACE_Z_EPSILON &&
-          marbleBehindSouthFace(marble, tx, tx + 1, ty + 1)
-        ) {
-          plan.surfaceSouth.add(key);
-        }
+      const behindSouth =
+        topZ > southFill + 0.01 &&
+        topZ > marbleCoverZ + SIDE_FACE_Z_EPSILON &&
+        marbleBehindSouthFace(marble, tx, tx + 1, ty + 1);
 
-        if (
-          topZ > eastFill + 0.01 &&
-          topZ > marbleCoverZ + SIDE_FACE_Z_EPSILON &&
-          marbleBehindEastFace(marble, ty, ty + 1, tx + 1)
-        ) {
-          plan.surfaceEast.add(key);
-        }
+      const behindEast =
+        topZ > eastFill + 0.01 &&
+        topZ > marbleCoverZ + SIDE_FACE_Z_EPSILON &&
+        marbleBehindEastFace(marble, ty, ty + 1, tx + 1);
 
-        if (marbleUnderTop(marble, tx, ty, tx + 1, ty + 1, topZ, marbleCoverZ)) {
-          plan.surfaceTop.add(key);
-        }
-      }
+      const underTop =
+        marbleUnderTop(marble, tx, ty, tx + 1, ty + 1, topZ, marbleCoverZ);
 
-      const blocker = window.MarbleLevels.getBlockerCell(runtime.level, tx, ty);
-      if (blocker) {
-        const topZ = blocker.top;
-        const southFill = window.MarbleLevels.getFillTopAtCell(runtime.level, tx, ty + 1, {
-          runtime: runtime.dynamicState
-        });
-        const eastFill = window.MarbleLevels.getFillTopAtCell(runtime.level, tx + 1, ty, {
-          runtime: runtime.dynamicState
-        });
+      if (behindSouth) plan.surfaceSouth.add(key);
+      if (behindEast) plan.surfaceEast.add(key);
 
-        if (
-          topZ > southFill + 0.01 &&
-          topZ > marbleCoverZ + SIDE_FACE_Z_EPSILON &&
-          marbleBehindSouthFace(marble, tx, tx + 1, ty + 1)
-        ) {
-          plan.blockerSouth.add(key);
-        }
-
-        if (
-          topZ > eastFill + 0.01 &&
-          topZ > marbleCoverZ + SIDE_FACE_Z_EPSILON &&
-          marbleBehindEastFace(marble, ty, ty + 1, tx + 1)
-        ) {
-          plan.blockerEast.add(key);
-        }
-
-        if (marbleUnderTop(marble, tx, ty, tx + 1, ty + 1, topZ, marbleCoverZ)) {
-          plan.blockerTop.add(key);
-        }
+      if (underTop) {
+        plan.surfaceTop.add(key);
+        if (topZ > southFill + 0.01) plan.surfaceSouth.add(key);
+        if (topZ > eastFill + 0.01) plan.surfaceEast.add(key);
       }
     }
 
-    for (const actor of runtime.level.actors) {
-      const actorState = runtime.dynamicState.actors[actor.id];
-      if (!actorState || actorState.active === false) continue;
+    const blocker = window.MarbleLevels.getBlockerCell(runtime.level, tx, ty);
+    if (blocker) {
+      const topZ = blocker.top;
+      const southFill = window.MarbleLevels.getFillTopAtCell(runtime.level, tx, ty + 1, {
+        runtime: runtime.dynamicState
+      });
+      const eastFill = window.MarbleLevels.getFillTopAtCell(runtime.level, tx + 1, ty, {
+        runtime: runtime.dynamicState
+      });
 
-      if (
-        actor.kind === window.MarbleLevels.ACTOR_KINDS.MOVING_PLATFORM ||
-        actor.kind === window.MarbleLevels.ACTOR_KINDS.ELEVATOR ||
-        actor.kind === window.MarbleLevels.ACTOR_KINDS.TIMED_GATE
-      ) {
-        const topZ =
-          actor.kind === window.MarbleLevels.ACTOR_KINDS.TIMED_GATE
-            ? actor.topHeight
-            : actorState.topHeight;
+      const behindSouth =
+        topZ > southFill + 0.01 &&
+        topZ > marbleCoverZ + SIDE_FACE_Z_EPSILON &&
+        marbleBehindSouthFace(marble, tx, tx + 1, ty + 1);
 
-        if (
-          topZ > marbleCoverZ + SIDE_FACE_Z_EPSILON &&
-          marbleBehindSouthFace(
-            marble,
-            actorState.x,
-            actorState.x + actor.width,
-            actorState.y + actor.height
-          )
-        ) {
-          plan.actorSouth.add(actor.id);
-        }
+      const behindEast =
+        topZ > eastFill + 0.01 &&
+        topZ > marbleCoverZ + SIDE_FACE_Z_EPSILON &&
+        marbleBehindEastFace(marble, ty, ty + 1, tx + 1);
 
-        if (
-          topZ > marbleCoverZ + SIDE_FACE_Z_EPSILON &&
-          marbleBehindEastFace(
-            marble,
-            actorState.y,
-            actorState.y + actor.height,
-            actorState.x + actor.width
-          )
-        ) {
-          plan.actorEast.add(actor.id);
-        }
+      const underTop =
+        marbleUnderTop(marble, tx, ty, tx + 1, ty + 1, topZ, marbleCoverZ);
 
-        if (
-          marbleUnderTop(
-            marble,
-            actorState.x,
-            actorState.y,
-            actorState.x + actor.width,
-            actorState.y + actor.height,
-            topZ,
-            marbleCoverZ
-          )
-        ) {
-          plan.actorTop.add(actor.id);
-        }
+      if (behindSouth) plan.blockerSouth.add(key);
+      if (behindEast) plan.blockerEast.add(key);
+
+      if (underTop) {
+        plan.blockerTop.add(key);
+        if (topZ > southFill + 0.01) plan.blockerSouth.add(key);
+        if (topZ > eastFill + 0.01) plan.blockerEast.add(key);
       }
     }
-
-    return plan;
   }
+
+  for (const actor of runtime.level.actors) {
+    const actorState = runtime.dynamicState.actors[actor.id];
+    if (!actorState || actorState.active === false) continue;
+
+    if (
+      actor.kind === window.MarbleLevels.ACTOR_KINDS.MOVING_PLATFORM ||
+      actor.kind === window.MarbleLevels.ACTOR_KINDS.ELEVATOR ||
+      actor.kind === window.MarbleLevels.ACTOR_KINDS.TIMED_GATE
+    ) {
+      const topZ =
+        actor.kind === window.MarbleLevels.ACTOR_KINDS.TIMED_GATE
+          ? actor.topHeight
+          : actorState.topHeight;
+
+      const behindSouth =
+        topZ > marbleCoverZ + SIDE_FACE_Z_EPSILON &&
+        marbleBehindSouthFace(
+          marble,
+          actorState.x,
+          actorState.x + actor.width,
+          actorState.y + actor.height
+        );
+
+      const behindEast =
+        topZ > marbleCoverZ + SIDE_FACE_Z_EPSILON &&
+        marbleBehindEastFace(
+          marble,
+          actorState.y,
+          actorState.y + actor.height,
+          actorState.x + actor.width
+        );
+
+      const underTop =
+        marbleUnderTop(
+          marble,
+          actorState.x,
+          actorState.y,
+          actorState.x + actor.width,
+          actorState.y + actor.height,
+          topZ,
+          marbleCoverZ
+        );
+
+      if (behindSouth) plan.actorSouth.add(actor.id);
+      if (behindEast) plan.actorEast.add(actor.id);
+
+      if (underTop) {
+        plan.actorTop.add(actor.id);
+        plan.actorSouth.add(actor.id);
+        plan.actorEast.add(actor.id);
+      }
+    }
+  }
+
+  return plan;
+}
 
   function renderSurfaceSouthFace(ctx, runtime, tx, ty, view, baseColor) {
     const fillTop = window.MarbleLevels.getFillTopAtCell(runtime.level, tx, ty, {

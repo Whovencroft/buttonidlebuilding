@@ -551,7 +551,7 @@
     return best;
   }
 
-  const BLOCKER_TOP_SUPPORT_INSET = 0.18;
+  const BLOCKER_TOP_SUPPORT_INSET = 0.26;
 
   function isPointSecurelyOnBlockerTop(tx, ty, x, y, inset = BLOCKER_TOP_SUPPORT_INSET) {
     return (
