@@ -354,16 +354,18 @@
     );
   }
 
-function addNeighborBlockerCoverFaces(runtime, marble, marbleCoverZ, plan, tx, ty) {
+function addNeighborSurfaceCoverFaces(runtime, marble, marbleCoverZ, plan, tx, ty) {
   for (let oy = -1; oy <= 1; oy += 1) {
     for (let ox = -1; ox <= 1; ox += 1) {
       const nx = tx + ox;
       const ny = ty + oy;
-      const blocker = window.MarbleLevels.getBlockerCell(runtime.level, nx, ny);
-      if (!blocker) continue;
+      const surface = window.MarbleLevels.getSurfaceCell(runtime.level, nx, ny);
+      if (!surface || surface.kind === 'void') continue;
 
       const key = tileKey(nx, ny);
-      const topZ = blocker.top;
+      const topZ = window.MarbleLevels.getFillTopAtCell(runtime.level, nx, ny, {
+        runtime: runtime.dynamicState
+      });
       if (topZ <= marbleCoverZ + SIDE_FACE_Z_EPSILON) continue;
 
       const southFill = window.MarbleLevels.getFillTopAtCell(runtime.level, nx, ny + 1, {
@@ -379,10 +381,10 @@ function addNeighborBlockerCoverFaces(runtime, marble, marbleCoverZ, plan, tx, t
 
       if (!overlapsFootprint) continue;
 
-      if (topZ > southFill + 0.01) plan.blockerSouth.add(key);
-      if (topZ > eastFill + 0.01) plan.blockerEast.add(key);
+      if (topZ > southFill + 0.01) plan.surfaceSouth.add(key);
+      if (topZ > eastFill + 0.01) plan.surfaceEast.add(key);
       if (marbleUnderTop(marble, nx, ny, nx + 1, ny + 1, topZ, marbleCoverZ)) {
-        plan.blockerTop.add(key);
+        plan.surfaceTop.add(key);
       }
     }
   }
@@ -587,10 +589,17 @@ function buildDeferredCoverPlan(runtime) {
       if (behindSouth) plan.surfaceSouth.add(key);
       if (behindEast) plan.surfaceEast.add(key);
 
+if (behindSouth) plan.surfaceSouth.add(key);
+if (behindEast) plan.surfaceEast.add(key);
+
 if (underTop) {
-  plan.blockerTop.add(key);
-  if (topZ > southFill + 0.01) plan.blockerSouth.add(key);
-  if (topZ > eastFill + 0.01) plan.blockerEast.add(key);
+  plan.surfaceTop.add(key);
+  if (topZ > southFill + 0.01) plan.surfaceSouth.add(key);
+  if (topZ > eastFill + 0.01) plan.surfaceEast.add(key);
+}
+
+if (behindSouth || behindEast || underTop) {
+  addNeighborSurfaceCoverFaces(runtime, marble, marbleCoverZ, plan, tx, ty);
 }
     }
 
@@ -1057,70 +1066,79 @@ if (underTop) {
     ctx.stroke();
   }
 
-  function renderDeferredCoverPass(ctx, runtime, view, playerReferenceZ, deferPlan) {
-    const tiles = getTileDrawOrder(runtime.level);
+function renderDeferredCoverPass(ctx, runtime, view, playerReferenceZ, deferPlan, marbleRender) {
+  if (!marbleRender) return;
 
-    for (const { tx, ty } of tiles) {
-      const key = tileKey(tx, ty);
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(marbleRender.ball.x, marbleRender.ball.y, marbleRender.radius + 1.5, 0, Math.PI * 2);
+  ctx.clip();
 
-      const surface = window.MarbleLevels.getSurfaceCell(runtime.level, tx, ty);
-      if (surface && surface.kind !== 'void') {
-        const top = buildSurfaceTopPolygon(runtime.level, runtime, tx, ty, view);
-        if (top) {
-          const trigger = window.MarbleLevels.getTriggerCell(runtime.level, tx, ty);
-          const baseColor = getSurfaceBaseColor(surface, trigger);
+  const tiles = getTileDrawOrder(runtime.level);
 
-          if (deferPlan.surfaceSouth.has(key)) {
-            renderSurfaceSouthFace(ctx, runtime, tx, ty, view, baseColor);
-          }
-          if (deferPlan.surfaceEast.has(key)) {
-            renderSurfaceEastFace(ctx, runtime, tx, ty, view, baseColor);
-          }
-          if (deferPlan.surfaceTop.has(key)) {
-            renderSurfaceTopFace(ctx, runtime, tx, ty, view, playerReferenceZ, surface, top, baseColor, trigger);
-          }
+  for (const { tx, ty } of tiles) {
+    const key = tileKey(tx, ty);
+
+    const surface = window.MarbleLevels.getSurfaceCell(runtime.level, tx, ty);
+    if (surface && surface.kind !== 'void') {
+      const top = buildSurfaceTopPolygon(runtime.level, runtime, tx, ty, view);
+      if (top) {
+        const trigger = window.MarbleLevels.getTriggerCell(runtime.level, tx, ty);
+        const baseColor = getSurfaceBaseColor(surface, trigger);
+
+        if (deferPlan.surfaceSouth.has(key)) {
+          renderSurfaceSouthFace(ctx, runtime, tx, ty, view, baseColor);
         }
-      }
-
-      const blocker = window.MarbleLevels.getBlockerCell(runtime.level, tx, ty);
-      if (blocker) {
-        const baseColor = blocker.transparent ? '#64748b' : '#334155';
-
-        if (deferPlan.blockerSouth.has(key)) {
-          renderBlockerSouthFace(ctx, runtime, tx, ty, view, baseColor, blocker.top);
+        if (deferPlan.surfaceEast.has(key)) {
+          renderSurfaceEastFace(ctx, runtime, tx, ty, view, baseColor);
         }
-        if (deferPlan.blockerEast.has(key)) {
-          renderBlockerEastFace(ctx, runtime, tx, ty, view, baseColor, blocker.top);
-        }
-        if (deferPlan.blockerTop.has(key)) {
-          renderBlockerTopFace(ctx, tx, ty, blocker.top, view, baseColor);
+        if (deferPlan.surfaceTop.has(key)) {
+          renderSurfaceTopFace(ctx, runtime, tx, ty, view, playerReferenceZ, surface, top, baseColor, trigger);
         }
       }
     }
 
-    const actors = [...runtime.level.actors];
-    actors.sort((a, b) => {
-      const sa = runtime.dynamicState.actors[a.id];
-      const sb = runtime.dynamicState.actors[b.id];
-      return (sa.x + sa.y) - (sb.x + sb.y);
-    });
+    const blocker = window.MarbleLevels.getBlockerCell(runtime.level, tx, ty);
+    if (blocker) {
+      const baseColor = blocker.transparent ? '#64748b' : '#334155';
 
-    for (const actor of actors) {
-      const actorState = runtime.dynamicState.actors[actor.id];
-      if (!actorState || actorState.active === false) continue;
-      const color = getActorColor(actor);
-
-      if (deferPlan.actorSouth.has(actor.id)) {
-        renderActorSouthFace(ctx, actor, actorState, view, color);
+      if (deferPlan.blockerSouth.has(key)) {
+        renderBlockerSouthFace(ctx, runtime, tx, ty, view, baseColor, blocker.top);
       }
-      if (deferPlan.actorEast.has(actor.id)) {
-        renderActorEastFace(ctx, actor, actorState, view, color);
+      if (deferPlan.blockerEast.has(key)) {
+        renderBlockerEastFace(ctx, runtime, tx, ty, view, baseColor, blocker.top);
       }
-      if (deferPlan.actorTop.has(actor.id)) {
-        renderActorTopFace(ctx, actor, actorState, view, playerReferenceZ, color);
+      if (deferPlan.blockerTop.has(key)) {
+        renderBlockerTopFace(ctx, tx, ty, blocker.top, view, baseColor);
       }
     }
   }
+
+  const actors = [...runtime.level.actors];
+  actors.sort((a, b) => {
+    const sa = runtime.dynamicState.actors[a.id];
+    const sb = runtime.dynamicState.actors[b.id];
+    return (sa.x + sa.y) - (sb.x + sb.y);
+  });
+
+  for (const actor of actors) {
+    const actorState = runtime.dynamicState.actors[actor.id];
+    if (!actorState || actorState.active === false) continue;
+    const color = getActorColor(actor);
+
+    if (deferPlan.actorSouth.has(actor.id)) {
+      renderActorSouthFace(ctx, actor, actorState, view, color);
+    }
+    if (deferPlan.actorEast.has(actor.id)) {
+      renderActorEastFace(ctx, actor, actorState, view, color);
+    }
+    if (deferPlan.actorTop.has(actor.id)) {
+      renderActorTopFace(ctx, actor, actorState, view, playerReferenceZ, color);
+    }
+  }
+
+  ctx.restore();
+}
 
   function renderGoal(ctx, runtime, view) {
     const goal = runtime.level.goal;
@@ -1232,6 +1250,7 @@ function draw(runtime, canvas) {
   const view = createView(runtime, cssWidth, cssHeight);
   const playerReferenceZ = getPlayerReferenceZ(runtime);
   const deferPlan = buildDeferredCoverPlan(runtime);
+  const marbleRender = getMarbleRenderData(runtime, view);
 
   ctx.clearRect(0, 0, cssWidth, cssHeight);
   renderBackground(ctx, cssWidth, cssHeight);
@@ -1239,7 +1258,7 @@ function draw(runtime, canvas) {
   renderActors(ctx, runtime, view, playerReferenceZ, deferPlan);
   renderGoal(ctx, runtime, view);
   renderMarble(ctx, runtime, view);
-  renderDeferredCoverPass(ctx, runtime, view, playerReferenceZ, deferPlan);
+  renderDeferredCoverPass(ctx, runtime, view, playerReferenceZ, deferPlan, marbleRender);
   renderRouteGraph(ctx, runtime, view);
   renderStatus(ctx, runtime, cssWidth);
 }
