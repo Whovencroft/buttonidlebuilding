@@ -603,7 +603,7 @@
     return sampleWalkableSurface(level, x, y, { runtime });
   }
 
-  function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, options = {}) {
+function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, options = {}) {
   const minRatio = options.minRatio ?? 0.45;
   const runtime = options.runtime ?? null;
 
@@ -674,6 +674,20 @@
 
   const coherentSamples = samples.filter((sample) => Math.abs(sample.z - anchorZ) <= 0.9);
   if (!coherentSamples.length) return null;
+
+  const coherentBlockerWeight = coherentSamples
+    .filter((sample) => sample.source === 'blocker')
+    .reduce((sum, sample) => sum + sample._weight, 0);
+
+  const coherentNonBlockerWeight = coherentSamples
+    .filter((sample) => sample.source !== 'blocker')
+    .reduce((sum, sample) => sum + sample._weight, 0);
+
+  if (coherentBlockerWeight > coherentNonBlockerWeight) {
+    if (!center || center.source !== 'blocker') {
+      return null;
+    }
+  }
 
   let gx = 0;
   let gy = 0;

@@ -354,6 +354,40 @@
     );
   }
 
+function addNeighborBlockerCoverFaces(runtime, marble, marbleCoverZ, plan, tx, ty) {
+  for (let oy = -1; oy <= 1; oy += 1) {
+    for (let ox = -1; ox <= 1; ox += 1) {
+      const nx = tx + ox;
+      const ny = ty + oy;
+      const blocker = window.MarbleLevels.getBlockerCell(runtime.level, nx, ny);
+      if (!blocker) continue;
+
+      const key = tileKey(nx, ny);
+      const topZ = blocker.top;
+      if (topZ <= marbleCoverZ + SIDE_FACE_Z_EPSILON) continue;
+
+      const southFill = window.MarbleLevels.getFillTopAtCell(runtime.level, nx, ny + 1, {
+        runtime: runtime.dynamicState
+      });
+      const eastFill = window.MarbleLevels.getFillTopAtCell(runtime.level, nx + 1, ny, {
+        runtime: runtime.dynamicState
+      });
+
+      const overlapsFootprint =
+        marbleOverlapsXSpan(marble.x, marble.collisionRadius, nx, nx + 1) &&
+        marbleOverlapsYSpan(marble.y, marble.collisionRadius, ny, ny + 1);
+
+      if (!overlapsFootprint) continue;
+
+      if (topZ > southFill + 0.01) plan.blockerSouth.add(key);
+      if (topZ > eastFill + 0.01) plan.blockerEast.add(key);
+      if (marbleUnderTop(marble, nx, ny, nx + 1, ny + 1, topZ, marbleCoverZ)) {
+        plan.blockerTop.add(key);
+      }
+    }
+  }
+}
+
   function tileKey(tx, ty) {
     return `${tx},${ty}`;
   }
@@ -432,11 +466,12 @@ function buildDeferredCoverPlan(runtime) {
       if (behindSouth) plan.surfaceSouth.add(key);
       if (behindEast) plan.surfaceEast.add(key);
 
-      if (underTop) {
-        plan.surfaceTop.add(key);
-        if (topZ > southFill + 0.01) plan.surfaceSouth.add(key);
-        if (topZ > eastFill + 0.01) plan.surfaceEast.add(key);
-      }
+if (underTop) {
+  plan.blockerTop.add(key);
+  if (topZ > southFill + 0.01) plan.blockerSouth.add(key);
+  if (topZ > eastFill + 0.01) plan.blockerEast.add(key);
+  addNeighborBlockerCoverFaces(runtime, marble, marbleCoverZ, plan, tx, ty);
+}
     }
 
     const blocker = window.MarbleLevels.getBlockerCell(runtime.level, tx, ty);
