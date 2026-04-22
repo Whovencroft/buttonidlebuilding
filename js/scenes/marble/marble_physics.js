@@ -332,61 +332,88 @@ const standingSecurelyOnTop =
   clampSpeed(marble, MAX_AIR_SPEED);
 }
 
-  function moveGrounded(runtime, dt) {
-    const marble = runtime.marble;
-    let currentSurface = getGroundSupport(runtime, marble.x, marble.y, marble.supportRadius);
-    if (!currentSurface) {
-      marble.grounded = false;
-      return null;
-    }
-
-    window.MarbleLevels.resolveSupportInteraction(runtime, currentSurface);
-    const totalDx = marble.vx * dt;
-    const totalDy = marble.vy * dt;
-    const steps = Math.max(1, Math.ceil(Math.hypot(totalDx, totalDy) / MOVE_STEP));
-    const stepDt = dt / steps;
-
-    for (let i = 0; i < steps; i += 1) {
-      const stepDx = marble.vx * stepDt;
-      const stepDy = marble.vy * stepDt;
-      const previewSurface = getGroundSupport(runtime, marble.x + stepDx, marble.y + stepDy, marble.supportRadius);
-      const transition = classifySurfaceTransition(currentSurface, previewSurface);
-      const collisionSupportZ = transition === 'ground' ? previewSurface.z : currentSurface.z;
-      const resolved = resolveSweptBlockerMovement(runtime, marble.x, marble.y, stepDx, stepDy, marble.z, collisionSupportZ);
-
-      marble.x = resolved.x;
-      marble.y = resolved.y;
-      if (resolved.collided && resolved.normal) {
-        const adjusted = removeIntoWallComponent(marble.vx, marble.vy, resolved.normal);
-        marble.vx = adjusted.vx;
-        marble.vy = adjusted.vy;
-      }
-
-      const landedSurface = getGroundSupport(runtime, marble.x, marble.y, marble.supportRadius);
-      const landedTransition = classifySurfaceTransition(currentSurface, landedSurface);
-      if (landedTransition === 'ground' && landedSurface) {
-        currentSurface = landedSurface;
-        marble.grounded = true;
-        marble.z = currentSurface.z + marble.collisionRadius;
-        marble.vz = 0;
-        continue;
-      }
-
-      if (landedTransition === 'air') {
-    marble.vx *= LEDGE_FALL_HORIZONTAL_DAMPING;
-    marble.vy *= LEDGE_FALL_HORIZONTAL_DAMPING;
-    marble.vz = Math.min(marble.vz, LEDGE_FALL_DOWNWARD_KICK);
+function moveGrounded(runtime, dt) {
+  const marble = runtime.marble;
+  let currentSurface = getGroundSupport(runtime, marble.x, marble.y, marble.supportRadius);
+  if (!currentSurface) {
     marble.grounded = false;
     return null;
   }
 
+  window.MarbleLevels.resolveSupportInteraction(runtime, currentSurface);
+  const totalDx = marble.vx * dt;
+  const totalDy = marble.vy * dt;
+  const steps = Math.max(1, Math.ceil(Math.hypot(totalDx, totalDy) / MOVE_STEP));
+  const stepDt = dt / steps;
+
+  for (let i = 0; i < steps; i += 1) {
+    const startX = marble.x;
+    const startY = marble.y;
+
+    const stepDx = marble.vx * stepDt;
+    const stepDy = marble.vy * stepDt;
+    const previewSurface = getGroundSupport(runtime, marble.x + stepDx, marble.y + stepDy, marble.supportRadius);
+    const transition = classifySurfaceTransition(currentSurface, previewSurface);
+    const collisionSupportZ = transition === 'ground' && previewSurface ? previewSurface.z : currentSurface.z;
+
+    const resolved = resolveSweptBlockerMovement(runtime, marble.x, marble.y, stepDx, stepDy, marble.z, collisionSupportZ);
+
+    marble.x = resolved.x;
+    marble.y = resolved.y;
+
+    if (resolved.collided && resolved.normal) {
+      const adjusted = removeIntoWallComponent(marble.vx, marble.vy, resolved.normal);
+      marble.vx = adjusted.vx;
+      marble.vy = adjusted.vy;
+    }
+
+    const landedSurface = getGroundSupport(runtime, marble.x, marble.y, marble.supportRadius);
+
+    if (
+      landedSurface &&
+      !landedSurface.landingPad &&
+      landedSurface.z - currentSurface.z > MAX_STEP_UP + 0.01
+    ) {
+      marble.x = startX;
+      marble.y = startY;
+
+      const len = Math.hypot(stepDx, stepDy) || 1;
+      const blockNormal = { x: -stepDx / len, y: -stepDy / len };
+      const adjusted = removeIntoWallComponent(marble.vx, marble.vy, blockNormal);
+      marble.vx = adjusted.vx;
+      marble.vy = adjusted.vy;
+
       marble.grounded = true;
       marble.z = currentSurface.z + marble.collisionRadius;
       marble.vz = 0;
+      continue;
     }
 
-    return currentSurface;
+    const landedTransition = classifySurfaceTransition(currentSurface, landedSurface);
+
+    if (landedTransition === 'ground' && landedSurface) {
+      currentSurface = landedSurface;
+      marble.grounded = true;
+      marble.z = currentSurface.z + marble.collisionRadius;
+      marble.vz = 0;
+      continue;
+    }
+
+    if (landedTransition === 'air') {
+      marble.vx *= LEDGE_FALL_HORIZONTAL_DAMPING;
+      marble.vy *= LEDGE_FALL_HORIZONTAL_DAMPING;
+      marble.vz = Math.min(marble.vz, LEDGE_FALL_DOWNWARD_KICK);
+      marble.grounded = false;
+      return null;
+    }
+
+    marble.grounded = true;
+    marble.z = currentSurface.z + marble.collisionRadius;
+    marble.vz = 0;
   }
+
+  return currentSurface;
+}
 
   function moveAirborne(runtime, dt) {
     const marble = runtime.marble;
