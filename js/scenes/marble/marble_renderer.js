@@ -442,14 +442,14 @@
   }
 
   function marbleBehindSouthCover(marble, minX, maxX, faceY) {
-    if (!marbleOverlapsXSpan(marble.x, marble.collisionRadius * 1.2, minX, maxX)) return false;
-    return marble.y < faceY + marble.collisionRadius * 0.8;
-  }
+  if (!marbleOverlapsXSpan(marble.x, marble.collisionRadius, minX, maxX)) return false;
+  return marble.y <= faceY - FACE_PLANE_EPSILON;
+}
 
-  function marbleBehindEastCover(marble, minY, maxY, faceX) {
-    if (!marbleOverlapsYSpan(marble.y, marble.collisionRadius * 1.2, minY, maxY)) return false;
-    return marble.x < faceX + marble.collisionRadius * 0.8;
-  }
+function marbleBehindEastCover(marble, minY, maxY, faceX) {
+  if (!marbleOverlapsYSpan(marble.y, marble.collisionRadius, minY, maxY)) return false;
+  return marble.x <= faceX - FACE_PLANE_EPSILON;
+}
 
   function pointInPolygon(px, py, polygon) {
     let inside = false;
@@ -467,6 +467,33 @@
     }
     return inside;
   }
+
+function expandSouthCoverPolygon(points, amount) {
+  if (!points || points.length !== 4) return points;
+  return [
+    { x: points[0].x - amount * 0.30, y: points[0].y - amount * 0.10 },
+    { x: points[1].x + amount * 0.30, y: points[1].y - amount * 0.10 },
+    { x: points[2].x + amount * 0.18, y: points[2].y + amount * 0.95 },
+    { x: points[3].x - amount * 0.18, y: points[3].y + amount * 0.95 }
+  ];
+}
+
+function expandEastCoverPolygon(points, amount) {
+  if (!points || points.length !== 4) return points;
+  return [
+    { x: points[0].x - amount * 0.10, y: points[0].y - amount * 0.12 },
+    { x: points[1].x + amount * 0.34, y: points[1].y - amount * 0.16 },
+    { x: points[2].x + amount * 0.95, y: points[2].y + amount * 0.18 },
+    { x: points[3].x - amount * 0.08, y: points[3].y + amount * 0.18 }
+  ];
+}
+
+function fillCoverPolygon(ctx, points, fillStyle) {
+  if (!points || points.length < 3) return;
+  beginPoly(ctx, points);
+  ctx.fillStyle = fillStyle;
+  ctx.fill();
+}
 
   function pointSegmentDistanceSq(px, py, ax, ay, bx, by) {
     const abx = bx - ax;
@@ -905,141 +932,56 @@
   }
 
   function renderDeferredCoverPass(ctx, runtime, view, playerReferenceZ, marbleRender) {
-    if (!marbleRender) return;
+  if (!marbleRender) return;
 
-    const marble = runtime.marble;
-    const marbleCoverZ = getMarbleCoverZ(runtime);
-    const cx = marbleRender.ball.x;
-    const cy = marbleRender.ball.y;
-    const radius = marbleRender.radius + 1.5;
+  const marble = runtime.marble;
+  const marbleCoverZ = getMarbleCoverZ(runtime);
+  const cx = marbleRender.ball.x;
+  const cy = marbleRender.ball.y;
+  const radius = marbleRender.radius + 1.5;
+  const coverExpand = marbleRender.radius * 0.48;
 
-    const clipToMarble = (drawFn) => {
-      ctx.save();
-      ctx.beginPath();
-      ctx.arc(cx, cy, radius, 0, Math.PI * 2);
-      ctx.clip();
-      drawFn();
-      ctx.restore();
-    };
+  const clipToMarble = (drawFn) => {
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+    ctx.clip();
+    drawFn();
+    ctx.restore();
+  };
 
-    const tiles = getTileDrawOrder(runtime.level);
+  const tiles = getTileDrawOrder(runtime.level);
 
-    for (const { tx, ty } of tiles) {
-      const surface = window.MarbleLevels.getSurfaceCell(runtime.level, tx, ty);
-      if (surface && surface.kind !== 'void') {
-        const topZ = window.MarbleLevels.getFillTopAtCell(runtime.level, tx, ty, {
-          runtime: runtime.dynamicState
-        });
-        const topPoly = buildSurfaceTopPolygon(runtime.level, runtime, tx, ty, view);
-        const southPoly = buildSurfaceSouthPolygon(runtime, tx, ty, view);
-        const eastPoly = buildSurfaceEastPolygon(runtime, tx, ty, view);
-        const trigger = window.MarbleLevels.getTriggerCell(runtime.level, tx, ty);
-        const baseColor = getSurfaceBaseColor(surface, trigger);
-
-        if (
-          southPoly &&
-          topZ > marbleCoverZ + SIDE_FACE_Z_EPSILON &&
-          marbleBehindSouthCover(marble, tx, tx + 1, ty + 1) &&
-          circleIntersectsPolygon(cx, cy, radius, southPoly)
-        ) {
-          clipToMarble(() => renderSurfaceSouthFace(ctx, runtime, tx, ty, view, baseColor));
-        }
-
-        if (
-          eastPoly &&
-          topZ > marbleCoverZ + SIDE_FACE_Z_EPSILON &&
-          marbleBehindEastCover(marble, ty, ty + 1, tx + 1) &&
-          circleIntersectsPolygon(cx, cy, radius, eastPoly)
-        ) {
-          clipToMarble(() => renderSurfaceEastFace(ctx, runtime, tx, ty, view, baseColor));
-        }
-
-        if (
-          topPoly &&
-          topZ > marbleCoverZ + TOP_FACE_Z_EPSILON &&
-          circleIntersectsPolygon(cx, cy, radius, topPoly)
-        ) {
-          clipToMarble(() => renderSurfaceTopFace(ctx, runtime, tx, ty, view, playerReferenceZ, surface, topPoly, baseColor, trigger));
-        }
-      }
-
-      const blocker = window.MarbleLevels.getBlockerCell(runtime.level, tx, ty);
-      if (blocker) {
-        const topZ = blocker.top;
-        const topPoly = buildBlockerTopPolygon(tx, ty, topZ, view);
-        const southPoly = buildBlockerSouthPolygon(runtime, tx, ty, topZ, view);
-        const eastPoly = buildBlockerEastPolygon(runtime, tx, ty, topZ, view);
-        const baseColor = blocker.transparent ? '#64748b' : '#334155';
-
-        if (
-          southPoly &&
-          topZ > marbleCoverZ + SIDE_FACE_Z_EPSILON &&
-          marbleBehindSouthCover(marble, tx, tx + 1, ty + 1) &&
-          circleIntersectsPolygon(cx, cy, radius, southPoly)
-        ) {
-          clipToMarble(() => renderBlockerSouthFace(ctx, runtime, tx, ty, view, baseColor, topZ));
-        }
-
-        if (
-          eastPoly &&
-          topZ > marbleCoverZ + SIDE_FACE_Z_EPSILON &&
-          marbleBehindEastCover(marble, ty, ty + 1, tx + 1) &&
-          circleIntersectsPolygon(cx, cy, radius, eastPoly)
-        ) {
-          clipToMarble(() => renderBlockerEastFace(ctx, runtime, tx, ty, view, baseColor, topZ));
-        }
-
-        if (
-          topPoly &&
-          topZ > marbleCoverZ + TOP_FACE_Z_EPSILON &&
-          circleIntersectsPolygon(cx, cy, radius, topPoly)
-        ) {
-          clipToMarble(() => renderBlockerTopFace(ctx, tx, ty, topZ, view, baseColor));
-        }
-      }
-    }
-
-    const actors = [...runtime.level.actors];
-    actors.sort((a, b) => {
-      const sa = runtime.dynamicState.actors[a.id];
-      const sb = runtime.dynamicState.actors[b.id];
-      return (sa.x + sa.y) - (sb.x + sb.y);
-    });
-
-    for (const actor of actors) {
-      const actorState = runtime.dynamicState.actors[actor.id];
-      if (!actorState || actorState.active === false) continue;
+  for (const { tx, ty } of tiles) {
+    const surface = window.MarbleLevels.getSurfaceCell(runtime.level, tx, ty);
+    if (surface && surface.kind !== 'void') {
+      const topZ = window.MarbleLevels.getFillTopAtCell(runtime.level, tx, ty, {
+        runtime: runtime.dynamicState
+      });
+      const topPoly = buildSurfaceTopPolygon(runtime.level, runtime, tx, ty, view);
+      const southPoly = buildSurfaceSouthPolygon(runtime, tx, ty, view);
+      const eastPoly = buildSurfaceEastPolygon(runtime, tx, ty, view);
+      const southCoverPoly = southPoly ? expandSouthCoverPolygon(southPoly, coverExpand) : null;
+      const eastCoverPoly = eastPoly ? expandEastCoverPolygon(eastPoly, coverExpand) : null;
+      const trigger = window.MarbleLevels.getTriggerCell(runtime.level, tx, ty);
+      const baseColor = getSurfaceBaseColor(surface, trigger);
 
       if (
-        actor.kind !== window.MarbleLevels.ACTOR_KINDS.MOVING_PLATFORM &&
-        actor.kind !== window.MarbleLevels.ACTOR_KINDS.ELEVATOR &&
-        actor.kind !== window.MarbleLevels.ACTOR_KINDS.TIMED_GATE
-      ) {
-        continue;
-      }
-
-      const topZ = actorTopZ(actor, actorState);
-      const color = getActorColor(actor);
-      const topPoly = buildActorTopPolygon(actor, actorState, view);
-      const southPoly = buildActorSouthPolygon(actor, actorState, view);
-      const eastPoly = buildActorEastPolygon(actor, actorState, view);
-
-      if (
-        southPoly &&
+        southCoverPoly &&
         topZ > marbleCoverZ + SIDE_FACE_Z_EPSILON &&
-        marbleBehindSouthCover(marble, actorState.x, actorState.x + actor.width, actorState.y + actor.height) &&
-        circleIntersectsPolygon(cx, cy, radius, southPoly)
+        marbleBehindSouthCover(marble, tx, tx + 1, ty + 1) &&
+        circleIntersectsPolygon(cx, cy, radius, southCoverPoly)
       ) {
-        clipToMarble(() => renderActorSouthFace(ctx, actor, actorState, view, color));
+        clipToMarble(() => fillCoverPolygon(ctx, southCoverPoly, darken(baseColor, 0.58)));
       }
 
       if (
-        eastPoly &&
+        eastCoverPoly &&
         topZ > marbleCoverZ + SIDE_FACE_Z_EPSILON &&
-        marbleBehindEastCover(marble, actorState.y, actorState.y + actor.height, actorState.x + actor.width) &&
-        circleIntersectsPolygon(cx, cy, radius, eastPoly)
+        marbleBehindEastCover(marble, ty, ty + 1, tx + 1) &&
+        circleIntersectsPolygon(cx, cy, radius, eastCoverPoly)
       ) {
-        clipToMarble(() => renderActorEastFace(ctx, actor, actorState, view, color));
+        clipToMarble(() => fillCoverPolygon(ctx, eastCoverPoly, darken(baseColor, 0.72)));
       }
 
       if (
@@ -1047,10 +989,102 @@
         topZ > marbleCoverZ + TOP_FACE_Z_EPSILON &&
         circleIntersectsPolygon(cx, cy, radius, topPoly)
       ) {
-        clipToMarble(() => renderActorTopFace(ctx, actor, actorState, view, playerReferenceZ, color));
+        clipToMarble(() => renderSurfaceTopFace(ctx, runtime, tx, ty, view, playerReferenceZ, surface, topPoly, baseColor, trigger));
+      }
+    }
+
+    const blocker = window.MarbleLevels.getBlockerCell(runtime.level, tx, ty);
+    if (blocker) {
+      const topZ = blocker.top;
+      const topPoly = buildBlockerTopPolygon(tx, ty, topZ, view);
+      const southPoly = buildBlockerSouthPolygon(runtime, tx, ty, topZ, view);
+      const eastPoly = buildBlockerEastPolygon(runtime, tx, ty, topZ, view);
+      const southCoverPoly = southPoly ? expandSouthCoverPolygon(southPoly, coverExpand) : null;
+      const eastCoverPoly = eastPoly ? expandEastCoverPolygon(eastPoly, coverExpand) : null;
+      const baseColor = blocker.transparent ? '#64748b' : '#334155';
+
+      if (
+        southCoverPoly &&
+        topZ > marbleCoverZ + SIDE_FACE_Z_EPSILON &&
+        marbleBehindSouthCover(marble, tx, tx + 1, ty + 1) &&
+        circleIntersectsPolygon(cx, cy, radius, southCoverPoly)
+      ) {
+        clipToMarble(() => fillCoverPolygon(ctx, southCoverPoly, darken(baseColor, 0.55)));
+      }
+
+      if (
+        eastCoverPoly &&
+        topZ > marbleCoverZ + SIDE_FACE_Z_EPSILON &&
+        marbleBehindEastCover(marble, ty, ty + 1, tx + 1) &&
+        circleIntersectsPolygon(cx, cy, radius, eastCoverPoly)
+      ) {
+        clipToMarble(() => fillCoverPolygon(ctx, eastCoverPoly, darken(baseColor, 0.70)));
+      }
+
+      if (
+        topPoly &&
+        topZ > marbleCoverZ + TOP_FACE_Z_EPSILON &&
+        circleIntersectsPolygon(cx, cy, radius, topPoly)
+      ) {
+        clipToMarble(() => renderBlockerTopFace(ctx, tx, ty, topZ, view, baseColor));
       }
     }
   }
+
+  const actors = [...runtime.level.actors];
+  actors.sort((a, b) => {
+    const sa = runtime.dynamicState.actors[a.id];
+    const sb = runtime.dynamicState.actors[b.id];
+    return (sa.x + sa.y) - (sb.x + sb.y);
+  });
+
+  for (const actor of actors) {
+    const actorState = runtime.dynamicState.actors[actor.id];
+    if (!actorState || actorState.active === false) continue;
+
+    if (
+      actor.kind !== window.MarbleLevels.ACTOR_KINDS.MOVING_PLATFORM &&
+      actor.kind !== window.MarbleLevels.ACTOR_KINDS.ELEVATOR &&
+      actor.kind !== window.MarbleLevels.ACTOR_KINDS.TIMED_GATE
+    ) {
+      continue;
+    }
+
+    const topZ = actorTopZ(actor, actorState);
+    const color = getActorColor(actor);
+    const topPoly = buildActorTopPolygon(actor, actorState, view);
+    const southPoly = buildActorSouthPolygon(actor, actorState, view);
+    const eastPoly = buildActorEastPolygon(actor, actorState, view);
+    const southCoverPoly = southPoly ? expandSouthCoverPolygon(southPoly, coverExpand) : null;
+    const eastCoverPoly = eastPoly ? expandEastCoverPolygon(eastPoly, coverExpand) : null;
+
+    if (
+      southCoverPoly &&
+      topZ > marbleCoverZ + SIDE_FACE_Z_EPSILON &&
+      marbleBehindSouthCover(marble, actorState.x, actorState.x + actor.width, actorState.y + actor.height) &&
+      circleIntersectsPolygon(cx, cy, radius, southCoverPoly)
+    ) {
+      clipToMarble(() => fillCoverPolygon(ctx, southCoverPoly, darken(color, 0.58)));
+    }
+
+    if (
+      eastCoverPoly &&
+      topZ > marbleCoverZ + SIDE_FACE_Z_EPSILON &&
+      marbleBehindEastCover(marble, actorState.y, actorState.y + actor.height, actorState.x + actor.width) &&
+      circleIntersectsPolygon(cx, cy, radius, eastCoverPoly)
+    ) {
+      clipToMarble(() => fillCoverPolygon(ctx, eastCoverPoly, darken(color, 0.72)));
+    }
+
+    if (
+      topPoly &&
+      topZ > marbleCoverZ + TOP_FACE_Z_EPSILON &&
+      circleIntersectsPolygon(cx, cy, radius, topPoly)
+    ) {
+      clipToMarble(() => renderActorTopFace(ctx, actor, actorState, view, playerReferenceZ, color));
+    }
+  }
+}
 
   function renderGoal(ctx, runtime, view) {
     const goal = runtime.level.goal;
