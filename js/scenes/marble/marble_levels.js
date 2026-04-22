@@ -1075,9 +1075,41 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
 function wallRing(level, x, y, w, h, top, options = {}) {
   const gaps = new Set((options.gaps || []).map((gap) => toKey(gap.x, gap.y)));
   const patch = {
+    kind: options.kind ?? 'track',
+    baseHeight: top,
+    shape: SHAPES.FLAT,
+    friction: options.friction ?? 1,
+    conveyor: null,
+    bounce: options.bounce ?? 0,
+    crumble: null,
+    failType: null,
+    landingPad: false,
+    data: options.data ?? null
+  };
+
+  function place(xx, yy) {
+    if (gaps.has(toKey(xx, yy))) return;
+    setSurface(level, xx, yy, patch);
+    clearBlocker(level, xx, yy);
+  }
+
+  for (let xx = x; xx < x + w; xx += 1) {
+    place(xx, y);
+    place(xx, y + h - 1);
+  }
+
+  for (let yy = y; yy < y + h; yy += 1) {
+    place(x, yy);
+    place(x + w - 1, yy);
+  }
+}
+
+function blockerRing(level, x, y, w, h, top, options = {}) {
+  const gaps = new Set((options.gaps || []).map((gap) => toKey(gap.x, gap.y)));
+  const patch = {
     kind: options.kind ?? 'wall',
     top,
-    walkableTop: options.walkableTop !== false,
+    walkableTop: !!options.walkableTop,
     transparent: !!options.transparent,
     data: options.data ?? null
   };
