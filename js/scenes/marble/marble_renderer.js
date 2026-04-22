@@ -441,14 +441,24 @@
     );
   }
 
-  function marbleBehindSouthCover(marble, minX, maxX, faceY) {
-  if (!marbleOverlapsXSpan(marble.x, marble.collisionRadius, minX, maxX)) return false;
-  return marble.y <= faceY - FACE_PLANE_EPSILON;
+ function marbleBehindSouthCover(marble, minX, maxX, faceY) {
+  const seamPad = Math.max(0.08, marble.collisionRadius * 0.55);
+  const planePad = Math.max(0.02, marble.collisionRadius * 0.14);
+
+  if ((marble.x + marble.collisionRadius) <= (minX - seamPad)) return false;
+  if ((marble.x - marble.collisionRadius) >= (maxX + seamPad)) return false;
+
+  return marble.y <= faceY + planePad;
 }
 
 function marbleBehindEastCover(marble, minY, maxY, faceX) {
-  if (!marbleOverlapsYSpan(marble.y, marble.collisionRadius, minY, maxY)) return false;
-  return marble.x <= faceX - FACE_PLANE_EPSILON;
+  const seamPad = Math.max(0.08, marble.collisionRadius * 0.55);
+  const planePad = Math.max(0.02, marble.collisionRadius * 0.14);
+
+  if ((marble.y + marble.collisionRadius) <= (minY - seamPad)) return false;
+  if ((marble.y - marble.collisionRadius) >= (maxY + seamPad)) return false;
+
+  return marble.x <= faceX + planePad;
 }
 
   function pointInPolygon(px, py, polygon) {
