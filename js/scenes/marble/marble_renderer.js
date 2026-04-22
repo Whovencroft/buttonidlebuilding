@@ -591,7 +591,6 @@ if (underTop) {
   plan.blockerTop.add(key);
   if (topZ > southFill + 0.01) plan.blockerSouth.add(key);
   if (topZ > eastFill + 0.01) plan.blockerEast.add(key);
-  addNeighborBlockerCoverFaces(runtime, marble, marbleCoverZ, plan, tx, ty);
 }
     }
 
@@ -978,43 +977,6 @@ if (underTop) {
     ctx.fill();
   }
 
-function renderTerrain(ctx, runtime, view, playerReferenceZ, marbleScreenY, layer = 'all') {
-  const tiles = getTileDrawOrder(runtime.level);
-
-  for (const { tx, ty } of tiles) {
-    const depthY = Math.max(
-      getSurfaceTileDepthY(runtime, tx, ty, view),
-      getBlockerTileDepthY(runtime, tx, ty, view)
-    );
-
-    if (layer === 'back' && depthY > marbleScreenY - 0.5) continue;
-    if (layer === 'front' && depthY <= marbleScreenY - 0.5) continue;
-
-    renderSurfaceTile(ctx, runtime, tx, ty, view, playerReferenceZ, null);
-    renderBlockerTile(ctx, runtime, tx, ty, view, null);
-  }
-}
-
-function renderActors(ctx, runtime, view, playerReferenceZ, marbleScreenY, layer = 'all') {
-  const actors = [...runtime.level.actors];
-
-  actors.sort((a, b) => {
-    const sa = runtime.dynamicState.actors[a.id];
-    const sb = runtime.dynamicState.actors[b.id];
-    return getActorDepthY(a, sa, view) - getActorDepthY(b, sb, view);
-  });
-
-  for (const actor of actors) {
-    const actorState = runtime.dynamicState.actors[actor.id];
-    if (!actorState || actorState.active === false) continue;
-
-    const depthY = getActorDepthY(actor, actorState, view);
-    if (layer === 'back' && depthY > marbleScreenY - 0.5) continue;
-    if (layer === 'front' && depthY <= marbleScreenY - 0.5) continue;
-
-    renderActor(ctx, runtime, actor, view, playerReferenceZ, null);
-  }
-}
 
   function getShadowScreenPosition(baseShadow, heightAboveSurface, view) {
     if (SHADOW_MODE !== 'light' || heightAboveSurface <= 0.0001) {
@@ -1242,26 +1204,42 @@ function renderActors(ctx, runtime, view, playerReferenceZ, marbleScreenY, layer
     ctx.restore();
   }
 
+function renderTerrain(ctx, runtime, view, playerReferenceZ, deferPlan = null) {
+  const tiles = getTileDrawOrder(runtime.level);
+  for (const { tx, ty } of tiles) {
+    renderSurfaceTile(ctx, runtime, tx, ty, view, playerReferenceZ, deferPlan);
+    renderBlockerTile(ctx, runtime, tx, ty, view, deferPlan);
+  }
+}
+
+function renderActors(ctx, runtime, view, playerReferenceZ, deferPlan = null) {
+  const actors = [...runtime.level.actors];
+  actors.sort((a, b) => {
+    const sa = runtime.dynamicState.actors[a.id];
+    const sb = runtime.dynamicState.actors[b.id];
+    return (sa.x + sa.y) - (sb.x + sb.y);
+  });
+
+  for (const actor of actors) {
+    renderActor(ctx, runtime, actor, view, playerReferenceZ, deferPlan);
+  }
+}
+
 function draw(runtime, canvas) {
   if (!runtime || !canvas) return;
 
   const { ctx, cssWidth, cssHeight } = fitCanvasToDisplay(canvas);
   const view = createView(runtime, cssWidth, cssHeight);
   const playerReferenceZ = getPlayerReferenceZ(runtime);
-  const marbleRender = getMarbleRenderData(runtime, view);
+  const deferPlan = buildDeferredCoverPlan(runtime);
 
   ctx.clearRect(0, 0, cssWidth, cssHeight);
   renderBackground(ctx, cssWidth, cssHeight);
-
-  renderTerrain(ctx, runtime, view, playerReferenceZ, marbleRender.ball.y, 'back');
-  renderActors(ctx, runtime, view, playerReferenceZ, marbleRender.ball.y, 'back');
-
-  renderMarble(ctx, runtime, view);
-
-  renderTerrain(ctx, runtime, view, playerReferenceZ, marbleRender.ball.y, 'front');
-  renderActors(ctx, runtime, view, playerReferenceZ, marbleRender.ball.y, 'front');
-
+  renderTerrain(ctx, runtime, view, playerReferenceZ, deferPlan);
+  renderActors(ctx, runtime, view, playerReferenceZ, deferPlan);
   renderGoal(ctx, runtime, view);
+  renderMarble(ctx, runtime, view);
+  renderDeferredCoverPass(ctx, runtime, view, playerReferenceZ, deferPlan);
   renderRouteGraph(ctx, runtime, view);
   renderStatus(ctx, runtime, cssWidth);
 }
