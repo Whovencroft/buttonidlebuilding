@@ -586,9 +586,6 @@ function buildDeferredCoverPlan(runtime) {
       const underTop =
         marbleUnderTop(marble, tx, ty, tx + 1, ty + 1, topZ, marbleCoverZ);
 
-      if (behindSouth) plan.surfaceSouth.add(key);
-      if (behindEast) plan.surfaceEast.add(key);
-
 if (behindSouth) plan.surfaceSouth.add(key);
 if (behindEast) plan.surfaceEast.add(key);
 
@@ -1069,10 +1066,14 @@ if (behindSouth || behindEast || underTop) {
 function renderDeferredCoverPass(ctx, runtime, view, playerReferenceZ, deferPlan, marbleRender) {
   if (!marbleRender) return;
 
-  ctx.save();
-  ctx.beginPath();
-  ctx.arc(marbleRender.ball.x, marbleRender.ball.y, marbleRender.radius + 1.5, 0, Math.PI * 2);
-  ctx.clip();
+  const clipToMarble = (drawFn) => {
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(marbleRender.ball.x, marbleRender.ball.y, marbleRender.radius + 1.5, 0, Math.PI * 2);
+    ctx.clip();
+    drawFn();
+    ctx.restore();
+  };
 
   const tiles = getTileDrawOrder(runtime.level);
 
@@ -1087,13 +1088,13 @@ function renderDeferredCoverPass(ctx, runtime, view, playerReferenceZ, deferPlan
         const baseColor = getSurfaceBaseColor(surface, trigger);
 
         if (deferPlan.surfaceSouth.has(key)) {
-          renderSurfaceSouthFace(ctx, runtime, tx, ty, view, baseColor);
+          clipToMarble(() => renderSurfaceSouthFace(ctx, runtime, tx, ty, view, baseColor));
         }
         if (deferPlan.surfaceEast.has(key)) {
-          renderSurfaceEastFace(ctx, runtime, tx, ty, view, baseColor);
+          clipToMarble(() => renderSurfaceEastFace(ctx, runtime, tx, ty, view, baseColor));
         }
         if (deferPlan.surfaceTop.has(key)) {
-          renderSurfaceTopFace(ctx, runtime, tx, ty, view, playerReferenceZ, surface, top, baseColor, trigger);
+          clipToMarble(() => renderSurfaceTopFace(ctx, runtime, tx, ty, view, playerReferenceZ, surface, top, baseColor, trigger));
         }
       }
     }
@@ -1103,13 +1104,13 @@ function renderDeferredCoverPass(ctx, runtime, view, playerReferenceZ, deferPlan
       const baseColor = blocker.transparent ? '#64748b' : '#334155';
 
       if (deferPlan.blockerSouth.has(key)) {
-        renderBlockerSouthFace(ctx, runtime, tx, ty, view, baseColor, blocker.top);
+        clipToMarble(() => renderBlockerSouthFace(ctx, runtime, tx, ty, view, baseColor, blocker.top));
       }
       if (deferPlan.blockerEast.has(key)) {
-        renderBlockerEastFace(ctx, runtime, tx, ty, view, baseColor, blocker.top);
+        clipToMarble(() => renderBlockerEastFace(ctx, runtime, tx, ty, view, baseColor, blocker.top));
       }
       if (deferPlan.blockerTop.has(key)) {
-        renderBlockerTopFace(ctx, tx, ty, blocker.top, view, baseColor);
+        clipToMarble(() => renderBlockerTopFace(ctx, tx, ty, blocker.top, view, baseColor));
       }
     }
   }
@@ -1127,17 +1128,15 @@ function renderDeferredCoverPass(ctx, runtime, view, playerReferenceZ, deferPlan
     const color = getActorColor(actor);
 
     if (deferPlan.actorSouth.has(actor.id)) {
-      renderActorSouthFace(ctx, actor, actorState, view, color);
+      clipToMarble(() => renderActorSouthFace(ctx, actor, actorState, view, color));
     }
     if (deferPlan.actorEast.has(actor.id)) {
-      renderActorEastFace(ctx, actor, actorState, view, color);
+      clipToMarble(() => renderActorEastFace(ctx, actor, actorState, view, color));
     }
     if (deferPlan.actorTop.has(actor.id)) {
-      renderActorTopFace(ctx, actor, actorState, view, playerReferenceZ, color);
+      clipToMarble(() => renderActorTopFace(ctx, actor, actorState, view, playerReferenceZ, color));
     }
   }
-
-  ctx.restore();
 }
 
   function renderGoal(ctx, runtime, view) {
@@ -1254,8 +1253,9 @@ function draw(runtime, canvas) {
 
   ctx.clearRect(0, 0, cssWidth, cssHeight);
   renderBackground(ctx, cssWidth, cssHeight);
-  renderTerrain(ctx, runtime, view, playerReferenceZ, deferPlan);
-  renderActors(ctx, runtime, view, playerReferenceZ, deferPlan);
+
+  renderTerrain(ctx, runtime, view, playerReferenceZ, null);
+  renderActors(ctx, runtime, view, playerReferenceZ, null);
   renderGoal(ctx, runtime, view);
   renderMarble(ctx, runtime, view);
   renderDeferredCoverPass(ctx, runtime, view, playerReferenceZ, deferPlan, marbleRender);
