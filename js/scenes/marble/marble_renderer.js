@@ -442,7 +442,7 @@
   }
 
  function marbleBehindSouthCover(marble, minX, maxX, faceY) {
-  const seamPad = Math.max(0.08, marble.collisionRadius * 0.55);
+  const seamPad = Math.max(0.08, marble.collisionRadius * 0.65);
   const planePad = Math.max(0.02, marble.collisionRadius * 0.14);
 
   if ((marble.x + marble.collisionRadius) <= (minX - seamPad)) return false;
