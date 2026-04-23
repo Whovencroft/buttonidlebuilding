@@ -558,203 +558,211 @@
     return Math.abs(a - b) <= epsilon;
   }
 
-  function buildMergedSurfaceSouthSpans(runtime, view) {
-    const spans = [];
-    const level = runtime.level;
+function buildMergedSurfaceSouthSpans(runtime, view) {
+  const spans = [];
+  const level = runtime.level;
 
-    for (let ty = 0; ty < level.height; ty += 1) {
-      let tx = 0;
+  for (let ty = 0; ty < level.height; ty += 1) {
+    let tx = 0;
 
-      while (tx < level.width) {
-        const surface = window.MarbleLevels.getSurfaceCell(level, tx, ty);
-        if (!surface || surface.kind === 'void') {
-          tx += 1;
-          continue;
-        }
-
-        const topZ = window.MarbleLevels.getFillTopAtCell(level, tx, ty, {
-          runtime: runtime.dynamicState
-        });
-        const lowZ = window.MarbleLevels.getFillTopAtCell(level, tx, ty + 1, {
-          runtime: runtime.dynamicState
-        });
-
-        if (topZ <= lowZ + 0.01) {
-          tx += 1;
-          continue;
-        }
-
-        const trigger = window.MarbleLevels.getTriggerCell(level, tx, ty);
-        const baseColor = getSurfaceBaseColor(surface, trigger);
-        const lowSurface = window.MarbleLevels.getSurfaceCell(level, tx, ty + 1);
-        const external = !lowSurface || lowSurface.kind === 'void';
-
-        let endX = tx;
-
-        while (endX + 1 < level.width) {
-          const nextSurface = window.MarbleLevels.getSurfaceCell(level, endX + 1, ty);
-          if (!nextSurface || nextSurface.kind === 'void') break;
-
-          const nextTopZ = window.MarbleLevels.getFillTopAtCell(level, endX + 1, ty, {
-            runtime: runtime.dynamicState
-          });
-          const nextLowZ = window.MarbleLevels.getFillTopAtCell(level, endX + 1, ty + 1, {
-            runtime: runtime.dynamicState
-          });
-
-          if (nextTopZ <= nextLowZ + 0.01) break;
-          if (!sameHeight(nextTopZ, topZ) || !sameHeight(nextLowZ, lowZ)) break;
-
-          const nextTrigger = window.MarbleLevels.getTriggerCell(level, endX + 1, ty);
-          const nextBaseColor = getSurfaceBaseColor(nextSurface, nextTrigger);
-          if (nextBaseColor !== baseColor) break;
-
-          const nextLowSurface = window.MarbleLevels.getSurfaceCell(level, endX + 1, ty + 1);
-          const nextExternal = !nextLowSurface || nextLowSurface.kind === 'void';
-          if (nextExternal !== external) break;
-
-          endX += 1;
-        }
-
-        const polygon = [
-          project(tx, ty + 1, topZ, view),
-          project(endX + 1, ty + 1, topZ, view),
-          project(endX + 1, ty + 1, lowZ, view),
-          project(tx, ty + 1, lowZ, view)
-        ];
-
-        spans.push({
-          axis: 'south',
-          start: tx,
-          end: endX + 1,
-          faceCoord: ty + 1,
-          topZ,
-          lowZ,
-          baseColor,
-          external,
-          polygon
-        });
-
-        tx = endX + 1;
+    while (tx < level.width) {
+      const surface = window.MarbleLevels.getSurfaceCell(level, tx, ty);
+      if (!surface || surface.kind === 'void') {
+        tx += 1;
+        continue;
       }
-    }
 
-    return spans;
-  }
+      const topZ = window.MarbleLevels.getFillTopAtCell(level, tx, ty, {
+        runtime: runtime.dynamicState
+      });
+      const lowZ = window.MarbleLevels.getFillTopAtCell(level, tx, ty + 1, {
+        runtime: runtime.dynamicState
+      });
 
-  function buildMergedSurfaceEastSpans(runtime, view) {
-    const spans = [];
-    const level = runtime.level;
-
-    for (let tx = 0; tx < level.width; tx += 1) {
-      let ty = 0;
-
-      while (ty < level.height) {
-        const surface = window.MarbleLevels.getSurfaceCell(level, tx, ty);
-        if (!surface || surface.kind === 'void') {
-          ty += 1;
-          continue;
-        }
-
-        const topZ = window.MarbleLevels.getFillTopAtCell(level, tx, ty, {
-          runtime: runtime.dynamicState
-        });
-        const lowZ = window.MarbleLevels.getFillTopAtCell(level, tx + 1, ty, {
-          runtime: runtime.dynamicState
-        });
-
-        if (topZ <= lowZ + 0.01) {
-          ty += 1;
-          continue;
-        }
-
-        const trigger = window.MarbleLevels.getTriggerCell(level, tx, ty);
-        const baseColor = getSurfaceBaseColor(surface, trigger);
-        const lowSurface = window.MarbleLevels.getSurfaceCell(level, tx + 1, ty);
-        const external = !lowSurface || lowSurface.kind === 'void';
-
-        let endY = ty;
-
-        while (endY + 1 < level.height) {
-          const nextSurface = window.MarbleLevels.getSurfaceCell(level, tx, endY + 1);
-          if (!nextSurface || nextSurface.kind === 'void') break;
-
-          const nextTopZ = window.MarbleLevels.getFillTopAtCell(level, tx, endY + 1, {
-            runtime: runtime.dynamicState
-          });
-          const nextLowZ = window.MarbleLevels.getFillTopAtCell(level, tx + 1, endY + 1, {
-            runtime: runtime.dynamicState
-          });
-
-          if (nextTopZ <= nextLowZ + 0.01) break;
-          if (!sameHeight(nextTopZ, topZ) || !sameHeight(nextLowZ, lowZ)) break;
-
-          const nextTrigger = window.MarbleLevels.getTriggerCell(level, tx, endY + 1);
-          const nextBaseColor = getSurfaceBaseColor(nextSurface, nextTrigger);
-          if (nextBaseColor !== baseColor) break;
-
-          const nextLowSurface = window.MarbleLevels.getSurfaceCell(level, tx + 1, endY + 1);
-          const nextExternal = !nextLowSurface || nextLowSurface.kind === 'void';
-          if (nextExternal !== external) break;
-
-          endY += 1;
-        }
-
-        const polygon = [
-          project(tx + 1, ty, topZ, view),
-          project(tx + 1, endY + 1, topZ, view),
-          project(tx + 1, endY + 1, lowZ, view),
-          project(tx + 1, ty, lowZ, view)
-        ];
-
-        spans.push({
-          axis: 'east',
-          start: ty,
-          end: endY + 1,
-          faceCoord: tx + 1,
-          topZ,
-          lowZ,
-          baseColor,
-          external,
-          polygon
-        });
-
-        ty = endY + 1;
+      if (topZ <= lowZ + 0.01) {
+        tx += 1;
+        continue;
       }
+
+      const trigger = window.MarbleLevels.getTriggerCell(level, tx, ty);
+      const baseColor = getSurfaceBaseColor(surface, trigger);
+      const lowSurface = window.MarbleLevels.getSurfaceCell(level, tx, ty + 1);
+      const external = !lowSurface || lowSurface.kind === 'void';
+
+      let endX = tx;
+      let runLowZ = lowZ;
+
+      while (endX + 1 < level.width) {
+        const nextSurface = window.MarbleLevels.getSurfaceCell(level, endX + 1, ty);
+        if (!nextSurface || nextSurface.kind === 'void') break;
+
+        const nextTopZ = window.MarbleLevels.getFillTopAtCell(level, endX + 1, ty, {
+          runtime: runtime.dynamicState
+        });
+        const nextLowZ = window.MarbleLevels.getFillTopAtCell(level, endX + 1, ty + 1, {
+          runtime: runtime.dynamicState
+        });
+
+        if (nextTopZ <= nextLowZ + 0.01) break;
+        if (!sameHeight(nextTopZ, topZ)) break;
+
+        const nextTrigger = window.MarbleLevels.getTriggerCell(level, endX + 1, ty);
+        const nextBaseColor = getSurfaceBaseColor(nextSurface, nextTrigger);
+        if (nextBaseColor !== baseColor) break;
+
+        const nextLowSurface = window.MarbleLevels.getSurfaceCell(level, endX + 1, ty + 1);
+        const nextExternal = !nextLowSurface || nextLowSurface.kind === 'void';
+        if (nextExternal !== external) break;
+
+        if (!external && !sameHeight(nextLowZ, runLowZ)) break;
+
+        runLowZ = Math.min(runLowZ, nextLowZ);
+        endX += 1;
+      }
+
+      const polygon = [
+        project(tx, ty + 1, topZ, view),
+        project(endX + 1, ty + 1, topZ, view),
+        project(endX + 1, ty + 1, runLowZ, view),
+        project(tx, ty + 1, runLowZ, view)
+      ];
+
+      spans.push({
+        axis: 'south',
+        start: tx,
+        end: endX + 1,
+        faceCoord: ty + 1,
+        topZ,
+        lowZ: runLowZ,
+        baseColor,
+        external,
+        polygon
+      });
+
+      tx = endX + 1;
     }
-
-    return spans;
   }
 
-  function marbleInsideSouthSpan(marble, span) {
-    const seamPad = span.external
-      ? Math.max(0.14, marble.collisionRadius * 1.2)
-      : Math.max(0.08, marble.collisionRadius * 0.65);
+  return spans;
+}
 
-    if ((marble.x + marble.collisionRadius) <= (span.start - seamPad)) return false;
-    if ((marble.x - marble.collisionRadius) >= (span.end + seamPad)) return false;
+function buildMergedSurfaceEastSpans(runtime, view) {
+  const spans = [];
+  const level = runtime.level;
 
-    const planePad = span.external
-      ? Math.max(0.06, marble.collisionRadius * 0.45)
-      : Math.max(0.02, marble.collisionRadius * 0.14);
+  for (let tx = 0; tx < level.width; tx += 1) {
+    let ty = 0;
 
-    return marble.y <= span.faceCoord + planePad;
+    while (ty < level.height) {
+      const surface = window.MarbleLevels.getSurfaceCell(level, tx, ty);
+      if (!surface || surface.kind === 'void') {
+        ty += 1;
+        continue;
+      }
+
+      const topZ = window.MarbleLevels.getFillTopAtCell(level, tx, ty, {
+        runtime: runtime.dynamicState
+      });
+      const lowZ = window.MarbleLevels.getFillTopAtCell(level, tx + 1, ty, {
+        runtime: runtime.dynamicState
+      });
+
+      if (topZ <= lowZ + 0.01) {
+        ty += 1;
+        continue;
+      }
+
+      const trigger = window.MarbleLevels.getTriggerCell(level, tx, ty);
+      const baseColor = getSurfaceBaseColor(surface, trigger);
+      const lowSurface = window.MarbleLevels.getSurfaceCell(level, tx + 1, ty);
+      const external = !lowSurface || lowSurface.kind === 'void';
+
+      let endY = ty;
+      let runLowZ = lowZ;
+
+      while (endY + 1 < level.height) {
+        const nextSurface = window.MarbleLevels.getSurfaceCell(level, tx, endY + 1);
+        if (!nextSurface || nextSurface.kind === 'void') break;
+
+        const nextTopZ = window.MarbleLevels.getFillTopAtCell(level, tx, endY + 1, {
+          runtime: runtime.dynamicState
+        });
+        const nextLowZ = window.MarbleLevels.getFillTopAtCell(level, tx + 1, endY + 1, {
+          runtime: runtime.dynamicState
+        });
+
+        if (nextTopZ <= nextLowZ + 0.01) break;
+        if (!sameHeight(nextTopZ, topZ)) break;
+
+        const nextTrigger = window.MarbleLevels.getTriggerCell(level, tx, endY + 1);
+        const nextBaseColor = getSurfaceBaseColor(nextSurface, nextTrigger);
+        if (nextBaseColor !== baseColor) break;
+
+        const nextLowSurface = window.MarbleLevels.getSurfaceCell(level, tx + 1, endY + 1);
+        const nextExternal = !nextLowSurface || nextLowSurface.kind === 'void';
+        if (nextExternal !== external) break;
+
+        if (!external && !sameHeight(nextLowZ, runLowZ)) break;
+
+        runLowZ = Math.min(runLowZ, nextLowZ);
+        endY += 1;
+      }
+
+      const polygon = [
+        project(tx + 1, ty, topZ, view),
+        project(tx + 1, endY + 1, topZ, view),
+        project(tx + 1, endY + 1, runLowZ, view),
+        project(tx + 1, ty, runLowZ, view)
+      ];
+
+      spans.push({
+        axis: 'east',
+        start: ty,
+        end: endY + 1,
+        faceCoord: tx + 1,
+        topZ,
+        lowZ: runLowZ,
+        baseColor,
+        external,
+        polygon
+      });
+
+      ty = endY + 1;
+    }
   }
 
-  function marbleInsideEastSpan(marble, span) {
-    const seamPad = span.external
-      ? Math.max(0.14, marble.collisionRadius * 1.2)
-      : Math.max(0.08, marble.collisionRadius * 0.65);
+  return spans;
+}
 
-    if ((marble.y + marble.collisionRadius) <= (span.start - seamPad)) return false;
-    if ((marble.y - marble.collisionRadius) >= (span.end + seamPad)) return false;
+function marbleInsideSouthSpan(marble, span) {
+  const seamPad = span.external
+    ? Math.max(0.10, marble.collisionRadius * 0.90)
+    : Math.max(0.04, marble.collisionRadius * 0.25);
 
-    const planePad = span.external
-      ? Math.max(0.06, marble.collisionRadius * 0.45)
-      : Math.max(0.02, marble.collisionRadius * 0.14);
+  if ((marble.x + marble.collisionRadius) <= (span.start - seamPad)) return false;
+  if ((marble.x - marble.collisionRadius) >= (span.end + seamPad)) return false;
 
-    return marble.x <= span.faceCoord + planePad;
-  }
+  const planePad = span.external
+    ? Math.max(0.02, marble.collisionRadius * 0.18)
+    : Math.max(0.01, marble.collisionRadius * 0.06);
+
+  return marble.y <= span.faceCoord + planePad;
+}
+
+function marbleInsideEastSpan(marble, span) {
+  const seamPad = span.external
+    ? Math.max(0.10, marble.collisionRadius * 0.90)
+    : Math.max(0.04, marble.collisionRadius * 0.25);
+
+  if ((marble.y + marble.collisionRadius) <= (span.start - seamPad)) return false;
+  if ((marble.y - marble.collisionRadius) >= (span.end + seamPad)) return false;
+
+  const planePad = span.external
+    ? Math.max(0.02, marble.collisionRadius * 0.18)
+    : Math.max(0.01, marble.collisionRadius * 0.06);
+
+  return marble.x <= span.faceCoord + planePad;
+}
 
   function renderSurfaceSouthFace(ctx, runtime, tx, ty, view, baseColor) {
     const fillTop = window.MarbleLevels.getFillTopAtCell(runtime.level, tx, ty, {
@@ -1143,14 +1151,20 @@
     const radius = marbleRender.radius + 1.5;
     const coverExpand = marbleRender.radius * 0.48;
 
-    const clipToMarble = (drawFn) => {
-      ctx.save();
-      ctx.beginPath();
-      ctx.arc(cx, cy, radius, 0, Math.PI * 2);
-      ctx.clip();
-      drawFn();
-      ctx.restore();
-    };
+const clipToMarble = (drawFn) => {
+  const shadowX = marbleRender.shadow.x;
+  const shadowY = marbleRender.shadow.y + marbleRender.radius * 0.35;
+  const shadowRx = marbleRender.radius * 0.95 + 1.5;
+  const shadowRy = marbleRender.radius * 0.48 + 1.0;
+
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(cx, cy, radius + 2.5, 0, Math.PI * 2);
+  ctx.ellipse(shadowX, shadowY, shadowRx, shadowRy, 0, 0, Math.PI * 2);
+  ctx.clip();
+  drawFn();
+  ctx.restore();
+};
 
     const southSpans = buildMergedSurfaceSouthSpans(runtime, view);
     const eastSpans = buildMergedSurfaceEastSpans(runtime, view);
