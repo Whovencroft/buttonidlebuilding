@@ -19,6 +19,30 @@
   const TOP_FACE_Z_EPSILON = 0.02;
   const FACE_PLANE_EPSILON = 0.02;
 
+  const COVER_TUNING = {
+    external: {
+      southExpandMultiplier: 1.35,
+      eastExpandMultiplier: 1.35,
+      seamPadMin: 0.10,
+      seamPadFactor: 1.00,
+      planePadMin: 0.02,
+      planePadFactor: 0.20
+    },
+    internal: {
+      southExpandMultiplier: 0.80,
+      eastExpandMultiplier: 0.80,
+      seamPadMin: 0.04,
+      seamPadFactor: 0.18,
+      planePadMin: 0.01,
+      planePadFactor: 0.04
+    },
+    clip: {
+      ballRadiusPad: 2.5,
+      shadowRadiusXPad: 1.5,
+      shadowRadiusYPad: 1.0
+    }
+  };
+
   function clamp(value, min, max) {
     return Math.max(min, Math.min(max, value));
   }
@@ -735,32 +759,24 @@ function buildMergedSurfaceEastSpans(runtime, view) {
 }
 
 function marbleInsideSouthSpan(marble, span) {
-  const seamPad = span.external
-    ? Math.max(0.10, marble.collisionRadius * 0.90)
-    : Math.max(0.04, marble.collisionRadius * 0.25);
+  const tuning = span.external ? COVER_TUNING.external : COVER_TUNING.internal;
+  const seamPad = Math.max(tuning.seamPadMin, marble.collisionRadius * tuning.seamPadFactor);
 
   if ((marble.x + marble.collisionRadius) <= (span.start - seamPad)) return false;
   if ((marble.x - marble.collisionRadius) >= (span.end + seamPad)) return false;
 
-  const planePad = span.external
-    ? Math.max(0.02, marble.collisionRadius * 0.18)
-    : Math.max(0.01, marble.collisionRadius * 0.06);
-
+  const planePad = Math.max(tuning.planePadMin, marble.collisionRadius * tuning.planePadFactor);
   return marble.y <= span.faceCoord + planePad;
 }
 
 function marbleInsideEastSpan(marble, span) {
-  const seamPad = span.external
-    ? Math.max(0.10, marble.collisionRadius * 0.90)
-    : Math.max(0.04, marble.collisionRadius * 0.25);
+  const tuning = span.external ? COVER_TUNING.external : COVER_TUNING.internal;
+  const seamPad = Math.max(tuning.seamPadMin, marble.collisionRadius * tuning.seamPadFactor);
 
   if ((marble.y + marble.collisionRadius) <= (span.start - seamPad)) return false;
   if ((marble.y - marble.collisionRadius) >= (span.end + seamPad)) return false;
 
-  const planePad = span.external
-    ? Math.max(0.02, marble.collisionRadius * 0.18)
-    : Math.max(0.01, marble.collisionRadius * 0.06);
-
+  const planePad = Math.max(tuning.planePadMin, marble.collisionRadius * tuning.planePadFactor);
   return marble.x <= span.faceCoord + planePad;
 }
 
@@ -1154,12 +1170,12 @@ function marbleInsideEastSpan(marble, span) {
 const clipToMarble = (drawFn) => {
   const shadowX = marbleRender.shadow.x;
   const shadowY = marbleRender.shadow.y + marbleRender.radius * 0.35;
-  const shadowRx = marbleRender.radius * 0.95 + 1.5;
-  const shadowRy = marbleRender.radius * 0.48 + 1.0;
+  const shadowRx = marbleRender.radius * 0.95 + COVER_TUNING.clip.shadowRadiusXPad;
+  const shadowRy = marbleRender.radius * 0.48 + COVER_TUNING.clip.shadowRadiusYPad;
 
   ctx.save();
   ctx.beginPath();
-  ctx.arc(cx, cy, radius + 2.5, 0, Math.PI * 2);
+  ctx.arc(cx, cy, radius + COVER_TUNING.clip.ballRadiusPad, 0, Math.PI * 2);
   ctx.ellipse(shadowX, shadowY, shadowRx, shadowRy, 0, 0, Math.PI * 2);
   ctx.clip();
   drawFn();
@@ -1172,9 +1188,11 @@ const clipToMarble = (drawFn) => {
     for (const span of southSpans) {
       if (span.topZ <= marbleCoverZ + SIDE_FACE_Z_EPSILON) continue;
 
-      const coverPoly = span.external
-        ? expandSouthCoverPolygon(span.polygon, coverExpand * 1.25)
-        : expandSouthCoverPolygon(span.polygon, coverExpand * 0.9);
+      const southMultiplier = span.external
+  ? COVER_TUNING.external.southExpandMultiplier
+  : COVER_TUNING.internal.southExpandMultiplier;
+
+const coverPoly = expandSouthCoverPolygon(span.polygon, coverExpand * southMultiplier);
 
       if (
         marbleInsideSouthSpan(marble, span) &&
@@ -1187,9 +1205,11 @@ const clipToMarble = (drawFn) => {
     for (const span of eastSpans) {
       if (span.topZ <= marbleCoverZ + SIDE_FACE_Z_EPSILON) continue;
 
-      const coverPoly = span.external
-        ? expandEastCoverPolygon(span.polygon, coverExpand * 1.25)
-        : expandEastCoverPolygon(span.polygon, coverExpand * 0.9);
+      const eastMultiplier = span.external
+  ? COVER_TUNING.external.eastExpandMultiplier
+  : COVER_TUNING.internal.eastExpandMultiplier;
+
+const coverPoly = expandEastCoverPolygon(span.polygon, coverExpand * eastMultiplier);
 
       if (
         marbleInsideEastSpan(marble, span) &&
