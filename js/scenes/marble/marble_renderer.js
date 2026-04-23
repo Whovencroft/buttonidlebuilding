@@ -1026,6 +1026,99 @@ function marbleInsideEastSpan(marble, span) {
     ];
   }
 
+function appendPolyPath(ctx, points) {
+  if (!points?.length) return;
+  ctx.moveTo(points[0].x, points[0].y);
+  for (let i = 1; i < points.length; i += 1) {
+    ctx.lineTo(points[i].x, points[i].y);
+  }
+  ctx.closePath();
+}
+
+function getPolygonMaxY(points) {
+  let maxY = -Infinity;
+  for (const p of points || []) {
+    if (p.y > maxY) maxY = p.y;
+  }
+  return maxY;
+}
+
+function buildActorOcclusionTarget(actor, actorState, view) {
+  const topPoly = buildActorTopPolygon(actor, actorState, view);
+  const southPoly = buildActorSouthPolygon(actor, actorState, view);
+  const eastPoly = buildActorEastPolygon(actor, actorState, view);
+
+  return {
+    actor,
+    actorState,
+    minX: actorState.x,
+    minY: actorState.y,
+    maxX: actorState.x + actor.width,
+    maxY: actorState.y + actor.height,
+    coverZ: actorTopZ(actor, actorState),
+    topPoly,
+    southPoly,
+    eastPoly,
+    screenBottom: Math.max(
+      getPolygonMaxY(topPoly),
+      getPolygonMaxY(southPoly),
+      getPolygonMaxY(eastPoly)
+    )
+  };
+}
+
+function targetOverlapsRect(target, minX, minY, maxX, maxY) {
+  return (
+    target.maxX > minX &&
+    target.minX < maxX &&
+    target.maxY > minY &&
+    target.minY < maxY
+  );
+}
+
+function targetBehindSouthFace(target, minX, maxX, faceY) {
+  if (target.maxX <= minX || target.minX >= maxX) return false;
+  return target.minY <= faceY - FACE_PLANE_EPSILON;
+}
+
+function targetBehindEastFace(target, minY, maxY, faceX) {
+  if (target.maxY <= minY || target.minY >= maxY) return false;
+  return target.minX <= faceX - FACE_PLANE_EPSILON;
+}
+
+function targetInsideSouthSpan(target, span) {
+  const tuning = span.external ? COVER_TUNING.external : COVER_TUNING.internal;
+  const seamPad = Math.max(tuning.seamPadMin, (target.maxX - target.minX) * 0.15);
+
+  if (target.maxX <= (span.start - seamPad)) return false;
+  if (target.minX >= (span.end + seamPad)) return false;
+
+  const planePad = Math.max(tuning.planePadMin, 0.03);
+  return target.minY <= span.faceCoord + planePad;
+}
+
+function targetInsideEastSpan(target, span) {
+  const tuning = span.external ? COVER_TUNING.external : COVER_TUNING.internal;
+  const seamPad = Math.max(tuning.seamPadMin, (target.maxY - target.minY) * 0.15);
+
+  if (target.maxY <= (span.start - seamPad)) return false;
+  if (target.minY >= (span.end + seamPad)) return false;
+
+  const planePad = Math.max(tuning.planePadMin, 0.03);
+  return target.minX <= span.faceCoord + planePad;
+}
+
+function clipToActorTarget(ctx, target, drawFn) {
+  ctx.save();
+  ctx.beginPath();
+  appendPolyPath(ctx, target.topPoly);
+  appendPolyPath(ctx, target.southPoly);
+  appendPolyPath(ctx, target.eastPoly);
+  ctx.clip();
+  drawFn();
+  ctx.restore();
+}
+
   function renderActorSouthFace(ctx, actor, actorState, view, color) {
     beginPoly(ctx, buildActorSouthPolygon(actor, actorState, view));
     ctx.fillStyle = darken(color, 0.58);
@@ -1190,6 +1283,166 @@ function marbleInsideEastSpan(marble, span) {
     ctx.lineWidth = 2;
     ctx.stroke();
   }
+
+function renderDeferredTerrainCoverOverActors(ctx, runtime, view, playerReferenceZ) {
+  const actorTargets = [];
+
+  for (const actor of runtime.level.actors) {
+    const actorState = runtime.dynamicState.actors[actor.id];
+    if (!actorState || actorState.active === false) continue;
+
+    if (
+      actor.kind === window.MarbleLevels.ACTOR_KINDS.MOVING_PLATFORM ||
+      actor.kind === window.MarbleLevels.ACTOR_KINDS.ELEVATOR ||
+      actor.kind === window.MarbleLevels.ACTOR_KINDS.TIMED_GATE
+    ) {
+      actorTargets.push(buildActorOcclusionTarget(actor, actorState, view));
+    }
+  }
+
+  if (!actorTargets.length) return;
+
+  const southSpans = buildMergedSurfaceSouthSpans(runtime, view);
+  const eastSpans = buildMergedSurfaceEastSpans(runtime, view);
+  const tiles = getTileDrawOrder(runtime.level);
+  const coverExpand = Math.max(6, view.tileW * 0.18);
+
+  for (const target of actorTargets) {
+    const fakeRenderRef = {
+      ball: { y: target.screenBottom },
+      shadow: { y: target.screenBottom },
+      radius: 0
+    };
+
+    for (const span of southSpans) {
+      if (span.topZ <= target.coverZ + SIDE_FACE_Z_EPSILON) continue;
+
+      const southMultiplier = span.external
+        ? COVER_TUNING.external.southExpandMultiplier
+        : COVER_TUNING.internal.southExpandMultiplier;
+
+      const southAmount = coverExpand * southMultiplier;
+      const coverPoly = span.external
+        ? buildExternalSouthCurtainPolygon(span.polygon, southAmount, fakeRenderRef)
+        : expandSouthCoverPolygon(span.polygon, southAmount);
+
+      if (
+        targetInsideSouthSpan(target, span) &&
+        circleIntersectsPolygon(
+          (target.minX + target.maxX) * 0.5,
+          (target.minY + target.maxY) * 0.5,
+          999999, // clip will do the real trimming
+          coverPoly
+        )
+      ) {
+        clipToActorTarget(ctx, target, () => {
+          fillCoverPolygon(ctx, coverPoly, darken(span.baseColor, 0.58));
+        });
+      }
+    }
+
+    for (const span of eastSpans) {
+      if (span.topZ <= target.coverZ + SIDE_FACE_Z_EPSILON) continue;
+
+      const eastMultiplier = span.external
+        ? COVER_TUNING.external.eastExpandMultiplier
+        : COVER_TUNING.internal.eastExpandMultiplier;
+
+      const eastAmount = coverExpand * eastMultiplier;
+      const coverPoly = span.external
+        ? buildExternalEastCurtainPolygon(span.polygon, eastAmount, fakeRenderRef)
+        : expandEastCoverPolygon(span.polygon, eastAmount);
+
+      if (
+        targetInsideEastSpan(target, span) &&
+        circleIntersectsPolygon(
+          (target.minX + target.maxX) * 0.5,
+          (target.minY + target.maxY) * 0.5,
+          999999,
+          coverPoly
+        )
+      ) {
+        clipToActorTarget(ctx, target, () => {
+          fillCoverPolygon(ctx, coverPoly, darken(span.baseColor, 0.72));
+        });
+      }
+    }
+
+    for (const { tx, ty } of tiles) {
+      const surface = window.MarbleLevels.getSurfaceCell(runtime.level, tx, ty);
+      if (surface && surface.kind !== 'void') {
+        const topZ = window.MarbleLevels.getFillTopAtCell(runtime.level, tx, ty, {
+          runtime: runtime.dynamicState
+        });
+        const trigger = window.MarbleLevels.getTriggerCell(runtime.level, tx, ty);
+        const baseColor = getSurfaceBaseColor(surface, trigger);
+        const topPoly = buildSurfaceTopPolygon(runtime.level, runtime, tx, ty, view);
+
+        if (
+          topPoly &&
+          topZ > target.coverZ + TOP_FACE_Z_EPSILON &&
+          targetOverlapsRect(target, tx, ty, tx + 1, ty + 1)
+        ) {
+          clipToActorTarget(ctx, target, () => {
+            renderSurfaceTopFace(
+              ctx,
+              runtime,
+              tx,
+              ty,
+              view,
+              playerReferenceZ,
+              surface,
+              topPoly,
+              baseColor,
+              trigger
+            );
+          });
+        }
+      }
+
+      const blocker = window.MarbleLevels.getBlockerCell(runtime.level, tx, ty);
+      if (blocker) {
+        const topZ = blocker.top;
+        const baseColor = blocker.transparent ? '#64748b' : '#334155';
+        const topPoly = buildBlockerTopPolygon(tx, ty, topZ, view);
+        const southPoly = buildBlockerSouthPolygon(runtime, tx, ty, topZ, view);
+        const eastPoly = buildBlockerEastPolygon(runtime, tx, ty, topZ, view);
+        const southCoverPoly = southPoly ? expandSouthCoverPolygon(southPoly, coverExpand) : null;
+        const eastCoverPoly = eastPoly ? expandEastCoverPolygon(eastPoly, coverExpand) : null;
+
+        if (
+          southCoverPoly &&
+          topZ > target.coverZ + SIDE_FACE_Z_EPSILON &&
+          targetBehindSouthFace(target, tx, tx + 1, ty + 1)
+        ) {
+          clipToActorTarget(ctx, target, () => {
+            fillCoverPolygon(ctx, southCoverPoly, darken(baseColor, 0.55));
+          });
+        }
+
+        if (
+          eastCoverPoly &&
+          topZ > target.coverZ + SIDE_FACE_Z_EPSILON &&
+          targetBehindEastFace(target, ty, ty + 1, tx + 1)
+        ) {
+          clipToActorTarget(ctx, target, () => {
+            fillCoverPolygon(ctx, eastCoverPoly, darken(baseColor, 0.70));
+          });
+        }
+
+        if (
+          topPoly &&
+          topZ > target.coverZ + TOP_FACE_Z_EPSILON &&
+          targetOverlapsRect(target, tx, ty, tx + 1, ty + 1)
+        ) {
+          clipToActorTarget(ctx, target, () => {
+            renderBlockerTopFace(ctx, tx, ty, topZ, view, baseColor);
+          });
+        }
+      }
+    }
+  }
+}
 
   function renderDeferredCoverPass(ctx, runtime, view, playerReferenceZ, marbleRender) {
     if (!marbleRender) return;
@@ -1469,10 +1722,11 @@ for (const span of eastSpans) {
     renderBackground(ctx, cssWidth, cssHeight);
 
     renderTerrain(ctx, runtime, view, playerReferenceZ);
-    renderActors(ctx, runtime, view, playerReferenceZ);
-    renderGoal(ctx, runtime, view);
-    renderMarble(ctx, runtime, view);
-    renderDeferredCoverPass(ctx, runtime, view, playerReferenceZ, marbleRender);
+renderActors(ctx, runtime, view, playerReferenceZ);
+renderDeferredTerrainCoverOverActors(ctx, runtime, view, playerReferenceZ);
+renderGoal(ctx, runtime, view);
+renderMarble(ctx, runtime, view);
+renderDeferredCoverPass(ctx, runtime, view, playerReferenceZ, marbleRender);
     renderRouteGraph(ctx, runtime, view);
     renderStatus(ctx, runtime, cssWidth);
   }
