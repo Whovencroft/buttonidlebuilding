@@ -571,6 +571,40 @@
     ];
   }
 
+function buildExternalSouthCurtainPolygon(points, amount, marbleRender) {
+  const poly = expandSouthCoverPolygon(points, amount);
+  const bottomY = Math.max(
+    poly[2].y,
+    poly[3].y,
+    marbleRender.ball.y + marbleRender.radius * 3.2,
+    marbleRender.shadow.y + marbleRender.radius * 1.6
+  );
+
+  return [
+    poly[0],
+    poly[1],
+    { x: poly[2].x, y: bottomY },
+    { x: poly[3].x, y: bottomY }
+  ];
+}
+
+function buildExternalEastCurtainPolygon(points, amount, marbleRender) {
+  const poly = expandEastCoverPolygon(points, amount);
+  const bottomY = Math.max(
+    poly[2].y,
+    poly[3].y,
+    marbleRender.ball.y + marbleRender.radius * 3.2,
+    marbleRender.shadow.y + marbleRender.radius * 1.6
+  );
+
+  return [
+    poly[0],
+    poly[1],
+    { x: poly[2].x, y: bottomY },
+    { x: poly[3].x, y: bottomY }
+  ];
+}
+
   function fillCoverPolygon(ctx, points, fillStyle) {
     if (!points || points.length < 3) return;
     beginPoly(ctx, points);
@@ -1185,39 +1219,45 @@ const clipToMarble = (drawFn) => {
     const southSpans = buildMergedSurfaceSouthSpans(runtime, view);
     const eastSpans = buildMergedSurfaceEastSpans(runtime, view);
 
-    for (const span of southSpans) {
-      if (span.topZ <= marbleCoverZ + SIDE_FACE_Z_EPSILON) continue;
+for (const span of southSpans) {
+  if (span.topZ <= marbleCoverZ + SIDE_FACE_Z_EPSILON) continue;
 
-      const southMultiplier = span.external
-  ? COVER_TUNING.external.southExpandMultiplier
-  : COVER_TUNING.internal.southExpandMultiplier;
+  const southMultiplier = span.external
+    ? COVER_TUNING.external.southExpandMultiplier
+    : COVER_TUNING.internal.southExpandMultiplier;
 
-const coverPoly = expandSouthCoverPolygon(span.polygon, coverExpand * southMultiplier);
+  const southAmount = coverExpand * southMultiplier;
+  const coverPoly = span.external
+    ? buildExternalSouthCurtainPolygon(span.polygon, southAmount, marbleRender)
+    : expandSouthCoverPolygon(span.polygon, southAmount);
 
-      if (
-        marbleInsideSouthSpan(marble, span) &&
-        circleIntersectsPolygon(cx, cy, radius, coverPoly)
-      ) {
-        clipToMarble(() => fillCoverPolygon(ctx, coverPoly, darken(span.baseColor, 0.58)));
-      }
-    }
+  if (
+    marbleInsideSouthSpan(marble, span) &&
+    circleIntersectsPolygon(cx, cy, radius, coverPoly)
+  ) {
+    clipToMarble(() => fillCoverPolygon(ctx, coverPoly, darken(span.baseColor, 0.58)));
+  }
+}
 
-    for (const span of eastSpans) {
-      if (span.topZ <= marbleCoverZ + SIDE_FACE_Z_EPSILON) continue;
+for (const span of eastSpans) {
+  if (span.topZ <= marbleCoverZ + SIDE_FACE_Z_EPSILON) continue;
 
-      const eastMultiplier = span.external
-  ? COVER_TUNING.external.eastExpandMultiplier
-  : COVER_TUNING.internal.eastExpandMultiplier;
+  const eastMultiplier = span.external
+    ? COVER_TUNING.external.eastExpandMultiplier
+    : COVER_TUNING.internal.eastExpandMultiplier;
 
-const coverPoly = expandEastCoverPolygon(span.polygon, coverExpand * eastMultiplier);
+  const eastAmount = coverExpand * eastMultiplier;
+  const coverPoly = span.external
+    ? buildExternalEastCurtainPolygon(span.polygon, eastAmount, marbleRender)
+    : expandEastCoverPolygon(span.polygon, eastAmount);
 
-      if (
-        marbleInsideEastSpan(marble, span) &&
-        circleIntersectsPolygon(cx, cy, radius, coverPoly)
-      ) {
-        clipToMarble(() => fillCoverPolygon(ctx, coverPoly, darken(span.baseColor, 0.72)));
-      }
-    }
+  if (
+    marbleInsideEastSpan(marble, span) &&
+    circleIntersectsPolygon(cx, cy, radius, coverPoly)
+  ) {
+    clipToMarble(() => fillCoverPolygon(ctx, coverPoly, darken(span.baseColor, 0.72)));
+  }
+}
 
     const tiles = getTileDrawOrder(runtime.level);
 
