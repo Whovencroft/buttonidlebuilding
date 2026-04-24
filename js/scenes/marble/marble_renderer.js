@@ -786,23 +786,86 @@
       }
 
       // ── 3. Terrain south face ──
+      // Suppress when:
+      //   (a) this tile has a blocker (the blocker south face replaces it), OR
+      //   (b) the south neighbour has a blocker tall enough to cover this face.
       if (cell && cell.kind !== 'void') {
-        drawTerrainSouthFace(ctx, level, dyn, tx, ty, view, color);
+        const bSouth = ML.getBlockerCell(level, tx, ty + 1);
+        const terrainTop = fillZ(level, dyn, tx, ty);
+        const terrainSouthHidden =
+          blocker ||
+          (bSouth && bSouth.top >= terrainTop);
+        if (!terrainSouthHidden) {
+          drawTerrainSouthFace(ctx, level, dyn, tx, ty, view, color);
+        }
       }
 
       // ── 4. Terrain east face ──
+      // Suppress when:
+      //   (a) this tile has a blocker (the blocker east face replaces it), OR
+      //   (b) the east neighbour has a blocker tall enough to cover this face.
       if (cell && cell.kind !== 'void') {
-        drawTerrainEastFace(ctx, level, dyn, tx, ty, view, color);
+        const bEast = ML.getBlockerCell(level, tx + 1, ty);
+        const terrainTop = fillZ(level, dyn, tx, ty);
+        const terrainEastHidden =
+          blocker ||
+          (bEast && bEast.top >= terrainTop);
+        if (!terrainEastHidden) {
+          drawTerrainEastFace(ctx, level, dyn, tx, ty, view, color);
+        }
       }
 
       // ── 5. Blocker south face ──
+      // Draw the ENTIRE south edge of the blocker group as a single wide polygon,
+      // triggered at the LEFTMOST tile of the SOUTHERNMOST row of the group.
+      // This prevents the staircase artifact caused by drawing per-tile faces at
+      // different painter depths.
       if (blocker) {
-        drawBlockerSouthFace(ctx, level, dyn, tx, ty, view, blocker);
+        const southNeighbor = ML.getBlockerCell(level, tx, ty + 1);
+        const westNeighbor  = ML.getBlockerCell(level, tx - 1, ty);
+        const isSouthRow = !southNeighbor || southNeighbor.top !== blocker.top;
+        const isLeftmost = !westNeighbor  || westNeighbor.top  !== blocker.top;
+        if (isSouthRow && isLeftmost) {
+          // Walk east to find the full width of this south edge
+          let xEnd = tx + 1;
+          while (true) {
+            const nb = ML.getBlockerCell(level, xEnd, ty);
+            const nbSouth = ML.getBlockerCell(level, xEnd, ty + 1);
+            if (!nb || nb.top !== blocker.top) break;
+            if (nbSouth && nbSouth.top === blocker.top) break; // not south row
+            xEnd++;
+          }
+          const col = blocker.transparent ? '#64748b' : '#334155';
+          const bot = fillZ(level, dyn, tx, ty + 1);
+          vface(ctx, tx, ty+1, xEnd, ty+1, blocker.top, bot, view, dk(col, 0.55));
+        }
       }
 
       // ── 6. Blocker east face ──
+      // Draw the ENTIRE east edge of the blocker group as a single tall polygon,
+      // triggered at the BOTTOMMOST tile of the EASTERNMOST column of the group.
+      // Drawing at the bottommost tile ensures that the blocker top faces of all
+      // tiles above it (which are in lower buckets) are painted first, so the
+      // east face correctly appears in front of them.
       if (blocker) {
-        drawBlockerEastFace(ctx, level, dyn, tx, ty, view, blocker);
+        const eastNeighbor  = ML.getBlockerCell(level, tx + 1, ty);
+        const southNeighbor = ML.getBlockerCell(level, tx, ty + 1);
+        const isEastCol    = !eastNeighbor  || eastNeighbor.top  !== blocker.top;
+        const isBottommost = !southNeighbor || southNeighbor.top !== blocker.top;
+        if (isEastCol && isBottommost) {
+          // Walk north to find the full height of this east edge
+          let yStart = ty;
+          while (true) {
+            const nb = ML.getBlockerCell(level, tx, yStart - 1);
+            const nbEast = ML.getBlockerCell(level, tx + 1, yStart - 1);
+            if (!nb || nb.top !== blocker.top) break;
+            if (nbEast && nbEast.top === blocker.top) break; // not east col
+            yStart--;
+          }
+          const col = blocker.transparent ? '#64748b' : '#334155';
+          const bot = fillZ(level, dyn, tx + 1, yStart);
+          vface(ctx, tx+1, yStart, tx+1, ty+1, blocker.top, bot, view, dk(col, 0.70));
+        }
       }
 
       // ── 7. Terrain top face ──
