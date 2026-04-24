@@ -314,24 +314,20 @@
         runtime.accumulator = Math.min(runtime.accumulator + dt, runtime.fixedStep * MAX_PHYSICS_STEPS);
         let steps = 0;
         while (runtime.accumulator >= runtime.fixedStep && steps < MAX_PHYSICS_STEPS) {
-  const result = stepSimulation(runtime.fixedStep);
-  runtime.accumulator -= runtime.fixedStep;
-  steps += 1;
+          const result = stepSimulation(runtime.fixedStep);
+          runtime.accumulator -= runtime.fixedStep;
+          steps += 1;
 
-  if (result?.type === 'failed') {
-    applyFailure(result);
-    break;
-  }
+          if (result?.type === 'failed') {
+            applyFailure(result);
+            break;
+          }
 
-  if (result?.type === 'completed' && !runtime.resultApplied) {
-    applyCompletion(result);
-    break;
-  }
-}
-
-if (steps >= MAX_PHYSICS_STEPS && runtime.accumulator >= runtime.fixedStep) {
-  runtime.accumulator = 0;
-}
+          if (result?.type === 'completed' && !runtime.resultApplied) {
+            applyCompletion(result);
+            break;
+          }
+        }
       }
 
       render();

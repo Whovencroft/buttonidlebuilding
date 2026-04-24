@@ -70,11 +70,12 @@
 
   function getVisualSupportZ(runtime, x, y, radius, fallbackZ) {
     const offsets = [[0, 0], [radius, 0], [-radius, 0], [0, radius], [0, -radius]];
+    let best = null;
     for (const [ox, oy] of offsets) {
       const sample = window.MarbleLevels.sampleVisualSurface(runtime.level, x + ox, y + oy, runtime.dynamicState);
-      if (sample) return sample.z;
+      if (sample && (best === null || sample.z > best)) best = sample.z;
     }
-    return fallbackZ;
+    return best !== null ? best : fallbackZ;
   }
 
   function getCameraFocusZ(runtime) {
@@ -87,10 +88,10 @@
       runtime.level.voidFloor ?? -1.5
     );
 
-    const depthBelowSupport = Math.max(0, supportZ - marble.z);
+    const heightAboveSurface = Math.max(0, marble.z - supportZ);
     return marble.grounded
       ? marble.z
-      : marble.z + Math.min(depthBelowSupport * AIRBORNE_RENDER_LIFT_FACTOR, AIRBORNE_RENDER_LIFT_MAX);
+      : marble.z + Math.min(heightAboveSurface * AIRBORNE_RENDER_LIFT_FACTOR, AIRBORNE_RENDER_LIFT_MAX);
   }
 
   function getMarbleCoverZ(runtime) {
@@ -1197,6 +1198,7 @@ function clipToActorTarget(ctx, target, drawFn) {
     actors.sort((a, b) => {
       const sa = runtime.dynamicState.actors[a.id];
       const sb = runtime.dynamicState.actors[b.id];
+      if (!sa || !sb) return 0;
       return (sa.x + sa.y) - (sb.x + sb.y);
     });
 
@@ -1231,13 +1233,15 @@ function clipToActorTarget(ctx, target, drawFn) {
       runtime.level.voidFloor ?? -1.5
     );
 
-    const depthBelowSupport = Math.max(0, shadowZ - marble.z);
+    // heightAboveSurface: how far the marble is above its visual shadow surface
+    const heightAboveSurface = Math.max(0, marble.z - shadowZ);
+    // Lift the rendered ball slightly upward when airborne so it visually
+    // separates from the shadow and reads as floating rather than clipping.
     const liftedRenderZ = marble.grounded
       ? marble.z
-      : marble.z + Math.min(depthBelowSupport * AIRBORNE_RENDER_LIFT_FACTOR, AIRBORNE_RENDER_LIFT_MAX);
+      : marble.z + Math.min(heightAboveSurface * AIRBORNE_RENDER_LIFT_FACTOR, AIRBORNE_RENDER_LIFT_MAX);
 
     const baseShadow = project(marble.x, marble.y, shadowZ, view);
-    const heightAboveSurface = Math.max(0, marble.z - shadowZ);
     const shadow = getShadowScreenPosition(baseShadow, heightAboveSurface, view);
 
     return {
@@ -1248,8 +1252,8 @@ function clipToActorTarget(ctx, target, drawFn) {
     };
   }
 
-  function renderMarble(ctx, runtime, view) {
-    const marbleRender = getMarbleRenderData(runtime, view);
+  function renderMarble(ctx, runtime, view, marbleRender) {
+    if (!marbleRender) marbleRender = getMarbleRenderData(runtime, view);
 
     const shadowX = marbleRender.shadow.x;
     const shadowY = marbleRender.shadow.y + marbleRender.radius * 0.35;
@@ -1284,7 +1288,7 @@ function clipToActorTarget(ctx, target, drawFn) {
     ctx.stroke();
   }
 
-function renderDeferredTerrainCoverOverActors(ctx, runtime, view, playerReferenceZ) {
+function renderDeferredTerrainCoverOverActors(ctx, runtime, view, playerReferenceZ, southSpans, eastSpans) {
   const actorTargets = [];
 
   for (const actor of runtime.level.actors) {
@@ -1302,8 +1306,8 @@ function renderDeferredTerrainCoverOverActors(ctx, runtime, view, playerReferenc
 
   if (!actorTargets.length) return;
 
-  const southSpans = buildMergedSurfaceSouthSpans(runtime, view);
-  const eastSpans = buildMergedSurfaceEastSpans(runtime, view);
+  if (!southSpans) southSpans = buildMergedSurfaceSouthSpans(runtime, view);
+  if (!eastSpans) eastSpans = buildMergedSurfaceEastSpans(runtime, view);
   const tiles = getTileDrawOrder(runtime.level);
   const coverExpand = Math.max(6, view.tileW * 0.18);
 
@@ -1444,8 +1448,10 @@ function renderDeferredTerrainCoverOverActors(ctx, runtime, view, playerReferenc
   }
 }
 
-  function renderDeferredCoverPass(ctx, runtime, view, playerReferenceZ, marbleRender) {
+  function renderDeferredCoverPass(ctx, runtime, view, playerReferenceZ, marbleRender, southSpans, eastSpans) {
     if (!marbleRender) return;
+    if (!southSpans) southSpans = buildMergedSurfaceSouthSpans(runtime, view);
+    if (!eastSpans) eastSpans = buildMergedSurfaceEastSpans(runtime, view);
 
     const marble = runtime.marble;
     const marbleCoverZ = getMarbleCoverZ(runtime);
@@ -1468,9 +1474,6 @@ const clipToMarble = (drawFn) => {
   drawFn();
   ctx.restore();
 };
-
-    const southSpans = buildMergedSurfaceSouthSpans(runtime, view);
-    const eastSpans = buildMergedSurfaceEastSpans(runtime, view);
 
 for (const span of southSpans) {
   if (span.topZ <= marbleCoverZ + SIDE_FACE_Z_EPSILON) continue;
@@ -1577,6 +1580,7 @@ for (const span of eastSpans) {
     actors.sort((a, b) => {
       const sa = runtime.dynamicState.actors[a.id];
       const sb = runtime.dynamicState.actors[b.id];
+      if (!sa || !sb) return 0;
       return (sa.x + sa.y) - (sb.x + sb.y);
     });
 
@@ -1721,12 +1725,16 @@ for (const span of eastSpans) {
     ctx.clearRect(0, 0, cssWidth, cssHeight);
     renderBackground(ctx, cssWidth, cssHeight);
 
+    // Build span arrays once and share them across all cover passes
+    const southSpans = buildMergedSurfaceSouthSpans(runtime, view);
+    const eastSpans = buildMergedSurfaceEastSpans(runtime, view);
+
     renderTerrain(ctx, runtime, view, playerReferenceZ);
-renderActors(ctx, runtime, view, playerReferenceZ);
-renderDeferredTerrainCoverOverActors(ctx, runtime, view, playerReferenceZ);
-renderGoal(ctx, runtime, view);
-renderMarble(ctx, runtime, view);
-renderDeferredCoverPass(ctx, runtime, view, playerReferenceZ, marbleRender);
+    renderActors(ctx, runtime, view, playerReferenceZ);
+    renderDeferredTerrainCoverOverActors(ctx, runtime, view, playerReferenceZ, southSpans, eastSpans);
+    renderGoal(ctx, runtime, view);
+    renderMarble(ctx, runtime, view, marbleRender);
+    renderDeferredCoverPass(ctx, runtime, view, playerReferenceZ, marbleRender, southSpans, eastSpans);
     renderRouteGraph(ctx, runtime, view);
     renderStatus(ctx, runtime, cssWidth);
   }

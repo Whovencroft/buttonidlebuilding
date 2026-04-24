@@ -184,7 +184,8 @@
         axis: actor.travel.axis ?? 'z',
         min: actor.travel.min ?? actor.z ?? 0,
         max: actor.travel.max ?? (actor.z ?? 0) + 2,
-        speed: actor.travel.speed ?? 1
+        speed: actor.travel.speed ?? 1,
+        cycle: actor.travel.cycle ?? null
       } : null,
       data: actor.data ?? null
     };
@@ -743,7 +744,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
       for (const actor of level.actors) {
         const state = getActorWorldState(actor, runtime);
         if (state.active === false) continue;
-        if (tx >= state.x && tx < state.x + actor.width && ty >= state.y && ty < state.y + actor.height) {
+        if (tx >= state.x && tx <= state.x + actor.width - 1 && ty >= state.y && ty <= state.y + actor.height - 1) {
           best = Math.max(best, state.topHeight);
         }
       }
@@ -912,6 +913,11 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
           actorState
         });
       } else if (actor.kind === ACTOR_KINDS.TIMED_GATE) {
+        // Only block when the marble is within the gate's vertical extent
+        const gateTop = actor.topHeight;
+        const gateBase = gateTop - 0.06; // ACTOR_THICKNESS equivalent
+        if (marbleBottom > gateTop + 0.04) continue;
+        if (zCheck < gateBase - radius) continue;
         const minX = actorState.x;
         const minY = actorState.y;
         const maxX = actorState.x + actor.width;
@@ -1159,7 +1165,7 @@ function addStaticPlatform(level, id, x, y, z, width, height, extra = {}) {
       setBlocker(level, xx, yy, {
         kind: 'overhang',
         top,
-        walkableTop: false,
+        walkableTop: extra.walkableTop !== false,
         transparent: !!extra.transparent,
         data: { id, overhang: true, ...extra.data }
       });

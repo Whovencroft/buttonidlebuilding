@@ -660,10 +660,16 @@ function shouldFailFromVoidFall(runtime) {
     const inputAxis = inputState?.axis || { x: 0, y: 0 };
     const jumpPressed = !!inputState?.jumpPressed;
 
-    const previousSupport = marble.grounded ? getGroundSupport(runtime, marble.x, marble.y, marble.supportRadius) : null;
+    // Sample previous support only to inform actor movement (e.g. riding a platform);
+    // skip the extra sample when already airborne to avoid a redundant sampleSupportSurface call.
+    const previousSupport = marble.grounded
+      ? getGroundSupport(runtime, marble.x, marble.y, marble.supportRadius)
+      : null;
     window.MarbleLevels.advanceDynamicState(runtime, dt, previousSupport);
 
-    let groundSurface = getGroundSupport(runtime, marble.x, marble.y, marble.supportRadius);
+    let groundSurface = marble.grounded
+      ? (previousSupport ?? getGroundSupport(runtime, marble.x, marble.y, marble.supportRadius))
+      : getGroundSupport(runtime, marble.x, marble.y, marble.supportRadius);
     const isSupportedNow = !!(marble.grounded && groundSurface);
     updateJumpTimers(marble, jumpPressed, isSupportedNow, dt);
 
