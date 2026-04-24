@@ -405,11 +405,11 @@
   function advanceToNextSceneForTesting() {
     const currentSceneId = sceneManager ? sceneManager.getActiveSceneId() : state.app.activeScene;
     const nextSceneId = getNextSceneId(currentSceneId);
-
     switchScene(nextSceneId, { force: true });
-
     elements.saveStatus.textContent = `Debug scene advance: ${currentSceneId} → ${nextSceneId}`;
   }
+  // Expose for console-based testing
+  window.debugAdvanceScene = advanceToNextSceneForTesting;
 
   function isTypingTarget(target) {
     if (!(target instanceof HTMLElement)) return false;
