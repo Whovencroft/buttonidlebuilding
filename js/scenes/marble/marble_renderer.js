@@ -516,10 +516,8 @@
       ctx.fill();
     }
 
-    const strokeCol = actor.kind === K.TIMED_GATE
-      ? 'rgba(254,215,170,0.4)'
-      : 'rgba(241,245,249,0.2)';
-    quadStroke(ctx, ax,ay, ax+aw,ay, ax+aw,ay+ah, ax,ay+ah, topZ, view, strokeCol, 1.1);
+    // No stroke: a stroke would bleed outside the fill polygon and remain
+    // visible through terrain that correctly covers the fill.
   }
 
   // ─── Marble ───────────────────────────────────────────────────────────────
@@ -540,9 +538,9 @@
 
     // Shadow
     const shx = screenX(m.x, m.y, shadowZ, view);
-    const shy = screenY(m.x, m.y, shadowZ, view) + radius * 0.35;
+    const shy = screenY(m.x, m.y, shadowZ, view);
     ctx.beginPath();
-    ctx.ellipse(shx, shy, radius * 0.95, radius * 0.48, 0, 0, Math.PI*2);
+    ctx.ellipse(shx, shy, radius * 0.82, radius * 0.38, 0, 0, Math.PI*2);
     ctx.fillStyle = 'rgba(0,0,0,0.26)';
     ctx.fill();
 
@@ -668,9 +666,23 @@
       runtime.marble.x, runtime.marble.y, runtime.marble.supportRadius,
       runtime.marble.z - runtime.marble.collisionRadius);
 
-    // Marble integer tile
+    // Marble draw tile: we want the marble drawn AFTER the top face of its
+    // own tile but BEFORE the faces of the tile one step forward.
+    // The marble's tile bucket is floor(x)+floor(y).  The top face of that
+    // tile is drawn at step 7 of that same bucket — before the marble at
+    // step 10.  So the marble is correctly on top of its own floor.
+    // However, when the marble is near the south/east edge of a tile, the
+    // top face of the next tile (bucket+1) is drawn after the marble and
+    // paints over it.  To prevent this, we place the marble in the bucket
+    // of the tile one step forward: floor(x)+floor(y)+1.  We draw it at
+    // step 0 of that bucket (before any faces of that tile) so it still
+    // appears in front of its own floor but behind the walls of the next tile.
     const mTX = Math.floor(runtime.marble.x);
     const mTY = Math.floor(runtime.marble.y);
+    // The "trigger" tile is the one whose bucket = mTX+mTY+1.
+    // We draw the marble when we reach the first tile in that bucket.
+    const marbleBucket = mTX + mTY + 1;
+    let marbleDrawn = false;
 
     // Rebuild actor lookup tables if physics stepped
     rebuildActorTables(level, dyn);
@@ -687,6 +699,14 @@
       const blocker = ML.getBlockerCell(level, tx, ty);
       const trigger = ML.getTriggerCell(level, tx, ty);
       const color   = surfaceColor(cell, trigger);
+
+      // ── 0. Marble: draw at the START of the bucket one step forward ──
+      // This ensures the marble is behind the faces of that tile but in
+      // front of the top face of its own tile (drawn in the previous bucket).
+      if (!marbleDrawn && (tx + ty) === marbleBucket) {
+        drawMarble(ctx, runtime, view);
+        marbleDrawn = true;
+      }
 
       // ── 1. Terrain south face ──
       if (cell && cell.kind !== 'void') {
@@ -744,11 +764,11 @@
         }
       }
 
-      // ── 10. Marble (shadow + ball) if marble is in this tile ──
-      if (tx === mTX && ty === mTY) {
-        drawMarble(ctx, runtime, view);
-      }
+      // (Marble is drawn at step 0 of bucket mTX+mTY+1 above)
     }
+
+    // If marble bucket was beyond the last tile, draw it now
+    if (!marbleDrawn) drawMarble(ctx, runtime, view);
 
     // Overlays always on top
     drawGoal(ctx, runtime, view);
