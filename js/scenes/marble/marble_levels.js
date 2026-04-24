@@ -199,9 +199,11 @@
 
   function getGridCell(grid, tx, ty) {
     if (!grid) return null;
-    if (ty < 0 || ty >= grid.length) return null;
-    if (tx < 0 || tx >= (grid[ty]?.length ?? 0)) return null;
-    return grid[ty][tx] ?? null;
+    const iy = Math.floor(ty);
+    const ix = Math.floor(tx);
+    if (iy < 0 || iy >= grid.length) return null;
+    if (ix < 0 || ix >= (grid[iy]?.length ?? 0)) return null;
+    return grid[iy][ix] ?? null;
   }
 
   function setGridCell(grid, tx, ty, value) {
@@ -1332,20 +1334,13 @@ function addStaticPlatform(level, id, x, y, z, width, height, extra = {}) {
 
     // ─ Citadel ring (z=13)
     fillTrack(level, 16, 26, 16, 14, 13);
-    clearSurfaceRect(level, 20, 29, 8, 7);  // inner void courtyard
+    fillTrack(level, 20, 29, 8, 7, 10);  // sunken inner courtyard (z=10, not a void)
     wallRing(level, 16, 26, 16, 14, 15, {
       gaps: [
         { x: 16, y: 32 }, { x: 16, y: 33 },   // west entry
         { x: 31, y: 29 }, { x: 31, y: 30 },   // east upper exit
         { x: 31, y: 33 }, { x: 31, y: 34 },   // east lower exit
         { x: 22, y: 26 }, { x: 23, y: 26 }    // north exit (upper route)
-      ]
-    });
-    // Inner courtyard ring (walkable rim)
-    wallRing(level, 19, 28, 10, 9, 15, {
-      gaps: [
-        { x: 22, y: 28 }, { x: 23, y: 28 },   // north inner gap
-        { x: 22, y: 36 }, { x: 23, y: 36 }    // south inner gap
       ]
     });
 
@@ -1386,9 +1381,6 @@ function addStaticPlatform(level, id, x, y, z, width, height, extra = {}) {
     // Goal on flat track tile (NOT a bounce tile)
     setSurface(level, 50, 13, { baseHeight: 5, shape: SHAPES.FLAT });
     setGoal(level, 50, 13, 0.44);
-
-    // ─ Overhead platform (visual interest)
-    addStaticPlatform(level, 'citadel_overhang_a', 21, 29, 16, 6, 3);
 
     // ─ Route graph
     addGraphNode(level, { id: 'start',       type: 'entry', x: 4.5,  y: 32.5, z: 14 });
@@ -1505,9 +1497,7 @@ function addStaticPlatform(level, id, x, y, z, width, height, extra = {}) {
     addHazardRect(level, 14, 34, 2, 1, 'goal_guard');
     setSurface(level, 10, 34, { baseHeight: 2, shape: SHAPES.FLAT, conveyor: { x: 0.6, y: 0, strength: 1.0 } });
 
-    // ─ Overhead platforms for visual interest
-    addStaticPlatform(level, 'sw_overhang_a', 8, 4, 21, 5, 3);
-    addStaticPlatform(level, 'sw_overhang_b', 8, 17, 5, 5, 3);
+    // Overhead platforms removed — they overlapped the play area and obscured the marble
 
     // ─ Route graph
     addGraphNode(level, { id: 'start',  type: 'entry',  x: 5.5,  y: 5.5,  z: 18 });
@@ -1630,10 +1620,6 @@ function addStaticPlatform(level, id, x, y, z, width, height, extra = {}) {
     setSurface(level, 36, 34, { baseHeight: 4, shape: SHAPES.FLAT });
     setGoal(level, 36, 34, 0.44);
 
-    // ─ Overhead platforms
-    addStaticPlatform(level, 'drop_overhang_a', 23, 14, 18, 5, 3);
-    addStaticPlatform(level, 'drop_overhang_b', 11, 22, 9, 5, 3);
-
     // ─ Route graph
     addGraphNode(level, { id: 'start',       type: 'entry', x: 5.5,  y: 6.5,  z: 16 });
     addGraphNode(level, { id: 'hub',         type: 'hub',   x: 30.5, y: 8.5,  z: 15 });
@@ -1747,10 +1733,6 @@ function addStaticPlatform(level, id, x, y, z, width, height, extra = {}) {
     // ─ Elevators inside towers (shortcut/hazard)
     addElevator(level, 'elevator_a', 19, 30, 8, 12, 3, 3, 0.7, 5.0);
     addElevator(level, 'elevator_b', 34, 28, 6, 10, 3, 3, 0.8, 4.6);
-
-    // ─ Static overhangs
-    addStaticPlatform(level, 'overhang_a', 18, 29, 13, 5, 3);
-    addStaticPlatform(level, 'overhang_b', 33, 27, 11, 5, 3);
 
     // ─ Timed gate on corridor B→C
     addTimedGate(level, 'gate_a', 36, 31, 11, 1, 3, 1.4, 1.2);
@@ -1895,11 +1877,6 @@ function addStaticPlatform(level, id, x, y, z, width, height, extra = {}) {
     // Goal on flat track tile (NOT a bounce tile)
     setSurface(level, 20, 26, { baseHeight: 2, shape: SHAPES.FLAT });
     setGoal(level, 20, 26, 0.44);
-
-    // ─ Overhead platforms
-    addStaticPlatform(level, 'crossover_overhang_a', 45, 35, 10, 7, 3);
-    addStaticPlatform(level, 'crossover_overhang_b', 45, 41, 9, 7, 3);
-    addStaticPlatform(level, 'crossover_overhang_c', 39, 23, 7, 8, 3);
 
     // ─ Route graph
     addGraphNode(level, { id: 'start',  type: 'entry', x: 5.5,  y: 40.5, z: 12 });

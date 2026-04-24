@@ -822,32 +822,91 @@
       }
 
       // ── 3. Terrain south face ──
-      // Suppress when:
-      //   (a) this tile has a blocker (the blocker south face replaces it), OR
-      //   (b) the south neighbour has a blocker tall enough to cover this face.
-      if (cell && cell.kind !== 'void') {
+      // Draw the ENTIRE south edge of a run of same-height flat tiles as a single
+      // wide polygon, triggered at the LEFTMOST tile of the run.
+      // This prevents staircase artifacts at terrain height transitions.
+      // Sloped tiles always draw per-tile (they have unique corner heights).
+      if (cell && cell.kind !== 'void' && !blocker) {
         const bSouth = ML.getBlockerCell(level, tx, ty + 1);
         const terrainTop = fillZ(level, dyn, tx, ty);
-        const terrainSouthHidden =
-          blocker ||
-          (bSouth && bSouth.top >= terrainTop);
-        if (!terrainSouthHidden) {
-          drawTerrainSouthFace(ctx, level, dyn, tx, ty, view, color);
+        const isSloped = cell.shape && cell.shape !== 'flat';
+        const isSouthHidden = bSouth && bSouth.top >= terrainTop;
+        if (!isSouthHidden) {
+          if (isSloped) {
+            // Sloped tile: draw per-tile trapezoid
+            drawTerrainSouthFace(ctx, level, dyn, tx, ty, view, color);
+          } else {
+            // Flat tile: only draw at the leftmost tile of a same-height run
+            const cellWest = ML.getSurfaceCell(level, tx - 1, ty);
+            const blockerWest = ML.getBlockerCell(level, tx - 1, ty);
+            const westTop = (cellWest && cellWest.kind !== 'void' && !blockerWest)
+              ? fillZ(level, dyn, tx - 1, ty) : null;
+            const bSouthWest = ML.getBlockerCell(level, tx - 1, ty + 1);
+            const westSouthHidden = bSouthWest && westTop !== null && bSouthWest.top >= westTop;
+            const isLeftmost = westTop === null || westTop !== terrainTop || westSouthHidden ||
+              (cellWest && (cellWest.shape && cellWest.shape !== 'flat'));
+            if (isLeftmost) {
+              // Walk east to find the full width of this same-height south edge
+              let xEnd = tx + 1;
+              while (true) {
+                const nbCell = ML.getSurfaceCell(level, xEnd, ty);
+                const nbBlocker = ML.getBlockerCell(level, xEnd, ty);
+                if (!nbCell || nbCell.kind === 'void' || nbBlocker) break;
+                if (nbCell.shape && nbCell.shape !== 'flat') break;
+                if (fillZ(level, dyn, xEnd, ty) !== terrainTop) break;
+                const nbBSouth = ML.getBlockerCell(level, xEnd, ty + 1);
+                if (nbBSouth && nbBSouth.top >= terrainTop) break;
+                xEnd++;
+              }
+              const bot = fillZ(level, dyn, tx, ty + 1);
+              const darkColor = dk(color, 0.58);
+              vface(ctx, tx, ty+1, xEnd, ty+1, terrainTop, bot, view, darkColor);
+            }
+          }
         }
       }
 
       // ── 4. Terrain east face ──
-      // Suppress when:
-      //   (a) this tile has a blocker (the blocker east face replaces it), OR
-      //   (b) the east neighbour has a blocker tall enough to cover this face.
-      if (cell && cell.kind !== 'void') {
+      // Draw the ENTIRE east edge of a run of same-height flat tiles as a single
+      // tall polygon, triggered at the BOTTOMMOST tile of the run.
+      // Sloped tiles always draw per-tile.
+      if (cell && cell.kind !== 'void' && !blocker) {
         const bEast = ML.getBlockerCell(level, tx + 1, ty);
         const terrainTop = fillZ(level, dyn, tx, ty);
-        const terrainEastHidden =
-          blocker ||
-          (bEast && bEast.top >= terrainTop);
-        if (!terrainEastHidden) {
-          drawTerrainEastFace(ctx, level, dyn, tx, ty, view, color);
+        const isSloped = cell.shape && cell.shape !== 'flat';
+        const isEastHidden = bEast && bEast.top >= terrainTop;
+        if (!isEastHidden) {
+          if (isSloped) {
+            // Sloped tile: draw per-tile trapezoid
+            drawTerrainEastFace(ctx, level, dyn, tx, ty, view, color);
+          } else {
+            // Flat tile: only draw at the bottommost tile of a same-height run
+            const cellSouth = ML.getSurfaceCell(level, tx, ty + 1);
+            const blockerSouth = ML.getBlockerCell(level, tx, ty + 1);
+            const southTop = (cellSouth && cellSouth.kind !== 'void' && !blockerSouth)
+              ? fillZ(level, dyn, tx, ty + 1) : null;
+            const bEastSouth = ML.getBlockerCell(level, tx + 1, ty + 1);
+            const southEastHidden = bEastSouth && southTop !== null && bEastSouth.top >= southTop;
+            const isBottommost = southTop === null || southTop !== terrainTop || southEastHidden ||
+              (cellSouth && (cellSouth.shape && cellSouth.shape !== 'flat'));
+            if (isBottommost) {
+              // Walk north to find the full height of this same-height east edge
+              let yStart = ty;
+              while (true) {
+                const nbCell = ML.getSurfaceCell(level, tx, yStart - 1);
+                const nbBlocker = ML.getBlockerCell(level, tx, yStart - 1);
+                if (!nbCell || nbCell.kind === 'void' || nbBlocker) break;
+                if (nbCell.shape && nbCell.shape !== 'flat') break;
+                if (fillZ(level, dyn, tx, yStart - 1) !== terrainTop) break;
+                const nbBEast = ML.getBlockerCell(level, tx + 1, yStart - 1);
+                if (nbBEast && nbBEast.top >= terrainTop) break;
+                yStart--;
+              }
+              const bot = fillZ(level, dyn, tx + 1, yStart);
+              const lightColor = dk(color, 0.72);
+              vface(ctx, tx+1, yStart, tx+1, ty+1, terrainTop, bot, view, lightColor);
+            }
+          }
         }
       }
 
