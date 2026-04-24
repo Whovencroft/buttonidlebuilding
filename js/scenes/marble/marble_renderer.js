@@ -490,23 +490,33 @@
 
   // ─── Actor drawing ────────────────────────────────────────────────────────
 
-  function drawActorSouthFace(ctx, actor, state, view) {
+  function drawActorSouthFace(ctx, actor, state, view, level, dyn) {
     const K   = window.MarbleLevels.ACTOR_KINDS;
     if (actor.kind === K.ROTATING_BAR || actor.kind === K.SWEEPER) return;
     const col = actorColor(actor);
     const ax = state.x, ay = state.y, aw = actor.width, ah = actor.height;
     const topZ  = actor.kind === K.TIMED_GATE ? actor.topHeight : state.topHeight;
     const baseZ = topZ - ACTOR_SLAB_THICKNESS;
+    // Skip if terrain at the south edge covers this face
+    const southTX = Math.floor(ax + aw * 0.5);
+    const southTY = Math.floor(ay + ah);
+    const terrainAbove = fillZ(level, dyn, southTX, southTY - 1);
+    if (terrainAbove !== null && terrainAbove > topZ + Z_EPS) return;
     vface(ctx, ax, ay+ah, ax+aw, ay+ah, topZ, baseZ, view, dk(col, 0.58));
   }
 
-  function drawActorEastFace(ctx, actor, state, view) {
+  function drawActorEastFace(ctx, actor, state, view, level, dyn) {
     const K   = window.MarbleLevels.ACTOR_KINDS;
     if (actor.kind === K.ROTATING_BAR || actor.kind === K.SWEEPER) return;
     const col = actorColor(actor);
     const ax = state.x, ay = state.y, aw = actor.width, ah = actor.height;
     const topZ  = actor.kind === K.TIMED_GATE ? actor.topHeight : state.topHeight;
     const baseZ = topZ - ACTOR_SLAB_THICKNESS;
+    // Skip if terrain at the east edge covers this face
+    const eastTX = Math.floor(ax + aw);
+    const eastTY = Math.floor(ay + ah * 0.5);
+    const terrainAbove = fillZ(level, dyn, eastTX - 1, eastTY);
+    if (terrainAbove !== null && terrainAbove > topZ + Z_EPS) return;
     vface(ctx, ax+aw, ay, ax+aw, ay+ah, topZ, baseZ, view, dk(col, 0.72));
   }
 
@@ -808,7 +818,7 @@
       const southActors = _actorBySouthTile.get(tx | (ty << 16));
       if (southActors) {
         for (const { actor, state } of southActors) {
-          drawActorSouthFace(ctx, actor, state, view);
+          drawActorSouthFace(ctx, actor, state, view, level, dyn);
         }
       }
 
@@ -817,7 +827,7 @@
       const eastActors = _actorByEastTile.get(tx | (ty << 16));
       if (eastActors) {
         for (const { actor, state } of eastActors) {
-          drawActorEastFace(ctx, actor, state, view);
+          drawActorEastFace(ctx, actor, state, view, level, dyn);
         }
       }
 
@@ -905,10 +915,16 @@
       }
 
       // ── 9. Actor top faces whose origin tile = (tx, ty) ──
+      // Skip if terrain at the actor's origin tile is above the actor's top
+      // (the actor is hidden under the terrain floor).
       const key = tx | (ty << 16);
       const originActors = _actorByOrigin.get(key);
       if (originActors) {
+        const terrainAtOrigin = fillZ(level, dyn, tx, ty);
         for (const { actor, state } of originActors) {
+          const actorTop = actor.kind === window.MarbleLevels.ACTOR_KINDS.TIMED_GATE
+            ? actor.topHeight : state.topHeight;
+          if (terrainAtOrigin !== null && terrainAtOrigin > actorTop + Z_EPS) continue;
           drawActorTop(ctx, actor, state, view, playerRefZ);
         }
       }

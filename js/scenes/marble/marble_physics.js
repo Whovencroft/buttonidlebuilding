@@ -461,6 +461,19 @@ function moveGrounded(runtime, dt) {
         const adjusted = removeIntoWallComponent(marble.vx, marble.vy, resolved.normal);
         marble.vx = adjusted.vx;
         marble.vy = adjusted.vy;
+        // Wall-climb prevention: if the marble is moving upward and the wall
+        // it hit extends above the marble's current z, cancel upward velocity.
+        // This prevents the marble from climbing arbitrarily tall walls by
+        // jumping against their side faces.
+        if (marble.vz > 0) {
+          const wallOverlaps = getAllBlockingOverlaps(
+            runtime, marble.x, marble.y, zCheck, marble.collisionRadius, collisionSupportZ
+          );
+          const wallTop = wallOverlaps.reduce((best, o) => Math.max(best, o.blockerTop ?? 0), 0);
+          if (wallTop > marble.z + 0.15) {
+            marble.vz = 0;
+          }
+        }
       }
 
       const surface = getLandingSupport(runtime, marble.x, marble.y, marble.supportRadius);
