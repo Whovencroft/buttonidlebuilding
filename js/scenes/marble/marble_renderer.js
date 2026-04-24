@@ -678,29 +678,35 @@
   function isMarbleOccluded(level, marble) {
     const ML  = window.MarbleLevels;
     const mx  = marble.x, my = marble.y, mz = marble.z;
-    const r   = marble.collisionRadius || 0.3;
     const mTX = Math.floor(mx), mTY = Math.floor(my);
+    const gridW = level.width || 60;
+    const gridH = level.height || 60;
 
-    // Check south faces: tile (tx, ty) has a south face at world y = ty+1.
-    // It occludes the marble if:
-    //   1. marble.y < ty+1  (marble is north/behind the face)
-    //   2. tx <= mx < tx+1  (marble's x is within the tile's x span)
-    //   3. fill height > marble.z  (the face is taller than the marble)
-    for (let ty = mTY; ty >= 0; ty--) {
-      if (my >= ty + 1) break; // marble is south of this face, no occlusion
-      const tx = mTX; // only the tile directly at the marble's x matters
+    // A south face at tile (tx, ty) is at world y = ty+1.
+    // It occludes the marble when:
+    //   1. marble.y < ty+1  (marble is NORTH of / behind the face)
+    //   2. tx == mTX        (face is in the marble's x column)
+    //   3. fillTop or blocker top > marble.z (face is taller than marble)
+    // We iterate FORWARD (increasing ty) from the marble's tile to find
+    // walls that are south of the marble and taller than it.
+    for (let ty = mTY; ty < gridH; ty++) {
+      // The south face of tile ty is at world y = ty+1.
+      // If marble.y >= ty+1 the marble is already south of this face — skip.
+      if (my >= ty + 1) continue;
+      const tx = mTX;
       const fz = ML.getFillTopAtCell(level, tx, ty, { staticOnly: true });
-      if (fz > mz + 0.05) return true;
+      if (fz !== null && fz > mz + 0.05) return true;
       const blk = ML.getBlockerCell(level, tx, ty);
       if (blk && blk.top > mz + 0.05) return true;
     }
 
-    // Check east faces: tile (tx, ty) has an east face at world x = tx+1.
-    for (let tx = mTX; tx >= 0; tx--) {
-      if (mx >= tx + 1) break;
+    // An east face at tile (tx, ty) is at world x = tx+1.
+    // It occludes the marble when marble.x < tx+1 and the face is taller.
+    for (let tx = mTX; tx < gridW; tx++) {
+      if (mx >= tx + 1) continue;
       const ty = mTY;
       const fz = ML.getFillTopAtCell(level, tx, ty, { staticOnly: true });
-      if (fz > mz + 0.05) return true;
+      if (fz !== null && fz > mz + 0.05) return true;
       const blk = ML.getBlockerCell(level, tx, ty);
       if (blk && blk.top > mz + 0.05) return true;
     }
