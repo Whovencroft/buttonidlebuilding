@@ -312,14 +312,15 @@
     const cell  = window.MarbleLevels.getSurfaceCell(level, tx, ty);
     if (!cell || cell.kind === 'void') return;
 
+    // Use staticOnly so moving actors never inflate terrain face geometry.
     const fillTop = window.MarbleLevels.getFillTopAtCell(level, tx, ty,
-                      { runtime: runtime.dynamicState });
+                      { runtime: runtime.dynamicState, staticOnly: true });
     const trigger  = window.MarbleLevels.getTriggerCell(level, tx, ty);
     const baseColor = getSurfaceColor(cell, trigger);
 
     // South face — depth is ty+1 (the row in front of this tile)
     const southFill = window.MarbleLevels.getFillTopAtCell(level, tx, ty + 1,
-                        { runtime: runtime.dynamicState });
+                        { runtime: runtime.dynamicState, staticOnly: true });
     if (fillTop > southFill + Z_EPS) {
       const poly = [
         project(tx,   ty+1, fillTop,   view),
@@ -337,7 +338,7 @@
 
     // East face — depth is tx+1
     const eastFill = window.MarbleLevels.getFillTopAtCell(level, tx + 1, ty,
-                       { runtime: runtime.dynamicState });
+                       { runtime: runtime.dynamicState, staticOnly: true });
     if (fillTop > eastFill + Z_EPS) {
       const poly = [
         project(tx+1, ty,   fillTop,  view),
@@ -423,7 +424,7 @@
 
     // South face
     const southFill = window.MarbleLevels.getFillTopAtCell(level, tx, ty + 1,
-                        { runtime: runtime.dynamicState });
+                        { runtime: runtime.dynamicState, staticOnly: true });
     if (topZ > southFill + Z_EPS) {
       const poly = [
         project(tx,   ty+1, topZ,      view),
@@ -441,7 +442,7 @@
 
     // East face
     const eastFill = window.MarbleLevels.getFillTopAtCell(level, tx + 1, ty,
-                       { runtime: runtime.dynamicState });
+                       { runtime: runtime.dynamicState, staticOnly: true });
     if (topZ > eastFill + Z_EPS) {
       const poly = [
         project(tx+1, ty,   topZ,     view),
@@ -588,10 +589,15 @@
     const ballPt   = project(marble.x, marble.y, renderZ, view);
     const radius   = Math.max(8, view.tileW * marble.renderRadius * 0.9);
 
-    // The marble's painter depth is marble.x + marble.y.
-    // Shadow and ball share the same world XY so they have the same depth;
-    // sub-depth ensures shadow is drawn before the ball.
-    const depth = marble.x + marble.y;
+    // Painter depth for the ball: marble.x + marble.y (the marble's world XY).
+    // The shadow is projected onto the surface tile directly below the marble.
+    // Its depth must be the tile it lands on (Math.floor(x) + Math.floor(y))
+    // so that terrain faces of tiles in front of that surface tile (which have
+    // higher depth) are drawn after the shadow and correctly overdraw it.
+    // The ball uses the marble's continuous XY so it sorts correctly relative
+    // to terrain faces at the marble's actual position.
+    const ballDepth   = marble.x + marble.y;
+    const shadowDepth = Math.floor(marble.x) + Math.floor(marble.y);
 
     // Shadow
     const sx  = shadowPt.x;
@@ -599,7 +605,7 @@
     const srx = radius * 0.95;
     const sry = radius * 0.48;
     list.push({
-      depth,
+      depth: shadowDepth,
       subDepth: SUB_MARBLE_SHADOW,
       draw: () => {
         ctx.beginPath();
@@ -611,7 +617,7 @@
 
     // Ball
     list.push({
-      depth,
+      depth: ballDepth,
       subDepth: SUB_MARBLE_BALL,
       draw: () => {
         const grad = ctx.createRadialGradient(

@@ -728,6 +728,9 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
 
   function getFillTopAtCell(level, tx, ty, options = {}) {
     const runtime = options.runtime ?? null;
+    // staticOnly: when true, skip actor height inflation so terrain geometry
+    // is not affected by moving platforms passing through or resting on tiles.
+    const staticOnly = options.staticOnly ?? false;
     const blocker = getBlockerCell(level, tx, ty);
     const surface = getSurfaceCell(level, tx, ty);
     let best = level?.voidFloor ?? -1.5;
@@ -740,7 +743,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
       best = Math.max(best, blocker.top);
     }
 
-    if (runtime?.actors) {
+    if (!staticOnly && runtime?.actors) {
       for (const actor of level.actors) {
         const state = getActorWorldState(actor, runtime);
         if (state.active === false) continue;
