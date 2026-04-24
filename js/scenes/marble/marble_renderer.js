@@ -572,14 +572,14 @@
     ];
   }
 
-function buildExternalSouthCurtainPolygon(points, amount, marbleRender) {
+function buildExternalSouthCurtainPolygon(points, amount) {
   const poly = expandSouthCoverPolygon(points, amount);
-  const bottomY = Math.max(
-    poly[2].y,
-    poly[3].y,
-    marbleRender.ball.y + marbleRender.radius * 3.2,
-    marbleRender.shadow.y + marbleRender.radius * 1.6
-  );
+  // Extend the curtain far enough below the face to cover the marble regardless
+  // of how far below the face the marble currently is.  A fixed large offset
+  // (2000 px) is safe because the polygon is always clipped to the marble/shadow
+  // shape before being painted, so no extra pixels are drawn outside the marble.
+  const CURTAIN_EXTEND = 2000;
+  const bottomY = Math.max(poly[2].y, poly[3].y) + CURTAIN_EXTEND;
 
   return [
     poly[0],
@@ -589,14 +589,11 @@ function buildExternalSouthCurtainPolygon(points, amount, marbleRender) {
   ];
 }
 
-function buildExternalEastCurtainPolygon(points, amount, marbleRender) {
+function buildExternalEastCurtainPolygon(points, amount) {
   const poly = expandEastCoverPolygon(points, amount);
-  const bottomY = Math.max(
-    poly[2].y,
-    poly[3].y,
-    marbleRender.ball.y + marbleRender.radius * 3.2,
-    marbleRender.shadow.y + marbleRender.radius * 1.6
-  );
+  // Same fixed-extent curtain as the south variant.
+  const CURTAIN_EXTEND = 2000;
+  const bottomY = Math.max(poly[2].y, poly[3].y) + CURTAIN_EXTEND;
 
   return [
     poly[0],
@@ -801,6 +798,14 @@ function marbleInsideSouthSpan(marble, span) {
   if ((marble.x - marble.collisionRadius) >= (span.end + seamPad)) return false;
 
   const planePad = Math.max(tuning.planePadMin, marble.collisionRadius * tuning.planePadFactor);
+  // The marble must be north of (behind) the face, but also close enough that
+  // the cover polygon can plausibly reach it.  Without the proximity cap the
+  // test is true for the entire map north of this row, causing the marble to
+  // be incorrectly obscured by any south-facing wall it shares an x-column with.
+  const proximityLimit = span.external
+    ? marble.collisionRadius * 8 + 2.5
+    : marble.collisionRadius * 3.5 + 1.0;
+  if (marble.y < span.faceCoord - proximityLimit) return false;
   return marble.y <= span.faceCoord + planePad;
 }
 
@@ -812,6 +817,12 @@ function marbleInsideEastSpan(marble, span) {
   if ((marble.y - marble.collisionRadius) >= (span.end + seamPad)) return false;
 
   const planePad = Math.max(tuning.planePadMin, marble.collisionRadius * tuning.planePadFactor);
+  // Same proximity cap as the south variant — without it the test is true for
+  // the entire map west of this column, causing false occlusion.
+  const proximityLimit = span.external
+    ? marble.collisionRadius * 8 + 2.5
+    : marble.collisionRadius * 3.5 + 1.0;
+  if (marble.x < span.faceCoord - proximityLimit) return false;
   return marble.x <= span.faceCoord + planePad;
 }
 
@@ -1095,6 +1106,13 @@ function targetInsideSouthSpan(target, span) {
   if (target.minX >= (span.end + seamPad)) return false;
 
   const planePad = Math.max(tuning.planePadMin, 0.03);
+  // Proximity cap: only consider the target 'behind' this face when it is
+  // close enough for the cover polygon to plausibly reach it.
+  const actorDepth = target.maxY - target.minY;
+  const proximityLimit = span.external
+    ? actorDepth * 4 + 3.0
+    : actorDepth * 2 + 1.5;
+  if (target.minY < span.faceCoord - proximityLimit) return false;
   return target.minY <= span.faceCoord + planePad;
 }
 
@@ -1106,6 +1124,12 @@ function targetInsideEastSpan(target, span) {
   if (target.minY >= (span.end + seamPad)) return false;
 
   const planePad = Math.max(tuning.planePadMin, 0.03);
+  // Same proximity cap as the south variant.
+  const actorWidth = target.maxX - target.minX;
+  const proximityLimit = span.external
+    ? actorWidth * 4 + 3.0
+    : actorWidth * 2 + 1.5;
+  if (target.minX < span.faceCoord - proximityLimit) return false;
   return target.minX <= span.faceCoord + planePad;
 }
 
@@ -1252,18 +1276,41 @@ function clipToActorTarget(ctx, target, drawFn) {
     };
   }
 
-  function renderMarble(ctx, runtime, view, marbleRender) {
+  function isMarbleOccludedByCover(runtime, southSpans, eastSpans) {
+    const marble = runtime.marble;
+    const marbleCoverZ = getMarbleCoverZ(runtime);
+    for (const span of southSpans) {
+      if (span.topZ <= marbleCoverZ + SIDE_FACE_Z_EPSILON) continue;
+      if (marbleInsideSouthSpan(marble, span)) return true;
+    }
+    for (const span of eastSpans) {
+      if (span.topZ <= marbleCoverZ + SIDE_FACE_Z_EPSILON) continue;
+      if (marbleInsideEastSpan(marble, span)) return true;
+    }
+    return false;
+  }
+
+  function renderMarble(ctx, runtime, view, marbleRender, southSpans, eastSpans) {
     if (!marbleRender) marbleRender = getMarbleRenderData(runtime, view);
 
-    const shadowX = marbleRender.shadow.x;
-    const shadowY = marbleRender.shadow.y + marbleRender.radius * 0.35;
-    const shadowRx = marbleRender.radius * 0.95;
-    const shadowRy = marbleRender.radius * 0.48;
+    // Only draw the shadow when the marble is not behind an occluding face.
+    // When occluded the cover pass will paint terrain over the ball, and the
+    // shadow (drawn earlier in the pipeline) would bleed through the terrain.
+    const occluded = southSpans && eastSpans
+      ? isMarbleOccludedByCover(runtime, southSpans, eastSpans)
+      : false;
 
-    ctx.beginPath();
-    ctx.ellipse(shadowX, shadowY, shadowRx, shadowRy, 0, 0, Math.PI * 2);
-    ctx.fillStyle = 'rgba(0,0,0,0.26)';
-    ctx.fill();
+    if (!occluded) {
+      const shadowX = marbleRender.shadow.x;
+      const shadowY = marbleRender.shadow.y + marbleRender.radius * 0.35;
+      const shadowRx = marbleRender.radius * 0.95;
+      const shadowRy = marbleRender.radius * 0.48;
+
+      ctx.beginPath();
+      ctx.ellipse(shadowX, shadowY, shadowRx, shadowRy, 0, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(0,0,0,0.26)';
+      ctx.fill();
+    }
 
     const ball = marbleRender.ball;
     const radius = marbleRender.radius;
@@ -1312,12 +1359,6 @@ function renderDeferredTerrainCoverOverActors(ctx, runtime, view, playerReferenc
   const coverExpand = Math.max(6, view.tileW * 0.18);
 
   for (const target of actorTargets) {
-    const fakeRenderRef = {
-      ball: { y: target.screenBottom },
-      shadow: { y: target.screenBottom },
-      radius: 0
-    };
-
     for (const span of southSpans) {
       if (span.topZ <= target.coverZ + SIDE_FACE_Z_EPSILON) continue;
 
@@ -1327,7 +1368,7 @@ function renderDeferredTerrainCoverOverActors(ctx, runtime, view, playerReferenc
 
       const southAmount = coverExpand * southMultiplier;
       const coverPoly = span.external
-        ? buildExternalSouthCurtainPolygon(span.polygon, southAmount, fakeRenderRef)
+        ? buildExternalSouthCurtainPolygon(span.polygon, southAmount)
         : expandSouthCoverPolygon(span.polygon, southAmount);
 
       if (
@@ -1354,7 +1395,7 @@ function renderDeferredTerrainCoverOverActors(ctx, runtime, view, playerReferenc
 
       const eastAmount = coverExpand * eastMultiplier;
       const coverPoly = span.external
-        ? buildExternalEastCurtainPolygon(span.polygon, eastAmount, fakeRenderRef)
+        ? buildExternalEastCurtainPolygon(span.polygon, eastAmount)
         : expandEastCoverPolygon(span.polygon, eastAmount);
 
       if (
@@ -1460,16 +1501,14 @@ function renderDeferredTerrainCoverOverActors(ctx, runtime, view, playerReferenc
     const radius = marbleRender.radius + 1.5;
     const coverExpand = marbleRender.radius * 0.48;
 
+// Clip cover painting to the ball circle only.  The shadow is drawn before
+// the cover pass and must NOT be included in the clip region — doing so
+// caused cover polygons to paint the terrain colour over the shadow even
+// when the marble was fully behind a wall.
 const clipToMarble = (drawFn) => {
-  const shadowX = marbleRender.shadow.x;
-  const shadowY = marbleRender.shadow.y + marbleRender.radius * 0.35;
-  const shadowRx = marbleRender.radius * 0.95 + COVER_TUNING.clip.shadowRadiusXPad;
-  const shadowRy = marbleRender.radius * 0.48 + COVER_TUNING.clip.shadowRadiusYPad;
-
   ctx.save();
   ctx.beginPath();
   ctx.arc(cx, cy, radius + COVER_TUNING.clip.ballRadiusPad, 0, Math.PI * 2);
-  ctx.ellipse(shadowX, shadowY, shadowRx, shadowRy, 0, 0, Math.PI * 2);
   ctx.clip();
   drawFn();
   ctx.restore();
@@ -1484,7 +1523,7 @@ for (const span of southSpans) {
 
   const southAmount = coverExpand * southMultiplier;
   const coverPoly = span.external
-    ? buildExternalSouthCurtainPolygon(span.polygon, southAmount, marbleRender)
+    ? buildExternalSouthCurtainPolygon(span.polygon, southAmount)
     : expandSouthCoverPolygon(span.polygon, southAmount);
 
   if (
@@ -1504,7 +1543,7 @@ for (const span of eastSpans) {
 
   const eastAmount = coverExpand * eastMultiplier;
   const coverPoly = span.external
-    ? buildExternalEastCurtainPolygon(span.polygon, eastAmount, marbleRender)
+    ? buildExternalEastCurtainPolygon(span.polygon, eastAmount)
     : expandEastCoverPolygon(span.polygon, eastAmount);
 
   if (
@@ -1733,7 +1772,7 @@ for (const span of eastSpans) {
     renderActors(ctx, runtime, view, playerReferenceZ);
     renderDeferredTerrainCoverOverActors(ctx, runtime, view, playerReferenceZ, southSpans, eastSpans);
     renderGoal(ctx, runtime, view);
-    renderMarble(ctx, runtime, view, marbleRender);
+    renderMarble(ctx, runtime, view, marbleRender, southSpans, eastSpans);
     renderDeferredCoverPass(ctx, runtime, view, playerReferenceZ, marbleRender, southSpans, eastSpans);
     renderRouteGraph(ctx, runtime, view);
     renderStatus(ctx, runtime, cssWidth);
