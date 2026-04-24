@@ -159,16 +159,19 @@
   }
 
   // ─── Actor lookup tables ───────────────────────────────────────────────────
-  // Rebuilt when dynState reference changes (once per physics step).
+  // Rebuilt every frame because dynState is mutated in place (same reference
+  // each frame), so reference equality cannot detect actor position changes.
+  // We use the simulation clock to detect when a new physics step has run.
 
-  let _lastDynState = null;
+  let _lastSimClock = -1;
   let _actorBySouthTile = null; // Map<packed (originX | southRow<<16), actor[]>
   let _actorByEastTile  = null; // Map<packed (eastCol | originY<<16), actor[]>
   let _actorByOrigin    = null; // Map<packed int, actor[]>
 
   function rebuildActorTables(level, dynState) {
-    if (dynState === _lastDynState) return;
-    _lastDynState = dynState;
+    // dynState is mutated in place, so compare clock to detect physics steps
+    if (dynState.clock === _lastSimClock) return;
+    _lastSimClock = dynState.clock;
 
     _actorBySouthTile = new Map();
     _actorByEastTile  = new Map();
@@ -277,6 +280,21 @@
     ctx.beginPath();
     ctx.moveTo(screenX(x0,y0,zTop,view), screenY(x0,y0,zTop,view));
     ctx.lineTo(screenX(x1,y1,zTop,view), screenY(x1,y1,zTop,view));
+    ctx.lineTo(screenX(x1,y1,zBot,view),  screenY(x1,y1,zBot,view));
+    ctx.lineTo(screenX(x0,y0,zBot,view),  screenY(x0,y0,zBot,view));
+    ctx.closePath();
+    ctx.fillStyle = color;
+    ctx.fill();
+  }
+
+  // Draw a trapezoidal face: top-left corner at zTop0, top-right corner at zTop1,
+  // bottom edge at zBot (uniform).  Used for sloped terrain side faces.
+  function trapFace(ctx, x0,y0, x1,y1, zTop0, zTop1, zBot, view, color) {
+    const visTop = Math.max(zTop0, zTop1);
+    if (visTop <= zBot + Z_EPS) return;
+    ctx.beginPath();
+    ctx.moveTo(screenX(x0,y0,zTop0,view), screenY(x0,y0,zTop0,view));
+    ctx.lineTo(screenX(x1,y1,zTop1,view), screenY(x1,y1,zTop1,view));
     ctx.lineTo(screenX(x1,y1,zBot,view),  screenY(x1,y1,zBot,view));
     ctx.lineTo(screenX(x0,y0,zBot,view),  screenY(x0,y0,zBot,view));
     ctx.closePath();
@@ -417,15 +435,33 @@
   // ─── Terrain south/east faces ─────────────────────────────────────────────
 
   function drawTerrainSouthFace(ctx, level, dynState, tx, ty, view, color) {
-    const top  = fillZ(level, dynState, tx, ty);
+    const ML   = window.MarbleLevels;
+    const cell = ML.getSurfaceCell(level, tx, ty);
     const bot  = fillZ(level, dynState, tx, ty + 1);
-    vface(ctx, tx, ty+1, tx+1, ty+1, top, bot, view, dk(color, 0.58));
+    const darkColor = dk(color, 0.58);
+    if (cell && cell.kind !== 'void' && cell.shape && cell.shape !== 'flat') {
+      // Sloped tile: use actual corner heights for trapezoidal south face
+      const h = ML.getSurfaceCornerHeights(cell);
+      trapFace(ctx, tx, ty+1, tx+1, ty+1, h.sw, h.se, bot, view, darkColor);
+    } else {
+      const top = fillZ(level, dynState, tx, ty);
+      vface(ctx, tx, ty+1, tx+1, ty+1, top, bot, view, darkColor);
+    }
   }
 
   function drawTerrainEastFace(ctx, level, dynState, tx, ty, view, color) {
-    const top  = fillZ(level, dynState, tx, ty);
+    const ML   = window.MarbleLevels;
+    const cell = ML.getSurfaceCell(level, tx, ty);
     const bot  = fillZ(level, dynState, tx + 1, ty);
-    vface(ctx, tx+1, ty, tx+1, ty+1, top, bot, view, dk(color, 0.72));
+    const lightColor = dk(color, 0.72);
+    if (cell && cell.kind !== 'void' && cell.shape && cell.shape !== 'flat') {
+      // Sloped tile: use actual corner heights for trapezoidal east face
+      const h = ML.getSurfaceCornerHeights(cell);
+      trapFace(ctx, tx+1, ty, tx+1, ty+1, h.ne, h.se, bot, view, lightColor);
+    } else {
+      const top = fillZ(level, dynState, tx, ty);
+      vface(ctx, tx+1, ty, tx+1, ty+1, top, bot, view, lightColor);
+    }
   }
 
   // ─── Blocker tile ─────────────────────────────────────────────────────────
