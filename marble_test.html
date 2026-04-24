@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Marble Test</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: #0b1323; color: #e2e8f0; font-family: system-ui, sans-serif; }
+#container { display: flex; flex-direction: column; height: 100vh; }
+#toolbar { display: flex; gap: 8px; padding: 8px; background: #1e293b; flex-shrink: 0; }
+button { background: #334155; color: #e2e8f0; border: 1px solid #475569; padding: 4px 12px; border-radius: 4px; cursor: pointer; font-size: 13px; }
+button:hover { background: #475569; }
+button.active { background: #3b82f6; border-color: #60a5fa; }
+#canvas-wrap { flex: 1; position: relative; overflow: hidden; }
+canvas { display: block; width: 100%; height: 100%; }
+#info { position: absolute; top: 8px; left: 8px; font-size: 11px; color: rgba(255,255,255,0.5); pointer-events: none; }
+</style>
+</head>
+<body>
+<div id="container">
+  <div id="toolbar">
+    <span style="line-height:28px;font-size:13px;color:#94a3b8">Level:</span>
+    <div id="level-btns"></div>
+    <span style="flex:1"></span>
+    <button id="resetBtn">Reset</button>
+  </div>
+  <div id="canvas-wrap">
+    <canvas id="marbleCanvas"></canvas>
+    <div id="info">Arrow keys / WASD to move</div>
+  </div>
+</div>
+
+<script src="./js/scenes/marble/marble_levels.js"></script>
+<script src="./js/scenes/marble/marble_state.js"></script>
+<script src="./js/scenes/marble/marble_input.js"></script>
+<script src="./js/scenes/marble/marble_physics.js"></script>
+<script src="./js/scenes/marble/marble_renderer.js"></script>
+<script src="./js/scenes/marble_scene.js"></script>
+
+<script>
+(function() {
+  const canvas = document.getElementById('marbleCanvas');
+  const ML = window.MarbleLevels;
+  const levels = ML.getAllLevels();
+
+  // Build level buttons
+  const toolbar = document.getElementById('level-btns');
+  let currentLevelId = levels[0]?.id;
+  levels.forEach(lv => {
+    const b = document.createElement('button');
+    b.textContent = lv.name || lv.id;
+    b.dataset.id = lv.id;
+    if (lv.id === currentLevelId) b.classList.add('active');
+    b.addEventListener('click', () => {
+      currentLevelId = lv.id;
+      toolbar.querySelectorAll('button').forEach(x => x.classList.remove('active'));
+      b.classList.add('active');
+      startLevel(lv.id);
+    });
+    toolbar.appendChild(b);
+  });
+
+  // Minimal API stub for MarbleScene
+  const api = {
+    config: {},
+    getState: () => ({ scenes: { marble: { unlocked: true, currentLevelId, bestTimes: {}, clearedLevels: [], rewardClaims: {}, unlockedFlags: [] } } }),
+    saveNow: () => {},
+    renderShell: () => {},
+    switchScene: () => {},
+    applyMarbleReward: () => {},
+    replaceState: () => {},
+    isMarbleUnlocked: () => true,
+    isEndingTransitionActive: () => false,
+    setSaveStatus: () => {},
+    elements: { sceneHost: document.getElementById('canvas-wrap') }
+  };
+
+  let scene = null;
+  let rafId = null;
+  let lastTime = null;
+
+  function startLevel(levelId) {
+    if (rafId) cancelAnimationFrame(rafId);
+    if (scene && typeof scene.destroy === 'function') scene.destroy();
+
+    // Create a fresh scene
+    scene = window.MarbleScene.create(api);
+
+    // Mount into our canvas wrapper
+    const wrap = document.getElementById('canvas-wrap');
+    // Clear any existing canvases added by the scene
+    wrap.querySelectorAll('canvas:not(#marbleCanvas)').forEach(c => c.remove());
+
+    // Use our own canvas
+    lastTime = null;
+
+    // Start the scene with the chosen level
+    if (typeof scene.start === 'function') {
+      scene.start({ levelId, canvas });
+    } else if (typeof scene.loadLevel === 'function') {
+      scene.loadLevel(levelId);
+    }
+
+    loop();
+  }
+
+  function loop(ts) {
+    rafId = requestAnimationFrame(loop);
+    const dt = lastTime === null ? 0 : Math.min((ts - lastTime) / 1000, 0.1);
+    lastTime = ts;
+    if (scene && typeof scene.update === 'function') scene.update(dt);
+    if (scene && typeof scene.render === 'function') scene.render(canvas);
+  }
+
+  document.getElementById('resetBtn').addEventListener('click', () => startLevel(currentLevelId));
+
+  // Start with first level
+  startLevel(currentLevelId);
+})();
+</script>
+</body>
+</html>

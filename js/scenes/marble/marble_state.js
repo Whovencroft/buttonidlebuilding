@@ -141,6 +141,7 @@
       runtime = window.MarbleState.createRuntime(level);
       runtime.fixedStep = FIXED_DT;
       runtime.accumulator = 0;
+      window._marbleRuntime = runtime; // debug
       playback = options.playReplayData ? { data: options.playReplayData, cursor: 0 } : null;
       if (playback?.data?.radii) {
         runtime.marble.renderRadius = playback.data.radii.renderRadius ?? runtime.marble.renderRadius;

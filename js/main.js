@@ -59,7 +59,7 @@
         idleGameComplete: false
       },
       app: {
-        activeScene: 'button_idle'
+        activeScene: 'title'
       },
       scenes: {
         button_idle: {},
@@ -85,8 +85,10 @@
     }
 
     if (typeof data.app.activeScene !== 'string' || !data.app.activeScene) {
-      data.app.activeScene = 'button_idle';
+      data.app.activeScene = 'title';
     }
+    // Migrate old saves that default to button_idle on first load — keep them as-is
+    // (button_idle is still a valid scene id)
 
     if (!data.flags || typeof data.flags !== 'object' || Array.isArray(data.flags)) {
       data.flags = {};
@@ -383,6 +385,7 @@
 
     const activeSceneId = sceneManager ? sceneManager.getActiveSceneId() : 'button_idle';
     const isMarble = activeSceneId === 'marble';
+    const isTitle = activeSceneId === 'title';
     const marbleUnlocked = !!state.scenes.marble.unlocked;
 
     elements.playGameGrid.classList.toggle('scene-marble-active', isMarble);
@@ -393,6 +396,7 @@
 
     if (elements.appRoot) {
       elements.appRoot.classList.toggle('app-marble-mode', isMarble);
+      elements.appRoot.classList.toggle('app-title-mode', isTitle);
     }
   }
 
@@ -583,6 +587,16 @@
 function switchScene(sceneId, options = {}) {
   if (!sceneManager) return;
 
+  if (sceneId === 'title') {
+    // Title scene is always available
+    state.ui.activeTab = 'play';
+    state.app.activeScene = 'title';
+    sceneManager.setActiveScene('title', { state, ...options });
+    renderShell();
+    if (!options.silentSave) saveGame();
+    return;
+  }
+
   if (sceneId === 'marble') {
     if (!marbleScene) {
       elements.saveStatus.textContent = 'Marble scene failed to load.';
@@ -644,6 +658,18 @@ sceneManager = window.ButtonSceneManager.createSceneManager({
 });
 
 sceneManager.registerScene(buttonScene);
+
+let titleScene = null;
+try {
+  if (!window.TitleScene || typeof window.TitleScene.create !== 'function') {
+    throw new Error('TitleScene.create is unavailable.');
+  }
+  titleScene = window.TitleScene.create(api);
+  sceneManager.registerScene(titleScene);
+} catch (error) {
+  console.error('Title scene failed to initialize:', error);
+  titleScene = null;
+}
 
 try {
   if (!window.MarbleScene || typeof window.MarbleScene.create !== 'function') {
@@ -717,9 +743,13 @@ try {
   }
 
   function init() {
+    // Always start at the title screen on fresh load, regardless of saved scene.
+    // The saved activeScene is preserved in state so returning players can resume
+    // from the title screen's buttons.
+    state.app.activeScene = 'title';
     renderShell();
     sceneManager.notifyStateLoaded({ state });
-    sceneManager.setActiveScene(state.app.activeScene, { state, force: true });
+    sceneManager.setActiveScene('title', { state, force: true });
     sceneManager.render({ state });
     attachShellEvents();
 
