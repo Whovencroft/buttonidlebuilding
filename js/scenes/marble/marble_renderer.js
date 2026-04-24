@@ -162,17 +162,17 @@
   // Rebuilt when dynState reference changes (once per physics step).
 
   let _lastDynState = null;
-  let _actorBySouthRow = null; // Map<int row, actor[]>
-  let _actorByEastCol  = null; // Map<int col, actor[]>
-  let _actorByOrigin   = null; // Map<packed int, actor[]>
+  let _actorBySouthTile = null; // Map<packed (originX | southRow<<16), actor[]>
+  let _actorByEastTile  = null; // Map<packed (eastCol | originY<<16), actor[]>
+  let _actorByOrigin    = null; // Map<packed int, actor[]>
 
   function rebuildActorTables(level, dynState) {
     if (dynState === _lastDynState) return;
     _lastDynState = dynState;
 
-    _actorBySouthRow = new Map();
-    _actorByEastCol  = new Map();
-    _actorByOrigin   = new Map();
+    _actorBySouthTile = new Map();
+    _actorByEastTile  = new Map();
+    _actorByOrigin    = new Map();
 
     const ML = window.MarbleLevels;
     const K  = ML.ACTOR_KINDS;
@@ -183,19 +183,27 @@
 
       const ax = state.x, ay = state.y;
       const aw = actor.width, ah = actor.height;
+      const originX = Math.floor(ax);
+      const originY = Math.floor(ay);
 
-      // South face row
+      // South face: drawn once at tile (originX, southRow)
+      // This places it at bucket (originX + southRow), which is the correct
+      // depth for the left edge of the actor's south face.  Terrain tiles to
+      // the right (higher tx) are in higher buckets and will paint over the
+      // right portion of the face, preventing it from bleeding through.
       const southRow = Math.floor(ay + ah);
-      if (!_actorBySouthRow.has(southRow)) _actorBySouthRow.set(southRow, []);
-      _actorBySouthRow.get(southRow).push({ actor, state });
+      const southKey = originX | (southRow << 16);
+      if (!_actorBySouthTile.has(southKey)) _actorBySouthTile.set(southKey, []);
+      _actorBySouthTile.get(southKey).push({ actor, state });
 
-      // East face col
+      // East face: drawn once at tile (eastCol, originY)
       const eastCol = Math.floor(ax + aw);
-      if (!_actorByEastCol.has(eastCol)) _actorByEastCol.set(eastCol, []);
-      _actorByEastCol.get(eastCol).push({ actor, state });
+      const eastKey = eastCol | (originY << 16);
+      if (!_actorByEastTile.has(eastKey)) _actorByEastTile.set(eastKey, []);
+      _actorByEastTile.get(eastKey).push({ actor, state });
 
       // Origin tile
-      const key = Math.floor(ax) | (Math.floor(ay) << 16);
+      const key = originX | (originY << 16);
       if (!_actorByOrigin.has(key)) _actorByOrigin.set(key, []);
       _actorByOrigin.get(key).push({ actor, state });
     }
@@ -334,16 +342,9 @@
         ctx.fill();
       }
 
-      // Grid stroke
-      ctx.beginPath();
-      ctx.moveTo(pNW.x, pNW.y);
-      ctx.lineTo(pNE.x, pNE.y);
-      ctx.lineTo(pSE.x, pSE.y);
-      ctx.lineTo(pSW.x, pSW.y);
-      ctx.closePath();
-      ctx.strokeStyle = 'rgba(241,245,249,0.16)';
-      ctx.lineWidth = 1;
-      ctx.stroke();
+      // No grid stroke: a stroke bleeds outside the fill polygon boundary
+      // and remains visible through terrain that correctly covers the fill.
+      // (Same reason blocker tops and actor tops have no stroke.)
 
     } else {
       // Curved shape: 3×3 sub-grid
@@ -369,17 +370,8 @@
           ctx.fill();
         }
       }
-      // Single grid stroke over the whole tile
-      const h = ML.getSurfaceCornerHeights(cell);
-      ctx.beginPath();
-      ctx.moveTo(screenX(tx,   ty,   h.nw, view), screenY(tx,   ty,   h.nw, view));
-      ctx.lineTo(screenX(tx+1, ty,   h.ne, view), screenY(tx+1, ty,   h.ne, view));
-      ctx.lineTo(screenX(tx+1, ty+1, h.se, view), screenY(tx+1, ty+1, h.se, view));
-      ctx.lineTo(screenX(tx,   ty+1, h.sw, view), screenY(tx,   ty+1, h.sw, view));
-      ctx.closePath();
-      ctx.strokeStyle = 'rgba(241,245,249,0.12)';
-      ctx.lineWidth = 1;
-      ctx.stroke();
+      // No grid stroke: a stroke bleeds outside the fill polygon boundary
+      // and remains visible through terrain that correctly covers the fill.
     }
 
     // Tile markers (drawn on top of the surface)
@@ -773,18 +765,20 @@
       // The ball is still covered by faces of tiles in higher buckets.
       // (Ball draw is at the BOTTOM of the loop body — see below)
 
-      // ── 1. Actor south faces whose front row = ty ──
-      // Drawn BEFORE terrain south face so terrain correctly covers actors
-      // at the same depth.  front row = floor(actorState.y + actor.height) == ty
-      const southActors = _actorBySouthRow.get(ty);
+      // ── 1. Actor south faces triggered at tile (tx, ty) ──
+      // Each actor south face is drawn exactly once, at tile (floor(ax), southRow).
+      // This gives it bucket (floor(ax)+southRow), so terrain tiles to the right
+      // and south are in higher buckets and correctly paint over it.
+      const southActors = _actorBySouthTile.get(tx | (ty << 16));
       if (southActors) {
         for (const { actor, state } of southActors) {
           drawActorSouthFace(ctx, actor, state, view);
         }
       }
 
-      // ── 2. Actor east faces whose front col = tx ──
-      const eastActors = _actorByEastCol.get(tx);
+      // ── 2. Actor east faces triggered at tile (tx, ty) ──
+      // Each actor east face is drawn exactly once, at tile (eastCol, floor(ay)).
+      const eastActors = _actorByEastTile.get(tx | (ty << 16));
       if (eastActors) {
         for (const { actor, state } of eastActors) {
           drawActorEastFace(ctx, actor, state, view);
@@ -830,18 +824,22 @@
         }
       }
 
-      // ── 9b. Shadow (after top face of shadowBucket tile) ──
-      // Suppressed when marble is behind terrain (shadow would bleed through wall)
-      if (!shadowDrawn && (tx + ty) === shadowBucket) {
+      // ── 9b. Shadow (drawn just before the first tile of bucket shadowBucket+1) ──
+      // Wait until we've moved PAST shadowBucket so all terrain top faces in
+      // that bucket are drawn before the shadow sits on top of them.
+      // Suppressed when marble is behind terrain (shadow would bleed through wall).
+      if (!shadowDrawn && (tx + ty) > shadowBucket) {
         if (!marbleOccluded) drawMarbleShadow(ctx, runtime, view);
         shadowDrawn = true;
       }
 
-      // ── 9c. Ball (after top face of ballBucket tile) ──
-      // Drawing the ball AFTER the top face of the next tile means the next
-      // tile's floor does not cover the ball.  Faces in even higher buckets
-      // (walls further forward) will still paint over the ball correctly.
-      if (!ballDrawn && (tx + ty) === ballBucket) {
+      // ── 9c. Ball (drawn just before the first tile of bucket ballBucket+1) ──
+      // We wait until we've moved PAST ballBucket so that ALL terrain top
+      // faces in ballBucket have been drawn before the ball.  This prevents
+      // floor tiles in the same bucket from painting over the ball.
+      // Faces in buckets > ballBucket (walls further forward) are drawn
+      // after this point and will still correctly cover the ball.
+      if (!ballDrawn && (tx + ty) > ballBucket) {
         drawMarbleBall(ctx, runtime, view);
         ballDrawn = true;
       }
