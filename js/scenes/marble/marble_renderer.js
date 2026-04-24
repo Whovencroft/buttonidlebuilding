@@ -456,8 +456,8 @@
     const col = blocker.transparent ? '#64748b' : '#334155';
     const z   = blocker.top;
     quad(ctx, tx,ty, tx+1,ty, tx+1,ty+1, tx,ty+1, z, view, col);
-    quadStroke(ctx, tx,ty, tx+1,ty, tx+1,ty+1, tx,ty+1, z, view,
-      'rgba(241,245,249,0.12)', 1);
+    // No stroke: a stroke would bleed outside the fill polygon and remain
+    // visible through terrain that correctly covers the fill.
   }
 
   // ─── Actor drawing ────────────────────────────────────────────────────────
@@ -521,41 +521,59 @@
   }
 
   // ─── Marble ───────────────────────────────────────────────────────────────
+  //
+  // The shadow and ball are drawn at DIFFERENT points in the tile loop:
+  //
+  //   Shadow: drawn at step 9 of bucket (mTX+mTY)  — after the terrain top
+  //           face of the marble's own tile, so it sits ON the floor.
+  //           Any terrain face in a higher bucket will paint over it.
+  //
+  //   Ball:   drawn at step 0 of bucket (mTX+mTY+1) — before the faces of
+  //           the tile one step forward, so those faces correctly cover it.
+  //
+  // We cache the computed shadowZ and renderZ so both functions share the
+  // same values without recomputing them.
 
-  function drawMarble(ctx, runtime, view) {
+  let _marbleShadowZ = 0;
+  let _marbleRenderZ = 0;
+  let _marbleRadius  = 0;
+
+  function prepareMarble(runtime, view) {
     const m     = runtime.marble;
     const level = runtime.level;
     const dyn   = runtime.dynamicState;
-
-    const shadowZ = getVisualSupportZ(level, dyn, m.x, m.y, m.supportRadius,
-                      level.voidFloor ?? -1.5);
-    const hgt     = Math.max(0, m.z - shadowZ);
-    const renderZ = m.grounded
+    _marbleShadowZ = getVisualSupportZ(level, dyn, m.x, m.y, m.supportRadius,
+                       level.voidFloor ?? -1.5);
+    const hgt = Math.max(0, m.z - _marbleShadowZ);
+    _marbleRenderZ = m.grounded
       ? m.z
       : m.z + Math.min(hgt * AIRBORNE_LIFT_SCALE, AIRBORNE_LIFT_MAX);
+    _marbleRadius = Math.max(8, view.tileW * m.renderRadius * 0.9);
+  }
 
-    const radius = Math.max(8, view.tileW * m.renderRadius * 0.9);
-
-    // Shadow
-    const shx = screenX(m.x, m.y, shadowZ, view);
-    const shy = screenY(m.x, m.y, shadowZ, view);
+  function drawMarbleShadow(ctx, runtime, view) {
+    const m   = runtime.marble;
+    const shx = screenX(m.x, m.y, _marbleShadowZ, view);
+    const shy = screenY(m.x, m.y, _marbleShadowZ, view);
     ctx.beginPath();
-    ctx.ellipse(shx, shy, radius * 0.82, radius * 0.38, 0, 0, Math.PI*2);
+    ctx.ellipse(shx, shy, _marbleRadius * 0.82, _marbleRadius * 0.38, 0, 0, Math.PI*2);
     ctx.fillStyle = 'rgba(0,0,0,0.26)';
     ctx.fill();
+  }
 
-    // Ball
-    const bx = screenX(m.x, m.y, renderZ, view);
-    const by = screenY(m.x, m.y, renderZ, view);
+  function drawMarbleBall(ctx, runtime, view) {
+    const m  = runtime.marble;
+    const bx = screenX(m.x, m.y, _marbleRenderZ, view);
+    const by = screenY(m.x, m.y, _marbleRenderZ, view);
     const grad = ctx.createRadialGradient(
-      bx - radius*0.35, by - radius*0.48, radius*0.14,
-      bx, by, radius
+      bx - _marbleRadius*0.35, by - _marbleRadius*0.48, _marbleRadius*0.14,
+      bx, by, _marbleRadius
     );
     grad.addColorStop(0,    '#ffffff');
     grad.addColorStop(0.22, '#dbeafe');
     grad.addColorStop(1,    '#475569');
     ctx.beginPath();
-    ctx.arc(bx, by, radius, 0, Math.PI*2);
+    ctx.arc(bx, by, _marbleRadius, 0, Math.PI*2);
     ctx.fillStyle = grad;
     ctx.fill();
     ctx.strokeStyle = 'rgba(255,255,255,0.65)';
@@ -650,6 +668,46 @@
 
   function clamp(v, lo, hi) { return v < lo ? lo : v > hi ? hi : v; }
 
+  // ─── Marble visibility test ─────────────────────────────────────────────
+  // Returns true if the marble is visually occluded by terrain in front of it.
+  // A tile at (tx, ty) occludes the marble if:
+  //   - it has a surface or blocker taller than the marble's z, AND
+  //   - the marble's world position is "behind" it (marble.y < ty+1 for south
+  //     faces, or marble.x < tx+1 for east faces)
+  // We only need to check tiles in the marble's own column/row and forward.
+  function isMarbleOccluded(level, marble) {
+    const ML  = window.MarbleLevels;
+    const mx  = marble.x, my = marble.y, mz = marble.z;
+    const r   = marble.collisionRadius || 0.3;
+    const mTX = Math.floor(mx), mTY = Math.floor(my);
+
+    // Check south faces: tile (tx, ty) has a south face at world y = ty+1.
+    // It occludes the marble if:
+    //   1. marble.y < ty+1  (marble is north/behind the face)
+    //   2. tx <= mx < tx+1  (marble's x is within the tile's x span)
+    //   3. fill height > marble.z  (the face is taller than the marble)
+    for (let ty = mTY; ty >= 0; ty--) {
+      if (my >= ty + 1) break; // marble is south of this face, no occlusion
+      const tx = mTX; // only the tile directly at the marble's x matters
+      const fz = ML.getFillTopAtCell(level, tx, ty, { staticOnly: true });
+      if (fz > mz + 0.05) return true;
+      const blk = ML.getBlockerCell(level, tx, ty);
+      if (blk && blk.top > mz + 0.05) return true;
+    }
+
+    // Check east faces: tile (tx, ty) has an east face at world x = tx+1.
+    for (let tx = mTX; tx >= 0; tx--) {
+      if (mx >= tx + 1) break;
+      const ty = mTY;
+      const fz = ML.getFillTopAtCell(level, tx, ty, { staticOnly: true });
+      if (fz > mz + 0.05) return true;
+      const blk = ML.getBlockerCell(level, tx, ty);
+      if (blk && blk.top > mz + 0.05) return true;
+    }
+
+    return false;
+  }
+
   // ─── Main draw ────────────────────────────────────────────────────────────
 
   function draw(runtime, canvas) {
@@ -666,23 +724,27 @@
       runtime.marble.x, runtime.marble.y, runtime.marble.supportRadius,
       runtime.marble.z - runtime.marble.collisionRadius);
 
-    // Marble draw tile: we want the marble drawn AFTER the top face of its
-    // own tile but BEFORE the faces of the tile one step forward.
-    // The marble's tile bucket is floor(x)+floor(y).  The top face of that
-    // tile is drawn at step 7 of that same bucket — before the marble at
-    // step 10.  So the marble is correctly on top of its own floor.
-    // However, when the marble is near the south/east edge of a tile, the
-    // top face of the next tile (bucket+1) is drawn after the marble and
-    // paints over it.  To prevent this, we place the marble in the bucket
-    // of the tile one step forward: floor(x)+floor(y)+1.  We draw it at
-    // step 0 of that bucket (before any faces of that tile) so it still
-    // appears in front of its own floor but behind the walls of the next tile.
+    // Pre-compute marble shadow/ball geometry once per frame.
+    prepareMarble(runtime, view);
+    const marbleOccluded = isMarbleOccluded(level, runtime.marble);
+
+    // The shadow is drawn at step 9 of the marble's OWN tile bucket
+    // (mTX+mTY), after the terrain top face of that tile.  This ensures
+    // terrain faces in higher buckets paint over the shadow.
+    //
+    // The ball is drawn at step 0 of the NEXT bucket (mTX+mTY+1), before
+    // the faces of that tile, so those faces correctly cover the ball.
     const mTX = Math.floor(runtime.marble.x);
     const mTY = Math.floor(runtime.marble.y);
-    // The "trigger" tile is the one whose bucket = mTX+mTY+1.
-    // We draw the marble when we reach the first tile in that bucket.
-    const marbleBucket = mTX + mTY + 1;
-    let marbleDrawn = false;
+    // The south face of tile (tx,ty) is drawn at step 1 of bucket (tx+ty),
+    // but its visual depth is ty+1 — it sits at depth tx+(ty+1) = bucket+1.
+    // So to have the south face of the marble's own tile cover the shadow,
+    // we must draw the shadow at step 9b of bucket (mTX+mTY-1), one step
+    // before the marble's own tile bucket.
+    const shadowBucket = mTX + mTY - 1;   // draw shadow one bucket BEFORE own tile
+    const ballBucket   = mTX + mTY + 1;   // draw ball before faces here
+    let shadowDrawn = false;
+    let ballDrawn   = false;
 
     // Rebuild actor lookup tables if physics stepped
     rebuildActorTables(level, dyn);
@@ -700,36 +762,14 @@
       const trigger = ML.getTriggerCell(level, tx, ty);
       const color   = surfaceColor(cell, trigger);
 
-      // ── 0. Marble: draw at the START of the bucket one step forward ──
-      // This ensures the marble is behind the faces of that tile but in
-      // front of the top face of its own tile (drawn in the previous bucket).
-      if (!marbleDrawn && (tx + ty) === marbleBucket) {
-        drawMarble(ctx, runtime, view);
-        marbleDrawn = true;
-      }
+      // Ball is drawn at step 9b of ballBucket (after the top face of that
+      // tile), so the top face of the next tile does not cover the ball.
+      // The ball is still covered by faces of tiles in higher buckets.
+      // (Ball draw is at the BOTTOM of the loop body — see below)
 
-      // ── 1. Terrain south face ──
-      if (cell && cell.kind !== 'void') {
-        drawTerrainSouthFace(ctx, level, dyn, tx, ty, view, color);
-      }
-
-      // ── 2. Terrain east face ──
-      if (cell && cell.kind !== 'void') {
-        drawTerrainEastFace(ctx, level, dyn, tx, ty, view, color);
-      }
-
-      // ── 3. Blocker south face ──
-      if (blocker) {
-        drawBlockerSouthFace(ctx, level, dyn, tx, ty, view, blocker);
-      }
-
-      // ── 4. Blocker east face ──
-      if (blocker) {
-        drawBlockerEastFace(ctx, level, dyn, tx, ty, view, blocker);
-      }
-
-      // ── 5. Actor south faces whose front row = ty ──
-      // (front row = floor(actorState.y + actor.height) == ty)
+      // ── 1. Actor south faces whose front row = ty ──
+      // Drawn BEFORE terrain south face so terrain correctly covers actors
+      // at the same depth.  front row = floor(actorState.y + actor.height) == ty
       const southActors = _actorBySouthRow.get(ty);
       if (southActors) {
         for (const { actor, state } of southActors) {
@@ -737,12 +777,32 @@
         }
       }
 
-      // ── 6. Actor east faces whose front col = tx ──
+      // ── 2. Actor east faces whose front col = tx ──
       const eastActors = _actorByEastCol.get(tx);
       if (eastActors) {
         for (const { actor, state } of eastActors) {
           drawActorEastFace(ctx, actor, state, view);
         }
+      }
+
+      // ── 3. Terrain south face ──
+      if (cell && cell.kind !== 'void') {
+        drawTerrainSouthFace(ctx, level, dyn, tx, ty, view, color);
+      }
+
+      // ── 4. Terrain east face ──
+      if (cell && cell.kind !== 'void') {
+        drawTerrainEastFace(ctx, level, dyn, tx, ty, view, color);
+      }
+
+      // ── 5. Blocker south face ──
+      if (blocker) {
+        drawBlockerSouthFace(ctx, level, dyn, tx, ty, view, blocker);
+      }
+
+      // ── 6. Blocker east face ──
+      if (blocker) {
+        drawBlockerEastFace(ctx, level, dyn, tx, ty, view, blocker);
       }
 
       // ── 7. Terrain top face ──
@@ -764,11 +824,26 @@
         }
       }
 
-      // (Marble is drawn at step 0 of bucket mTX+mTY+1 above)
+      // ── 9b. Shadow (after top face of shadowBucket tile) ──
+      // Suppressed when marble is behind terrain (shadow would bleed through wall)
+      if (!shadowDrawn && (tx + ty) === shadowBucket) {
+        if (!marbleOccluded) drawMarbleShadow(ctx, runtime, view);
+        shadowDrawn = true;
+      }
+
+      // ── 9c. Ball (after top face of ballBucket tile) ──
+      // Drawing the ball AFTER the top face of the next tile means the next
+      // tile's floor does not cover the ball.  Faces in even higher buckets
+      // (walls further forward) will still paint over the ball correctly.
+      if (!ballDrawn && (tx + ty) === ballBucket) {
+        drawMarbleBall(ctx, runtime, view);
+        ballDrawn = true;
+      }
     }
 
-    // If marble bucket was beyond the last tile, draw it now
-    if (!marbleDrawn) drawMarble(ctx, runtime, view);
+    // If shadow/ball buckets were beyond the last tile, draw them now
+    if (!shadowDrawn && !marbleOccluded) drawMarbleShadow(ctx, runtime, view);
+    if (!ballDrawn)   drawMarbleBall(ctx, runtime, view);
 
     // Overlays always on top
     drawGoal(ctx, runtime, view);
