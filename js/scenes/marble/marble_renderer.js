@@ -904,30 +904,86 @@
     // A south face at tile (tx, ty) is at world y = ty+1.
     // It occludes the marble when:
     //   1. marble.y < ty+1  (marble is NORTH of / behind the face)
-    //   2. tx == mTX        (face is in the marble's x column)
+    //   2. The face's x-span includes the marble's x position
+    //      For terrain: tx <= mx < tx+1  (single tile wide)
+    //      For blockers: we check all tiles in the blocker group that share
+    //                    the same south row (ty+1) and span the marble's x.
     //   3. fillTop or blocker top > marble.z (face is taller than marble)
-    // We iterate FORWARD (increasing ty) from the marble's tile to find
-    // walls that are south of the marble and taller than it.
+    //
+    // We check the marble's own column (tx=mTX) AND adjacent columns
+    // (mTX-1, mTX+1) to catch wide blocker faces that span multiple tiles
+    // and visually cover the marble even when the marble is not in the
+    // triggering tile's column.
     for (let ty = mTY; ty < gridH; ty++) {
-      // The south face of tile ty is at world y = ty+1.
-      // If marble.y >= ty+1 the marble is already south of this face — skip.
       if (my >= ty + 1) continue;
-      const tx = mTX;
-      const fz = ML.getFillTopAtCell(level, tx, ty, { staticOnly: true });
-      if (fz !== null && fz > mz + 0.05) return true;
-      const blk = ML.getBlockerCell(level, tx, ty);
-      if (blk && blk.top > mz + 0.05) return true;
+      // Check a range of x tiles whose south face could visually cover the marble.
+      // Blockers draw their south face as a wide polygon starting from the
+      // leftmost tile of the southernmost row — so we need to check tiles
+      // to the west of the marble as well.
+      for (let tx = Math.max(0, mTX - 4); tx <= Math.min(gridW - 1, mTX + 1); tx++) {
+        // For terrain tiles, only the marble's own column can occlude it.
+        // For blocker tiles, any tile in the blocker group whose south face
+        // spans the marble's x position can occlude it.
+        const blk = ML.getBlockerCell(level, tx, ty);
+        if (blk && blk.top > mz + 0.05) {
+          // Check if this blocker's south face spans the marble's x position.
+          // The south face is drawn from tx to (tx + group width).
+          // A tile is part of the south row if its south neighbour is not
+          // the same blocker. Walk east from tx to find the face's x extent.
+          const southNeighbor = ML.getBlockerCell(level, tx, ty + 1);
+          if (southNeighbor && southNeighbor.top === blk.top) continue; // not south row
+          // This tile IS on the south row of a blocker. Walk east to find extent.
+          let xEnd = tx + 1;
+          while (xEnd < gridW) {
+            const nb = ML.getBlockerCell(level, xEnd, ty);
+            const nbS = ML.getBlockerCell(level, xEnd, ty + 1);
+            if (!nb || nb.top !== blk.top) break;
+            if (nbS && nbS.top === blk.top) break;
+            xEnd++;
+          }
+          // The south face spans world x from tx to xEnd.
+          // It occludes the marble if mx is within [tx, xEnd).
+          if (mx >= tx && mx < xEnd) return true;
+        }
+        // Terrain tiles: check the marble's own column AND adjacent columns.
+        // The south face of a terrain tile at (tx, ty) spans world x [tx, tx+1].
+        // The marble at mx is behind this face if tx <= mx < tx+1.
+        if (mx >= tx && mx < tx + 1) {
+          const fz = ML.getFillTopAtCell(level, tx, ty, { staticOnly: true });
+          if (fz !== null && fz > mz + 0.05) return true;
+        }
+      }
     }
 
     // An east face at tile (tx, ty) is at world x = tx+1.
     // It occludes the marble when marble.x < tx+1 and the face is taller.
+    // Same logic: check the marble's own row AND adjacent rows for wide blockers.
     for (let tx = mTX; tx < gridW; tx++) {
       if (mx >= tx + 1) continue;
-      const ty = mTY;
-      const fz = ML.getFillTopAtCell(level, tx, ty, { staticOnly: true });
-      if (fz !== null && fz > mz + 0.05) return true;
-      const blk = ML.getBlockerCell(level, tx, ty);
-      if (blk && blk.top > mz + 0.05) return true;
+      for (let ty = Math.max(0, mTY - 4); ty <= Math.min(gridH - 1, mTY + 1); ty++) {
+        const blk = ML.getBlockerCell(level, tx, ty);
+        if (blk && blk.top > mz + 0.05) {
+          const eastNeighbor = ML.getBlockerCell(level, tx + 1, ty);
+          if (eastNeighbor && eastNeighbor.top === blk.top) continue; // not east col
+          // Walk north to find the east face's y extent.
+          let yStart = ty;
+          while (yStart > 0) {
+            const nb = ML.getBlockerCell(level, tx, yStart - 1);
+            const nbE = ML.getBlockerCell(level, tx + 1, yStart - 1);
+            if (!nb || nb.top !== blk.top) break;
+            if (nbE && nbE.top === blk.top) break;
+            yStart--;
+          }
+          // The east face spans world y from yStart to ty+1.
+          if (my >= yStart && my < ty + 1) return true;
+        }
+        // East face of terrain tile at (tx, ty) spans world y [ty, ty+1].
+        // The marble at my is behind this face if ty <= my < ty+1.
+        if (my >= ty && my < ty + 1) {
+          const fz = ML.getFillTopAtCell(level, tx, ty, { staticOnly: true });
+          if (fz !== null && fz > mz + 0.05) return true;
+        }
+      }
     }
 
     return false;
