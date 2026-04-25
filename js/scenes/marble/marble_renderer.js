@@ -447,13 +447,16 @@
   function drawTerrainSouthFace(ctx, level, dynState, tx, ty, view, color) {
     const ML   = window.MarbleLevels;
     const cell = ML.getSurfaceCell(level, tx, ty);
-    const bot  = fillZ(level, dynState, tx, ty + 1);
     const darkColor = dk(color, 0.58);
     if (cell && cell.kind !== 'void' && cell.shape && cell.shape !== 'flat') {
-      // Sloped tile: use actual corner heights for trapezoidal south face
+      // Sloped tile: use actual corner heights for trapezoidal south face.
+      // bot must be <= min(sw, se) so the trapezoid covers the full sloped
+      // edge even when the south neighbour is higher than the ramp's low corner.
       const h = ML.getSurfaceCornerHeights(cell);
+      const bot = Math.min(fillZ(level, dynState, tx, ty + 1), h.sw, h.se);
       trapFace(ctx, tx, ty+1, tx+1, ty+1, h.sw, h.se, bot, view, darkColor);
     } else {
+      const bot = fillZ(level, dynState, tx, ty + 1);
       const top = fillZ(level, dynState, tx, ty);
       vface(ctx, tx, ty+1, tx+1, ty+1, top, bot, view, darkColor);
     }
@@ -462,13 +465,16 @@
   function drawTerrainEastFace(ctx, level, dynState, tx, ty, view, color) {
     const ML   = window.MarbleLevels;
     const cell = ML.getSurfaceCell(level, tx, ty);
-    const bot  = fillZ(level, dynState, tx + 1, ty);
     const lightColor = dk(color, 0.72);
     if (cell && cell.kind !== 'void' && cell.shape && cell.shape !== 'flat') {
-      // Sloped tile: use actual corner heights for trapezoidal east face
+      // Sloped tile: use actual corner heights for trapezoidal east face.
+      // bot must be <= min(ne, se) so the trapezoid covers the full sloped
+      // edge even when the east neighbour is higher than the ramp's low corner.
       const h = ML.getSurfaceCornerHeights(cell);
+      const bot = Math.min(fillZ(level, dynState, tx + 1, ty), h.ne, h.se);
       trapFace(ctx, tx+1, ty, tx+1, ty+1, h.ne, h.se, bot, view, lightColor);
     } else {
+      const bot = fillZ(level, dynState, tx + 1, ty);
       const top = fillZ(level, dynState, tx, ty);
       vface(ctx, tx+1, ty, tx+1, ty+1, top, bot, view, lightColor);
     }
