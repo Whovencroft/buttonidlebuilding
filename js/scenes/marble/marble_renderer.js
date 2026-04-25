@@ -312,6 +312,22 @@
     ctx.fill();
   }
 
+  // Draw a general quadrilateral face with independent per-corner heights.
+  // (x0,y0,zTL) = top-left, (x1,y1,zTR) = top-right,
+  // (x1,y1,zBR) = bottom-right, (x0,y0,zBL) = bottom-left.
+  // Skips drawing if the face has no visible area.
+  function quadFace(ctx, x0,y0, x1,y1, zTL, zTR, zBR, zBL, view, color) {
+    if (Math.max(zTL,zTR) <= Math.min(zBL,zBR) + Z_EPS) return;
+    ctx.beginPath();
+    ctx.moveTo(screenX(x0,y0,zTL,view), screenY(x0,y0,zTL,view));
+    ctx.lineTo(screenX(x1,y1,zTR,view), screenY(x1,y1,zTR,view));
+    ctx.lineTo(screenX(x1,y1,zBR,view), screenY(x1,y1,zBR,view));
+    ctx.lineTo(screenX(x0,y0,zBL,view), screenY(x0,y0,zBL,view));
+    ctx.closePath();
+    ctx.fillStyle = color;
+    ctx.fill();
+  }
+
   // Stroke a quad outline (grid lines)
   function quadStroke(ctx, x0,y0, x1,y1, x2,y2, x3,y3, z, view, color, lw) {
     ctx.beginPath();
@@ -449,16 +465,58 @@
     const cell = ML.getSurfaceCell(level, tx, ty);
     const darkColor = dk(color, 0.58);
     if (cell && cell.kind !== 'void' && cell.shape && cell.shape !== 'flat') {
-      // Sloped tile: use actual corner heights for trapezoidal south face.
-      // bot must be <= min(sw, se) so the trapezoid covers the full sloped
-      // edge even when the south neighbour is higher than the ramp's low corner.
+      // Sloped tile: use actual corner heights for the south face.
+      // The bottom edge uses the NW/NE corners of the south neighbour tile so
+      // that both the top AND bottom edges of the face polygon are correctly
+      // sloped, eliminating triangular void gaps.
       const h = ML.getSurfaceCornerHeights(cell);
-      const bot = Math.min(fillZ(level, dynState, tx, ty + 1), h.sw, h.se);
-      trapFace(ctx, tx, ty+1, tx+1, ty+1, h.sw, h.se, bot, view, darkColor);
+      const southCell = ML.getSurfaceCell(level, tx, ty + 1);
+      let botL, botR;
+      if (southCell && southCell.kind !== 'void' && southCell.shape && southCell.shape !== 'flat') {
+        const hs = ML.getSurfaceCornerHeights(southCell);
+        botL = Math.min(hs.nw, h.sw);
+        botR = Math.min(hs.ne, h.se);
+      } else {
+        const flat = fillZ(level, dynState, tx, ty + 1);
+        botL = Math.min(flat, h.sw);
+        botR = Math.min(flat, h.se);
+      }
+      quadFace(ctx, tx, ty+1, tx+1, ty+1, h.sw, h.se, botR, botL, view, darkColor);
     } else {
-      const bot = fillZ(level, dynState, tx, ty + 1);
+      // Flat tile: extend the south face downward to cover any lower ramp corners.
+      // Two cases to handle:
+      //   1. South neighbour is sloped — its north edge (nw/ne) may be lower than
+      //      this tile's fillZ, leaving a void on the south neighbour's north side.
+      //   2. North neighbour is a lower ramp — this flat wall's south face must
+      //      extend down to the ramp's sw/se corners to fill the void between
+      //      the ramp's sloped top and this wall's flat top.
       const top = fillZ(level, dynState, tx, ty);
-      vface(ctx, tx, ty+1, tx+1, ty+1, top, bot, view, darkColor);
+      const southCell2 = ML.getSurfaceCell(level, tx, ty + 1);
+      const northCell2 = ML.getSurfaceCell(level, tx, ty - 1);
+      const hasSlopedSouth = southCell2 && southCell2.kind !== 'void' && southCell2.shape && southCell2.shape !== 'flat';
+      const hasLowerNorthRamp = northCell2 && northCell2.kind !== 'void' && northCell2.shape && northCell2.shape !== 'flat';
+      if (hasSlopedSouth || hasLowerNorthRamp) {
+        let botL2 = fillZ(level, dynState, tx, ty + 1);
+        let botR2 = botL2;
+        if (hasSlopedSouth) {
+          const hs2 = ML.getSurfaceCornerHeights(southCell2);
+          botL2 = Math.min(botL2, hs2.nw);
+          botR2 = Math.min(botR2, hs2.ne);
+        }
+        if (hasLowerNorthRamp) {
+          const hn2 = ML.getSurfaceCornerHeights(northCell2);
+          // The north ramp's south edge (sw/se) may be lower than this tile.
+          // Extend this face down to cover those corners.
+          botL2 = Math.min(botL2, hn2.sw);
+          botR2 = Math.min(botR2, hn2.se);
+        }
+        botL2 = Math.min(botL2, top);
+        botR2 = Math.min(botR2, top);
+        quadFace(ctx, tx, ty+1, tx+1, ty+1, top, top, botR2, botL2, view, darkColor);
+      } else {
+        const bot = fillZ(level, dynState, tx, ty + 1);
+        vface(ctx, tx, ty+1, tx+1, ty+1, top, bot, view, darkColor);
+      }
     }
   }
 
@@ -467,16 +525,58 @@
     const cell = ML.getSurfaceCell(level, tx, ty);
     const lightColor = dk(color, 0.72);
     if (cell && cell.kind !== 'void' && cell.shape && cell.shape !== 'flat') {
-      // Sloped tile: use actual corner heights for trapezoidal east face.
-      // bot must be <= min(ne, se) so the trapezoid covers the full sloped
-      // edge even when the east neighbour is higher than the ramp's low corner.
+      // Sloped tile: use actual corner heights for the east face.
+      // The bottom edge uses the NW/SW corners of the east neighbour tile so
+      // that both the top AND bottom edges of the face polygon are correctly
+      // sloped, eliminating triangular void gaps.
       const h = ML.getSurfaceCornerHeights(cell);
-      const bot = Math.min(fillZ(level, dynState, tx + 1, ty), h.ne, h.se);
-      trapFace(ctx, tx+1, ty, tx+1, ty+1, h.ne, h.se, bot, view, lightColor);
+      const eastCell = ML.getSurfaceCell(level, tx + 1, ty);
+      let botT, botB;
+      if (eastCell && eastCell.kind !== 'void' && eastCell.shape && eastCell.shape !== 'flat') {
+        const he = ML.getSurfaceCornerHeights(eastCell);
+        botT = Math.min(he.nw, h.ne);
+        botB = Math.min(he.sw, h.se);
+      } else {
+        const flat = fillZ(level, dynState, tx + 1, ty);
+        botT = Math.min(flat, h.ne);
+        botB = Math.min(flat, h.se);
+      }
+      quadFace(ctx, tx+1, ty, tx+1, ty+1, h.ne, h.se, botB, botT, view, lightColor);
     } else {
-      const bot = fillZ(level, dynState, tx + 1, ty);
+      // Flat tile: extend the east face downward to cover any lower ramp corners.
+      // Two cases to handle:
+      //   1. East neighbour is sloped — its west edge (nw/sw) may be lower than
+      //      this tile's fillZ, leaving a void on the east neighbour's west side.
+      //   2. West neighbour is a lower ramp — this flat wall's east face must
+      //      extend down to the ramp's ne/se corners to fill the void between
+      //      the ramp's sloped top and this wall's flat top.
       const top = fillZ(level, dynState, tx, ty);
-      vface(ctx, tx+1, ty, tx+1, ty+1, top, bot, view, lightColor);
+      const eastCell2 = ML.getSurfaceCell(level, tx + 1, ty);
+      const westCell2 = ML.getSurfaceCell(level, tx - 1, ty);
+      const hasSlopedEast = eastCell2 && eastCell2.kind !== 'void' && eastCell2.shape && eastCell2.shape !== 'flat';
+      const hasLowerWestRamp = westCell2 && westCell2.kind !== 'void' && westCell2.shape && westCell2.shape !== 'flat';
+      if (hasSlopedEast || hasLowerWestRamp) {
+        let botT2 = fillZ(level, dynState, tx + 1, ty);
+        let botB2 = botT2;
+        if (hasSlopedEast) {
+          const he2 = ML.getSurfaceCornerHeights(eastCell2);
+          botT2 = Math.min(botT2, he2.nw);
+          botB2 = Math.min(botB2, he2.sw);
+        }
+        if (hasLowerWestRamp) {
+          const hw2 = ML.getSurfaceCornerHeights(westCell2);
+          // The west ramp's east edge (ne/se) may be lower than this tile.
+          // Extend this face down to cover those corners.
+          botT2 = Math.min(botT2, hw2.ne);
+          botB2 = Math.min(botB2, hw2.se);
+        }
+        botT2 = Math.min(botT2, top);
+        botB2 = Math.min(botB2, top);
+        quadFace(ctx, tx+1, ty, tx+1, ty+1, top, top, botB2, botT2, view, lightColor);
+      } else {
+        const bot = fillZ(level, dynState, tx + 1, ty);
+        vface(ctx, tx+1, ty, tx+1, ty+1, top, bot, view, lightColor);
+      }
     }
   }
 
