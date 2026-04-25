@@ -490,6 +490,49 @@
 
   // ─── Actor drawing ────────────────────────────────────────────────────────
 
+  // Returns true if any terrain tile along the actor's south edge (the row of
+  // tiles just inside the south boundary) has a fill top above actorTopZ.
+  // We check every tile column that the actor spans.
+  function actorSouthCovered(level, dyn, ax, ay, aw, ah, actorTopZ) {
+    const southTY = Math.floor(ay + ah) - 1; // last row inside actor footprint
+    const x0 = Math.floor(ax);
+    const x1 = Math.floor(ax + aw - 0.001);
+    for (let tx = x0; tx <= x1; tx++) {
+      const t = fillZ(level, dyn, tx, southTY);
+      if (t !== null && t > actorTopZ + Z_EPS) return true;
+    }
+    return false;
+  }
+
+  // Returns true if any terrain tile along the actor's east edge (the column
+  // of tiles just inside the east boundary) has a fill top above actorTopZ.
+  function actorEastCovered(level, dyn, ax, ay, aw, ah, actorTopZ) {
+    const eastTX = Math.floor(ax + aw) - 1; // last column inside actor footprint
+    const y0 = Math.floor(ay);
+    const y1 = Math.floor(ay + ah - 0.001);
+    for (let ty = y0; ty <= y1; ty++) {
+      const t = fillZ(level, dyn, eastTX, ty);
+      if (t !== null && t > actorTopZ + Z_EPS) return true;
+    }
+    return false;
+  }
+
+  // Returns true if ANY tile under the actor's full footprint has terrain
+  // above actorTopZ — meaning the actor top face should be suppressed.
+  function actorTopCovered(level, dyn, ax, ay, aw, ah, actorTopZ) {
+    const x0 = Math.floor(ax);
+    const x1 = Math.floor(ax + aw - 0.001);
+    const y0 = Math.floor(ay);
+    const y1 = Math.floor(ay + ah - 0.001);
+    for (let tx = x0; tx <= x1; tx++) {
+      for (let ty = y0; ty <= y1; ty++) {
+        const t = fillZ(level, dyn, tx, ty);
+        if (t !== null && t >= actorTopZ - Z_EPS) return true;
+      }
+    }
+    return false;
+  }
+
   function drawActorSouthFace(ctx, actor, state, view, level, dyn) {
     const K   = window.MarbleLevels.ACTOR_KINDS;
     if (actor.kind === K.ROTATING_BAR || actor.kind === K.SWEEPER) return;
@@ -497,11 +540,8 @@
     const ax = state.x, ay = state.y, aw = actor.width, ah = actor.height;
     const topZ  = actor.kind === K.TIMED_GATE ? actor.topHeight : state.topHeight;
     const baseZ = topZ - ACTOR_SLAB_THICKNESS;
-    // Skip if terrain at the south edge covers this face
-    const southTX = Math.floor(ax + aw * 0.5);
-    const southTY = Math.floor(ay + ah);
-    const terrainAbove = fillZ(level, dyn, southTX, southTY - 1);
-    if (terrainAbove !== null && terrainAbove > topZ + Z_EPS) return;
+    // Skip if ANY tile under the full actor footprint has terrain above the actor
+    if (actorTopCovered(level, dyn, ax, ay, aw, ah, topZ)) return;
     vface(ctx, ax, ay+ah, ax+aw, ay+ah, topZ, baseZ, view, dk(col, 0.58));
   }
 
@@ -512,11 +552,8 @@
     const ax = state.x, ay = state.y, aw = actor.width, ah = actor.height;
     const topZ  = actor.kind === K.TIMED_GATE ? actor.topHeight : state.topHeight;
     const baseZ = topZ - ACTOR_SLAB_THICKNESS;
-    // Skip if terrain at the east edge covers this face
-    const eastTX = Math.floor(ax + aw);
-    const eastTY = Math.floor(ay + ah * 0.5);
-    const terrainAbove = fillZ(level, dyn, eastTX - 1, eastTY);
-    if (terrainAbove !== null && terrainAbove > topZ + Z_EPS) return;
+    // Skip if ANY tile under the full actor footprint has terrain above the actor
+    if (actorTopCovered(level, dyn, ax, ay, aw, ah, topZ)) return;
     vface(ctx, ax+aw, ay, ax+aw, ay+ah, topZ, baseZ, view, dk(col, 0.72));
   }
 
@@ -920,11 +957,11 @@
       const key = tx | (ty << 16);
       const originActors = _actorByOrigin.get(key);
       if (originActors) {
-        const terrainAtOrigin = fillZ(level, dyn, tx, ty);
         for (const { actor, state } of originActors) {
           const actorTop = actor.kind === window.MarbleLevels.ACTOR_KINDS.TIMED_GATE
             ? actor.topHeight : state.topHeight;
-          if (terrainAtOrigin !== null && terrainAtOrigin > actorTop + Z_EPS) continue;
+          // Skip if ANY tile under the actor's footprint has terrain above the actor
+          if (actorTopCovered(level, dyn, state.x, state.y, actor.width, actor.height, actorTop)) continue;
           drawActorTop(ctx, actor, state, view, playerRefZ);
         }
       }
