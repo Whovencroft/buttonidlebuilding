@@ -54,6 +54,7 @@
   const AIRBORNE_LIFT_SCALE  = 0.18;
   const AIRBORNE_LIFT_MAX    = 0.22;
   const ACTOR_SLAB_THICKNESS = 0.06;   // visual thickness of platform slab
+  const FACE_MIN_EMERGE      = 0.5;    // min units above terrain before side faces are drawn
 
   const COL_ABOVE = 'rgba(250,204,21,';
   const COL_BELOW = 'rgba(96,165,250,';
@@ -533,6 +534,26 @@
     return false;
   }
 
+  // Returns true if the actor has not yet emerged far enough above the terrain
+  // for its south/east side faces to be worth drawing.  Prevents thin-line
+  // artefacts when a platform is just barely poking through the floor.
+  function actorFaceSuppressed(level, dyn, ax, ay, aw, ah, actorTopZ) {
+    const x0 = Math.floor(ax);
+    const x1 = Math.floor(ax + aw - 0.001);
+    const y0 = Math.floor(ay);
+    const y1 = Math.floor(ay + ah - 0.001);
+    let maxT = null;
+    for (let tx = x0; tx <= x1; tx++) {
+      for (let ty = y0; ty <= y1; ty++) {
+        const t = fillZ(level, dyn, tx, ty);
+        if (t !== null && (maxT === null || t > maxT)) maxT = t;
+      }
+    }
+    // Suppress if actor top is within FACE_MIN_EMERGE of the highest terrain tile
+    if (maxT !== null && actorTopZ < maxT + FACE_MIN_EMERGE) return true;
+    return false;
+  }
+
   function drawActorSouthFace(ctx, actor, state, view, level, dyn) {
     const K   = window.MarbleLevels.ACTOR_KINDS;
     if (actor.kind === K.ROTATING_BAR || actor.kind === K.SWEEPER) return;
@@ -540,8 +561,9 @@
     const ax = state.x, ay = state.y, aw = actor.width, ah = actor.height;
     const topZ  = actor.kind === K.TIMED_GATE ? actor.topHeight : state.topHeight;
     const baseZ = topZ - ACTOR_SLAB_THICKNESS;
-    // Skip if ANY tile under the full actor footprint has terrain above the actor
+    // Skip if terrain covers the actor or if it hasn't emerged far enough above terrain
     if (actorTopCovered(level, dyn, ax, ay, aw, ah, topZ)) return;
+    if (actorFaceSuppressed(level, dyn, ax, ay, aw, ah, topZ)) return;
     vface(ctx, ax, ay+ah, ax+aw, ay+ah, topZ, baseZ, view, dk(col, 0.58));
   }
 
@@ -552,8 +574,9 @@
     const ax = state.x, ay = state.y, aw = actor.width, ah = actor.height;
     const topZ  = actor.kind === K.TIMED_GATE ? actor.topHeight : state.topHeight;
     const baseZ = topZ - ACTOR_SLAB_THICKNESS;
-    // Skip if ANY tile under the full actor footprint has terrain above the actor
+    // Skip if terrain covers the actor or if it hasn't emerged far enough above terrain
     if (actorTopCovered(level, dyn, ax, ay, aw, ah, topZ)) return;
+    if (actorFaceSuppressed(level, dyn, ax, ay, aw, ah, topZ)) return;
     vface(ctx, ax+aw, ay, ax+aw, ay+ah, topZ, baseZ, view, dk(col, 0.72));
   }
 
