@@ -861,7 +861,26 @@
     // we must draw the shadow at step 9b of bucket (mTX+mTY-1), one step
     // before the marble's own tile bucket.
     const shadowBucket = mTX + mTY - 1;   // draw shadow one bucket BEFORE own tile
-    const ballBucket   = mTX + mTY + 1;   // draw ball before faces here
+
+    // When the marble is standing on a moving actor (elevator/bridge), the actor
+    // top face is drawn at the bottom-right tile of the actor's footprint, which
+    // may be in a HIGHER bucket than mTX+mTY+1.  If we draw the ball before that
+    // bucket, the actor top face will paint over the marble.  So we advance
+    // ballBucket to be at least the actor's top-draw bucket + 1.
+    let ballBucket = mTX + mTY + 1;
+    if (runtime.marble.supportSource === 'actor' && runtime.marble.supportRef) {
+      const supportActorDef = level.actors.find(a => a.id === runtime.marble.supportRef);
+      if (supportActorDef) {
+        const supportActorState = dyn.actors[supportActorDef.id];
+        if (supportActorState) {
+          const ax = supportActorState.x, ay = supportActorState.y;
+          const aw = supportActorDef.width, ah = supportActorDef.height;
+          const topDrawX = Math.floor(ax + aw - 0.001);
+          const topDrawY = Math.floor(ay + ah - 0.001);
+          ballBucket = Math.max(ballBucket, topDrawX + topDrawY + 1);
+        }
+      }
+    }
     let shadowDrawn = false;
     let ballDrawn   = false;
 
