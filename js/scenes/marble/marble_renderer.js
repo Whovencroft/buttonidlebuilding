@@ -13,12 +13,15 @@
 //   3. Any ACTOR whose south-face front row equals this tile row (ty+1 == actorSouthRow)
 //   4. Any ACTOR whose east-face front column equals this tile col (tx+1 == actorEastCol)
 //   5. The tile's top face
-//   6. Any ACTOR top face whose origin tile is (tx, ty)
+//   6. Any ACTOR top face whose BOTTOM-RIGHT footprint tile is (tx, ty)
+//      (Drawing at the highest bucket in the footprint ensures the actor top
+//       is painted AFTER all terrain tops in its footprint, preventing floor
+//       tiles from bleeding over the actor when it emerges from the ground.)
 //   7. The MARBLE shadow and ball, if the marble's integer tile is (tx, ty)
 //
 // "Actor south-face front row" = floor(actorState.y + actor.height)
 // "Actor east-face front col"  = floor(actorState.x + actor.width)
-// "Actor origin tile"          = (floor(actorState.x), floor(actorState.y))
+// "Actor top draw tile"         = (floor(ax+aw-ε), floor(ay+ah-ε))  — bottom-right of footprint
 // "Marble tile"                = (floor(marble.x), floor(marble.y))
 //
 // This ordering is correct because:
@@ -165,18 +168,18 @@
   // We use the simulation clock to detect when a new physics step has run.
 
   let _lastSimClock = -1;
-  let _actorBySouthTile = null; // Map<packed (originX | southRow<<16), actor[]>
-  let _actorByEastTile  = null; // Map<packed (eastCol | originY<<16), actor[]>
-  let _actorByOrigin    = null; // Map<packed int, actor[]>
+  let _actorBySouthTile    = null; // Map<packed (originX | southRow<<16), actor[]>
+  let _actorByEastTile     = null; // Map<packed (eastCol | originY<<16), actor[]>
+  let _actorByOrigin       = null; // Map<packed (topDrawX | topDrawY<<16), actor[]> — bottom-right tile of each actor's footprint
 
   function rebuildActorTables(level, dynState) {
     // dynState is mutated in place, so compare clock to detect physics steps
     if (dynState.clock === _lastSimClock) return;
     _lastSimClock = dynState.clock;
 
-    _actorBySouthTile = new Map();
-    _actorByEastTile  = new Map();
-    _actorByOrigin    = new Map();
+    _actorBySouthTile    = new Map();
+    _actorByEastTile     = new Map();
+    _actorByOrigin       = new Map();
 
     const ML = window.MarbleLevels;
     const K  = ML.ACTOR_KINDS;
@@ -206,10 +209,16 @@
       if (!_actorByEastTile.has(eastKey)) _actorByEastTile.set(eastKey, []);
       _actorByEastTile.get(eastKey).push({ actor, state });
 
-      // Origin tile
-      const key = originX | (originY << 16);
+      // Actor top face: draw at the BOTTOM-RIGHT tile of the footprint
+      // (highest painter bucket = floor(ax+aw-ε) + floor(ay+ah-ε)).
+      // This ensures the actor top is drawn AFTER all terrain top faces in
+      // its footprint, preventing floor tiles from painting over the actor.
+      const topDrawX = Math.floor(ax + aw - 0.001);
+      const topDrawY = Math.floor(ay + ah - 0.001);
+      const key = topDrawX | (topDrawY << 16);
       if (!_actorByOrigin.has(key)) _actorByOrigin.set(key, []);
       _actorByOrigin.get(key).push({ actor, state });
+
     }
   }
 
@@ -518,16 +527,15 @@
     return false;
   }
 
-  // Returns true if ANY tile under the actor's full footprint OR in the one-tile
-  // border surrounding it has terrain above actorTopZ.  The border check is
-  // needed for elevators whose shaft floor is lower than the surrounding level
-  // (e.g. shaft at z=8, surrounding floor at z=10): without it the elevator top
-  // face would be visible while the platform is still below the surrounding floor.
+  // Returns true when the actor top face should be hidden because terrain at or
+  // above the actor top covers any tile in the actor's footprint.
+  // Only checks tiles WITHIN the footprint (no border) to avoid false positives
+  // for platforms that travel along terrain edges (e.g. bridges).
   function actorTopCovered(level, dyn, ax, ay, aw, ah, actorTopZ) {
-    const x0 = Math.floor(ax) - 1;
-    const x1 = Math.floor(ax + aw - 0.001) + 1;
-    const y0 = Math.floor(ay) - 1;
-    const y1 = Math.floor(ay + ah - 0.001) + 1;
+    const x0 = Math.floor(ax);
+    const x1 = Math.floor(ax + aw - 0.001);
+    const y0 = Math.floor(ay);
+    const y1 = Math.floor(ay + ah - 0.001);
     for (let tx = x0; tx <= x1; tx++) {
       for (let ty = y0; ty <= y1; ty++) {
         const t = fillZ(level, dyn, tx, ty);
@@ -566,8 +574,10 @@
     const ax = state.x, ay = state.y, aw = actor.width, ah = actor.height;
     const topZ  = actor.kind === K.TIMED_GATE ? actor.topHeight : state.topHeight;
     // Skip if terrain covers the actor, or actor hasn't emerged enough above terrain
-    if (actorTopCovered(level, dyn, ax, ay, aw, ah, topZ)) return;
-    if (actorFaceSuppressed(level, dyn, ax, ay, aw, ah, topZ)) return;
+    const _sCov = actorTopCovered(level, dyn, ax, ay, aw, ah, topZ);
+    const _sSup = actorFaceSuppressed(level, dyn, ax, ay, aw, ah, topZ);
+    if (_sCov) return;
+    if (_sSup) return;
     const baseZ = topZ - ACTOR_SLAB_THICKNESS;
     vface(ctx, ax, ay+ah, ax+aw, ay+ah, topZ, baseZ, view, dk(col, 0.58));
   }
@@ -979,19 +989,22 @@
         drawBlockerTop(ctx, tx, ty, view, blocker);
       }
 
-      // ── 9. Actor top faces whose origin tile = (tx, ty) ──
-      // Skip if terrain at the actor's origin tile is above the actor's top
-      // (the actor is hidden under the terrain floor).
+      // ── 9. Actor top faces drawn at the bottom-right tile of their footprint ──
+      // Drawing here (highest bucket in the footprint) ensures the actor top
+      // is painted AFTER all terrain top faces in its footprint, so floor tiles
+      // cannot bleed over the actor top face.
       const key = tx | (ty << 16);
       const originActors = _actorByOrigin.get(key);
       if (originActors) {
         for (const { actor, state } of originActors) {
           const actorTop = actor.kind === window.MarbleLevels.ACTOR_KINDS.TIMED_GATE
             ? actor.topHeight : state.topHeight;
-          // Skip if ANY tile under the actor's footprint has terrain above the actor,
-          // or if the actor hasn't emerged far enough above terrain to be worth drawing.
-          if (actorTopCovered(level, dyn, state.x, state.y, actor.width, actor.height, actorTop)) continue;
-          if (actorFaceSuppressed(level, dyn, state.x, state.y, actor.width, actor.height, actorTop)) continue;
+          // Skip if ANY tile under the actor's footprint has terrain above the actor.
+          // Note: actorFaceSuppressed is intentionally NOT checked here — it only
+          // suppresses side faces, not the top face.  The top face should appear
+          // as soon as the actor emerges above the terrain (actorTopCovered=false).
+          const _topCov = actorTopCovered(level, dyn, state.x, state.y, actor.width, actor.height, actorTop);
+          if (_topCov) continue;
           drawActorTop(ctx, actor, state, view, playerRefZ);
         }
       }
