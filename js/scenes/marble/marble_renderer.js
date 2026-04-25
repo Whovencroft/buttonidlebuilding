@@ -1043,6 +1043,41 @@
         }
       }
     }
+
+    // A terrain tile at (mTX+1, mTY+1) — the SE corner — has its east face
+    // drawn at bucket mTX+mTY+2 (= ballBucket+1), which is AFTER the ball
+    // is drawn.  If that tile is a tall wall, its east face will paint over
+    // the marble.  Advance ballBucket past any such wall faces.
+    //
+    // We check a 2-tile band around the marble's SE corner:
+    //   - (mTX+1, mTY+1): east face at bucket mTX+mTY+2
+    //   - (mTX,   mTY+1): east face at bucket mTX+mTY+1  (already covered)
+    //   - (mTX+1, mTY  ): east face at bucket mTX+mTY+1  (already covered)
+    // The only problematic case is the SE corner tile.
+    //
+    // We also check the south face of (mTX+1, mTY+1): it is drawn at step 1
+    // of bucket mTX+mTY+2, also after the ball.
+    {
+      const mz = runtime.marble.z;
+      // Check SE corner tile (mTX+1, mTY+1) — bucket mTX+mTY+2
+      const seFz = fillZ(level, dyn, mTX + 1, mTY + 1);
+      if (seFz !== null && seFz > mz + 0.1) {
+        // Tall wall at SE corner — its south and east faces are at bucket mTX+mTY+2
+        // which is currently ballBucket+1.  Advance ballBucket so ball is drawn
+        // after those faces.
+        ballBucket = Math.max(ballBucket, mTX + mTY + 2);
+      }
+      // Also check (mTX+1, mTY+2) — east face at bucket mTX+mTY+3
+      const sesFz = fillZ(level, dyn, mTX + 1, mTY + 2);
+      if (sesFz !== null && sesFz > mz + 0.1) {
+        ballBucket = Math.max(ballBucket, mTX + mTY + 3);
+      }
+      // And (mTX+2, mTY+1) — east face at bucket mTX+mTY+3
+      const esFz = fillZ(level, dyn, mTX + 2, mTY + 1);
+      if (esFz !== null && esFz > mz + 0.1) {
+        ballBucket = Math.max(ballBucket, mTX + mTY + 3);
+      }
+    }
     let shadowDrawn = false;
     let ballDrawn   = false;
 
