@@ -49,7 +49,7 @@
             </div>
             <div class="marble-level-strip" data-marble-level-strip></div>
           </div>
-          <div class="marble-help">WASD / Arrows move • Space jump • R restart • Esc return • window.MarbleSceneDebug toggles graph overlays, lists templates, and generates graph courses</div>
+          <div class="marble-help">Drag to roll • Tap to jump • R restart • Esc return</div>
           <div class="marble-overlay" data-marble-overlay hidden>
             <div class="marble-overlay-card">
               <div class="popup-title" data-marble-overlay-title>Marble Branch</div>
@@ -341,6 +341,8 @@
       refs.timer.textContent = `${(runtime.timerMs / 1000).toFixed(2)}s`;
       const bestMs = marbleSlice().bestTimes[runtime.level.id];
       refs.best.textContent = bestMs ? `${(bestMs / 1000).toFixed(2)}s` : '--';
+      // Expose drag state to renderer for arrow overlay
+      if (input) runtime.dragInput = input.getDragState();
       window.MarbleRenderer.render(runtime, refs.canvas);
     }
 
@@ -413,7 +415,7 @@
       enter(context = {}) {
         prepare();
         ensureInput();
-        input.attach();
+        input.attach(refs.canvas);
 
         if (!runtime || (context.startLevelId && context.startLevelId !== runtime.level.id)) {
           openLevel(context.startLevelId || currentLevelId(), { silentSave: true, playReplayData: context.playReplayData || null });

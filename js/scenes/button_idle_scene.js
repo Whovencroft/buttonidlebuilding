@@ -87,7 +87,7 @@ function completeIdleGame() {
   s.flags.idleGameComplete = true;
   s.scenes.marble.unlocked = true;
   s.scenes.marble.currentLevelId =
-    s.scenes.marble.currentLevelId || 'training_run';
+    s.scenes.marble.currentLevelId || 'fork_rejoin_test';
   s.ui.autonomyEndingOpen = false;
 
   logMessage('The button has awakened, now begins its journey.', 'good');

@@ -271,11 +271,35 @@
   }
 
   function setGoal(level, x, y, radius = 0.42) {
+    // Level design guideline: goals must be placed on flat, non-bounce, non-crumble terrain tiles.
+    const cell = getSurfaceCell(level, x, y);
+    if (cell) {
+      if (cell.kind === 'void') {
+        console.warn(`[LevelDesign] setGoal at (${x},${y}) is on a void tile — goal will be unreachable.`);
+      } else if (cell.shape !== SHAPES.FLAT) {
+        console.warn(`[LevelDesign] setGoal at (${x},${y}) is on a non-flat tile (shape='${cell.shape}') — marble may slide through goal.`);
+      } else if (cell.bounce > 0) {
+        console.warn(`[LevelDesign] setGoal at (${x},${y}) is on a bounce tile (bounce=${cell.bounce}) — marble will be deflected away from goal.`);
+      } else if (cell.crumble) {
+        console.warn(`[LevelDesign] setGoal at (${x},${y}) is on a crumble tile — goal surface may disappear before marble arrives.`);
+      }
+    }
     setTrigger(level, x, y, { kind: 'goal', radius });
     level.goal = { x: x + 0.5, y: y + 0.5, radius };
   }
 
   function addActor(level, actor) {
+    // Level design guideline: moving platforms should be positioned outside terrain
+    // (except elevators, which may interact with terrain vertically).
+    if (actor.kind === ACTOR_KINDS.MOVING_PLATFORM && actor.path) {
+      const points = actor.path.points ?? [];
+      for (const pt of points) {
+        const cell = getSurfaceCell(level, Math.floor(pt.x), Math.floor(pt.y));
+        if (cell && cell.kind !== 'void') {
+          console.warn(`[LevelDesign] Moving platform '${actor.id || 'unknown'}' path point (${pt.x},${pt.y}) overlaps terrain tile — platform may clip through geometry.`);
+        }
+      }
+    }
     level.actors.push(normalizeActor(actor, level.actors.length));
   }
 

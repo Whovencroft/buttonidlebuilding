@@ -65,6 +65,17 @@
   }
 
   function mapScreenInputToWorld(axis) {
+    // If the input already carries pre-projected world-space components
+    // (set by the drag input system), use them directly.
+    if (axis?.worldSpace) {
+      let wx = axis.x ?? 0;
+      let wy = axis.y ?? 0;
+      const length = Math.hypot(wx, wy);
+      if (length > 1) { wx /= length; wy /= length; }
+      return { x: wx, y: wy };
+    }
+
+    // Legacy keyboard path: screen-space WASD → isometric world axes
     const sx = axis?.x ?? 0;
     const sy = axis?.y ?? 0;
 

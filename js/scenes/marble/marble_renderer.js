@@ -1035,7 +1035,12 @@
     const ML     = window.MarbleLevels;
     const mx     = marble.x, my = marble.y, mz = marble.z;
     const mTX    = Math.floor(mx), mTY = Math.floor(my);
-    const radius = marble.visualRadius ?? marble.collisionRadius ?? 0.225;
+    // Use the full visual radius for the "inside own tile" check (Case 1),
+    // but a reduced radius for adjacency checks (Cases 2-5) to prevent false
+    // positives when the marble is resting against a wall face without actually
+    // being visually behind it.
+    const radius     = marble.visualRadius ?? marble.collisionRadius ?? 0.225;
+    const adjRadius  = radius * 0.72;   // tighter threshold for neighbour faces
     const fx     = mx - mTX;   // fractional position within tile [0,1)
     const fy     = my - mTY;
 
