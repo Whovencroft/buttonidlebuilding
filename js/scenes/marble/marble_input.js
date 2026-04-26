@@ -10,8 +10,11 @@
  *   - Force is applied as a continuous axis while dragging, then released
  *   - On release, a one-shot impulse proportional to drag length is applied
  *
- * SECONDARY: Keyboard (WASD / Arrows) — kept for desktop convenience
- *   - Keyboard axis is in screen space and converted to world space by physics
+ * Keyboard: non-movement keys only.
+ *   - Space: jump
+ *   - R: restart  (consumed by marble_state.js)
+ *   - Escape: return (consumed by marble_state.js)
+ *   Arrow keys and WASD are intentionally NOT supported.
  *
  * Isometric world projection:
  *   The isometric camera is oriented at 45° yaw, ~35.26° pitch.
@@ -20,8 +23,6 @@
  *
  *   World X = (screenDx + screenDy) / 2   (east)
  *   World Y = (screenDy - screenDx) / 2   (south)
- *
- *   This is the same transform used in the old keyboard path.
  */
 (() => {
   'use strict';
@@ -36,9 +37,10 @@
   const JUMP_ON_TAP = true;
 
   function createInput() {
-    // ── Keyboard state ──────────────────────────────────────────────────────
+    // ── Non-movement key state ────────────────────────────────────────────
     const held             = new Set();
     const bufferedPresses  = new Set();
+    const TRACKED_KEYS     = new Set(['Space', 'KeyR', 'Escape']);
     let   attached         = false;
 
     // ── Drag state ──────────────────────────────────────────────────────────
@@ -56,12 +58,16 @@
     // Canvas reference (set when attached)
     let canvas = null;
 
-    // ── Keyboard handlers ───────────────────────────────────────────────────
+    // ── Keyboard handlers (non-movement keys only) ─────────────────────────
     function onKeyDown(e) {
+      if (!TRACKED_KEYS.has(e.code)) return;
       if (!held.has(e.code)) bufferedPresses.add(e.code);
       held.add(e.code);
     }
-    function onKeyUp(e)  { held.delete(e.code); }
+    function onKeyUp(e)  {
+      if (!TRACKED_KEYS.has(e.code)) return;
+      held.delete(e.code);
+    }
     function onBlur()    { held.clear(); bufferedPresses.clear(); }
 
     // ── Pointer handlers ────────────────────────────────────────────────────
@@ -163,22 +169,14 @@
 
     /**
      * Returns the current continuous axis for the physics step.
-     * - During a drag: returns the normalised world-space drag direction
-     *   with magnitude proportional to drag distance (0..1), flagged as
-     *   worldSpace=true so the physics engine skips the screen→world transform.
-     * - During keyboard hold: returns screen-space axis (worldSpace=false).
+     * Drag-only: returns the normalised world-space drag direction
+     * with magnitude proportional to drag distance (0..1), flagged as
+     * worldSpace=true so the physics engine skips the screen→world transform.
+     * Returns zero axis when no drag is active.
      */
     function getAxis() {
-      // Keyboard takes priority when no drag is active
       if (!dragActive) {
-        let x = 0, y = 0;
-        if (held.has('ArrowLeft')  || held.has('KeyA')) x -= 1;
-        if (held.has('ArrowRight') || held.has('KeyD')) x += 1;
-        if (held.has('ArrowUp')    || held.has('KeyW')) y -= 1;
-        if (held.has('ArrowDown')  || held.has('KeyS')) y += 1;
-        const len = Math.hypot(x, y);
-        if (len > 1) { x /= len; y /= len; }
-        return { x: Number(x.toFixed(4)), y: Number(y.toFixed(4)), worldSpace: false };
+        return { x: 0, y: 0, worldSpace: true };
       }
 
       // Active drag: project to world space

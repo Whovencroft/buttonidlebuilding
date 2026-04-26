@@ -367,33 +367,38 @@
       }
     }
 
-    // Wall faces: south and east
-    // For each flat tile, check if the tile to the south/east is lower
-    const fillZ = (tx, ty) => {
-      const c = ML.getSurfaceCell(level, tx, ty);
-      if (!c || c.kind === 'void') return voidFloor;
-      return c.baseHeight;
-    };
-
+    // Wall faces: all four directions for every tile.
+    // Use getFillTopAtCell (staticOnly) so ramp tiles contribute their
+    // actual max-corner height, not just baseHeight.
+    const fillZ = (ttx, tty) => ML.getFillTopAtCell(level, ttx, tty, { staticOnly: true });
     for (const { tx, ty, cell } of tiles) {
-      if (cell.shape && cell.shape !== 'flat') continue; // ramps handled separately
-      const topZ = cell.baseHeight;
-
-      // South face
+      // Use the true max-corner height of this tile as the top of its faces.
+      const topZ = ML.getSurfaceTopZ ? ML.getSurfaceTopZ(cell) : cell.baseHeight;
+      // South face (visible when tile to south is lower)
       const southZ = fillZ(tx, ty + 1);
       if (southZ < topZ - 0.01) {
         const sf = buildWallFaceMesh(tx, tx + 1, ty + 1, southZ, topZ, matWallSouth());
         if (sf) group.add(sf);
       }
-
-      // East face
+      // East face (visible when tile to east is lower)
       const eastZ = fillZ(tx + 1, ty);
       if (eastZ < topZ - 0.01) {
         const ef = buildWallFaceEastMesh(ty, ty + 1, tx + 1, eastZ, topZ, matWallEast());
         if (ef) group.add(ef);
       }
+      // North face (visible when tile to north is lower)
+      const northZ = fillZ(tx, ty - 1);
+      if (northZ < topZ - 0.01) {
+        const nf = buildWallFaceMesh(tx, tx + 1, ty, northZ, topZ, matWallSouth());
+        if (nf) group.add(nf);
+      }
+      // West face (visible when tile to west is lower)
+      const westZ = fillZ(tx - 1, ty);
+      if (westZ < topZ - 0.01) {
+        const wf = buildWallFaceEastMesh(ty, ty + 1, tx, westZ, topZ, matWallEast());
+        if (wf) group.add(wf);
+      }
     }
-
     // Blockers (walls / raised platforms)
     for (let ty = 0; ty < level.height; ty++) {
       for (let tx = 0; tx < level.width; tx++) {
