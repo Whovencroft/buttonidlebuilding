@@ -203,11 +203,17 @@
           continue;
         }
 
-        // Terrain tiles that are too tall to step up also act as walls.
-        // This prevents the marble from walking through raised terrain (e.g.
-        // wall rings built with setSurface rather than setBlocker).
-        const fz = window.MarbleLevels.getFillTopAtCell(level, tx, ty, { staticOnly: true });
-        if (fz === null || fz <= marbleBottom + MAX_STEP_UP + 0.04) continue;
+        // Terrain tiles that are too tall to step up also act as walls,
+        // but ONLY for flat-topped tiles (shape === 'flat').  Ramp and slope
+        // tiles have a high max-corner height but are walkable from the low
+        // end; treating them as walls would block the marble from rolling
+        // alongside or onto them.
+        const surface = window.MarbleLevels.getSurfaceCell(level, tx, ty);
+        if (!surface || surface.kind === 'void') continue;
+        if (surface.shape !== 'flat') continue;
+
+        const fz = surface.baseHeight;
+        if (fz <= marbleBottom + MAX_STEP_UP + 0.04) continue;
 
         // Don't block if the marble is standing on top of this terrain tile
         // (supportZ matches the tile's surface height).
