@@ -541,53 +541,56 @@
     // Only draw if this tile has an exposed south face
     if (!hasSouthFaceAt(level, dynState, tx, ty, top)) return;
 
-    // Only draw at the LEFTMOST tile of the contiguous run
-    // (west neighbour is not a flat tile at the same height with an exposed south face)
-    if (isFlatTerrainAt(level, dynState, tx - 1, ty, top) &&
-        hasSouthFaceAt(level, dynState, tx - 1, ty, top)) return;
+    // Only draw at the RIGHTMOST tile of the contiguous run.
+    // Drawing at the rightmost tile (highest bucket in the run) ensures the
+    // grouped face polygon is painted AFTER the top faces of all tiles to its
+    // left (which share the same screen depth), preventing them from covering
+    // the south face.
+    if (isFlatTerrainAt(level, dynState, tx + 1, ty, top) &&
+        hasSouthFaceAt(level, dynState, tx + 1, ty, top)) return;
 
-    // Walk east to find the full width of this south face run
-    let xEnd = tx + 1;
-    while (isFlatTerrainAt(level, dynState, xEnd, ty, top) &&
-           hasSouthFaceAt(level, dynState, xEnd, ty, top)) {
-      xEnd++;
+    // Walk west to find the start of this south face run
+    let xStart = tx;
+    while (isFlatTerrainAt(level, dynState, xStart - 1, ty, top) &&
+           hasSouthFaceAt(level, dynState, xStart - 1, ty, top)) {
+      xStart--;
     }
+    const xEnd = tx + 1;
 
     // Check for sloped neighbours that require bottom edge adjustment
-    // (only for the leftmost and rightmost tiles in the run)
-    const southCell2 = ML.getSurfaceCell(level, tx, ty + 1);
-    const northCell2 = ML.getSurfaceCell(level, tx, ty - 1);
-    const hasSlopedSouth = southCell2 && southCell2.kind !== 'void' && southCell2.shape && southCell2.shape !== 'flat';
-    const hasLowerNorthRamp = northCell2 && northCell2.kind !== 'void' && northCell2.shape && northCell2.shape !== 'flat';
+    // (only for the leftmost tile in the run)
+    const southCellL = ML.getSurfaceCell(level, xStart, ty + 1);
+    const northCellL = ML.getSurfaceCell(level, xStart, ty - 1);
+    const hasSlopedSouth = southCellL && southCellL.kind !== 'void' && southCellL.shape && southCellL.shape !== 'flat';
+    const hasLowerNorthRamp = northCellL && northCellL.kind !== 'void' && northCellL.shape && northCellL.shape !== 'flat';
 
     if (hasSlopedSouth || hasLowerNorthRamp) {
-      // For runs adjacent to slopes, fall back to per-tile drawing to preserve
-      // the correct trapezoidal bottom edge shape at ramp transitions.
-      // This only affects the first tile; the rest of the run draws normally below.
-      let botL2 = fillZ(level, dynState, tx, ty + 1);
+      // For runs adjacent to slopes, draw the leftmost tile with a trapezoidal
+      // bottom edge, then draw the rest of the run as a single solid sheet.
+      let botL2 = fillZ(level, dynState, xStart, ty + 1);
       let botR2 = botL2;
       if (hasSlopedSouth) {
-        const hs2 = ML.getSurfaceCornerHeights(southCell2);
+        const hs2 = ML.getSurfaceCornerHeights(southCellL);
         botL2 = Math.min(botL2, hs2.nw);
         botR2 = Math.min(botR2, hs2.ne);
       }
       if (hasLowerNorthRamp) {
-        const hn2 = ML.getSurfaceCornerHeights(northCell2);
+        const hn2 = ML.getSurfaceCornerHeights(northCellL);
         botL2 = Math.min(botL2, hn2.sw);
         botR2 = Math.min(botR2, hn2.se);
       }
       botL2 = Math.min(botL2, top);
       botR2 = Math.min(botR2, top);
-      quadFace(ctx, tx, ty+1, tx+1, ty+1, top, top, botR2, botL2, view, darkColor);
-      // Draw the rest of the run as a single solid sheet starting from tx+1
-      if (xEnd > tx + 1) {
-        const bot = fillZ(level, dynState, tx + 1, ty + 1) ?? (top - 2);
-        vface(ctx, tx+1, ty+1, xEnd, ty+1, top, bot, view, darkColor);
+      quadFace(ctx, xStart, ty+1, xStart+1, ty+1, top, top, botR2, botL2, view, darkColor);
+      // Draw the rest of the run as a single solid sheet starting from xStart+1
+      if (xEnd > xStart + 1) {
+        const bot = fillZ(level, dynState, xStart + 1, ty + 1) ?? (top - 2);
+        vface(ctx, xStart+1, ty+1, xEnd, ty+1, top, bot, view, darkColor);
       }
     } else {
       // Uniform run: draw as one solid sheet
-      const bot = fillZ(level, dynState, tx, ty + 1) ?? (top - 2);
-      vface(ctx, tx, ty+1, xEnd, ty+1, top, bot, view, darkColor);
+      const bot = fillZ(level, dynState, xStart, ty + 1) ?? (top - 2);
+      vface(ctx, xStart, ty+1, xEnd, ty+1, top, bot, view, darkColor);
     }
   }
 
@@ -620,50 +623,56 @@
     // Only draw if this tile has an exposed east face
     if (!hasEastFaceAt(level, dynState, tx, ty, top)) return;
 
-    // Only draw at the TOPMOST (northernmost) tile of the contiguous run
-    // (north neighbour is not a flat tile at the same height with an exposed east face)
-    if (isFlatTerrainAt(level, dynState, tx, ty - 1, top) &&
-        hasEastFaceAt(level, dynState, tx, ty - 1, top)) return;
+    // Only draw at the BOTTOMMOST (southernmost) tile of the contiguous run.
+    // Drawing at the bottommost tile (highest bucket in the run) ensures the
+    // grouped face polygon is painted AFTER the top faces of all tiles above it
+    // (which share the same screen depth), preventing them from covering the
+    // east face.
+    if (isFlatTerrainAt(level, dynState, tx, ty + 1, top) &&
+        hasEastFaceAt(level, dynState, tx, ty + 1, top)) return;
 
-    // Walk south to find the full height of this east face run
-    let yEnd = ty + 1;
-    while (isFlatTerrainAt(level, dynState, tx, yEnd, top) &&
-           hasEastFaceAt(level, dynState, tx, yEnd, top)) {
-      yEnd++;
+    // Walk north to find the start of this east face run
+    let yStart = ty;
+    while (isFlatTerrainAt(level, dynState, tx, yStart - 1, top) &&
+           hasEastFaceAt(level, dynState, tx, yStart - 1, top)) {
+      yStart--;
     }
+    const yEnd = ty + 1;
 
     // Check for sloped neighbours that require bottom edge adjustment
-    const eastCell2 = ML.getSurfaceCell(level, tx + 1, ty);
-    const westCell2 = ML.getSurfaceCell(level, tx - 1, ty);
-    const hasSlopedEast = eastCell2 && eastCell2.kind !== 'void' && eastCell2.shape && eastCell2.shape !== 'flat';
-    const hasLowerWestRamp = westCell2 && westCell2.kind !== 'void' && westCell2.shape && westCell2.shape !== 'flat';
+    // (only for the topmost tile in the run)
+    const eastCellT = ML.getSurfaceCell(level, tx + 1, yStart);
+    const westCellT = ML.getSurfaceCell(level, tx - 1, yStart);
+    const hasSlopedEast = eastCellT && eastCellT.kind !== 'void' && eastCellT.shape && eastCellT.shape !== 'flat';
+    const hasLowerWestRamp = westCellT && westCellT.kind !== 'void' && westCellT.shape && westCellT.shape !== 'flat';
 
     if (hasSlopedEast || hasLowerWestRamp) {
-      // Fall back to per-tile drawing for the first tile at a ramp transition.
-      let botT2 = fillZ(level, dynState, tx + 1, ty);
+      // Draw the topmost tile with a trapezoidal bottom edge, then draw the
+      // rest of the run as a single solid sheet.
+      let botT2 = fillZ(level, dynState, tx + 1, yStart);
       let botB2 = botT2;
       if (hasSlopedEast) {
-        const he2 = ML.getSurfaceCornerHeights(eastCell2);
+        const he2 = ML.getSurfaceCornerHeights(eastCellT);
         botT2 = Math.min(botT2, he2.nw);
         botB2 = Math.min(botB2, he2.sw);
       }
       if (hasLowerWestRamp) {
-        const hw2 = ML.getSurfaceCornerHeights(westCell2);
+        const hw2 = ML.getSurfaceCornerHeights(westCellT);
         botT2 = Math.min(botT2, hw2.ne);
         botB2 = Math.min(botB2, hw2.se);
       }
       botT2 = Math.min(botT2, top);
       botB2 = Math.min(botB2, top);
-      quadFace(ctx, tx+1, ty, tx+1, ty+1, top, top, botB2, botT2, view, lightColor);
-      // Draw the rest of the run as a single solid sheet starting from ty+1
-      if (yEnd > ty + 1) {
-        const bot = fillZ(level, dynState, tx + 1, ty + 1) ?? (top - 2);
-        vface(ctx, tx+1, ty+1, tx+1, yEnd, top, bot, view, lightColor);
+      quadFace(ctx, tx+1, yStart, tx+1, yStart+1, top, top, botB2, botT2, view, lightColor);
+      // Draw the rest of the run as a single solid sheet starting from yStart+1
+      if (yEnd > yStart + 1) {
+        const bot = fillZ(level, dynState, tx + 1, yStart + 1) ?? (top - 2);
+        vface(ctx, tx+1, yStart+1, tx+1, yEnd, top, bot, view, lightColor);
       }
     } else {
       // Uniform run: draw as one solid sheet
-      const bot = fillZ(level, dynState, tx + 1, ty) ?? (top - 2);
-      vface(ctx, tx+1, ty, tx+1, yEnd, top, bot, view, lightColor);
+      const bot = fillZ(level, dynState, tx + 1, yStart) ?? (top - 2);
+      vface(ctx, tx+1, yStart, tx+1, yEnd, top, bot, view, lightColor);
     }
   }
 
