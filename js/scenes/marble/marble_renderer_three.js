@@ -34,32 +34,36 @@
   // Marble Madness colour palette
   const COL = {
     void:         0x000000,
-    // Tile tops: clean mid-grey with subtle grid
-    tileTop:      0xb8b0a0,   // solid tile top colour
-    tileGrid:     0x888070,   // grid line colour (subtle)
-    // Wall faces: clearly distinct from tops, south lighter than east
-    wallSouth:    0xa03020,   // south-facing wall (lighter, more lit)
-    wallEast:     0x6a1e10,   // east-facing wall (darker, in shadow)
-    wallNorth:    0x7a2418,   // north wall (mid)
-    wallWest:     0x8a2c1c,   // west wall (mid-light)
+    // Tile tops: original slate-blue-grey from canvas renderer (#94a3b8)
+    tileTop:      0x94a3b8,   // slate-400 cool blue-grey (exact match to original)
+    tileGrid:     0x6b7a8a,   // subtle grid lines (slightly darker)
+    // Wall faces: darkened versions of tile top, matching dk() from original renderer
+    // south: dk(#94a3b8, 0.58) = #565e6b  (darker, south-facing shadow)
+    wallSouth:    0x565e6b,
+    // east:  dk(#94a3b8, 0.72) = #6a7585  (medium, east-facing)
+    wallEast:     0x6a7585,
+    // north: slightly lighter than south (lit from above-north)
+    wallNorth:    0x6a7585,
+    // west:  same as east
+    wallWest:     0x565e6b,
     // Ramp tops match tile tops
-    rampTop:      0xb8b0a0,
-    // Marble: matches the idle button
+    rampTop:      0x94a3b8,
+    // Marble: matches the idle button (navy blue with sky-blue ring)
     marbleTop:    0x253244,
     marbleBot:    0x1b2532,
     marbleRing:   0x7dd3fc,
-    // Special tiles
-    goalLight:    0xffd700,   // gold
-    goalDark:     0xb8860b,   // dark gold
-    bounceTop:    0x44dd44,   // bright green
-    bounceDark:   0x228822,
-    platformTop:  0x8ab4d4,
-    platformSide: 0x4a7a9a,
-    hazardTop:    0xff4444,
-    hazardSide:   0xaa2222,
-    conveyorTop:  0x44ccaa,
-    conveyorSide: 0x228866,
-    goalFlag:     0xffd700,
+    // Special tiles (exact hex from original renderer)
+    goalLight:    0x22c55e,   // #22c55e green goal
+    goalDark:     0x16a34a,   // darker green
+    bounceTop:    0x38bdf8,   // #38bdf8 sky blue bounce
+    bounceDark:   0x0ea5e9,
+    platformTop:  0x64748b,   // #64748b slate moving platform
+    platformSide: 0x475569,   // #475569 darker slate
+    hazardTop:    0xef4444,   // #ef4444 red hazard
+    hazardSide:   0xdc2626,
+    conveyorTop:  0x0891b2,   // #0891b2 cyan conveyor
+    conveyorSide: 0x0e7490,
+    goalFlag:     0x22c55e,
   };
 
   // ─── Module state ────────────────────────────────────────────────────────────
