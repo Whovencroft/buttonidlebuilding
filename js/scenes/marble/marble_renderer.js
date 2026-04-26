@@ -459,13 +459,62 @@
   }
 
   // ─── Terrain south/east faces ─────────────────────────────────────────────
+  //
+  // FLAT terrain tiles at the same height are grouped into contiguous solid
+  // face sheets — exactly mirroring the blocker face grouping logic.
+  // This eliminates seams between adjacent wall tiles that would otherwise
+  // allow the marble sphere to visually bleed through.
+  //
+  // Sloped/curved tiles continue to draw per-tile because each has different
+  // corner heights and cannot be grouped.
+  //
+  // South face grouping:
+  //   Triggered at the LEFTMOST tile of a contiguous run of flat terrain at
+  //   the same height with an exposed south face (tile to south is lower/void).
+  //   Walks east to find the full width, then draws one wide polygon.
+  //
+  // East face grouping:
+  //   Triggered at the TOPMOST (northernmost) tile of a contiguous run of flat
+  //   terrain at the same height with an exposed east face (tile to east is
+  //   lower/void).  Walks south to find the full height, then draws one tall
+  //   polygon.
+
+  // Helper: is this tile a flat terrain tile with a specific fillZ?
+  function isFlatTerrainAt(level, dynState, tx, ty, expectedZ) {
+    const ML   = window.MarbleLevels;
+    const cell = ML.getSurfaceCell(level, tx, ty);
+    if (!cell || cell.kind === 'void') return false;
+    if (cell.shape && cell.shape !== 'flat') return false;
+    if (ML.getBlockerCell(level, tx, ty)) return false; // blocker overrides terrain face
+    const fz = fillZ(level, dynState, tx, ty);
+    return Math.abs(fz - expectedZ) < 0.001;
+  }
+
+  // Helper: does this flat tile have an exposed south face?
+  // (i.e. the tile to the south is lower, void, or a different height)
+  function hasSouthFaceAt(level, dynState, tx, ty, topZ) {
+    const ML = window.MarbleLevels;
+    const bSouth = ML.getBlockerCell(level, tx, ty + 1);
+    if (bSouth && bSouth.top >= topZ) return false; // blocker covers the face
+    const botZ = fillZ(level, dynState, tx, ty + 1);
+    return botZ === null || botZ < topZ - Z_EPS;
+  }
+
+  // Helper: does this flat tile have an exposed east face?
+  function hasEastFaceAt(level, dynState, tx, ty, topZ) {
+    const ML = window.MarbleLevels;
+    const bEast = ML.getBlockerCell(level, tx + 1, ty);
+    if (bEast && bEast.top >= topZ) return false;
+    const botZ = fillZ(level, dynState, tx + 1, ty);
+    return botZ === null || botZ < topZ - Z_EPS;
+  }
 
   function drawTerrainSouthFace(ctx, level, dynState, tx, ty, view, color) {
     const ML   = window.MarbleLevels;
     const cell = ML.getSurfaceCell(level, tx, ty);
     const darkColor = dk(color, 0.58);
     if (cell && cell.kind !== 'void' && cell.shape && cell.shape !== 'flat') {
-      // Sloped tile: use actual corner heights for the south face.
+      // Sloped tile: draw per-tile with actual corner heights.
       // The bottom edge uses the NW/NE corners of the south neighbour tile so
       // that both the top AND bottom edges of the face polygon are correctly
       // sloped, eliminating triangular void gaps.
@@ -482,41 +531,63 @@
         botR = Math.min(flat, h.se);
       }
       quadFace(ctx, tx, ty+1, tx+1, ty+1, h.sw, h.se, botR, botL, view, darkColor);
-    } else {
-      // Flat tile: extend the south face downward to cover any lower ramp corners.
-      // Two cases to handle:
-      //   1. South neighbour is sloped — its north edge (nw/ne) may be lower than
-      //      this tile's fillZ, leaving a void on the south neighbour's north side.
-      //   2. North neighbour is a lower ramp — this flat wall's south face must
-      //      extend down to the ramp's sw/se corners to fill the void between
-      //      the ramp's sloped top and this wall's flat top.
-      const top = fillZ(level, dynState, tx, ty);
-      const southCell2 = ML.getSurfaceCell(level, tx, ty + 1);
-      const northCell2 = ML.getSurfaceCell(level, tx, ty - 1);
-      const hasSlopedSouth = southCell2 && southCell2.kind !== 'void' && southCell2.shape && southCell2.shape !== 'flat';
-      const hasLowerNorthRamp = northCell2 && northCell2.kind !== 'void' && northCell2.shape && northCell2.shape !== 'flat';
-      if (hasSlopedSouth || hasLowerNorthRamp) {
-        let botL2 = fillZ(level, dynState, tx, ty + 1);
-        let botR2 = botL2;
-        if (hasSlopedSouth) {
-          const hs2 = ML.getSurfaceCornerHeights(southCell2);
-          botL2 = Math.min(botL2, hs2.nw);
-          botR2 = Math.min(botR2, hs2.ne);
-        }
-        if (hasLowerNorthRamp) {
-          const hn2 = ML.getSurfaceCornerHeights(northCell2);
-          // The north ramp's south edge (sw/se) may be lower than this tile.
-          // Extend this face down to cover those corners.
-          botL2 = Math.min(botL2, hn2.sw);
-          botR2 = Math.min(botR2, hn2.se);
-        }
-        botL2 = Math.min(botL2, top);
-        botR2 = Math.min(botR2, top);
-        quadFace(ctx, tx, ty+1, tx+1, ty+1, top, top, botR2, botL2, view, darkColor);
-      } else {
-        const bot = fillZ(level, dynState, tx, ty + 1);
-        vface(ctx, tx, ty+1, tx+1, ty+1, top, bot, view, darkColor);
+      return;
+    }
+
+    // Flat tile: group contiguous same-height flat tiles into a solid face sheet.
+    const top = fillZ(level, dynState, tx, ty);
+    if (top === null) return;
+
+    // Only draw if this tile has an exposed south face
+    if (!hasSouthFaceAt(level, dynState, tx, ty, top)) return;
+
+    // Only draw at the LEFTMOST tile of the contiguous run
+    // (west neighbour is not a flat tile at the same height with an exposed south face)
+    if (isFlatTerrainAt(level, dynState, tx - 1, ty, top) &&
+        hasSouthFaceAt(level, dynState, tx - 1, ty, top)) return;
+
+    // Walk east to find the full width of this south face run
+    let xEnd = tx + 1;
+    while (isFlatTerrainAt(level, dynState, xEnd, ty, top) &&
+           hasSouthFaceAt(level, dynState, xEnd, ty, top)) {
+      xEnd++;
+    }
+
+    // Check for sloped neighbours that require bottom edge adjustment
+    // (only for the leftmost and rightmost tiles in the run)
+    const southCell2 = ML.getSurfaceCell(level, tx, ty + 1);
+    const northCell2 = ML.getSurfaceCell(level, tx, ty - 1);
+    const hasSlopedSouth = southCell2 && southCell2.kind !== 'void' && southCell2.shape && southCell2.shape !== 'flat';
+    const hasLowerNorthRamp = northCell2 && northCell2.kind !== 'void' && northCell2.shape && northCell2.shape !== 'flat';
+
+    if (hasSlopedSouth || hasLowerNorthRamp) {
+      // For runs adjacent to slopes, fall back to per-tile drawing to preserve
+      // the correct trapezoidal bottom edge shape at ramp transitions.
+      // This only affects the first tile; the rest of the run draws normally below.
+      let botL2 = fillZ(level, dynState, tx, ty + 1);
+      let botR2 = botL2;
+      if (hasSlopedSouth) {
+        const hs2 = ML.getSurfaceCornerHeights(southCell2);
+        botL2 = Math.min(botL2, hs2.nw);
+        botR2 = Math.min(botR2, hs2.ne);
       }
+      if (hasLowerNorthRamp) {
+        const hn2 = ML.getSurfaceCornerHeights(northCell2);
+        botL2 = Math.min(botL2, hn2.sw);
+        botR2 = Math.min(botR2, hn2.se);
+      }
+      botL2 = Math.min(botL2, top);
+      botR2 = Math.min(botR2, top);
+      quadFace(ctx, tx, ty+1, tx+1, ty+1, top, top, botR2, botL2, view, darkColor);
+      // Draw the rest of the run as a single solid sheet starting from tx+1
+      if (xEnd > tx + 1) {
+        const bot = fillZ(level, dynState, tx + 1, ty + 1) ?? (top - 2);
+        vface(ctx, tx+1, ty+1, xEnd, ty+1, top, bot, view, darkColor);
+      }
+    } else {
+      // Uniform run: draw as one solid sheet
+      const bot = fillZ(level, dynState, tx, ty + 1) ?? (top - 2);
+      vface(ctx, tx, ty+1, xEnd, ty+1, top, bot, view, darkColor);
     }
   }
 
@@ -525,10 +596,7 @@
     const cell = ML.getSurfaceCell(level, tx, ty);
     const lightColor = dk(color, 0.72);
     if (cell && cell.kind !== 'void' && cell.shape && cell.shape !== 'flat') {
-      // Sloped tile: use actual corner heights for the east face.
-      // The bottom edge uses the NW/SW corners of the east neighbour tile so
-      // that both the top AND bottom edges of the face polygon are correctly
-      // sloped, eliminating triangular void gaps.
+      // Sloped tile: draw per-tile with actual corner heights.
       const h = ML.getSurfaceCornerHeights(cell);
       const eastCell = ML.getSurfaceCell(level, tx + 1, ty);
       let botT, botB;
@@ -542,41 +610,60 @@
         botB = Math.min(flat, h.se);
       }
       quadFace(ctx, tx+1, ty, tx+1, ty+1, h.ne, h.se, botB, botT, view, lightColor);
-    } else {
-      // Flat tile: extend the east face downward to cover any lower ramp corners.
-      // Two cases to handle:
-      //   1. East neighbour is sloped — its west edge (nw/sw) may be lower than
-      //      this tile's fillZ, leaving a void on the east neighbour's west side.
-      //   2. West neighbour is a lower ramp — this flat wall's east face must
-      //      extend down to the ramp's ne/se corners to fill the void between
-      //      the ramp's sloped top and this wall's flat top.
-      const top = fillZ(level, dynState, tx, ty);
-      const eastCell2 = ML.getSurfaceCell(level, tx + 1, ty);
-      const westCell2 = ML.getSurfaceCell(level, tx - 1, ty);
-      const hasSlopedEast = eastCell2 && eastCell2.kind !== 'void' && eastCell2.shape && eastCell2.shape !== 'flat';
-      const hasLowerWestRamp = westCell2 && westCell2.kind !== 'void' && westCell2.shape && westCell2.shape !== 'flat';
-      if (hasSlopedEast || hasLowerWestRamp) {
-        let botT2 = fillZ(level, dynState, tx + 1, ty);
-        let botB2 = botT2;
-        if (hasSlopedEast) {
-          const he2 = ML.getSurfaceCornerHeights(eastCell2);
-          botT2 = Math.min(botT2, he2.nw);
-          botB2 = Math.min(botB2, he2.sw);
-        }
-        if (hasLowerWestRamp) {
-          const hw2 = ML.getSurfaceCornerHeights(westCell2);
-          // The west ramp's east edge (ne/se) may be lower than this tile.
-          // Extend this face down to cover those corners.
-          botT2 = Math.min(botT2, hw2.ne);
-          botB2 = Math.min(botB2, hw2.se);
-        }
-        botT2 = Math.min(botT2, top);
-        botB2 = Math.min(botB2, top);
-        quadFace(ctx, tx+1, ty, tx+1, ty+1, top, top, botB2, botT2, view, lightColor);
-      } else {
-        const bot = fillZ(level, dynState, tx + 1, ty);
-        vface(ctx, tx+1, ty, tx+1, ty+1, top, bot, view, lightColor);
+      return;
+    }
+
+    // Flat tile: group contiguous same-height flat tiles into a solid face sheet.
+    const top = fillZ(level, dynState, tx, ty);
+    if (top === null) return;
+
+    // Only draw if this tile has an exposed east face
+    if (!hasEastFaceAt(level, dynState, tx, ty, top)) return;
+
+    // Only draw at the TOPMOST (northernmost) tile of the contiguous run
+    // (north neighbour is not a flat tile at the same height with an exposed east face)
+    if (isFlatTerrainAt(level, dynState, tx, ty - 1, top) &&
+        hasEastFaceAt(level, dynState, tx, ty - 1, top)) return;
+
+    // Walk south to find the full height of this east face run
+    let yEnd = ty + 1;
+    while (isFlatTerrainAt(level, dynState, tx, yEnd, top) &&
+           hasEastFaceAt(level, dynState, tx, yEnd, top)) {
+      yEnd++;
+    }
+
+    // Check for sloped neighbours that require bottom edge adjustment
+    const eastCell2 = ML.getSurfaceCell(level, tx + 1, ty);
+    const westCell2 = ML.getSurfaceCell(level, tx - 1, ty);
+    const hasSlopedEast = eastCell2 && eastCell2.kind !== 'void' && eastCell2.shape && eastCell2.shape !== 'flat';
+    const hasLowerWestRamp = westCell2 && westCell2.kind !== 'void' && westCell2.shape && westCell2.shape !== 'flat';
+
+    if (hasSlopedEast || hasLowerWestRamp) {
+      // Fall back to per-tile drawing for the first tile at a ramp transition.
+      let botT2 = fillZ(level, dynState, tx + 1, ty);
+      let botB2 = botT2;
+      if (hasSlopedEast) {
+        const he2 = ML.getSurfaceCornerHeights(eastCell2);
+        botT2 = Math.min(botT2, he2.nw);
+        botB2 = Math.min(botB2, he2.sw);
       }
+      if (hasLowerWestRamp) {
+        const hw2 = ML.getSurfaceCornerHeights(westCell2);
+        botT2 = Math.min(botT2, hw2.ne);
+        botB2 = Math.min(botB2, hw2.se);
+      }
+      botT2 = Math.min(botT2, top);
+      botB2 = Math.min(botB2, top);
+      quadFace(ctx, tx+1, ty, tx+1, ty+1, top, top, botB2, botT2, view, lightColor);
+      // Draw the rest of the run as a single solid sheet starting from ty+1
+      if (yEnd > ty + 1) {
+        const bot = fillZ(level, dynState, tx + 1, ty + 1) ?? (top - 2);
+        vface(ctx, tx+1, ty+1, tx+1, yEnd, top, bot, view, lightColor);
+      }
+    } else {
+      // Uniform run: draw as one solid sheet
+      const bot = fillZ(level, dynState, tx + 1, ty) ?? (top - 2);
+      vface(ctx, tx+1, ty, tx+1, yEnd, top, bot, view, lightColor);
     }
   }
 
