@@ -906,71 +906,45 @@
   //   BLOCKER south/east faces span multiple tiles; we walk the group to find
   //   the full extent and check if the marble falls within it.
   //
-  //   TOP FACE of tile (tx, ty) in the SE quadrant: covers the marble when
-  //   the marble's world position is within the tile's footprint and the tile
-  //   is taller than the marble.
-  function isMarbleOccluded(level, marble) {
+  //   The marble is occluded only when it is physically inside a tile that is
+  //   taller than the marble (e.g. a wall tile).  Terrain collision in the
+  //   physics engine prevents the marble from entering wall tiles during normal
+  //   gameplay; this check is a safety net for edge cases (e.g. spawn inside
+  //   a wall, or physics tunnelling at high speed).
+  //
+  //   We also check the marble's own tile for a blocker, which handles the case
+  //   where a dynamic blocker (moving platform, etc.) overlaps the marble.
+  function isMarbleOccluded(level, marble, _debugReason) {
     const ML  = window.MarbleLevels;
     const mx  = marble.x, my = marble.y, mz = marble.z;
     const mTX = Math.floor(mx), mTY = Math.floor(my);
-    const gridW = level.width || 60;
-    const gridH = level.height || 60;
 
-    // Helper: is there a tall-enough blocker or terrain at (tx, ty)?
-    function tallAt(tx, ty) {
-      const blk = ML.getBlockerCell(level, tx, ty);
-      if (blk && blk.top > mz + 0.05) return true;
-      const fz = ML.getFillTopAtCell(level, tx, ty, { staticOnly: true });
-      return fz !== null && fz > mz + 0.05;
+    // Check if the marble's own tile has a blocker taller than the marble.
+    const blk = ML.getBlockerCell(level, mTX, mTY);
+    if (blk && blk.top > mz + 0.05) {
+      if (_debugReason) _debugReason.reason = `blocker(${mTX},${mTY}) top=${blk.top} mz=${mz.toFixed(2)}`;
+      return true;
     }
 
-    // ── South face check ─────────────────────────────────────────────────────
-    // The south face of tile (tx, ty) is at world y = ty+1.
-    // It occludes the marble when:
-    //   - marble is north of the face: my < ty+1
-    //   - marble's x is within the face's x-span: tx <= mx < tx+1
-    //   - the tile (or a blocker there) is taller than the marble
-    // We check ty = mTY (marble's own row) only — faces in other rows are in
-    // different isometric diagonal bands and cannot overlap the marble.
-    // For blockers, we also check ty = mTY+1 (the row just south) because a
-    // blocker's south face may be drawn at a row south of the marble's row.
-    for (let ty = mTY; ty <= Math.min(gridH - 1, mTY + 1); ty++) {
-      if (my >= ty + 1) continue;  // marble is south of this face
-      if (tallAt(mTX, ty)) return true;
-    }
-
-    // ── East face check ──────────────────────────────────────────────────────
-    // The east face of tile (tx, ty) is at world x = tx+1.
-    // It occludes the marble when:
-    //   - marble is west of the face: mx < tx+1
-    //   - marble's y is within the face's y-span: ty <= my < ty+1
-    //   - the tile (or a blocker there) is taller than the marble
-    // We check tx = mTX (marble's own column) and tx = mTX+1 (column just east).
-    // For blockers that span multiple columns, the tile directly east of the
-    // marble may not be the easternmost column, but it still occludes the marble.
-    for (let tx = mTX; tx <= Math.min(gridW - 1, mTX + 1); tx++) {
-      if (mx >= tx + 1) continue;  // marble is east of this face
-      if (tallAt(tx, mTY)) return true;
-    }
-
-    // ── Top-face occlusion: SE quadrant ──────────────────────────────────────
-    // The top face of a tile at (tx, ty) visually covers the marble when the
-    // marble's world position is within the tile's footprint and the tile is
-    // taller than the marble.  We check a 2-tile radius in the SE quadrant.
-    // NOTE: we do NOT check the NW quadrant (tx < mTX or ty < mTY) because
-    // tiles there are drawn BEFORE the marble in painter's order and their top
-    // faces cannot cover the marble.
-    for (let tx = mTX; tx <= Math.min(gridW - 1, mTX + 2); tx++) {
-      for (let ty = mTY; ty <= Math.min(gridH - 1, mTY + 2); ty++) {
-        if (tx === mTX && ty === mTY) continue;  // marble's own tile
-        if (mx >= tx && mx < tx + 1 && my >= ty && my < ty + 1) {
-          if (tallAt(tx, ty)) return true;
-        }
-      }
+    // Check if the marble's own tile is a terrain tile taller than the marble.
+    // This catches the case where the marble is inside a wall tile.
+    const fz = ML.getFillTopAtCell(level, mTX, mTY, { staticOnly: true });
+    if (fz !== null && fz > mz + 0.05) {
+      if (_debugReason) _debugReason.reason = `terrain(${mTX},${mTY}) fz=${fz} mz=${mz.toFixed(2)}`;
+      return true;
     }
 
     return false;
   }
+
+  // Expose for console debugging
+  window._debugMarbleOcclusion = function() {
+    const rt = window._marbleRuntime;
+    if (!rt) return 'no runtime';
+    const dbg = {};
+    const result = isMarbleOccluded(rt.level, rt.marble, dbg);
+    return `pos=(${rt.marble.x.toFixed(3)},${rt.marble.y.toFixed(3)},${rt.marble.z.toFixed(3)}) occluded=${result} reason=${dbg.reason||'none'}`;
+  };
 
   // ─── Main draw ────────────────────────────────────────────────────────────
 

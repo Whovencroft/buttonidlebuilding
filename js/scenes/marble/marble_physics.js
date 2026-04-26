@@ -176,18 +176,42 @@
     for (let ty = minTy; ty <= maxTy; ty += 1) {
       for (let tx = minTx; tx <= maxTx; tx += 1) {
         const blocker = window.MarbleLevels.getBlockerCell(level, tx, ty);
-        if (!blocker) continue;
-        if (marbleBottom > blocker.top + 0.04) continue;
+        if (blocker) {
+          if (marbleBottom > blocker.top + 0.04) continue;
 
-const standingSecurelyOnTop =
-  blocker.walkableTop &&
-  supportZ !== null &&
-  supportZ !== undefined &&
-  Math.abs(supportZ - blocker.top) <= 0.02 &&
-  marbleBottom >= blocker.top - 0.02 &&
-  isSecurelyOnBlockerTop(x, y, radius, tx, ty);
-  
-        if (standingSecurelyOnTop) continue;
+          const standingSecurelyOnTop =
+            blocker.walkableTop &&
+            supportZ !== null &&
+            supportZ !== undefined &&
+            Math.abs(supportZ - blocker.top) <= 0.02 &&
+            marbleBottom >= blocker.top - 0.02 &&
+            isSecurelyOnBlockerTop(x, y, radius, tx, ty);
+
+          if (standingSecurelyOnTop) continue;
+
+          const overlap = rectCircleOverlapData(tx, ty, tx + 1, ty + 1, x, y, radius);
+          if (!overlap) continue;
+
+          overlaps.push({
+            penetration: overlap.penetration,
+            normal: overlap.normal,
+            blockerTop: blocker.top,
+            blocker,
+            tx,
+            ty
+          });
+          continue;
+        }
+
+        // Terrain tiles that are too tall to step up also act as walls.
+        // This prevents the marble from walking through raised terrain (e.g.
+        // wall rings built with setSurface rather than setBlocker).
+        const fz = window.MarbleLevels.getFillTopAtCell(level, tx, ty, { staticOnly: true });
+        if (fz === null || fz <= marbleBottom + MAX_STEP_UP + 0.04) continue;
+
+        // Don't block if the marble is standing on top of this terrain tile
+        // (supportZ matches the tile's surface height).
+        if (supportZ !== null && supportZ !== undefined && Math.abs(supportZ - fz) <= 0.04) continue;
 
         const overlap = rectCircleOverlapData(tx, ty, tx + 1, ty + 1, x, y, radius);
         if (!overlap) continue;
@@ -195,8 +219,8 @@ const standingSecurelyOnTop =
         overlaps.push({
           penetration: overlap.penetration,
           normal: overlap.normal,
-          blockerTop: blocker.top,
-          blocker,
+          blockerTop: fz,
+          blocker: null,
           tx,
           ty
         });
