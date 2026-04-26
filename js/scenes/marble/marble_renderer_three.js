@@ -654,10 +654,10 @@
     scene.background = new THREE.Color(COL.void);
 
     // Lighting
-    const ambient = new THREE.AmbientLight(0xffffff, 0.55);
+    const ambient = new THREE.AmbientLight(0xffffff, 0.35);
     scene.add(ambient);
 
-    const sun = new THREE.DirectionalLight(0xffffff, 0.9);
+    const sun = new THREE.DirectionalLight(0xffffff, 0.65);
     sun.position.set(-8, 20, -6);
     sun.castShadow = true;
     sun.shadow.mapSize.width  = 1024;
@@ -669,7 +669,7 @@
     scene.add(sun);
 
     // Fill light from south-east
-    const fill = new THREE.DirectionalLight(0xaaccff, 0.3);
+    const fill = new THREE.DirectionalLight(0xaaccff, 0.15);
     fill.position.set(6, 10, 8);
     scene.add(fill);
 
