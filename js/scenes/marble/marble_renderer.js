@@ -906,31 +906,84 @@
   //   BLOCKER south/east faces span multiple tiles; we walk the group to find
   //   the full extent and check if the marble falls within it.
   //
-  //   The marble is occluded only when it is physically inside a tile that is
-  //   taller than the marble (e.g. a wall tile).  Terrain collision in the
-  //   physics engine prevents the marble from entering wall tiles during normal
-  //   gameplay; this check is a safety net for edge cases (e.g. spawn inside
-  //   a wall, or physics tunnelling at high speed).
+  //   The marble is occluded (hidden) in two situations:
   //
-  //   We also check the marble's own tile for a blocker, which handles the case
-  //   where a dynamic blocker (moving platform, etc.) overlaps the marble.
+  //   1. INSIDE A WALL TILE — the marble's own tile is taller than the marble
+  //      (e.g. spawned inside a wall, or physics tunnelling at high speed).
+  //      Terrain collision normally prevents this during gameplay.
+  //
+  //   2. SPHERE OVERLAPS A LOWER-BUCKET FACE — the marble's sphere extends into
+  //      a tile face that is drawn BEFORE the marble in painter's order (i.e. a
+  //      face in a lower isometric bucket).  This happens when the marble is
+  //      near the NW corner of its tile and an adjacent NW tile has a tall face.
+  //
+  //      In isometric projection, lower-bucket faces are drawn first.  If the
+  //      marble's sphere overlaps such a face, the marble appears to float
+  //      through the wall.  We hide the marble in this case.
+  //
+  //      The relevant faces are:
+  //        - East face of tile (mTX-1, mTY): at world x = mTX, bucket mTX+mTY-1
+  //          Overlaps marble sphere when mx - mTX < radius
+  //        - South face of tile (mTX, mTY-1): at world y = mTY, bucket mTX+mTY-1
+  //          Overlaps marble sphere when my - mTY < radius
+  //
+  //      We also check the adjacent SE tiles for the case where the marble is
+  //      near the SE corner of its tile and a SE tile's face covers it:
+  //        - South face of tile (mTX, mTY+1): at world y = mTY+2, bucket mTX+mTY+1
+  //          This face is drawn AFTER the marble (same bucket, earlier step).
+  //          Overlaps when my - mTY > 1 - radius
+  //        - East face of tile (mTX+1, mTY): at world x = mTX+2, bucket mTX+mTY+1
+  //          This face is drawn AFTER the marble (same bucket, earlier step).
+  //          Overlaps when mx - mTX > 1 - radius
   function isMarbleOccluded(level, marble, _debugReason) {
-    const ML  = window.MarbleLevels;
-    const mx  = marble.x, my = marble.y, mz = marble.z;
-    const mTX = Math.floor(mx), mTY = Math.floor(my);
+    const ML     = window.MarbleLevels;
+    const mx     = marble.x, my = marble.y, mz = marble.z;
+    const mTX    = Math.floor(mx), mTY = Math.floor(my);
+    const radius = marble.visualRadius ?? marble.collisionRadius ?? 0.225;
+    const fx     = mx - mTX;   // fractional position within tile [0,1)
+    const fy     = my - mTY;
 
-    // Check if the marble's own tile has a blocker taller than the marble.
-    const blk = ML.getBlockerCell(level, mTX, mTY);
-    if (blk && blk.top > mz + 0.05) {
-      if (_debugReason) _debugReason.reason = `blocker(${mTX},${mTY}) top=${blk.top} mz=${mz.toFixed(2)}`;
+    // Helper: is tile (tx,ty) tall enough to occlude the marble?
+    function tallAt(tx, ty) {
+      const blk = ML.getBlockerCell(level, tx, ty);
+      if (blk && blk.top > mz + 0.05) return true;
+      const fz = ML.getFillTopAtCell(level, tx, ty, { staticOnly: true });
+      return fz !== null && fz > mz + 0.05;
+    }
+
+    // Case 1: marble is inside its own tile (wall tile or blocker)
+    if (tallAt(mTX, mTY)) {
+      if (_debugReason) _debugReason.reason = `own(${mTX},${mTY})`;
       return true;
     }
 
-    // Check if the marble's own tile is a terrain tile taller than the marble.
-    // This catches the case where the marble is inside a wall tile.
-    const fz = ML.getFillTopAtCell(level, mTX, mTY, { staticOnly: true });
-    if (fz !== null && fz > mz + 0.05) {
-      if (_debugReason) _debugReason.reason = `terrain(${mTX},${mTY}) fz=${fz} mz=${mz.toFixed(2)}`;
+    // Case 2: marble sphere overlaps the east face of the tile to the NW
+    // (tile (mTX-1, mTY), east face at world x = mTX, bucket mTX+mTY-1)
+    // This face is drawn BEFORE the marble, so the marble floats through it.
+    if (fx < radius && tallAt(mTX - 1, mTY)) {
+      if (_debugReason) _debugReason.reason = `NW_east(${mTX-1},${mTY}) fx=${fx.toFixed(3)}`;
+      return true;
+    }
+
+    // Case 3: marble sphere overlaps the south face of the tile to the NW
+    // (tile (mTX, mTY-1), south face at world y = mTY, bucket mTX+mTY-1)
+    if (fy < radius && tallAt(mTX, mTY - 1)) {
+      if (_debugReason) _debugReason.reason = `NW_south(${mTX},${mTY-1}) fy=${fy.toFixed(3)}`;
+      return true;
+    }
+
+    // Case 4: marble sphere overlaps the south face of the tile to the SE
+    // (tile (mTX, mTY+1), south face at world y = mTY+2, bucket mTX+mTY+1)
+    // This face is drawn in the same bucket as the marble but at an earlier step.
+    if (fy > 1 - radius && tallAt(mTX, mTY + 1)) {
+      if (_debugReason) _debugReason.reason = `SE_south(${mTX},${mTY+1}) fy=${fy.toFixed(3)}`;
+      return true;
+    }
+
+    // Case 5: marble sphere overlaps the east face of the tile to the SE
+    // (tile (mTX+1, mTY), east face at world x = mTX+2, bucket mTX+mTY+1)
+    if (fx > 1 - radius && tallAt(mTX + 1, mTY)) {
+      if (_debugReason) _debugReason.reason = `SE_east(${mTX+1},${mTY}) fx=${fx.toFixed(3)}`;
       return true;
     }
 
