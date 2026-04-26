@@ -909,6 +909,12 @@
     //      For blockers: we check all tiles in the blocker group that share
     //                    the same south row (ty+1) and span the marble's x.
     //   3. fillTop or blocker top > marble.z (face is taller than marble)
+    //   4. Screen-space X overlap: the face's screen X range covers the marble.
+    //      In isometric projection, screen X ∝ (wx - wy).
+    //      South face at (tx,ty) spans screen X: [tx-(ty+1), tx+1-(ty+1)] = [tx-ty-1, tx-ty].
+    //      Marble screen X ∝ (mx-my). Overlap: tx-ty-1 <= mx-my < tx-ty.
+    //      This prevents distant south walls (large ty) from falsely occluding
+    //      the marble when they are far to the lower-left in screen space.
     //
     // We check the marble's own column (tx=mTX) AND adjacent columns
     // (mTX-1, mTX+1) to catch wide blocker faces that span multiple tiles
@@ -916,6 +922,14 @@
     // triggering tile's column.
     for (let ty = mTY; ty < gridH; ty++) {
       if (my >= ty + 1) continue;
+      // Screen-space X overlap check for terrain south faces:
+      // The south face at (tx,ty) only covers the marble if its screen X
+      // range [tx-ty-1, tx-ty) overlaps the marble's screen X (mx-my).
+      // For terrain (single tile wide), tx must satisfy:
+      //   tx - ty - 1 <= mx - my < tx - ty
+      //   => mx - my + ty < tx <= mx - my + ty + 1
+      // We only need to check tiles in this narrow x range.
+      const screenXDiff = mx - my;  // proportional to marble screen X
       // Check a range of x tiles whose south face could visually cover the marble.
       // Blockers draw their south face as a wide polygon starting from the
       // leftmost tile of the southernmost row — so we need to check tiles
@@ -948,9 +962,14 @@
         // Terrain tiles: check the marble's own column AND adjacent columns.
         // The south face of a terrain tile at (tx, ty) spans world x [tx, tx+1].
         // The marble at mx is behind this face if tx <= mx < tx+1.
+        // Also require screen-space X overlap: tx-ty-1 <= mx-my < tx-ty.
         if (mx >= tx && mx < tx + 1) {
-          const fz = ML.getFillTopAtCell(level, tx, ty, { staticOnly: true });
-          if (fz !== null && fz > mz + 0.05) return true;
+          // Screen X overlap: the face at (tx,ty) covers screen X [tx-ty-1, tx-ty).
+          // Marble is at screen X (mx-my). Overlap iff tx-ty-1 <= mx-my < tx-ty.
+          if (screenXDiff >= tx - ty - 1 && screenXDiff < tx - ty) {
+            const fz = ML.getFillTopAtCell(level, tx, ty, { staticOnly: true });
+            if (fz !== null && fz > mz + 0.05) return true;
+          }
         }
       }
     }
@@ -958,8 +977,19 @@
     // An east face at tile (tx, ty) is at world x = tx+1.
     // It occludes the marble when marble.x < tx+1 and the face is taller.
     // Same logic: check the marble's own row AND adjacent rows for wide blockers.
+    //
+    // Screen-space X overlap check for east faces:
+    //   In isometric projection, screen X ∝ (wx - wy).
+    //   East face at (tx,ty) spans screen X: [tx+1-ty-1, tx+1-ty] = [tx-ty, tx-ty+1).
+    //   Marble screen X ∝ (mx-my). Overlap: tx-ty <= mx-my < tx-ty+1.
+    //   This prevents distant east walls (large tx) from falsely occluding
+    //   the marble when they are far to the lower-right in screen space.
     for (let tx = mTX; tx < gridW; tx++) {
       if (mx >= tx + 1) continue;
+      // Screen-space X overlap check: east face at (tx,ty) covers screen X [tx-ty, tx-ty+1).
+      // Marble screen X is (mx-my). For overlap: tx-ty <= mx-my < tx-ty+1.
+      // This means: mx-my >= tx-ty, i.e., tx <= mx-my+ty.
+      // We check this per-ty in the inner loop.
       for (let ty = Math.max(0, mTY - 4); ty <= Math.min(gridH - 1, mTY + 1); ty++) {
         const blk = ML.getBlockerCell(level, tx, ty);
         if (blk && blk.top > mz + 0.05) {
@@ -979,7 +1009,39 @@
         }
         // East face of terrain tile at (tx, ty) spans world y [ty, ty+1].
         // The marble at my is behind this face if ty <= my < ty+1.
+        // Also require screen-space X overlap: tx-ty <= mx-my < tx-ty+1.
         if (my >= ty && my < ty + 1) {
+          // Screen X overlap: east face at (tx,ty) covers screen X [tx-ty, tx-ty+1).
+          // Marble screen X (mx-my) must be in this range.
+          const screenXDiff = mx - my;
+          if (screenXDiff >= tx - ty && screenXDiff < tx - ty + 1) {
+            const fz = ML.getFillTopAtCell(level, tx, ty, { staticOnly: true });
+            if (fz !== null && fz > mz + 0.05) return true;
+          }
+        }
+      }
+    }
+
+    // ── Top-face occlusion: SE quadrant ──────────────────────────────────────
+    // The top face of a tile at (tx, ty) visually covers the marble when:
+    //   1. tx >= mTX AND ty >= mTY  (tile is in the SE quadrant — drawn after marble)
+    //   2. fillZ(tx, ty) > mz       (tile top is higher than marble)
+    //   3. The marble's world position is within the tile's footprint
+    //      [tx, tx+1) x [ty, ty+1)
+    //
+    // This catches the SE corner tile (mTX+1, mTY+1) and any wall tile that
+    // the marble is standing directly below in isometric space.
+    //
+    // We check a 2-tile radius around the marble's SE quadrant to be safe.
+    for (let tx = mTX; tx <= mTX + 2; tx++) {
+      if (tx >= gridW) break;
+      for (let ty = mTY; ty <= mTY + 2; ty++) {
+        if (ty >= gridH) break;
+        // Only tiles strictly in the SE quadrant (not the marble's own tile)
+        if (tx === mTX && ty === mTY) continue;
+        // The tile's top face covers world x [tx, tx+1) x [ty, ty+1).
+        // The marble is covered if its world position falls in this range.
+        if (mx >= tx && mx < tx + 1 && my >= ty && my < ty + 1) {
           const fz = ML.getFillTopAtCell(level, tx, ty, { staticOnly: true });
           if (fz !== null && fz > mz + 0.05) return true;
         }
@@ -1044,40 +1106,10 @@
       }
     }
 
-    // A terrain tile at (mTX+1, mTY+1) — the SE corner — has its east face
-    // drawn at bucket mTX+mTY+2 (= ballBucket+1), which is AFTER the ball
-    // is drawn.  If that tile is a tall wall, its east face will paint over
-    // the marble.  Advance ballBucket past any such wall faces.
-    //
-    // We check a 2-tile band around the marble's SE corner:
-    //   - (mTX+1, mTY+1): east face at bucket mTX+mTY+2
-    //   - (mTX,   mTY+1): east face at bucket mTX+mTY+1  (already covered)
-    //   - (mTX+1, mTY  ): east face at bucket mTX+mTY+1  (already covered)
-    // The only problematic case is the SE corner tile.
-    //
-    // We also check the south face of (mTX+1, mTY+1): it is drawn at step 1
-    // of bucket mTX+mTY+2, also after the ball.
-    {
-      const mz = runtime.marble.z;
-      // Check SE corner tile (mTX+1, mTY+1) — bucket mTX+mTY+2
-      const seFz = fillZ(level, dyn, mTX + 1, mTY + 1);
-      if (seFz !== null && seFz > mz + 0.1) {
-        // Tall wall at SE corner — its south and east faces are at bucket mTX+mTY+2
-        // which is currently ballBucket+1.  Advance ballBucket so ball is drawn
-        // after those faces.
-        ballBucket = Math.max(ballBucket, mTX + mTY + 2);
-      }
-      // Also check (mTX+1, mTY+2) — east face at bucket mTX+mTY+3
-      const sesFz = fillZ(level, dyn, mTX + 1, mTY + 2);
-      if (sesFz !== null && sesFz > mz + 0.1) {
-        ballBucket = Math.max(ballBucket, mTX + mTY + 3);
-      }
-      // And (mTX+2, mTY+1) — east face at bucket mTX+mTY+3
-      const esFz = fillZ(level, dyn, mTX + 2, mTY + 1);
-      if (esFz !== null && esFz > mz + 0.1) {
-        ballBucket = Math.max(ballBucket, mTX + mTY + 3);
-      }
-    }
+    // NOTE: SE corner ballBucket advancement was removed.
+    // Wall occlusion is handled entirely by isMarbleOccluded(), which checks
+    // whether any terrain tile in front of the marble is taller than the marble.
+    // The ballBucket is only advanced for actor-on-platform cases (above).
     let shadowDrawn = false;
     let ballDrawn   = false;
 
@@ -1240,15 +1272,16 @@
       // floor tiles in the same bucket from painting over the ball.
       // Faces in buckets > ballBucket (walls further forward) are drawn
       // after this point and will still correctly cover the ball.
+      // marbleOccluded suppresses the ball when it is behind/below a wall.
       if (!ballDrawn && (tx + ty) > ballBucket) {
-        drawMarbleBall(ctx, runtime, view);
+        if (!marbleOccluded) drawMarbleBall(ctx, runtime, view);
         ballDrawn = true;
       }
     }
 
     // If shadow/ball buckets were beyond the last tile, draw them now
     if (!shadowDrawn && !marbleOccluded) drawMarbleShadow(ctx, runtime, view);
-    if (!ballDrawn)   drawMarbleBall(ctx, runtime, view);
+    if (!ballDrawn && !marbleOccluded) drawMarbleBall(ctx, runtime, view);
 
     // Overlays always on top
     drawGoal(ctx, runtime, view);
