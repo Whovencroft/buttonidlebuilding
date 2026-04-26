@@ -29,32 +29,36 @@
   const ISO_YAW   = Math.PI / 4;                   // 45°
 
   // Orthographic frustum half-size in world units (will be scaled by zoom)
-  const BASE_FRUSTUM = 14;
+  const BASE_FRUSTUM = 8;
 
   // Marble Madness colour palette
   const COL = {
     void:         0x000000,
-    tileLight:    0xc8bfa8,   // light checker square
-    tileDark:     0xa89f8a,   // dark checker square
-    tileGrid:     0x6e6455,   // grid line colour
-    wallBase:     0x8c3a1e,   // wall background (red-brown, like MM level 1)
-    wallStripe:   0x000000,   // vertical stripe colour
-    wallSide:     0x6b2c16,   // slightly darker for east face
-    rampLight:    0xb8af9a,
-    rampDark:     0x9a9180,
-    marbleTop:    0x253244,   // button gradient top
-    marbleBot:    0x1b2532,   // button gradient bottom
-    marbleRing:   0x7dd3fc,   // accent blue
-    goalLight:    0xffffff,
-    goalDark:     0x222222,
-    bounceTop:    0xb5e853,   // bright lime
-    bounceDark:   0x7aaa2a,
+    // Tile tops: clean mid-grey with subtle grid
+    tileTop:      0xb8b0a0,   // solid tile top colour
+    tileGrid:     0x888070,   // grid line colour (subtle)
+    // Wall faces: clearly distinct from tops, south lighter than east
+    wallSouth:    0xa03020,   // south-facing wall (lighter, more lit)
+    wallEast:     0x6a1e10,   // east-facing wall (darker, in shadow)
+    wallNorth:    0x7a2418,   // north wall (mid)
+    wallWest:     0x8a2c1c,   // west wall (mid-light)
+    // Ramp tops match tile tops
+    rampTop:      0xb8b0a0,
+    // Marble: matches the idle button
+    marbleTop:    0x253244,
+    marbleBot:    0x1b2532,
+    marbleRing:   0x7dd3fc,
+    // Special tiles
+    goalLight:    0xffd700,   // gold
+    goalDark:     0xb8860b,   // dark gold
+    bounceTop:    0x44dd44,   // bright green
+    bounceDark:   0x228822,
     platformTop:  0x8ab4d4,
-    platformSide: 0x5a8aaa,
-    hazardTop:    0xfb7185,
-    hazardSide:   0xc04060,
-    conveyorTop:  0x6ee7b7,
-    conveyorSide: 0x3aaa7a,
+    platformSide: 0x4a7a9a,
+    hazardTop:    0xff4444,
+    hazardSide:   0xaa2222,
+    conveyorTop:  0x44ccaa,
+    conveyorSide: 0x228866,
     goalFlag:     0xffd700,
   };
 
@@ -142,14 +146,45 @@
   let texGoalTop    = null;
   let texConvTop    = null;
 
+  function makeSolidTexture(size, col) {
+    const T = THREE;
+    const canvas = document.createElement('canvas');
+    canvas.width = canvas.height = size;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#' + col.toString(16).padStart(6, '0');
+    ctx.fillRect(0, 0, size, size);
+    const tex = new T.CanvasTexture(canvas);
+    return tex;
+  }
+  function makeTileTopTexture(size, col, gridCol) {
+    // Clean solid tile with subtle grid lines only (no checkerboard)
+    const T = THREE;
+    const canvas = document.createElement('canvas');
+    canvas.width = canvas.height = size;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#' + col.toString(16).padStart(6, '0');
+    ctx.fillRect(0, 0, size, size);
+    // Draw grid lines every 1/4 of the texture (4x4 grid)
+    ctx.strokeStyle = '#' + gridCol.toString(16).padStart(6, '0');
+    ctx.lineWidth = Math.max(1, size / 256);
+    const step = size / 4;
+    for (let i = 0; i <= 4; i++) {
+      const p = i * step;
+      ctx.beginPath(); ctx.moveTo(p, 0); ctx.lineTo(p, size); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(0, p); ctx.lineTo(size, p); ctx.stroke();
+    }
+    const tex = new T.CanvasTexture(canvas);
+    tex.wrapS = tex.wrapT = T.RepeatWrapping;
+    return tex;
+  }
   function ensureTextures() {
     if (texTileTop) return;
-    texTileTop   = makeCheckerTexture(256, COL.tileLight, COL.tileDark, COL.tileGrid, 8);
-    texWallSouth = makeStripedTexture(128, COL.wallBase,  COL.wallStripe, 8);
-    texWallEast  = makeStripedTexture(128, COL.wallSide,  COL.wallStripe, 8);
-    texBounceTop = makeCheckerTexture(128, COL.bounceTop, COL.bounceDark, COL.tileGrid, 4);
-    texGoalTop   = makeCheckerTexture(128, COL.goalLight, COL.goalDark,   0x888888, 4);
-    texConvTop   = makeCheckerTexture(128, COL.conveyorTop, COL.conveyorSide, COL.tileGrid, 4);
+    texTileTop   = makeTileTopTexture(256, COL.tileTop, COL.tileGrid);
+    texWallSouth = makeSolidTexture(64, COL.wallSouth);
+    texWallEast  = makeSolidTexture(64, COL.wallEast);
+    texBounceTop = makeTileTopTexture(128, COL.bounceTop, COL.bounceDark);
+    texGoalTop   = makeCheckerTexture(128, COL.goalLight, COL.goalDark, 0xaa8800, 4);
+    texConvTop   = makeTileTopTexture(128, COL.conveyorTop, COL.conveyorSide);
   }
 
   // ─── Material cache ──────────────────────────────────────────────────────────
@@ -168,11 +203,16 @@
   }
 
   function matWallSouth() {
-    return getMat('wall_south', () => new THREE.MeshLambertMaterial({ map: texWallSouth }));
+    return getMat('wall_south', () => new THREE.MeshLambertMaterial({ color: COL.wallSouth }));
   }
-
   function matWallEast() {
-    return getMat('wall_east', () => new THREE.MeshLambertMaterial({ map: texWallEast }));
+    return getMat('wall_east', () => new THREE.MeshLambertMaterial({ color: COL.wallEast }));
+  }
+  function matWallNorth() {
+    return getMat('wall_north', () => new THREE.MeshLambertMaterial({ color: COL.wallNorth }));
+  }
+  function matWallWest() {
+    return getMat('wall_west', () => new THREE.MeshLambertMaterial({ color: COL.wallWest }));
   }
 
   function matPlatformTop() {
@@ -389,13 +429,13 @@
       // North face (visible when tile to north is lower)
       const northZ = fillZ(tx, ty - 1);
       if (northZ < topZ - 0.01) {
-        const nf = buildWallFaceMesh(tx, tx + 1, ty, northZ, topZ, matWallSouth());
+        const nf = buildWallFaceMesh(tx, tx + 1, ty, northZ, topZ, matWallNorth());
         if (nf) group.add(nf);
       }
       // West face (visible when tile to west is lower)
       const westZ = fillZ(tx - 1, ty);
       if (westZ < topZ - 0.01) {
-        const wf = buildWallFaceEastMesh(ty, ty + 1, tx, westZ, topZ, matWallEast());
+        const wf = buildWallFaceEastMesh(ty, ty + 1, tx, westZ, topZ, matWallWest());
         if (wf) group.add(wf);
       }
     }
