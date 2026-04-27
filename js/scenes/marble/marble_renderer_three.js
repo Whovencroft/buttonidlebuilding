@@ -25,7 +25,7 @@
 
   const ISO_ANGLE  = Math.atan(1 / Math.sqrt(2));  // ~35.26°
   const ISO_YAW    = Math.PI / 4;                  // 45°
-  const BASE_FRUSTUM = 8;
+  const BASE_FRUSTUM = 11;
 
   const COL = {
     void:          0x000000,
@@ -640,8 +640,9 @@
     const zoom = runtime.camera?.zoom ?? 1;
     updateCameraFrustum(camera, w, h, zoom);
 
-    const camX = runtime.camera?.x ?? marble.x;
-    const camY = runtime.camera?.y ?? marble.y;
+    // Always center on the marble — use marble XY directly, no smoothing needed
+    const camX = marble.x;
+    const camY = marble.y;
     // Use level median Z as the camera anchor — completely eliminates void jitter
     const camZ = levelCamZ;
 
