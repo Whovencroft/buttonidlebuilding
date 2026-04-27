@@ -1,22 +1,20 @@
 /**
- * marble_renderer_three.js  (v7)
+ * marble_renderer_three.js  (v8)
  *
  * Three.js-based renderer for the marble scene.
  *
- * Fixes in v7:
- *  1. Grid 45° rotation  — tile-top texture now draws a diamond/argyle grid
- *                          (lines at ±45°) instead of axis-aligned squares.
- *  2. External wall faces visible — all four wall directions now use
- *                          double-sided materials so they are never back-culled.
- *                          North and West face meshes are rebuilt with correct
- *                          outward normals instead of post-hoc rotation hacks.
- *  3. Internal faces don't occlude marble — wall faces are inset 0.01 units
- *                          from the tile boundary so they never z-fight with
- *                          or clip into an adjacent tile's surface.
- *  4. Ramp visibility    — ramp mesh uses a dedicated material with a mild
- *                          emissive boost so the slope reads clearly regardless
- *                          of lighting angle.  Ramp side walls also use the
- *                          correct per-direction materials.
+ * Fixes in v8:
+ *  1. Ramp geometry   — uses getSurfaceCornerHeights() for exact per-corner Z
+ *                       values so slopes match the physics surface exactly.
+ *                       No more sky-pointing fins.
+ *  2. Camera Z lock   — camera vertical target is fixed to the level's median
+ *                       tile height, not the marble's live Z.  This eliminates
+ *                       all void-background vibration as the marble moves.
+ *  3. Internal walls  — north and west wall faces are NOT rendered.  From the
+ *                       isometric camera (looking south-east from above) only
+ *                       the south and east faces of any raised tile are ever
+ *                       visible.  North/west faces were the ones clipping
+ *                       through adjacent tiles and occluding the marble.
  *
  * Coordinate system: world X = east, world Y = south, world Z = up
  */
@@ -35,11 +33,9 @@
     tileGrid:      0x7a8f9a,
     wallSouth:     0x2e3440,
     wallEast:      0x3b4252,
-    wallNorth:     0x4a5568,   // slightly lighter — faces camera from above
-    wallWest:      0x374151,
     wallHighlight: 0xd8e0e8,
-    rampTop:       0xc8d6dc,   // slightly lighter than flat tiles — stands out
-    rampEmissive:  0x1a2530,   // mild emissive so slope reads in low light
+    rampTop:       0xc8d6dc,
+    rampEmissive:  0x1a2530,
     marbleTop:     0x253244,
     marbleRing:    0x7dd3fc,
     goalLight:     0x22c55e,
@@ -65,12 +61,12 @@
   let dynamicGroup   = null;
   let marbleMesh     = null;
   let dragArrowGroup = null;
-  let smoothCamZ     = null;
+  // Fixed camera Z anchor computed once per level load
+  let levelCamZ      = 0;
 
   // ─── Texture helpers ─────────────────────────────────────────────────────────
 
   function makeCheckerTexture(size, col1, col2, gridCol, squares) {
-    const T = THREE;
     const cv = document.createElement('canvas');
     cv.width = cv.height = size;
     const ctx = cv.getContext('2d');
@@ -88,52 +84,36 @@
       ctx.beginPath(); ctx.moveTo(p, 0); ctx.lineTo(p, size); ctx.stroke();
       ctx.beginPath(); ctx.moveTo(0, p); ctx.lineTo(size, p); ctx.stroke();
     }
-    const tex = new T.CanvasTexture(cv);
-    tex.wrapS = tex.wrapT = T.RepeatWrapping;
+    const tex = new THREE.CanvasTexture(cv);
+    tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
     return tex;
   }
 
   /**
-   * Tile-top texture with a 45°-rotated (diamond) grid.
-   * We draw the fill, then rotate the canvas 45° and draw two crossing lines
-   * through the centre — this produces a diamond/argyle border on each tile.
+   * Tile-top texture: 45° diamond grid (two diagonals + border per tile).
    */
   function makeTileTopTexture(size, col, gridCol) {
-    const T = THREE;
     const cv = document.createElement('canvas');
     cv.width = cv.height = size;
     const ctx = cv.getContext('2d');
 
-    // Solid fill
     ctx.fillStyle = '#' + col.toString(16).padStart(6,'0');
     ctx.fillRect(0, 0, size, size);
 
-    // Draw diagonal grid lines (45°) — two diagonals per tile
     ctx.strokeStyle = '#' + gridCol.toString(16).padStart(6,'0');
     ctx.lineWidth = Math.max(2, size / 80);
+    ctx.beginPath(); ctx.moveTo(0, 0);    ctx.lineTo(size, size); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(size, 0); ctx.lineTo(0, size);    ctx.stroke();
 
-    // Main diagonal: top-left → bottom-right
-    ctx.beginPath();
-    ctx.moveTo(0, 0);
-    ctx.lineTo(size, size);
-    ctx.stroke();
-
-    // Anti-diagonal: top-right → bottom-left
-    ctx.beginPath();
-    ctx.moveTo(size, 0);
-    ctx.lineTo(0, size);
-    ctx.stroke();
-
-    // Border outline so tile edges are still clear
     ctx.lineWidth = Math.max(1, size / 128);
     ctx.strokeRect(0, 0, size, size);
 
-    const tex = new T.CanvasTexture(cv);
-    tex.wrapS = tex.wrapT = T.RepeatWrapping;
+    const tex = new THREE.CanvasTexture(cv);
+    tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
     return tex;
   }
 
-  // Shared textures (created once)
+  // Shared textures (created once after THREE is available)
   let texTileTop   = null;
   let texBounceTop = null;
   let texGoalTop   = null;
@@ -157,35 +137,30 @@
     return matCache[key];
   }
 
-  // All wall materials are double-sided so they render regardless of which
-  // way the camera happens to face them.
-  const DS = () => THREE.DoubleSide;
-
   function matTileTop(bounce, conveyor, goal) {
-    if (goal)     return getMat('goal_top',   () => new THREE.MeshLambertMaterial({ map: texGoalTop,   side: THREE.FrontSide }));
-    if (bounce)   return getMat('bounce_top', () => new THREE.MeshLambertMaterial({ map: texBounceTop, side: THREE.FrontSide }));
-    if (conveyor) return getMat('conv_top',   () => new THREE.MeshLambertMaterial({ map: texConvTop,   side: THREE.FrontSide }));
-    return getMat('tile_top', () => new THREE.MeshLambertMaterial({ map: texTileTop, side: THREE.FrontSide }));
+    if (goal)     return getMat('goal_top',   () => new THREE.MeshLambertMaterial({ map: texGoalTop }));
+    if (bounce)   return getMat('bounce_top', () => new THREE.MeshLambertMaterial({ map: texBounceTop }));
+    if (conveyor) return getMat('conv_top',   () => new THREE.MeshLambertMaterial({ map: texConvTop }));
+    return getMat('tile_top', () => new THREE.MeshLambertMaterial({ map: texTileTop }));
   }
   function matRampTop() {
     return getMat('ramp_top', () => new THREE.MeshLambertMaterial({
       map: texRampTop,
-      side: THREE.DoubleSide,   // double-sided so slope is always visible
+      side: THREE.DoubleSide,
       emissive: new THREE.Color(COL.rampEmissive),
     }));
   }
-  function matWallSouth()     { return getMat('wall_s',  () => new THREE.MeshLambertMaterial({ color: COL.wallSouth,     side: DS() })); }
-  function matWallEast()      { return getMat('wall_e',  () => new THREE.MeshLambertMaterial({ color: COL.wallEast,      side: DS() })); }
-  function matWallNorth()     { return getMat('wall_n',  () => new THREE.MeshLambertMaterial({ color: COL.wallNorth,     side: DS() })); }
-  function matWallWest()      { return getMat('wall_w',  () => new THREE.MeshLambertMaterial({ color: COL.wallWest,      side: DS() })); }
-  function matWallHighlight() { return getMat('wall_hl', () => new THREE.MeshLambertMaterial({ color: COL.wallHighlight, side: DS(), emissive: new THREE.Color(COL.wallHighlight), emissiveIntensity: 0.25 })); }
+  // Wall faces: FrontSide only — south and east faces always face the camera.
+  function matWallSouth()     { return getMat('wall_s',  () => new THREE.MeshLambertMaterial({ color: COL.wallSouth })); }
+  function matWallEast()      { return getMat('wall_e',  () => new THREE.MeshLambertMaterial({ color: COL.wallEast  })); }
+  function matWallHighlight() { return getMat('wall_hl', () => new THREE.MeshLambertMaterial({ color: COL.wallHighlight, emissive: new THREE.Color(COL.wallHighlight), emissiveIntensity: 0.25 })); }
   function matPlatformTop()   { return getMat('plat_top',  () => new THREE.MeshLambertMaterial({ color: COL.platformTop  })); }
-  function matPlatformSide()  { return getMat('plat_side', () => new THREE.MeshLambertMaterial({ color: COL.platformSide, side: DS() })); }
+  function matPlatformSide()  { return getMat('plat_side', () => new THREE.MeshLambertMaterial({ color: COL.platformSide })); }
 
   // ─── Mesh builders ───────────────────────────────────────────────────────────
 
   /**
-   * Flat tile top. UV is always 0→1 per tile.
+   * Flat tile top. UV always 0→1 per tile.
    */
   function buildTileTopMesh(tx, ty, z, w, d, mat) {
     const geo = new THREE.PlaneGeometry(w, d);
@@ -197,117 +172,130 @@
   }
 
   /**
-   * Build a vertical wall face using an explicit position + normal direction.
+   * South-facing wall face.
+   * Spans world x [x0,x1], at world y = fy (south edge of tile), z [zBot,zTop].
    *
-   * @param {number} along0  start along the wall's long axis (world units)
-   * @param {number} along1  end along the wall's long axis
-   * @param {number} perp    position along the perpendicular axis
-   * @param {number} zBot    bottom Z
-   * @param {number} zTop    top Z
-   * @param {'s'|'n'|'e'|'w'} dir  which face direction
-   * @param {THREE.Material} mat
-   * @param {number} [inset=0.01]  how far to pull the face inward from the tile boundary
+   * Three.js coordinate system: X=east, Y=up, Z=south.
+   * A PlaneGeometry in XY with normal +Z already faces south (+Z). ✓
+   * We only need to rotate it so it stands vertically:
+   *   rotateX(-PI/2) tilts the plane from XY into XZ (horizontal → vertical),
+   *   but that flips the normal to -Y.  We want it vertical AND facing +Z.
+   *   Solution: build a vertical plane directly using a custom quad.
    */
-  function buildWallFace(along0, along1, perp, zBot, zTop, dir, mat, inset = 0.01) {
+  function buildSouthFace(x0, x1, fy, zBot, zTop, mat) {
     if (zTop <= zBot + 0.001) return null;
-    const span = along1 - along0;
-    const h    = zTop - zBot;
-
-    const geo  = new THREE.PlaneGeometry(span, h);
+    const w = x1 - x0;
+    const h = zTop - zBot;
+    // Build quad manually: 4 verts in world space, normal = +Z (south)
+    const positions = new Float32Array([
+      x0, zBot, fy,
+      x1, zBot, fy,
+      x0, zTop, fy,
+      x1, zTop, fy,
+    ]);
+    const normals = new Float32Array([
+      0,0,1, 0,0,1, 0,0,1, 0,0,1,
+    ]);
+    const uvs = new Float32Array([0,0, 1,0, 0,1, 1,1]);
+    const indices = [0,1,2, 1,3,2];
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    geo.setAttribute('normal',   new THREE.BufferAttribute(normals, 3));
+    geo.setAttribute('uv',       new THREE.BufferAttribute(uvs, 2));
+    geo.setIndex(indices);
     const mesh = new THREE.Mesh(geo, mat);
     mesh.receiveShadow = true;
-
-    // PlaneGeometry default: lies in XY plane, normal = +Z.
-    // We need it vertical (in the XZ or YZ plane) facing a cardinal direction.
-    // Strategy: rotateX(PI/2) makes it lie in XZ plane, normal = +Y (south).
-    // Then rotateY to point in the desired direction.
-    //
-    // After rotateX(PI/2):
-    //   normal = (0, 1, 0) — faces +Y (south)
-    //   "width" axis = X, "height" axis = Z (up)
-    //
-    // Rotations around Y to get other directions:
-    //   south (+Y): rotY = 0
-    //   north (-Y): rotY = PI
-    //   east  (+X): rotY = -PI/2
-    //   west  (-X): rotY = +PI/2
-
-    mesh.rotation.x = Math.PI / 2;
-
-    switch (dir) {
-      case 's':
-        // South face: normal +Y, at world y = perp (inset inward = smaller y)
-        mesh.rotation.y = 0;
-        mesh.position.set(along0 + span / 2, zBot + h / 2, perp - inset);
-        break;
-      case 'n':
-        // North face: normal -Y, at world y = perp (inset inward = larger y)
-        mesh.rotation.y = Math.PI;
-        mesh.position.set(along0 + span / 2, zBot + h / 2, perp + inset);
-        break;
-      case 'e':
-        // East face: normal +X, at world x = perp (inset inward = smaller x)
-        mesh.rotation.y = -Math.PI / 2;
-        mesh.position.set(perp - inset, zBot + h / 2, along0 + span / 2);
-        break;
-      case 'w':
-        // West face: normal -X, at world x = perp (inset inward = larger x)
-        mesh.rotation.y = Math.PI / 2;
-        mesh.position.set(perp + inset, zBot + h / 2, along0 + span / 2);
-        break;
-    }
     return mesh;
   }
 
   /**
-   * Thin highlight strip at the top edge of a wall face.
-   * Rendered as a flat horizontal plane sitting on top of the tile edge,
-   * slightly above zTop so it is always visible.
-   * Only generated for south and east faces (the two camera-facing sides).
+   * East-facing wall face.
+   * Spans world y [y0,y1], at world x = fx (east edge of tile), z [zBot,zTop].
+   * Normal = +X (east).
    */
-  function buildWallTopHighlight(along0, along1, perp, zTop, dir) {
+  function buildEastFace(y0, y1, fx, zBot, zTop, mat) {
+    if (zTop <= zBot + 0.001) return null;
+    const d = y1 - y0;
+    const h = zTop - zBot;
+    const positions = new Float32Array([
+      fx, zBot, y0,
+      fx, zBot, y1,
+      fx, zTop, y0,
+      fx, zTop, y1,
+    ]);
+    const normals = new Float32Array([
+      1,0,0, 1,0,0, 1,0,0, 1,0,0,
+    ]);
+    const uvs = new Float32Array([0,0, 1,0, 0,1, 1,1]);
+    const indices = [0,2,1, 1,2,3];
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    geo.setAttribute('normal',   new THREE.BufferAttribute(normals, 3));
+    geo.setAttribute('uv',       new THREE.BufferAttribute(uvs, 2));
+    geo.setIndex(indices);
+    const mesh = new THREE.Mesh(geo, mat);
+    mesh.receiveShadow = true;
+    return mesh;
+  }
+
+  /**
+   * Flat highlight strip at the top edge of a south or east wall face.
+   * Lies horizontally just inside the tile edge at height zTop.
+   */
+  function buildWallHighlight(along0, along1, perp, zTop, dir) {
     const span = along1 - along0;
-    const W    = 0.08;  // width of the strip (into the tile)
-    // Lay flat in the XZ plane
-    const geo  = new THREE.PlaneGeometry(span, W);
-    geo.rotateX(-Math.PI / 2);  // now lies flat
-    const mesh = new THREE.Mesh(geo, matWallHighlight());
-    const y    = zTop + 0.005;  // just above the tile top
-    switch (dir) {
-      case 's':
-        // South edge: strip runs along X, centred at y = perp, inset slightly
-        mesh.position.set(along0 + span / 2, y, perp - W / 2);
-        break;
-      case 'e':
-        // East edge: strip runs along Z, centred at x = perp, inset slightly
-        mesh.rotation.y = Math.PI / 2;
-        mesh.position.set(perp - W / 2, y, along0 + span / 2);
-        break;
+    const W = 0.06;
+    const y = zTop + 0.004;
+    let positions;
+    if (dir === 's') {
+      // strip runs along X, inset from south edge
+      positions = new Float32Array([
+        along0, y, perp - W,
+        along1, y, perp - W,
+        along0, y, perp,
+        along1, y, perp,
+      ]);
+    } else {
+      // east: strip runs along Z, inset from east edge
+      positions = new Float32Array([
+        perp - W, y, along0,
+        perp - W, y, along1,
+        perp,     y, along0,
+        perp,     y, along1,
+      ]);
     }
+    const normals = new Float32Array([0,1,0, 0,1,0, 0,1,0, 0,1,0]);
+    const uvs = new Float32Array([0,0, 1,0, 0,1, 1,1]);
+    const indices = [0,1,2, 1,3,2];
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    geo.setAttribute('normal',   new THREE.BufferAttribute(normals, 3));
+    geo.setAttribute('uv',       new THREE.BufferAttribute(uvs, 2));
+    geo.setIndex(indices);
+    const mesh = new THREE.Mesh(geo, matWallHighlight());
     return mesh;
   }
 
   /**
    * Slope tile (ramp) as a single angled quad.
-   * shape: 'slope_n' | 'slope_s' | 'slope_e' | 'slope_w'
+   * Uses getSurfaceCornerHeights() for exact physics-matching corner Z values.
    */
-  function buildSlopeMesh(tx, ty, shape, baseHeight, rampHeight) {
-    let corners = { NW: baseHeight, NE: baseHeight, SW: baseHeight, SE: baseHeight };
-    switch (shape) {
-      case 'slope_n': corners.NW = rampHeight; corners.NE = rampHeight; break;
-      case 'slope_s': corners.SW = rampHeight; corners.SE = rampHeight; break;
-      case 'slope_e': corners.NE = rampHeight; corners.SE = rampHeight; break;
-      case 'slope_w': corners.NW = rampHeight; corners.SW = rampHeight; break;
-    }
-    // NW=(tx,ty), NE=(tx+1,ty), SW=(tx,ty+1), SE=(tx+1,ty+1)
+  function buildSlopeMesh(tx, ty, cell) {
+    const ML = window.MarbleLevels;
+    const h = ML.getSurfaceCornerHeights ? ML.getSurfaceCornerHeights(cell)
+            : { nw: cell.baseHeight, ne: cell.baseHeight, sw: cell.baseHeight, se: cell.baseHeight };
+
+    // World positions: NW=(tx,ty), NE=(tx+1,ty), SW=(tx,ty+1), SE=(tx+1,ty+1)
+    // Three.js Y = world Z (up), Three.js X = world X, Three.js Z = world Y
     const positions = new Float32Array([
-      tx,     corners.NW, ty,
-      tx + 1, corners.NE, ty,
-      tx,     corners.SW, ty + 1,
-      tx + 1, corners.SE, ty + 1,
+      tx,     h.nw, ty,
+      tx + 1, h.ne, ty,
+      tx,     h.sw, ty + 1,
+      tx + 1, h.se, ty + 1,
     ]);
+    // Two triangles: NW-SW-NE and NE-SW-SE
     const indices = [0, 2, 1,  1, 2, 3];
-    const uvs = new Float32Array([0,0, 1,0, 0,1, 1,1]);
+    const uvs = new Float32Array([0,1, 0,0, 1,1, 1,0]);
     const geo = new THREE.BufferGeometry();
     geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
     geo.setAttribute('uv',       new THREE.BufferAttribute(uvs, 2));
@@ -317,33 +305,23 @@
   }
 
   /**
-   * Box group (top + 4 sides) — used for blockers and platforms.
+   * Box group (top + south + east faces) — used for blockers and platforms.
    */
   function buildBoxGroup(tx, ty, zBot, w, d, h, matTop, matSide) {
     const group = new THREE.Group();
     group.add(buildTileTopMesh(tx, ty, zBot + h, w, d, matTop));
-    // South face: at y = ty+d, faces south (+Y)
-    const sf = buildWallFace(tx, tx + w, ty + d, zBot, zBot + h, 's', matSide);
+    const sf = buildSouthFace(tx, tx + w, ty + d, zBot, zBot + h, matSide);
     if (sf) group.add(sf);
-    // East face: at x = tx+w, faces east (+X)
-    const ef = buildWallFace(ty, ty + d, tx + w, zBot, zBot + h, 'e', matSide);
+    const ef = buildEastFace(ty, ty + d, tx + w, zBot, zBot + h, matSide);
     if (ef) group.add(ef);
-    // North face: at y = ty, faces north (-Y)
-    const nf = buildWallFace(tx, tx + w, ty, zBot, zBot + h, 'n', matSide);
-    if (nf) group.add(nf);
-    // West face: at x = tx, faces west (-X)
-    const wf = buildWallFace(ty, ty + d, tx, zBot, zBot + h, 'w', matSide);
-    if (wf) group.add(wf);
     return group;
   }
 
   // ─── Level mesh builder ──────────────────────────────────────────────────────
 
   function buildLevelMeshes(level) {
-    const T  = THREE;
     const ML = window.MarbleLevels;
-    const group = new T.Group();
-    const voidFloor = level.voidFloor ?? -12;
+    const group = new THREE.Group();
 
     // Collect non-void tiles
     const tiles = [];
@@ -355,9 +333,17 @@
       }
     }
 
+    // Compute level median Z for camera anchor (fixed, no vibration)
+    if (tiles.length > 0) {
+      const zVals = tiles.map(({ cell }) => cell.baseHeight).sort((a, b) => a - b);
+      levelCamZ = zVals[Math.floor(zVals.length / 2)];
+    } else {
+      levelCamZ = 0;
+    }
+
     // ── Pass 1: Tile tops ────────────────────────────────────────────────────
     for (const { tx, ty, cell } of tiles) {
-      const isGoal     = !!ML.getTriggerCell(level, tx, ty)?.kind === 'goal';
+      const isGoal     = ML.getTriggerCell(level, tx, ty)?.kind === 'goal';
       const isBounce   = !!cell.bounce;
       const isConveyor = !!cell.conveyor;
 
@@ -365,43 +351,36 @@
         group.add(buildTileTopMesh(tx, ty, cell.baseHeight, 1, 1,
           matTileTop(isBounce, isConveyor, isGoal)));
       } else {
-        const rampH = cell.rampHeight ?? (cell.baseHeight + 2);
-        group.add(buildSlopeMesh(tx, ty, cell.shape, cell.baseHeight, rampH));
+        group.add(buildSlopeMesh(tx, ty, cell));
       }
     }
 
-    // ── Pass 2: Wall faces ───────────────────────────────────────────────────
+    // ── Pass 2: Wall faces — SOUTH and EAST only ─────────────────────────────
+    // North and west faces are never visible from the isometric camera and
+    // were causing incorrect occlusion of the marble from the inside.
     const fillZ = (ttx, tty) => ML.getFillTopAtCell(level, ttx, tty, { staticOnly: true });
 
     for (const { tx, ty, cell } of tiles) {
       const topZ = ML.getSurfaceTopZ ? ML.getSurfaceTopZ(cell) : cell.baseHeight;
 
-      // South face: at y = ty+1, faces +Y (south)
+      // South face: at y = ty+1, faces +Y (toward camera)
       const southZ = fillZ(tx, ty + 1);
       if (southZ < topZ - 0.01) {
-        const sf = buildWallFace(tx, tx + 1, ty + 1, southZ, topZ, 's', matWallSouth());
-        if (sf) { group.add(sf); group.add(buildWallTopHighlight(tx, tx + 1, ty + 1, topZ, 's')); }
+        const sf = buildSouthFace(tx, tx + 1, ty + 1, southZ, topZ, matWallSouth());
+        if (sf) {
+          group.add(sf);
+          group.add(buildWallHighlight(tx, tx + 1, ty + 1, topZ, 's'));
+        }
       }
 
-      // East face: at x = tx+1, faces +X (east)
+      // East face: at x = tx+1, faces +X (toward camera)
       const eastZ = fillZ(tx + 1, ty);
       if (eastZ < topZ - 0.01) {
-        const ef = buildWallFace(ty, ty + 1, tx + 1, eastZ, topZ, 'e', matWallEast());
-        if (ef) { group.add(ef); group.add(buildWallTopHighlight(ty, ty + 1, tx + 1, topZ, 'e')); }
-      }
-
-      // North face: at y = ty, faces -Y (north)
-      const northZ = fillZ(tx, ty - 1);
-      if (northZ < topZ - 0.01) {
-        const nf = buildWallFace(tx, tx + 1, ty, northZ, topZ, 'n', matWallNorth());
-        if (nf) group.add(nf);
-      }
-
-      // West face: at x = tx, faces -X (west)
-      const westZ = fillZ(tx - 1, ty);
-      if (westZ < topZ - 0.01) {
-        const wf = buildWallFace(ty, ty + 1, tx, westZ, topZ, 'w', matWallWest());
-        if (wf) group.add(wf);
+        const ef = buildEastFace(ty, ty + 1, tx + 1, eastZ, topZ, matWallEast());
+        if (ef) {
+          group.add(ef);
+          group.add(buildWallHighlight(ty, ty + 1, tx + 1, topZ, 'e'));
+        }
       }
     }
 
@@ -411,7 +390,7 @@
         const blk = ML.getBlockerCell(level, tx, ty);
         if (!blk) continue;
         const surface = ML.getSurfaceCell(level, tx, ty);
-        const baseZ = surface ? surface.baseHeight : voidFloor;
+        const baseZ = surface ? surface.baseHeight : (level.voidFloor ?? -12);
         const h = blk.top - baseZ;
         if (h <= 0.01) continue;
         group.add(buildBoxGroup(tx, ty, baseZ, 1, 1, h,
@@ -428,10 +407,11 @@
         if (!cell) continue;
         const z = cell.baseHeight + 0.02;
         group.add(buildTileTopMesh(tx, ty, z, 1, 1,
-          getMat('goal_top_overlay', () => new THREE.MeshLambertMaterial({ map: texGoalTop }))));
-        const poleGeo = new THREE.CylinderGeometry(0.04, 0.04, 1.2, 8);
-        const poleMat = getMat('pole', () => new THREE.MeshLambertMaterial({ color: 0xffd700 }));
-        const pole = new THREE.Mesh(poleGeo, poleMat);
+          getMat('goal_overlay', () => new THREE.MeshLambertMaterial({ map: texGoalTop }))));
+        const pole = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.04, 0.04, 1.2, 8),
+          getMat('pole', () => new THREE.MeshLambertMaterial({ color: 0xffd700 }))
+        );
         pole.position.set(tx + 0.5, z + 0.6, ty + 0.5);
         group.add(pole);
       }
@@ -443,9 +423,8 @@
   // ─── Dynamic actor meshes ────────────────────────────────────────────────────
 
   function buildDynamicMeshes(level, dynState) {
-    const T  = THREE;
     const ML = window.MarbleLevels;
-    const group = new T.Group();
+    const group = new THREE.Group();
     if (!dynState?.actors) return group;
 
     for (const actor of level.actors || []) {
@@ -466,9 +445,9 @@
 
       if (kind === ML.ACTOR_KINDS.ROTATING_BAR || kind === ML.ACTOR_KINDS.SWEEPER) {
         const len = actor.length ?? 3;
-        const geo = new T.BoxGeometry(len, 0.15, 0.3);
-        const mat = getMat('haz_bar', () => new T.MeshLambertMaterial({ color: COL.hazardTop }));
-        const mesh = new T.Mesh(geo, mat);
+        const geo = new THREE.BoxGeometry(len, 0.15, 0.3);
+        const mat = getMat('haz_bar', () => new THREE.MeshLambertMaterial({ color: COL.hazardTop }));
+        const mesh = new THREE.Mesh(geo, mat);
         mesh.position.set(state.x ?? actor.x ?? 0, (actor.z ?? 0) + 0.15, state.y ?? actor.y ?? 0);
         mesh.rotation.y = state.angle ?? 0;
         group.add(mesh);
@@ -476,9 +455,9 @@
 
       if (kind === ML.ACTOR_KINDS.TIMED_GATE && state.blocking) {
         const gw = actor.width ?? 1;
-        const geo = new T.BoxGeometry(gw, 1.5, 0.2);
-        const mat = getMat('gate', () => new T.MeshLambertMaterial({ color: 0xfbbf24 }));
-        const mesh = new T.Mesh(geo, mat);
+        const geo = new THREE.BoxGeometry(gw, 1.5, 0.2);
+        const mat = getMat('gate', () => new THREE.MeshLambertMaterial({ color: 0xfbbf24 }));
+        const mesh = new THREE.Mesh(geo, mat);
         mesh.position.set((actor.x ?? 0) + gw / 2, (actor.z ?? 0) + 0.75, actor.y ?? 0);
         group.add(mesh);
       }
@@ -489,21 +468,20 @@
   // ─── Marble mesh ─────────────────────────────────────────────────────────────
 
   function buildMarbleMesh() {
-    const T = THREE;
     const r = 0.225;
-    const sphere = new T.Mesh(
-      new T.SphereGeometry(r, 24, 16),
-      new T.MeshPhongMaterial({ color: COL.marbleTop, emissive: 0x0a1020, shininess: 80, specular: 0x7dd3fc })
+    const sphere = new THREE.Mesh(
+      new THREE.SphereGeometry(r, 24, 16),
+      new THREE.MeshPhongMaterial({ color: COL.marbleTop, emissive: 0x0a1020, shininess: 80, specular: 0x7dd3fc })
     );
     sphere.castShadow = true;
 
-    const ring = new T.Mesh(
-      new T.TorusGeometry(r * 1.05, r * 0.08, 8, 32),
-      new T.MeshPhongMaterial({ color: COL.marbleRing, emissive: 0x1a4060, shininess: 120 })
+    const ring = new THREE.Mesh(
+      new THREE.TorusGeometry(r * 1.05, r * 0.08, 8, 32),
+      new THREE.MeshPhongMaterial({ color: COL.marbleRing, emissive: 0x1a4060, shininess: 120 })
     );
     ring.rotation.x = Math.PI / 2;
 
-    const group = new T.Group();
+    const group = new THREE.Group();
     group.add(sphere);
     group.add(ring);
     return group;
@@ -512,13 +490,12 @@
   // ─── Drag arrow overlay ──────────────────────────────────────────────────────
 
   function buildDragArrow() {
-    const T = THREE;
-    const mat = new T.MeshBasicMaterial({ color: 0x7dd3fc, transparent: true, opacity: 0.85 });
-    const shaft = new T.Mesh(new T.CylinderGeometry(0.04, 0.04, 1, 8), mat);
+    const mat = new THREE.MeshBasicMaterial({ color: 0x7dd3fc, transparent: true, opacity: 0.85 });
+    const shaft = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 1, 8), mat);
     shaft.position.y = 0.5;
-    const head = new T.Mesh(new T.ConeGeometry(0.12, 0.3, 8), mat);
+    const head = new THREE.Mesh(new THREE.ConeGeometry(0.12, 0.3, 8), mat);
     head.position.y = 1.15;
-    const group = new T.Group();
+    const group = new THREE.Group();
     group.add(shaft);
     group.add(head);
     group.visible = false;
@@ -598,7 +575,7 @@
     dynamicGroup = new THREE.Group();
     scene.add(dynamicGroup);
 
-    smoothCamZ  = null;
+    levelCamZ   = 0;
     lastLevelId = null;
   }
 
@@ -627,7 +604,7 @@
       levelMeshGroup = buildLevelMeshes(runtime.level);
       scene.add(levelMeshGroup);
       lastLevelId = runtime.level.id;
-      smoothCamZ  = null;
+      // levelCamZ is set inside buildLevelMeshes
     }
 
     scene.remove(dynamicGroup);
@@ -635,6 +612,7 @@
     dynamicGroup = buildDynamicMeshes(runtime.level, runtime.dynamicState);
     scene.add(dynamicGroup);
 
+    // Marble position
     const marble = runtime.marble;
     marbleMesh.position.set(marble.x, marble.z, marble.y);
 
@@ -646,6 +624,7 @@
       marbleMesh.rotation.z -= marble.vx * roll;
     }
 
+    // Drag arrow
     const drag = runtime.dragInput;
     if (drag && drag.active && drag.worldDx !== undefined) {
       dragArrowGroup.visible = true;
@@ -657,21 +636,22 @@
       dragArrowGroup.visible = false;
     }
 
+    // Camera — XY follows marble, Z is fixed to level median (no vibration)
     const zoom = runtime.camera?.zoom ?? 1;
     updateCameraFrustum(camera, w, h, zoom);
 
     const camX = runtime.camera?.x ?? marble.x;
     const camY = runtime.camera?.y ?? marble.y;
-    if (smoothCamZ === null) smoothCamZ = marble.z;
-    smoothCamZ += (marble.z - smoothCamZ) * 0.12;
+    // Use level median Z as the camera anchor — completely eliminates void jitter
+    const camZ = levelCamZ;
 
     const dist = 30;
     camera.position.set(
       camX + dist * Math.cos(ISO_YAW),
-      smoothCamZ + dist * Math.sin(ISO_ANGLE) + 5,
-      camY + dist * Math.cos(ISO_YAW)
+      camZ  + dist * Math.sin(ISO_ANGLE) + 5,
+      camY  + dist * Math.cos(ISO_YAW)
     );
-    camera.lookAt(camX, smoothCamZ, camY);
+    camera.lookAt(camX, camZ, camY);
 
     renderer.render(scene, camera);
   }
