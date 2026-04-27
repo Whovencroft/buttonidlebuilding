@@ -243,6 +243,60 @@
   }
 
   /**
+   * North-facing wall face.
+   * Spans world x [x0,x1], at world y = fy (north edge of tile), z [zBot,zTop].
+   * Normal = -Z (north). Used only for slope high-end connections.
+   */
+  function buildNorthFace(x0, x1, fy, zBot, zTop, mat) {
+    if (zTop <= zBot + 0.001) return null;
+    const positions = new Float32Array([
+      x0, zBot, fy,
+      x1, zBot, fy,
+      x0, zTop, fy,
+      x1, zTop, fy,
+    ]);
+    const normals = new Float32Array([
+      0,0,-1, 0,0,-1, 0,0,-1, 0,0,-1,
+    ]);
+    const uvs = new Float32Array([0,0, 1,0, 0,1, 1,1]);
+    const indices = [0,2,1, 1,2,3];
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    geo.setAttribute('normal',   new THREE.BufferAttribute(normals, 3));
+    geo.setAttribute('uv',       new THREE.BufferAttribute(uvs, 2));
+    geo.setIndex(indices);
+    const mesh = new THREE.Mesh(geo, mat);
+    mesh.receiveShadow = true;
+    return mesh;
+  }
+  /**
+   * West-facing wall face.
+   * Spans world y [y0,y1], at world x = fx (west edge of tile), z [zBot,zTop].
+   * Normal = -X (west). Used only for slope high-end connections.
+   */
+  function buildWestFace(y0, y1, fx, zBot, zTop, mat) {
+    if (zTop <= zBot + 0.001) return null;
+    const positions = new Float32Array([
+      fx, zBot, y0,
+      fx, zBot, y1,
+      fx, zTop, y0,
+      fx, zTop, y1,
+    ]);
+    const normals = new Float32Array([
+      -1,0,0, -1,0,0, -1,0,0, -1,0,0,
+    ]);
+    const uvs = new Float32Array([0,0, 1,0, 0,1, 1,1]);
+    const indices = [0,1,2, 1,3,2];
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    geo.setAttribute('normal',   new THREE.BufferAttribute(normals, 3));
+    geo.setAttribute('uv',       new THREE.BufferAttribute(uvs, 2));
+    geo.setIndex(indices);
+    const mesh = new THREE.Mesh(geo, mat);
+    mesh.receiveShadow = true;
+    return mesh;
+  }
+  /**
    * East-facing wall face.
    * Spans world y [y0,y1], at world x = fx (east edge of tile), z [zBot,zTop].
    * Normal = +X (east).
@@ -419,6 +473,28 @@
         if (ef) {
           group.add(ef);
           group.add(buildWallHighlight(ty, ty + 1, tx + 1, eastEdgeZ, 'e'));
+        }
+      }
+
+      // For slope tiles only: also draw north and west faces at the HIGH end
+      // of the ramp so it connects visually to the flat tile above it.
+      // These faces are only drawn when the ramp edge is HIGHER than the
+      // neighbour (i.e. the high end of the ramp), preventing the floating slab look.
+      const isSlope = cell.shape && cell.shape.startsWith('slope_');
+      if (isSlope) {
+        // North face: at y = ty, wall top = max of north edge (nw, ne)
+        const northEdgeZ = Math.max(corners.nw, corners.ne);
+        const northZ     = fillZ(tx, ty - 1);
+        if (northZ < northEdgeZ - 0.01) {
+          const nf = buildNorthFace(tx, tx + 1, ty, northZ, northEdgeZ, matWallSouth());
+          if (nf) group.add(nf);
+        }
+        // West face: at x = tx, wall top = max of west edge (nw, sw)
+        const westEdgeZ = Math.max(corners.nw, corners.sw);
+        const westZ     = fillZ(tx - 1, ty);
+        if (westZ < westEdgeZ - 0.01) {
+          const wf = buildWestFace(ty, ty + 1, tx, westZ, westEdgeZ, matWallEast());
+          if (wf) group.add(wf);
         }
       }
     }
