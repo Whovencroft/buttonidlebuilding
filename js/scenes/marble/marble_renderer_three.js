@@ -34,8 +34,18 @@
     wallSouth:     0x2e3440,
     wallEast:      0x3b4252,
     wallHighlight: 0xd8e0e8,
-    rampTop:       0xc8d6dc,
-    rampEmissive:  0x1a2530,
+    // Ramp colours are pre-compensated for lighting angle so all four
+    // slope directions appear at similar perceived brightness.
+    // Sun is at (-8,20,-6); normals for each slope direction:
+    //   slope_n  normal ≈ (0, +0.7, +0.7)  → faces sun well  → darker base
+    //   slope_s  normal ≈ (0, +0.7, -0.7)  → faces away      → lighter base
+    //   slope_e  normal ≈ (+0.7, +0.7, 0)  → moderate        → mid base
+    //   slope_w  normal ≈ (-0.7, +0.7, 0)  → faces away      → lighter base
+    rampN:         0xaabfcc,   // north slope  — sun-facing, slightly darker
+    rampS:         0xd8eaf0,   // south slope  — away from sun, lightest
+    rampE:         0xbccdd8,   // east slope   — moderate
+    rampW:         0xd0e4ec,   // west slope   — mostly away, light
+    rampEmissive:  0x2a3a48,   // emissive floor prevents any slope going black
     hazardOverlay: 0xef4444,
     marbleTop:     0x253244,
     marbleRing:    0x7dd3fc,
@@ -127,7 +137,8 @@
     texBounceTop = makeTileTopTexture(128, COL.bounceTop,  COL.bounceDark);
     texGoalTop   = makeCheckerTexture(128, COL.goalLight,  COL.goalDark, 0xaa8800, 4);
     texConvTop   = makeTileTopTexture(128, COL.conveyorTop,COL.conveyorSide);
-    texRampTop   = makeTileTopTexture(256, COL.rampTop,    COL.tileGrid);
+    // texRampTop removed — ramps now use solid-colour Lambert materials
+    // (matRampDir) that are pre-compensated per slope direction.
   }
 
   // ─── Material cache ──────────────────────────────────────────────────────────
@@ -144,11 +155,24 @@
     if (conveyor) return getMat('conv_top',   () => new THREE.MeshLambertMaterial({ map: texConvTop }));
     return getMat('tile_top', () => new THREE.MeshLambertMaterial({ map: texTileTop }));
   }
-  function matRampTop() {
-    // Use MeshBasicMaterial so the slope surface is never darkened by lighting
-    // angle — ramps face away from the sun and go nearly black with Lambert.
-    return getMat('ramp_top', () => new THREE.MeshBasicMaterial({
-      map: texRampTop,
+  // Per-direction ramp materials: MeshLambertMaterial with a pre-compensated
+  // base colour and an emissive floor so all slope directions stay legible
+  // while still responding to the scene lights.
+  function matRampDir(shape) {
+    const dirMap = {
+      slope_n: 'ramp_n', slope_s: 'ramp_s',
+      slope_e: 'ramp_e', slope_w: 'ramp_w',
+      drop_ramp_n: 'ramp_n', drop_ramp_s: 'ramp_s',
+      drop_ramp_e: 'ramp_e', drop_ramp_w: 'ramp_w',
+    };
+    const key = dirMap[shape] || 'ramp_s';
+    const colMap = {
+      ramp_n: COL.rampN, ramp_s: COL.rampS,
+      ramp_e: COL.rampE, ramp_w: COL.rampW,
+    };
+    return getMat(key, () => new THREE.MeshLambertMaterial({
+      color:   new THREE.Color(colMap[key]),
+      emissive: new THREE.Color(COL.rampEmissive),
       side: THREE.DoubleSide,
     }));
   }
@@ -311,7 +335,7 @@
     geo.setAttribute('uv',       new THREE.BufferAttribute(uvs, 2));
     geo.setIndex(indices);
     geo.computeVertexNormals();
-    return new THREE.Mesh(geo, matRampTop());
+    return new THREE.Mesh(geo, matRampDir(cell.shape));
   }
 
   /**
