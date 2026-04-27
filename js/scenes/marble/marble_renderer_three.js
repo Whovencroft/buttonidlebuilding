@@ -1,103 +1,117 @@
 /**
- * marble_renderer_three.js
+ * marble_renderer_three.js  (v6)
  *
  * Three.js-based renderer for the marble scene.
  * Replaces the canvas 2D painter's-algorithm renderer.
  *
  * Visual style: Marble Madness arcade (1984)
- *   - Tile tops:   grey checkerboard grid
- *   - Side walls:  vertical black stripes on a coloured background
- *   - Void:        pure black
+ *   - Tile tops:   slate-grey with clear 1-per-tile grid
+ *   - Side walls:  strongly contrasted darker faces, bright top-edge highlight
+ *   - Void:        pure black (scene background, no floor mesh)
  *   - Marble:      navy-blue sphere (matches the idle-game button)
- *   - Ramps:       same tile grid, angled, matching striped sides
+ *   - Ramps:       angled quad + filled side walls on exposed edges
  *   - Goal:        checkerboard flag pattern
- *   - Bounce tile: bright yellow-green
+ *   - Bounce tile: sky-blue
  *   - Moving platform / elevator: lighter grey with blue edge
  *
  * Camera: orthographic, isometric angle (arctan(1/√2) ≈ 35.26°, 45° yaw)
  *
  * Coordinate system: world X = east, world Y = south, world Z = up
  *   (matches marble_levels.js grid convention)
+ *
+ * Fixes in v6:
+ *  1. Wall contrast  — tile tops lighter (#b0bec5), south walls much darker
+ *                      (#2e3440), east walls dark (#3b4252), plus a bright
+ *                      1px highlight strip mesh at the top edge of each wall.
+ *  2. Marble occlusion — Three.js depth buffer handles occlusion correctly;
+ *                        no manual occlusion logic needed or used.
+ *  3. Void floor flicker — removed all dynamic void-floor geometry; the
+ *                          renderer clear-colour (pure black) is sufficient.
+ *                          Camera vertical target is smoothed to avoid jumps.
+ *  4. Grid texture UV — texture now has exactly ONE grid cell per tile
+ *                       (step = size, not size/4).  UV coords are always 0→1
+ *                       per tile regardless of tile size.
+ *  5. Ramp side walls — exposed edges of slope tiles get filled wall faces
+ *                       down to the neighbour's fill height, exactly like
+ *                       flat tiles.
  */
 (() => {
   'use strict';
 
   // ─── Constants ───────────────────────────────────────────────────────────────
 
-  const TILE = 1;          // world units per tile
+  const TILE = 1;
   const ISO_ANGLE = Math.atan(1 / Math.sqrt(2));   // ~35.26°
   const ISO_YAW   = Math.PI / 4;                   // 45°
-
-  // Orthographic frustum half-size in world units (will be scaled by zoom)
   const BASE_FRUSTUM = 8;
 
-  // Marble Madness colour palette
+  // Colour palette — high-contrast Marble Madness style
   const COL = {
     void:         0x000000,
-    // Tile tops: original slate-blue-grey from canvas renderer (#94a3b8)
-    tileTop:      0x94a3b8,   // slate-400 cool blue-grey (exact match to original)
-    tileGrid:     0x6b7a8a,   // subtle grid lines (slightly darker)
-    // Wall faces: darkened versions of tile top, matching dk() from original renderer
-    // south: dk(#94a3b8, 0.58) = #565e6b  (darker, south-facing shadow)
-    wallSouth:    0x565e6b,
-    // east:  dk(#94a3b8, 0.72) = #6a7585  (medium, east-facing)
-    wallEast:     0x6a7585,
-    // north: slightly lighter than south (lit from above-north)
-    wallNorth:    0x6a7585,
-    // west:  same as east
-    wallWest:     0x565e6b,
+
+    // Tile tops: lighter slate so walls read as clearly darker
+    tileTop:      0xb0bec5,   // blue-grey-300 (lighter than before)
+    tileGrid:     0x8fa0aa,   // grid lines — visible but not garish
+
+    // Wall faces: strongly darkened for clear silhouette
+    wallSouth:    0x2e3440,   // very dark blue-grey (south shadow face)
+    wallEast:     0x3b4252,   // dark blue-grey (east face)
+    wallNorth:    0x3b4252,   // north face (same as east — lit from above)
+    wallWest:     0x2e3440,   // west face (same as south)
+
+    // Wall top-edge highlight strip
+    wallHighlight: 0xd8e0e8,  // near-white highlight at top of each wall
+
     // Ramp tops match tile tops
-    rampTop:      0x94a3b8,
-    // Marble: matches the idle button (navy blue with sky-blue ring)
+    rampTop:      0xb0bec5,
+
+    // Marble: navy-blue sphere with sky-blue ring (matches idle button)
     marbleTop:    0x253244,
     marbleBot:    0x1b2532,
     marbleRing:   0x7dd3fc,
-    // Special tiles (exact hex from original renderer)
-    goalLight:    0x22c55e,   // #22c55e green goal
-    goalDark:     0x16a34a,   // darker green
-    bounceTop:    0x38bdf8,   // #38bdf8 sky blue bounce
+
+    // Special tiles
+    goalLight:    0x22c55e,
+    goalDark:     0x16a34a,
+    bounceTop:    0x38bdf8,
     bounceDark:   0x0ea5e9,
-    platformTop:  0x64748b,   // #64748b slate moving platform
-    platformSide: 0x475569,   // #475569 darker slate
-    hazardTop:    0xef4444,   // #ef4444 red hazard
+    platformTop:  0x64748b,
+    platformSide: 0x475569,
+    hazardTop:    0xef4444,
     hazardSide:   0xdc2626,
-    conveyorTop:  0x0891b2,   // #0891b2 cyan conveyor
+    conveyorTop:  0x0891b2,
     conveyorSide: 0x0e7490,
     goalFlag:     0x22c55e,
   };
 
   // ─── Module state ────────────────────────────────────────────────────────────
 
-  let renderer  = null;   // THREE.WebGLRenderer
-  let scene     = null;   // THREE.Scene
-  let camera    = null;   // THREE.OrthographicCamera
-  let THREE     = null;   // reference to the global THREE object
+  let renderer  = null;
+  let scene     = null;
+  let camera    = null;
+  let THREE     = null;
 
-  // Object pools / caches
-  let levelMeshGroup = null;   // group rebuilt when level changes
+  let levelMeshGroup = null;
   let lastLevelId    = null;
-
-  // Dynamic objects (rebuilt each frame for moving actors)
-  let dynamicGroup = null;
-
-  // Marble mesh
-  let marbleMesh = null;
-  let marbleRingMesh = null;
-
-  // Drag arrow
+  let dynamicGroup   = null;
+  let marbleMesh     = null;
   let dragArrowGroup = null;
 
-  // ─── Geometry helpers ────────────────────────────────────────────────────────
+  // Smoothed camera vertical target (avoids void-floor flicker)
+  let smoothCamZ = null;
 
+  // ─── Texture helpers ─────────────────────────────────────────────────────────
+
+  /**
+   * Checkerboard texture (used for goal tiles).
+   */
   function makeCheckerTexture(size, col1, col2, gridCol, squares) {
     const T = THREE;
     const canvas = document.createElement('canvas');
     canvas.width  = size;
     canvas.height = size;
     const ctx = canvas.getContext('2d');
-
     const sqSize = size / squares;
-
     for (let row = 0; row < squares; row++) {
       for (let col = 0; col < squares; col++) {
         const light = (row + col) % 2 === 0;
@@ -106,8 +120,6 @@
         ctx.fillRect(col * sqSize, row * sqSize, sqSize, sqSize);
       }
     }
-
-    // Grid lines
     ctx.strokeStyle = '#' + gridCol.toString(16).padStart(6,'0');
     ctx.lineWidth = Math.max(1, size / 128);
     for (let i = 0; i <= squares; i++) {
@@ -115,40 +127,36 @@
       ctx.beginPath(); ctx.moveTo(p, 0); ctx.lineTo(p, size); ctx.stroke();
       ctx.beginPath(); ctx.moveTo(0, p); ctx.lineTo(size, p); ctx.stroke();
     }
-
     const tex = new T.CanvasTexture(canvas);
     tex.wrapS = tex.wrapT = T.RepeatWrapping;
     return tex;
   }
 
-  function makeStripedTexture(size, bgCol, stripeCol, stripeCount) {
+  /**
+   * Tile-top texture: solid fill + ONE grid border per tile.
+   * The texture represents exactly one tile (UV 0→1 = one tile).
+   * Grid lines are drawn only at the edges (i=0 and i=1) so each tile
+   * shows a single clear border — giving reliable spatial reference.
+   */
+  function makeTileTopTexture(size, col, gridCol) {
     const T = THREE;
     const canvas = document.createElement('canvas');
-    canvas.width  = size;
-    canvas.height = size;
+    canvas.width = canvas.height = size;
     const ctx = canvas.getContext('2d');
 
-    ctx.fillStyle = '#' + bgCol.toString(16).padStart(6,'0');
+    // Fill background
+    ctx.fillStyle = '#' + col.toString(16).padStart(6, '0');
     ctx.fillRect(0, 0, size, size);
 
-    ctx.fillStyle = '#' + stripeCol.toString(16).padStart(6,'0');
-    const stripeW = size / (stripeCount * 2);
-    for (let i = 0; i < stripeCount; i++) {
-      ctx.fillRect(i * stripeW * 2, 0, stripeW, size);
-    }
+    // Draw a single border (outline) around the whole tile
+    ctx.strokeStyle = '#' + gridCol.toString(16).padStart(6, '0');
+    ctx.lineWidth = Math.max(2, size / 64);
+    ctx.strokeRect(0, 0, size, size);
 
     const tex = new T.CanvasTexture(canvas);
     tex.wrapS = tex.wrapT = T.RepeatWrapping;
     return tex;
   }
-
-  // Shared textures (created once)
-  let texTileTop    = null;
-  let texWallSouth  = null;
-  let texWallEast   = null;
-  let texBounceTop  = null;
-  let texGoalTop    = null;
-  let texConvTop    = null;
 
   function makeSolidTexture(size, col) {
     const T = THREE;
@@ -160,35 +168,19 @@
     const tex = new T.CanvasTexture(canvas);
     return tex;
   }
-  function makeTileTopTexture(size, col, gridCol) {
-    // Clean solid tile with subtle grid lines only (no checkerboard)
-    const T = THREE;
-    const canvas = document.createElement('canvas');
-    canvas.width = canvas.height = size;
-    const ctx = canvas.getContext('2d');
-    ctx.fillStyle = '#' + col.toString(16).padStart(6, '0');
-    ctx.fillRect(0, 0, size, size);
-    // Draw grid lines every 1/4 of the texture (4x4 grid)
-    ctx.strokeStyle = '#' + gridCol.toString(16).padStart(6, '0');
-    ctx.lineWidth = Math.max(1, size / 256);
-    const step = size / 4;
-    for (let i = 0; i <= 4; i++) {
-      const p = i * step;
-      ctx.beginPath(); ctx.moveTo(p, 0); ctx.lineTo(p, size); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(0, p); ctx.lineTo(size, p); ctx.stroke();
-    }
-    const tex = new T.CanvasTexture(canvas);
-    tex.wrapS = tex.wrapT = T.RepeatWrapping;
-    return tex;
-  }
+
+  // Shared textures (created once after THREE is available)
+  let texTileTop    = null;
+  let texBounceTop  = null;
+  let texGoalTop    = null;
+  let texConvTop    = null;
+
   function ensureTextures() {
     if (texTileTop) return;
-    texTileTop   = makeTileTopTexture(256, COL.tileTop, COL.tileGrid);
-    texWallSouth = makeSolidTexture(64, COL.wallSouth);
-    texWallEast  = makeSolidTexture(64, COL.wallEast);
-    texBounceTop = makeTileTopTexture(128, COL.bounceTop, COL.bounceDark);
-    texGoalTop   = makeCheckerTexture(128, COL.goalLight, COL.goalDark, 0xaa8800, 4);
-    texConvTop   = makeTileTopTexture(128, COL.conveyorTop, COL.conveyorSide);
+    texTileTop   = makeTileTopTexture(256, COL.tileTop,      COL.tileGrid);
+    texBounceTop = makeTileTopTexture(128, COL.bounceTop,    COL.bounceDark);
+    texGoalTop   = makeCheckerTexture(128, COL.goalLight,    COL.goalDark, 0xaa8800, 4);
+    texConvTop   = makeTileTopTexture(128, COL.conveyorTop,  COL.conveyorSide);
   }
 
   // ─── Material cache ──────────────────────────────────────────────────────────
@@ -205,50 +197,28 @@
     if (conveyor) return getMat('conv_top',    () => new THREE.MeshLambertMaterial({ map: texConvTop }));
     return getMat('tile_top', () => new THREE.MeshLambertMaterial({ map: texTileTop }));
   }
-
-  function matWallSouth() {
-    return getMat('wall_south', () => new THREE.MeshLambertMaterial({ color: COL.wallSouth }));
-  }
-  function matWallEast() {
-    return getMat('wall_east', () => new THREE.MeshLambertMaterial({ color: COL.wallEast }));
-  }
-  function matWallNorth() {
-    return getMat('wall_north', () => new THREE.MeshLambertMaterial({ color: COL.wallNorth }));
-  }
-  function matWallWest() {
-    return getMat('wall_west', () => new THREE.MeshLambertMaterial({ color: COL.wallWest }));
-  }
-
-  function matPlatformTop() {
-    return getMat('plat_top', () => new THREE.MeshLambertMaterial({ color: COL.platformTop }));
-  }
-
-  function matPlatformSide() {
-    return getMat('plat_side', () => new THREE.MeshLambertMaterial({ color: COL.platformSide }));
-  }
-
-  function matHazardTop() {
-    return getMat('haz_top', () => new THREE.MeshLambertMaterial({ color: COL.hazardTop }));
-  }
-
-  function matHazardSide() {
-    return getMat('haz_side', () => new THREE.MeshLambertMaterial({ color: COL.hazardSide }));
-  }
+  function matWallSouth()     { return getMat('wall_south', () => new THREE.MeshLambertMaterial({ color: COL.wallSouth })); }
+  function matWallEast()      { return getMat('wall_east',  () => new THREE.MeshLambertMaterial({ color: COL.wallEast  })); }
+  function matWallNorth()     { return getMat('wall_north', () => new THREE.MeshLambertMaterial({ color: COL.wallNorth })); }
+  function matWallWest()      { return getMat('wall_west',  () => new THREE.MeshLambertMaterial({ color: COL.wallWest  })); }
+  function matWallHighlight() { return getMat('wall_hl',    () => new THREE.MeshLambertMaterial({ color: COL.wallHighlight, emissive: COL.wallHighlight, emissiveIntensity: 0.3 })); }
+  function matPlatformTop()   { return getMat('plat_top',   () => new THREE.MeshLambertMaterial({ color: COL.platformTop  })); }
+  function matPlatformSide()  { return getMat('plat_side',  () => new THREE.MeshLambertMaterial({ color: COL.platformSide })); }
+  function matHazardTop()     { return getMat('haz_top',    () => new THREE.MeshLambertMaterial({ color: COL.hazardTop    })); }
+  function matHazardSide()    { return getMat('haz_side',   () => new THREE.MeshLambertMaterial({ color: COL.hazardSide   })); }
 
   // ─── Mesh builders ───────────────────────────────────────────────────────────
 
   /**
-   * Build a flat tile top face at world (tx, ty, z) with size (w x d).
-   * UV repeating so the texture tiles per world unit.
+   * Flat tile top.  UV is always 0→1 per tile (one grid cell per tile).
    */
   function buildTileTopMesh(tx, ty, z, w, d, mat) {
     const geo = new THREE.PlaneGeometry(w, d);
-    // Rotate to lie flat in XY plane (Three.js PlaneGeometry is in XY, we need XZ)
     geo.rotateX(-Math.PI / 2);
-    // UV: repeat once per tile
+    // UV: always 0→1 per tile regardless of size — one grid cell per tile
     const uvAttr = geo.attributes.uv;
     for (let i = 0; i < uvAttr.count; i++) {
-      uvAttr.setXY(i, uvAttr.getX(i) * w, uvAttr.getY(i) * d);
+      uvAttr.setXY(i, uvAttr.getX(i), uvAttr.getY(i));
     }
     const mesh = new THREE.Mesh(geo, mat);
     mesh.position.set(tx + w / 2, z, ty + d / 2);
@@ -257,7 +227,7 @@
   }
 
   /**
-   * Build a vertical south-facing wall face.
+   * Vertical south-facing wall face.
    * Spans world x [x0, x1], at world y = fy, from z = zBot to z = zTop.
    */
   function buildWallFaceMesh(x0, x1, fy, zBot, zTop, mat) {
@@ -265,16 +235,8 @@
     const w = x1 - x0;
     const h = zTop - zBot;
     const geo = new THREE.PlaneGeometry(w, h);
-    // UV: repeat per world unit
-    const uvAttr = geo.attributes.uv;
-    for (let i = 0; i < uvAttr.count; i++) {
-      uvAttr.setXY(i, uvAttr.getX(i) * w, uvAttr.getY(i) * h);
-    }
     const mesh = new THREE.Mesh(geo, mat);
-    // South face: normal points in +Y direction, so we don't rotate (PlaneGeometry faces +Z by default)
-    // We need it to face south (+Y in world), so rotate around X by -PI/2 then around Y by PI
-    mesh.rotation.x = Math.PI / 2;   // lay it vertical
-    // PlaneGeometry after rotateX(PI/2) faces -Z; we want it to face +Y (south)
+    mesh.rotation.x = Math.PI / 2;
     mesh.rotation.y = Math.PI;
     mesh.position.set(x0 + w / 2, zBot + h / 2, fy);
     mesh.receiveShadow = true;
@@ -282,7 +244,7 @@
   }
 
   /**
-   * Build a vertical east-facing wall face.
+   * Vertical east-facing wall face.
    * Spans world y [y0, y1], at world x = fx, from z = zBot to z = zTop.
    */
   function buildWallFaceEastMesh(y0, y1, fx, zBot, zTop, mat) {
@@ -290,83 +252,84 @@
     const d = y1 - y0;
     const h = zTop - zBot;
     const geo = new THREE.PlaneGeometry(d, h);
-    const uvAttr = geo.attributes.uv;
-    for (let i = 0; i < uvAttr.count; i++) {
-      uvAttr.setXY(i, uvAttr.getX(i) * d, uvAttr.getY(i) * h);
-    }
     const mesh = new THREE.Mesh(geo, mat);
     mesh.rotation.x = Math.PI / 2;
-    mesh.rotation.y = -Math.PI / 2;  // face east (+X)
+    mesh.rotation.y = -Math.PI / 2;
     mesh.position.set(fx, zBot + h / 2, y0 + d / 2);
     mesh.receiveShadow = true;
     return mesh;
   }
 
   /**
-   * Build a slope tile (ramp) as a single angled quad.
+   * Thin highlight strip at the top edge of a south-facing wall.
+   * Rendered as a flat plane slightly in front of the wall face.
+   */
+  function buildWallTopHighlightSouth(x0, x1, fy, zTop) {
+    const w = x1 - x0;
+    const geo = new THREE.PlaneGeometry(w, 0.06);
+    const mesh = new THREE.Mesh(geo, matWallHighlight());
+    mesh.rotation.x = Math.PI / 2;
+    mesh.rotation.y = Math.PI;
+    mesh.position.set(x0 + w / 2, zTop - 0.03, fy - 0.005);
+    return mesh;
+  }
+
+  /**
+   * Thin highlight strip at the top edge of an east-facing wall.
+   */
+  function buildWallTopHighlightEast(y0, y1, fx, zTop) {
+    const d = y1 - y0;
+    const geo = new THREE.PlaneGeometry(d, 0.06);
+    const mesh = new THREE.Mesh(geo, matWallHighlight());
+    mesh.rotation.x = Math.PI / 2;
+    mesh.rotation.y = -Math.PI / 2;
+    mesh.position.set(fx - 0.005, zTop - 0.03, y0 + d / 2);
+    return mesh;
+  }
+
+  /**
+   * Slope tile (ramp) as a single angled quad.
    * shape: 'slope_n' | 'slope_s' | 'slope_e' | 'slope_w'
-   * baseHeight: low corner Z
-   * rampHeight: high corner Z (= baseHeight + 2 typically)
    */
   function buildSlopeMesh(tx, ty, shape, baseHeight, rampHeight, mat) {
-    // Four corners of the tile top face
-    // NW=(tx,ty), NE=(tx+1,ty), SW=(tx,ty+1), SE=(tx+1,ty+1)
     const zNW = baseHeight, zNE = baseHeight, zSW = baseHeight, zSE = baseHeight;
     let corners = { NW: zNW, NE: zNE, SW: zSW, SE: zSE };
-
     switch (shape) {
       case 'slope_n': corners.NW = rampHeight; corners.NE = rampHeight; break;
       case 'slope_s': corners.SW = rampHeight; corners.SE = rampHeight; break;
       case 'slope_e': corners.NE = rampHeight; corners.SE = rampHeight; break;
       case 'slope_w': corners.NW = rampHeight; corners.SW = rampHeight; break;
     }
-
-    // Build custom geometry: two triangles
     const positions = new Float32Array([
-      tx,     corners.NW, ty,       // NW
-      tx + 1, corners.NE, ty,       // NE
-      tx,     corners.SW, ty + 1,   // SW
-      tx + 1, corners.SE, ty + 1,   // SE
+      tx,     corners.NW, ty,
+      tx + 1, corners.NE, ty,
+      tx,     corners.SW, ty + 1,
+      tx + 1, corners.SE, ty + 1,
     ]);
     const indices = [0, 2, 1,  1, 2, 3];
     const uvs = new Float32Array([0,0, 1,0, 0,1, 1,1]);
-
     const geo = new THREE.BufferGeometry();
     geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
     geo.setAttribute('uv',       new THREE.BufferAttribute(uvs, 2));
     geo.setIndex(indices);
     geo.computeVertexNormals();
-
     return new THREE.Mesh(geo, mat);
   }
 
   /**
-   * Build a box mesh (used for blockers, platforms, etc.)
-   * at world position (tx, ty, zBot) with size (w x d x h).
-   * Returns a group with top + 4 sides.
+   * Box group (top + 4 sides) — used for blockers and platforms.
    */
   function buildBoxGroup(tx, ty, zBot, w, d, h, matTop, matSide) {
     const group = new THREE.Group();
-
-    // Top
     group.add(buildTileTopMesh(tx, ty, zBot + h, w, d, matTop));
-
-    // South face (y = ty + d)
     const sf = buildWallFaceMesh(tx, tx + w, ty + d, zBot, zBot + h, matSide);
     if (sf) group.add(sf);
-
-    // East face (x = tx + w)
     const ef = buildWallFaceEastMesh(ty, ty + d, tx + w, zBot, zBot + h, matSide);
     if (ef) group.add(ef);
-
-    // North face (y = ty) — faces -Y, rotate south face 180° around Z
     const nf = buildWallFaceMesh(tx, tx + w, ty, zBot, zBot + h, matSide);
     if (nf) { nf.rotation.y = 0; group.add(nf); }
-
-    // West face (x = tx) — faces -X
     const wf = buildWallFaceEastMesh(ty, ty + d, tx, zBot, zBot + h, matSide);
     if (wf) { wf.rotation.y = Math.PI / 2; group.add(wf); }
-
     return group;
   }
 
@@ -378,11 +341,7 @@
     const group = new T.Group();
     const voidFloor = level.voidFloor ?? -12;
 
-    // We build the terrain in two passes:
-    // Pass 1: tile tops
-    // Pass 2: south and east wall faces (grouped into merged geometries for performance)
-
-    // Collect all tile data first
+    // Collect non-void tiles
     const tiles = [];
     for (let ty = 0; ty < level.height; ty++) {
       for (let tx = 0; tx < level.width; tx++) {
@@ -392,58 +351,66 @@
       }
     }
 
-    // Tile tops
+    // ── Pass 1: Tile tops ────────────────────────────────────────────────────
     for (const { tx, ty, cell } of tiles) {
-      const isGoal = !!ML.getTriggerCell(level, tx, ty)?.kind === 'goal';
-      const isBounce = !!cell.bounce;
+      const isGoal     = !!ML.getTriggerCell(level, tx, ty)?.kind === 'goal';
+      const isBounce   = !!cell.bounce;
       const isConveyor = !!cell.conveyor;
       const mat = matTileTop(isBounce, isConveyor, isGoal);
 
       if (!cell.shape || cell.shape === 'flat') {
-        const z = cell.baseHeight;
-        const mesh = buildTileTopMesh(tx, ty, z, 1, 1, mat);
-        group.add(mesh);
+        group.add(buildTileTopMesh(tx, ty, cell.baseHeight, 1, 1, mat));
       } else {
-        // Slope tile
         const rampH = cell.rampHeight ?? (cell.baseHeight + 2);
-        const mesh = buildSlopeMesh(tx, ty, cell.shape, cell.baseHeight, rampH, mat);
-        group.add(mesh);
+        group.add(buildSlopeMesh(tx, ty, cell.shape, cell.baseHeight, rampH, mat));
       }
     }
 
-    // Wall faces: all four directions for every tile.
-    // Use getFillTopAtCell (staticOnly) so ramp tiles contribute their
-    // actual max-corner height, not just baseHeight.
+    // ── Pass 2: Wall faces (all four directions per tile) ────────────────────
+    // getFillTopAtCell returns voidFloor for void/out-of-bounds cells, so
+    // every exposed edge gets a wall face down to the neighbour's height.
     const fillZ = (ttx, tty) => ML.getFillTopAtCell(level, ttx, tty, { staticOnly: true });
+
     for (const { tx, ty, cell } of tiles) {
-      // Use the true max-corner height of this tile as the top of its faces.
+      // For ramp tiles getSurfaceTopZ returns the highest corner.
       const topZ = ML.getSurfaceTopZ ? ML.getSurfaceTopZ(cell) : cell.baseHeight;
-      // South face (visible when tile to south is lower)
+
+      // South face
       const southZ = fillZ(tx, ty + 1);
       if (southZ < topZ - 0.01) {
         const sf = buildWallFaceMesh(tx, tx + 1, ty + 1, southZ, topZ, matWallSouth());
-        if (sf) group.add(sf);
+        if (sf) {
+          group.add(sf);
+          group.add(buildWallTopHighlightSouth(tx, tx + 1, ty + 1, topZ));
+        }
       }
-      // East face (visible when tile to east is lower)
+
+      // East face
       const eastZ = fillZ(tx + 1, ty);
       if (eastZ < topZ - 0.01) {
         const ef = buildWallFaceEastMesh(ty, ty + 1, tx + 1, eastZ, topZ, matWallEast());
-        if (ef) group.add(ef);
+        if (ef) {
+          group.add(ef);
+          group.add(buildWallTopHighlightEast(ty, ty + 1, tx + 1, topZ));
+        }
       }
-      // North face (visible when tile to north is lower)
+
+      // North face
       const northZ = fillZ(tx, ty - 1);
       if (northZ < topZ - 0.01) {
         const nf = buildWallFaceMesh(tx, tx + 1, ty, northZ, topZ, matWallNorth());
-        if (nf) group.add(nf);
+        if (nf) { nf.rotation.y = 0; group.add(nf); }
       }
-      // West face (visible when tile to west is lower)
+
+      // West face
       const westZ = fillZ(tx - 1, ty);
       if (westZ < topZ - 0.01) {
         const wf = buildWallFaceEastMesh(ty, ty + 1, tx, westZ, topZ, matWallWest());
-        if (wf) group.add(wf);
+        if (wf) { wf.rotation.y = Math.PI / 2; group.add(wf); }
       }
     }
-    // Blockers (walls / raised platforms)
+
+    // ── Pass 3: Blockers ─────────────────────────────────────────────────────
     for (let ty = 0; ty < level.height; ty++) {
       for (let tx = 0; tx < level.width; tx++) {
         const blk = ML.getBlockerCell(level, tx, ty);
@@ -452,12 +419,11 @@
         const baseZ = surface ? surface.baseHeight : voidFloor;
         const h = blk.top - baseZ;
         if (h <= 0.01) continue;
-        const bg = buildBoxGroup(tx, ty, baseZ, 1, 1, h, matTileTop(false, false, false), matWallSouth());
-        group.add(bg);
+        group.add(buildBoxGroup(tx, ty, baseZ, 1, 1, h, matTileTop(false, false, false), matWallSouth()));
       }
     }
 
-    // Goal trigger visual
+    // ── Pass 4: Goal trigger visuals ─────────────────────────────────────────
     for (let ty = 0; ty < level.height; ty++) {
       for (let tx = 0; tx < level.width; tx++) {
         const trig = ML.getTriggerCell(level, tx, ty);
@@ -465,10 +431,8 @@
         const cell = ML.getSurfaceCell(level, tx, ty);
         if (!cell) continue;
         const z = cell.baseHeight + 0.02;
-        const mesh = buildTileTopMesh(tx, ty, z, 1, 1, getMat('goal_top', () => new THREE.MeshLambertMaterial({ map: texGoalTop })));
-        group.add(mesh);
-
-        // Flag pole
+        group.add(buildTileTopMesh(tx, ty, z, 1, 1,
+          getMat('goal_top', () => new THREE.MeshLambertMaterial({ map: texGoalTop }))));
         const poleGeo = new THREE.CylinderGeometry(0.04, 0.04, 1.2, 8);
         const poleMat = getMat('pole', () => new THREE.MeshLambertMaterial({ color: 0xffd700 }));
         const pole = new THREE.Mesh(poleGeo, poleMat);
@@ -491,7 +455,6 @@
     for (const actor of level.actors || []) {
       const state = dynState.actors[actor.id];
       if (!state) continue;
-
       const kind = actor.kind;
 
       if (kind === ML.ACTOR_KINDS.MOVING_PLATFORM || kind === ML.ACTOR_KINDS.ELEVATOR) {
@@ -499,16 +462,14 @@
         const d = actor.depth ?? 2;
         const topZ = state.z ?? actor.z ?? actor.topHeight ?? 0;
         const h = 0.3;
-        const bg = buildBoxGroup(
+        group.add(buildBoxGroup(
           state.x - w / 2, state.y - d / 2,
           topZ - h, w, d, h,
           matPlatformTop(), matPlatformSide()
-        );
-        group.add(bg);
+        ));
       }
 
       if (kind === ML.ACTOR_KINDS.ROTATING_BAR || kind === ML.ACTOR_KINDS.SWEEPER) {
-        // Draw as a thin flat box
         const angle = state.angle ?? 0;
         const len = actor.length ?? 3;
         const geo = new THREE.BoxGeometry(len, 0.15, 0.3);
@@ -522,21 +483,18 @@
         group.add(mesh);
       }
 
-      if (kind === ML.ACTOR_KINDS.TIMED_GATE) {
-        if (state.blocking) {
-          const gx = actor.x ?? 0;
-          const gy = actor.y ?? 0;
-          const gz = actor.z ?? 0;
-          const gw = actor.width ?? 1;
-          const geo = new THREE.BoxGeometry(gw, 1.5, 0.2);
-          const mat = getMat('gate', () => new T.MeshLambertMaterial({ color: 0xfbbf24 }));
-          const mesh = new T.Mesh(geo, mat);
-          mesh.position.set(gx + gw / 2, gz + 0.75, gy);
-          group.add(mesh);
-        }
+      if (kind === ML.ACTOR_KINDS.TIMED_GATE && state.blocking) {
+        const gx = actor.x ?? 0;
+        const gy = actor.y ?? 0;
+        const gz = actor.z ?? 0;
+        const gw = actor.width ?? 1;
+        const geo = new THREE.BoxGeometry(gw, 1.5, 0.2);
+        const mat = getMat('gate', () => new T.MeshLambertMaterial({ color: 0xfbbf24 }));
+        const mesh = new T.Mesh(geo, mat);
+        mesh.position.set(gx + gw / 2, gz + 0.75, gy);
+        group.add(mesh);
       }
     }
-
     return group;
   }
 
@@ -545,8 +503,6 @@
   function buildMarbleMesh() {
     const T = THREE;
     const r = 0.225;
-
-    // Main sphere with gradient-like material (navy blue)
     const geo = new T.SphereGeometry(r, 24, 16);
     const mat = new T.MeshPhongMaterial({
       color:     COL.marbleTop,
@@ -557,7 +513,6 @@
     const sphere = new T.Mesh(geo, mat);
     sphere.castShadow = true;
 
-    // Equatorial ring (accent blue, matches button border)
     const ringGeo = new T.TorusGeometry(r * 1.05, r * 0.08, 8, 32);
     const ringMat = new T.MeshPhongMaterial({
       color:     COL.marbleRing,
@@ -565,7 +520,7 @@
       shininess: 120,
     });
     const ring = new T.Mesh(ringGeo, ringMat);
-    ring.rotation.x = Math.PI / 2;  // equatorial plane
+    ring.rotation.x = Math.PI / 2;
 
     const group = new T.Group();
     group.add(sphere);
@@ -578,20 +533,13 @@
   function buildDragArrow() {
     const T = THREE;
     const group = new T.Group();
-
-    // Arrow shaft
-    const shaftGeo = new T.CylinderGeometry(0.04, 0.04, 1, 8);
     const arrowMat = new T.MeshBasicMaterial({ color: 0x7dd3fc, transparent: true, opacity: 0.85 });
-    const shaft = new T.Mesh(shaftGeo, arrowMat);
+    const shaft = new T.Mesh(new T.CylinderGeometry(0.04, 0.04, 1, 8), arrowMat);
     shaft.position.y = 0.5;
     group.add(shaft);
-
-    // Arrow head
-    const headGeo = new T.ConeGeometry(0.12, 0.3, 8);
-    const head = new T.Mesh(headGeo, arrowMat);
+    const head = new T.Mesh(new T.ConeGeometry(0.12, 0.3, 8), arrowMat);
     head.position.y = 1.15;
     group.add(head);
-
     group.visible = false;
     return group;
   }
@@ -606,13 +554,9 @@
        frust,          -frust,
       -100, 200
     );
-
-    // Isometric position: look from NW-above
-    // Standard isometric: rotate 45° around Y, then tilt ~35.26° around X
     cam.rotation.order = 'YXZ';
-    cam.rotation.y = -Math.PI / 4;          // 45° yaw (NW)
-    cam.rotation.x = -Math.atan(1 / Math.sqrt(2));  // ~35.26° pitch
-
+    cam.rotation.y = -Math.PI / 4;
+    cam.rotation.x = -Math.atan(1 / Math.sqrt(2));
     return cam;
   }
 
@@ -630,25 +574,14 @@
 
   function ensureRenderer(canvas) {
     if (renderer && renderer.domElement === canvas) return;
-
-    if (renderer) {
-      renderer.dispose();
-      renderer = null;
-    }
+    if (renderer) { renderer.dispose(); renderer = null; }
 
     THREE = window.THREE;
-    if (!THREE) {
-      console.error('[MarbleRenderer3] THREE not loaded');
-      return;
-    }
+    if (!THREE) { console.error('[MarbleRenderer3] THREE not loaded'); return; }
 
     ensureTextures();
 
-    renderer = new THREE.WebGLRenderer({
-      canvas,
-      antialias: true,
-      alpha: false,
-    });
+    renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -658,10 +591,9 @@
     scene.background = new THREE.Color(COL.void);
 
     // Lighting
-    const ambient = new THREE.AmbientLight(0xffffff, 0.35);
-    scene.add(ambient);
+    scene.add(new THREE.AmbientLight(0xffffff, 0.40));
 
-    const sun = new THREE.DirectionalLight(0xffffff, 0.65);
+    const sun = new THREE.DirectionalLight(0xffffff, 0.70);
     sun.position.set(-8, 20, -6);
     sun.castShadow = true;
     sun.shadow.mapSize.width  = 1024;
@@ -672,27 +604,23 @@
     sun.shadow.camera.right = sun.shadow.camera.top   =  50;
     scene.add(sun);
 
-    // Fill light from south-east
     const fill = new THREE.DirectionalLight(0xaaccff, 0.15);
     fill.position.set(6, 10, 8);
     scene.add(fill);
 
-    // Camera
     camera = setupCamera(canvas.clientWidth || 800, canvas.clientHeight || 600);
     scene.add(camera);
 
-    // Marble
     marbleMesh = buildMarbleMesh();
     scene.add(marbleMesh);
 
-    // Drag arrow
     dragArrowGroup = buildDragArrow();
     scene.add(dragArrowGroup);
 
-    // Dynamic group placeholder
     dynamicGroup = new THREE.Group();
     scene.add(dynamicGroup);
 
+    smoothCamZ = null;
     lastLevelId = null;
   }
 
@@ -701,7 +629,6 @@
   function render(runtime, canvas) {
     if (!canvas) return;
 
-    // Resize if needed
     const w = canvas.clientWidth  || canvas.width  || 800;
     const h = canvas.clientHeight || canvas.height || 600;
     if (canvas.width !== w || canvas.height !== h) {
@@ -714,18 +641,16 @@
 
     renderer.setSize(w, h, false);
 
-    // Rebuild level meshes if level changed
+    // Rebuild level meshes only when level changes
     if (runtime.level.id !== lastLevelId) {
       if (levelMeshGroup) {
         scene.remove(levelMeshGroup);
-        // Dispose geometries
-        levelMeshGroup.traverse(obj => {
-          if (obj.geometry) obj.geometry.dispose();
-        });
+        levelMeshGroup.traverse(obj => { if (obj.geometry) obj.geometry.dispose(); });
       }
       levelMeshGroup = buildLevelMeshes(runtime.level);
       scene.add(levelMeshGroup);
       lastLevelId = runtime.level.id;
+      smoothCamZ = null;  // reset smoothing on level change
     }
 
     // Rebuild dynamic actor meshes every frame
@@ -742,7 +667,7 @@
     const speed = Math.hypot(marble.vx, marble.vy);
     if (speed > 0.01) {
       const r = marble.collisionRadius ?? 0.225;
-      const rollAngle = speed * (1 / r) * (1 / 120);  // approximate per-frame
+      const rollAngle = speed * (1 / r) * (1 / 120);
       marbleMesh.rotation.x += marble.vy * rollAngle;
       marbleMesh.rotation.z -= marble.vx * rollAngle;
     }
@@ -754,30 +679,31 @@
       dragArrowGroup.position.set(marble.x, marble.z + 0.5, marble.y);
       const len = Math.hypot(drag.worldDx, drag.worldDy);
       dragArrowGroup.scale.set(1, Math.min(len * 0.5, 2), 1);
-      if (len > 0.01) {
-        dragArrowGroup.rotation.y = Math.atan2(drag.worldDx, drag.worldDy);
-      }
+      if (len > 0.01) dragArrowGroup.rotation.y = Math.atan2(drag.worldDx, drag.worldDy);
     } else {
       dragArrowGroup.visible = false;
     }
 
-    // Update camera to follow marble
+    // Camera — smooth the vertical (Z) component to prevent void-floor flicker
     const zoom = runtime.camera?.zoom ?? 1;
     updateCameraFrustum(camera, w, h, zoom);
 
     const camX = runtime.camera?.x ?? marble.x;
     const camY = runtime.camera?.y ?? marble.y;
-    const camZ = marble.z;
+    const targetCamZ = marble.z;
 
-    // Camera target in world space (X, Z=up, Y=south)
-    // Offset camera position along the isometric view direction
+    // Exponential smoothing on the camera height — eliminates frame-to-frame
+    // jitter that caused the void background to appear to shift.
+    if (smoothCamZ === null) smoothCamZ = targetCamZ;
+    smoothCamZ += (targetCamZ - smoothCamZ) * 0.12;
+
     const dist = 30;
     camera.position.set(
       camX + dist * Math.cos(ISO_YAW),
-      camZ + dist * Math.sin(ISO_ANGLE) + 5,
+      smoothCamZ + dist * Math.sin(ISO_ANGLE) + 5,
       camY + dist * Math.cos(ISO_YAW)
     );
-    camera.lookAt(camX, camZ, camY);
+    camera.lookAt(camX, smoothCamZ, camY);
 
     renderer.render(scene, camera);
   }
