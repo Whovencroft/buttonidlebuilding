@@ -393,27 +393,32 @@
     // North and west faces are never visible from the isometric camera and
     // were causing incorrect occlusion of the marble from the inside.
     const fillZ = (ttx, tty) => ML.getFillTopAtCell(level, ttx, tty, { staticOnly: true });
-
     for (const { tx, ty, cell } of tiles) {
-      const topZ = ML.getSurfaceTopZ ? ML.getSurfaceTopZ(cell) : cell.baseHeight;
+      // Use per-edge heights so ramp walls only extend to the actual edge height,
+      // not the maximum corner of the whole tile.
+      const corners = ML.getSurfaceCornerHeights
+        ? ML.getSurfaceCornerHeights(cell)
+        : { nw: cell.baseHeight, ne: cell.baseHeight, sw: cell.baseHeight, se: cell.baseHeight };
 
-      // South face: at y = ty+1, faces +Y (toward camera)
-      const southZ = fillZ(tx, ty + 1);
-      if (southZ < topZ - 0.01) {
-        const sf = buildSouthFace(tx, tx + 1, ty + 1, southZ, topZ, matWallSouth());
+      // South face: at y = ty+1, wall top = max of south edge (sw, se)
+      const southEdgeZ = Math.max(corners.sw, corners.se);
+      const southZ     = fillZ(tx, ty + 1);
+      if (southZ < southEdgeZ - 0.01) {
+        const sf = buildSouthFace(tx, tx + 1, ty + 1, southZ, southEdgeZ, matWallSouth());
         if (sf) {
           group.add(sf);
-          group.add(buildWallHighlight(tx, tx + 1, ty + 1, topZ, 's'));
+          group.add(buildWallHighlight(tx, tx + 1, ty + 1, southEdgeZ, 's'));
         }
       }
 
-      // East face: at x = tx+1, faces +X (toward camera)
-      const eastZ = fillZ(tx + 1, ty);
-      if (eastZ < topZ - 0.01) {
-        const ef = buildEastFace(ty, ty + 1, tx + 1, eastZ, topZ, matWallEast());
+      // East face: at x = tx+1, wall top = max of east edge (ne, se)
+      const eastEdgeZ = Math.max(corners.ne, corners.se);
+      const eastZ     = fillZ(tx + 1, ty);
+      if (eastZ < eastEdgeZ - 0.01) {
+        const ef = buildEastFace(ty, ty + 1, tx + 1, eastZ, eastEdgeZ, matWallEast());
         if (ef) {
           group.add(ef);
-          group.add(buildWallHighlight(ty, ty + 1, tx + 1, topZ, 'e'));
+          group.add(buildWallHighlight(ty, ty + 1, tx + 1, eastEdgeZ, 'e'));
         }
       }
     }

@@ -1107,69 +1107,64 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     }, width);
   }
 
-function wallRing(level, x, y, w, h, top, options = {}) {
-  const gaps = new Set((options.gaps || []).map((gap) => toKey(gap.x, gap.y)));
-  const patch = {
-    kind: options.kind ?? 'track',
-    baseHeight: top,
-    shape: SHAPES.FLAT,
-    friction: options.friction ?? 1,
-    conveyor: null,
-    bounce: options.bounce ?? 0,
-    crumble: null,
-    failType: null,
-    landingPad: false,
-    data: options.data ?? null
-  };
-
-  function place(xx, yy) {
-    if (gaps.has(toKey(xx, yy))) return;
-    setSurface(level, xx, yy, patch);
-    clearBlocker(level, xx, yy);
-  }
-
-  for (let xx = x; xx < x + w; xx += 1) {
-    place(xx, y);
-    place(xx, y + h - 1);
-  }
-
-  for (let yy = y; yy < y + h; yy += 1) {
-    place(x, yy);
-    place(x + w - 1, yy);
-  }
-}
-
-function blockerRing(level, x, y, w, h, top, options = {}) {
-  const gaps = new Set((options.gaps || []).map((gap) => toKey(gap.x, gap.y)));
-  const patch = {
-    kind: options.kind ?? 'wall',
-    top,
-    walkableTop: !!options.walkableTop,
-    transparent: !!options.transparent,
-    data: options.data ?? null
-  };
-
-  for (let xx = x; xx < x + w; xx += 1) {
-    if (!gaps.has(toKey(xx, y))) setBlocker(level, xx, y, patch);
-    if (!gaps.has(toKey(xx, y + h - 1))) setBlocker(level, xx, y + h - 1, patch);
-  }
-
-  for (let yy = y; yy < y + h; yy += 1) {
-    if (!gaps.has(toKey(x, yy))) setBlocker(level, x, yy, patch);
-    if (!gaps.has(toKey(x + w - 1, yy))) setBlocker(level, x + w - 1, yy, patch);
-  }
-}
-
-function addHazardRect(level, x, y, w, h, type = 'hazard_strip') {
-  for (let yy = y; yy < y + h; yy += 1) {
+  function wallRing(level, x, y, w, h, top, options = {}) {
+    const gaps = new Set((options.gaps || []).map((gap) => toKey(gap.x, gap.y)));
+    const patch = {
+      kind: options.kind ?? 'track',
+      baseHeight: top,
+      shape: SHAPES.FLAT,
+      friction: options.friction ?? 1,
+      conveyor: null,
+      bounce: options.bounce ?? 0,
+      crumble: null,
+      failType: null,
+      landingPad: false,
+      data: options.data ?? null
+    };
+    function place(xx, yy) {
+      if (gaps.has(toKey(xx, yy))) return;
+      setSurface(level, xx, yy, patch);
+      clearBlocker(level, xx, yy);
+    }
     for (let xx = x; xx < x + w; xx += 1) {
-      setTrigger(level, xx, yy, {
-        kind: 'hazard',
-        data: { type }
-      });
+      place(xx, y);
+      place(xx, y + h - 1);
+    }
+    for (let yy = y; yy < y + h; yy += 1) {
+      place(x, yy);
+      place(x + w - 1, yy);
     }
   }
-}
+
+  function blockerRing(level, x, y, w, h, top, options = {}) {
+    const gaps = new Set((options.gaps || []).map((gap) => toKey(gap.x, gap.y)));
+    const patch = {
+      kind: options.kind ?? 'wall',
+      top,
+      walkableTop: !!options.walkableTop,
+      transparent: !!options.transparent,
+      data: options.data ?? null
+    };
+    for (let xx = x; xx < x + w; xx += 1) {
+      if (!gaps.has(toKey(xx, y))) setBlocker(level, xx, y, patch);
+      if (!gaps.has(toKey(xx, y + h - 1))) setBlocker(level, xx, y + h - 1, patch);
+    }
+    for (let yy = y; yy < y + h; yy += 1) {
+      if (!gaps.has(toKey(x, yy))) setBlocker(level, x, yy, patch);
+      if (!gaps.has(toKey(x + w - 1, yy))) setBlocker(level, x + w - 1, yy, patch);
+    }
+  }
+
+  function addHazardRect(level, x, y, w, h, type = 'hazard_strip') {
+    for (let yy = y; yy < y + h; yy += 1) {
+      for (let xx = x; xx < x + w; xx += 1) {
+        setTrigger(level, xx, yy, {
+          kind: 'hazard',
+          data: { type }
+        });
+      }
+    }
+  }
 
   function buildStairRun(level, x, y, length, dir, startHeight, step = -1, width = 3, extra = {}) {
     for (let i = 0; i < length; i += 1) {
@@ -1186,21 +1181,21 @@ function addHazardRect(level, x, y, w, h, type = 'hazard_strip') {
     }
   }
 
-function addStaticPlatform(level, id, x, y, z, width, height, extra = {}) {
-  const top = z + (extra.thickness ?? 1);
+  function addStaticPlatform(level, id, x, y, z, width, height, extra = {}) {
+    const top = z + (extra.thickness ?? 1);
 
-  for (let yy = y; yy < y + height; yy += 1) {
-    for (let xx = x; xx < x + width; xx += 1) {
-      setBlocker(level, xx, yy, {
-        kind: 'overhang',
-        top,
-        walkableTop: extra.walkableTop !== false,
-        transparent: !!extra.transparent,
-        data: { id, overhang: true, ...extra.data }
-      });
+    for (let yy = y; yy < y + height; yy += 1) {
+      for (let xx = x; xx < x + width; xx += 1) {
+        setBlocker(level, xx, yy, {
+          kind: 'overhang',
+          top,
+          walkableTop: extra.walkableTop !== false,
+          transparent: !!extra.transparent,
+          data: { id, overhang: true, ...extra.data }
+        });
+      }
     }
   }
-}
 
   function addMovingBridge(level, id, points, width, height, speed = 0.55, extra = {}) {
     addActor(level, {
