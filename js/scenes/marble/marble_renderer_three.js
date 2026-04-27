@@ -36,6 +36,7 @@
     wallHighlight: 0xd8e0e8,
     rampTop:       0xc8d6dc,
     rampEmissive:  0x1a2530,
+    hazardOverlay: 0xef4444,
     marbleTop:     0x253244,
     marbleRing:    0x7dd3fc,
     goalLight:     0x22c55e,
@@ -144,10 +145,19 @@
     return getMat('tile_top', () => new THREE.MeshLambertMaterial({ map: texTileTop }));
   }
   function matRampTop() {
-    return getMat('ramp_top', () => new THREE.MeshLambertMaterial({
+    // Use MeshBasicMaterial so the slope surface is never darkened by lighting
+    // angle — ramps face away from the sun and go nearly black with Lambert.
+    return getMat('ramp_top', () => new THREE.MeshBasicMaterial({
       map: texRampTop,
       side: THREE.DoubleSide,
-      emissive: new THREE.Color(COL.rampEmissive),
+    }));
+  }
+  function matHazard() {
+    return getMat('hazard', () => new THREE.MeshBasicMaterial({
+      color: COL.hazardOverlay,
+      transparent: true,
+      opacity: 0.55,
+      depthWrite: false,
     }));
   }
   // Wall faces: FrontSide only — south and east faces always face the camera.
@@ -398,7 +408,34 @@
       }
     }
 
-    // ── Pass 4: Goal trigger visuals ─────────────────────────────────────────
+    // ── Pass 4: Hazard trigger overlays ──────────────────────────────────────
+    for (let ty = 0; ty < level.height; ty++) {
+      for (let tx = 0; tx < level.width; tx++) {
+        const trig = ML.getTriggerCell(level, tx, ty);
+        if (trig?.kind !== 'hazard') continue;
+        const cell = ML.getSurfaceCell(level, tx, ty);
+        if (!cell) continue;
+        // Overlay a semi-transparent red quad slightly above the tile surface
+        const z = (ML.getSurfaceTopZ ? ML.getSurfaceTopZ(cell) : cell.baseHeight) + 0.015;
+        const positions = new Float32Array([
+          tx,     z, ty,
+          tx + 1, z, ty,
+          tx,     z, ty + 1,
+          tx + 1, z, ty + 1,
+        ]);
+        const normals = new Float32Array([0,1,0, 0,1,0, 0,1,0, 0,1,0]);
+        const uvs = new Float32Array([0,0, 1,0, 0,1, 1,1]);
+        const hGeo = new THREE.BufferGeometry();
+        hGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        hGeo.setAttribute('normal',   new THREE.BufferAttribute(normals, 3));
+        hGeo.setAttribute('uv',       new THREE.BufferAttribute(uvs, 2));
+        hGeo.setIndex([0,1,2, 1,3,2]);
+        const hMesh = new THREE.Mesh(hGeo, matHazard());
+        hMesh.renderOrder = 1;
+        group.add(hMesh);
+      }
+    }
+    // ── Pass 5: Goal trigger visuals ─────────────────────────────────────────
     for (let ty = 0; ty < level.height; ty++) {
       for (let tx = 0; tx < level.width; tx++) {
         const trig = ML.getTriggerCell(level, tx, ty);
