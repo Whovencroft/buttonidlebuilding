@@ -457,74 +457,67 @@
       }
     }
 
-    // ── Pass 2: Wall faces — SOUTH and EAST only ─────────────────────────────
-    // North and west faces are never visible from the isometric camera and
-    // were causing incorrect occlusion of the marble from the inside.
-    const fillZ = (ttx, tty) => ML.getFillTopAtCell(level, ttx, tty, { staticOnly: true });
+    // ── Pass 2: Wall faces — all four edges ──────────────────────────────────
+    // For every tile, draw a wall face on any edge where this tile's edge height
+    // is HIGHER than the neighbouring tile's shared-boundary edge height.
+    // Uses per-edge corner heights (not fillZ max) so slope tiles compare correctly.
+
+    // Helper: get the height of a cell's edge at the shared boundary with a neighbour.
+    // Returns 0 for void or out-of-bounds.
+    const edgeH = (ttx, tty, edge) => {
+      const nc = ML.getSurfaceCell(level, ttx, tty);
+      if (!nc || nc.kind === 'void') return 0;
+      const nc_ = ML.getSurfaceCornerHeights
+        ? ML.getSurfaceCornerHeights(nc)
+        : { nw: nc.baseHeight, ne: nc.baseHeight, sw: nc.baseHeight, se: nc.baseHeight };
+      if (edge === 'south') return Math.max(nc_.sw, nc_.se);
+      if (edge === 'north') return Math.max(nc_.nw, nc_.ne);
+      if (edge === 'west')  return Math.max(nc_.nw, nc_.sw);
+      if (edge === 'east')  return Math.max(nc_.ne, nc_.se);
+      return nc.baseHeight;
+    };
+
     for (const { tx, ty, cell } of tiles) {
-      // Use per-edge heights so ramp walls only extend to the actual edge height,
-      // not the maximum corner of the whole tile.
       const corners = ML.getSurfaceCornerHeights
         ? ML.getSurfaceCornerHeights(cell)
         : { nw: cell.baseHeight, ne: cell.baseHeight, sw: cell.baseHeight, se: cell.baseHeight };
 
-      // South face: at y = ty+1, wall top = max of south edge (sw, se)
+      // South face: at y = ty+1
       const southEdgeZ = Math.max(corners.sw, corners.se);
-      const southZ     = fillZ(tx, ty + 1);
-      if (southZ < southEdgeZ - 0.01) {
-        const sf = buildSouthFace(tx, tx + 1, ty + 1, southZ, southEdgeZ, matWallSouth());
+      const southNbrZ  = edgeH(tx, ty + 1, 'north');
+      if (southEdgeZ > southNbrZ + 0.01) {
+        const sf = buildSouthFace(tx, tx + 1, ty + 1, southNbrZ, southEdgeZ, matWallSouth());
         if (sf) {
           group.add(sf);
           group.add(buildWallHighlight(tx, tx + 1, ty + 1, southEdgeZ, 's'));
         }
       }
 
-      // East face: at x = tx+1, wall top = max of east edge (ne, se)
+      // East face: at x = tx+1
       const eastEdgeZ = Math.max(corners.ne, corners.se);
-      const eastZ     = fillZ(tx + 1, ty);
-      if (eastZ < eastEdgeZ - 0.01) {
-        const ef = buildEastFace(ty, ty + 1, tx + 1, eastZ, eastEdgeZ, matWallEast());
+      const eastNbrZ  = edgeH(tx + 1, ty, 'west');
+      if (eastEdgeZ > eastNbrZ + 0.01) {
+        const ef = buildEastFace(ty, ty + 1, tx + 1, eastNbrZ, eastEdgeZ, matWallEast());
         if (ef) {
           group.add(ef);
           group.add(buildWallHighlight(ty, ty + 1, tx + 1, eastEdgeZ, 'e'));
         }
       }
 
-      // North/west faces for slope tiles: fill void gaps where the ramp's edge is LOWER
-      // than the neighbour's shared-boundary edge height.
-      // IMPORTANT: compare against the neighbour's edge at the SHARED BOUNDARY, not its
-      // fillZ (max corner). fillZ returns the high end of a slope, which would create
-      // false gaps at every slope->slope step.
-      const isSlope = cell.shape && cell.shape.startsWith('slope_');
-      if (isSlope) {
-        // Helper: get the height of a cell's edge at the shared boundary
-        const edgeH = (ttx, tty, edge) => {
-          const nc = ML.getSurfaceCell(level, ttx, tty);
-          if (!nc || nc.kind === 'void') return 0;
-          const nc_ = ML.getSurfaceCornerHeights ? ML.getSurfaceCornerHeights(nc)
-            : { nw: nc.baseHeight, ne: nc.baseHeight, sw: nc.baseHeight, se: nc.baseHeight };
-          if (edge === 'south') return Math.max(nc_.sw, nc_.se);
-          if (edge === 'north') return Math.max(nc_.nw, nc_.ne);
-          if (edge === 'west')  return Math.max(nc_.nw, nc_.sw);
-          if (edge === 'east')  return Math.max(nc_.ne, nc_.se);
-          return nc.baseHeight;
-        };
+      // North face: at y = ty (only when this tile is higher than its north neighbour)
+      const northEdgeZ = Math.max(corners.nw, corners.ne);
+      const northNbrZ  = edgeH(tx, ty - 1, 'south');
+      if (northEdgeZ > northNbrZ + 0.01) {
+        const nf = buildNorthFace(tx, tx + 1, ty, northNbrZ, northEdgeZ, matWallSouth());
+        if (nf) group.add(nf);
+      }
 
-        // North face: at y=ty. Compare current north edge vs north neighbour's SOUTH edge.
-        const northEdgeZ = Math.max(corners.nw, corners.ne);
-        const northNbrSouthZ = edgeH(tx, ty - 1, 'south');
-        if (northEdgeZ < northNbrSouthZ - 0.01) {
-          const nf = buildNorthFace(tx, tx + 1, ty, northEdgeZ, northNbrSouthZ, matWallSouth());
-          if (nf) group.add(nf);
-        }
-
-        // West face: at x=tx. Compare current west edge vs west neighbour's EAST edge.
-        const westEdgeZ = Math.max(corners.nw, corners.sw);
-        const westNbrEastZ = edgeH(tx - 1, ty, 'east');
-        if (westEdgeZ < westNbrEastZ - 0.01) {
-          const wf = buildWestFace(ty, ty + 1, tx, westEdgeZ, westNbrEastZ, matWallEast());
-          if (wf) group.add(wf);
-        }
+      // West face: at x = tx (only when this tile is higher than its west neighbour)
+      const westEdgeZ = Math.max(corners.nw, corners.sw);
+      const westNbrZ  = edgeH(tx - 1, ty, 'east');
+      if (westEdgeZ > westNbrZ + 0.01) {
+        const wf = buildWestFace(ty, ty + 1, tx, westNbrZ, westEdgeZ, matWallEast());
+        if (wf) group.add(wf);
       }
     }
 
