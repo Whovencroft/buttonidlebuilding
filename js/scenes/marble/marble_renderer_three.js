@@ -873,5 +873,18 @@
     ensureRenderer(canvas);
   }
 
-  window.MarbleRenderer = { render, prepare };
+  function getDebugInfo() {
+    if (!renderer) return null;
+    const info = renderer.info;
+    return {
+      geometries: info.memory.geometries,
+      textures:   info.memory.textures,
+      programs:   info.programs ? info.programs.length : '?',
+      calls:      info.render.calls,
+      triangles:  info.render.triangles,
+      sceneChildren: scene ? scene.children.length : 0
+    };
+  }
+
+  window.MarbleRenderer = { render, prepare, getDebugInfo };
 })();
