@@ -300,7 +300,8 @@
       -1,0,0, -1,0,0, -1,0,0, -1,0,0,
     ]);
     const uvs = new Float32Array([0,0, 1,0, 0,1, 1,1]);
-    const indices = [0,1,2, 1,3,2];
+    // Winding reversed vs east face so front face points toward -X (west/camera side)
+    const indices = [0,2,1, 1,2,3];
     const geo = new THREE.BufferGeometry();
     geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
     geo.setAttribute('normal',   new THREE.BufferAttribute(normals, 3));
