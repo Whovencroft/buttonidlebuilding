@@ -41,11 +41,11 @@
     //   slope_s  normal ≈ (0, +0.7, -0.7)  → faces away      → lighter base
     //   slope_e  normal ≈ (+0.7, +0.7, 0)  → moderate        → mid base
     //   slope_w  normal ≈ (-0.7, +0.7, 0)  → faces away      → lighter base
-    rampN:         0xaabfcc,   // north slope  — sun-facing, slightly darker
-    rampS:         0xd8eaf0,   // south slope  — away from sun, lightest
-    rampE:         0xbccdd8,   // east slope   — moderate
-    rampW:         0xd0e4ec,   // west slope   — mostly away, light
-    rampEmissive:  0x2a3a48,   // emissive floor prevents any slope going black
+    rampN:         0x8fa8b5,   // north slope  — sun-facing, match tile top
+    rampS:         0xb0c8d4,   // south slope  — slightly lighter than tile top
+    rampE:         0x9ab2be,   // east slope   — moderate
+    rampW:         0xa8c0cc,   // west slope   — slightly lighter
+    rampEmissive:  0x1a2530,   // emissive floor prevents any slope going black
     hazardOverlay: 0xef4444,
     marbleTop:     0x253244,
     marbleRing:    0x7dd3fc,
@@ -125,11 +125,39 @@
   }
 
   // Shared textures (created once after THREE is available)
-  let texTileTop   = null;
-  let texBounceTop = null;
-  let texGoalTop   = null;
-  let texConvTop   = null;
-  let texRampTop   = null;
+  let texTileTop    = null;
+  let texBounceTop  = null;
+  let texGoalTop    = null;
+  let texConvTop    = null;
+  let texHazardTop  = null;
+
+  /**
+   * Hazard stripe texture: diagonal red/dark-red stripes.
+   */
+  function makeHazardTexture(size) {
+    const cv = document.createElement('canvas');
+    cv.width = cv.height = size;
+    const ctx = cv.getContext('2d');
+    ctx.fillStyle = '#dc2626';
+    ctx.fillRect(0, 0, size, size);
+    ctx.strokeStyle = '#7f1d1d';
+    ctx.lineWidth = size / 8;
+    // Diagonal stripes
+    for (let i = -2; i <= 4; i++) {
+      const x = i * size / 3;
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x + size, size);
+      ctx.stroke();
+    }
+    // Border
+    ctx.strokeStyle = '#fca5a5';
+    ctx.lineWidth = Math.max(2, size / 64);
+    ctx.strokeRect(1, 1, size - 2, size - 2);
+    const tex = new THREE.CanvasTexture(cv);
+    tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+    return tex;
+  }
 
   function ensureTextures() {
     if (texTileTop) return;
@@ -137,8 +165,7 @@
     texBounceTop = makeTileTopTexture(128, COL.bounceTop,  COL.bounceDark);
     texGoalTop   = makeCheckerTexture(128, COL.goalLight,  COL.goalDark, 0xaa8800, 4);
     texConvTop   = makeTileTopTexture(128, COL.conveyorTop,COL.conveyorSide);
-    // texRampTop removed — ramps now use solid-colour Lambert materials
-    // (matRampDir) that are pre-compensated per slope direction.
+    texHazardTop = makeHazardTexture(128);
   }
 
   // ─── Material cache ──────────────────────────────────────────────────────────
@@ -155,33 +182,20 @@
     if (conveyor) return getMat('conv_top',   () => new THREE.MeshLambertMaterial({ map: texConvTop }));
     return getMat('tile_top', () => new THREE.MeshLambertMaterial({ map: texTileTop }));
   }
-  // Per-direction ramp materials: MeshLambertMaterial with a pre-compensated
-  // base colour and an emissive floor so all slope directions stay legible
-  // while still responding to the scene lights.
-  function matRampDir(shape) {
-    const dirMap = {
-      slope_n: 'ramp_n', slope_s: 'ramp_s',
-      slope_e: 'ramp_e', slope_w: 'ramp_w',
-      drop_ramp_n: 'ramp_n', drop_ramp_s: 'ramp_s',
-      drop_ramp_e: 'ramp_e', drop_ramp_w: 'ramp_w',
-    };
-    const key = dirMap[shape] || 'ramp_s';
-    const colMap = {
-      ramp_n: COL.rampN, ramp_s: COL.rampS,
-      ramp_e: COL.rampE, ramp_w: COL.rampW,
-    };
-    return getMat(key, () => new THREE.MeshLambertMaterial({
-      color:   new THREE.Color(colMap[key]),
+  // Ramp material: same tile-top texture as flat tiles so ramps read as part
+  // of the level rather than separate floating objects.  A mild emissive floor
+  // prevents the slope going dark on sun-away faces.
+  function matRampDir(_shape) {
+    return getMat('ramp_top', () => new THREE.MeshLambertMaterial({
+      map:      texTileTop,
       emissive: new THREE.Color(COL.rampEmissive),
-      side: THREE.DoubleSide,
+      side:     THREE.DoubleSide,
     }));
   }
   function matHazard() {
-    return getMat('hazard', () => new THREE.MeshBasicMaterial({
-      color: COL.hazardOverlay,
-      transparent: true,
-      opacity: 0.55,
-      depthWrite: false,
+    // Use MeshLambertMaterial to match goal overlay approach — always visible.
+    return getMat('hazard', () => new THREE.MeshLambertMaterial({
+      map: texHazardTop,
     }));
   }
   // Wall faces: FrontSide only — south and east faces always face the camera.
@@ -520,24 +534,9 @@
         if (trig?.kind !== 'hazard') continue;
         const cell = ML.getSurfaceCell(level, tx, ty);
         if (!cell) continue;
-        // Overlay a semi-transparent red quad slightly above the tile surface
-        const z = (ML.getSurfaceTopZ ? ML.getSurfaceTopZ(cell) : cell.baseHeight) + 0.015;
-        const positions = new Float32Array([
-          tx,     z, ty,
-          tx + 1, z, ty,
-          tx,     z, ty + 1,
-          tx + 1, z, ty + 1,
-        ]);
-        const normals = new Float32Array([0,1,0, 0,1,0, 0,1,0, 0,1,0]);
-        const uvs = new Float32Array([0,0, 1,0, 0,1, 1,1]);
-        const hGeo = new THREE.BufferGeometry();
-        hGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-        hGeo.setAttribute('normal',   new THREE.BufferAttribute(normals, 3));
-        hGeo.setAttribute('uv',       new THREE.BufferAttribute(uvs, 2));
-        hGeo.setIndex([0,1,2, 1,3,2]);
-        const hMesh = new THREE.Mesh(hGeo, matHazard());
-        hMesh.renderOrder = 1;
-        group.add(hMesh);
+        // Use buildTileTopMesh — identical approach to goal overlay (which works).
+        const z = (ML.getSurfaceTopZ ? ML.getSurfaceTopZ(cell) : cell.baseHeight) + 0.05;
+        group.add(buildTileTopMesh(tx, ty, z, 1, 1, matHazard()));
       }
     }
     // ── Pass 5: Goal trigger visuals ─────────────────────────────────────────
