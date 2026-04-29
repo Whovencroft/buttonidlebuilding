@@ -70,6 +70,7 @@
   let levelMeshGroup = null;
   let lastLevelId    = null;
   let dynamicGroup   = null;
+  let actorMeshMap   = {};   // actorId -> { group, kind } — persistent per level
   let marbleMesh     = null;
   let dragArrowGroup = null;
   // Fixed camera Z anchor computed once per level load
@@ -582,25 +583,23 @@
 
   // ─── Dynamic actor meshes ────────────────────────────────────────────────────
 
-  function buildDynamicMeshes(level, dynState) {
+  // Build persistent actor meshes for the current level (called once on level load).
+  // Returns a group containing all actor meshes and populates actorMeshMap.
+  function buildActorMeshes(level) {
     const ML = window.MarbleLevels;
     const group = new THREE.Group();
-    if (!dynState?.actors) return group;
+    actorMeshMap = {};
 
     for (const actor of level.actors || []) {
-      const state = dynState.actors[actor.id];
-      if (!state) continue;
       const kind = actor.kind;
+      let actorGroup = null;
 
       if (kind === ML.ACTOR_KINDS.MOVING_PLATFORM || kind === ML.ACTOR_KINDS.ELEVATOR) {
         const w = actor.width ?? 2;
         const d = actor.depth ?? 2;
-        const topZ = state.z ?? actor.z ?? actor.topHeight ?? 0;
-        group.add(buildBoxGroup(
-          state.x - w / 2, state.y - d / 2,
-          topZ - 0.3, w, d, 0.3,
-          matPlatformTop(), matPlatformSide()
-        ));
+        actorGroup = buildBoxGroup(0, 0, -0.3, w, d, 0.3, matPlatformTop(), matPlatformSide());
+        actorMeshMap[actor.id] = { group: actorGroup, kind };
+        group.add(actorGroup);
       }
 
       if (kind === ML.ACTOR_KINDS.ROTATING_BAR || kind === ML.ACTOR_KINDS.SWEEPER) {
@@ -608,21 +607,61 @@
         const geo = new THREE.BoxGeometry(len, 0.15, 0.3);
         const mat = getMat('haz_bar', () => new THREE.MeshLambertMaterial({ color: COL.hazardTop }));
         const mesh = new THREE.Mesh(geo, mat);
-        mesh.position.set(state.x ?? actor.x ?? 0, (actor.z ?? 0) + 0.15, state.y ?? actor.y ?? 0);
-        mesh.rotation.y = state.angle ?? 0;
-        group.add(mesh);
+        actorGroup = new THREE.Group();
+        actorGroup.add(mesh);
+        actorMeshMap[actor.id] = { group: actorGroup, kind, mesh };
+        group.add(actorGroup);
       }
 
-      if (kind === ML.ACTOR_KINDS.TIMED_GATE && state.blocking) {
+      if (kind === ML.ACTOR_KINDS.TIMED_GATE) {
         const gw = actor.width ?? 1;
         const geo = new THREE.BoxGeometry(gw, 1.5, 0.2);
         const mat = getMat('gate', () => new THREE.MeshLambertMaterial({ color: 0xfbbf24 }));
         const mesh = new THREE.Mesh(geo, mat);
         mesh.position.set((actor.x ?? 0) + gw / 2, (actor.z ?? 0) + 0.75, actor.y ?? 0);
-        group.add(mesh);
+        actorGroup = new THREE.Group();
+        actorGroup.add(mesh);
+        actorMeshMap[actor.id] = { group: actorGroup, kind, mesh };
+        group.add(actorGroup);
       }
     }
     return group;
+  }
+
+  // Update persistent actor mesh positions/rotations/visibility each frame.
+  // No geometry or material allocation — just transforms.
+  function updateActorMeshes(level, dynState) {
+    const ML = window.MarbleLevels;
+    if (!dynState?.actors) return;
+
+    for (const actor of level.actors || []) {
+      const entry = actorMeshMap[actor.id];
+      if (!entry) continue;
+      const state = dynState.actors[actor.id];
+      if (!state) { entry.group.visible = false; continue; }
+      entry.group.visible = true;
+      const kind = actor.kind;
+
+      if (kind === ML.ACTOR_KINDS.MOVING_PLATFORM || kind === ML.ACTOR_KINDS.ELEVATOR) {
+        const w = actor.width ?? 2;
+        const d = actor.depth ?? 2;
+        const topZ = state.z ?? actor.z ?? actor.topHeight ?? 0;
+        entry.group.position.set(state.x - w / 2, topZ - 0.3, state.y - d / 2);
+      }
+
+      if (kind === ML.ACTOR_KINDS.ROTATING_BAR || kind === ML.ACTOR_KINDS.SWEEPER) {
+        entry.group.position.set(
+          state.x ?? actor.x ?? 0,
+          (actor.z ?? 0) + 0.15,
+          state.y ?? actor.y ?? 0
+        );
+        entry.group.rotation.y = state.angle ?? 0;
+      }
+
+      if (kind === ML.ACTOR_KINDS.TIMED_GATE) {
+        entry.group.visible = !!state.blocking;
+      }
+    }
   }
 
   // ─── Marble mesh ─────────────────────────────────────────────────────────────
@@ -732,8 +771,8 @@
     dragArrowGroup = buildDragArrow();
     scene.add(dragArrowGroup);
 
-    dynamicGroup = new THREE.Group();
-    scene.add(dynamicGroup);
+    dynamicGroup = null;
+    actorMeshMap = {};
 
     levelCamZ   = 0;
     lastLevelId = null;
@@ -757,20 +796,33 @@
     renderer.setSize(w, h, false);
 
     if (runtime.level.id !== lastLevelId) {
+      // Dispose old level geometry AND materials (prevents GPU leak on level switch)
       if (levelMeshGroup) {
         scene.remove(levelMeshGroup);
-        levelMeshGroup.traverse(obj => { if (obj.geometry) obj.geometry.dispose(); });
+        levelMeshGroup.traverse(obj => {
+          if (obj.geometry) obj.geometry.dispose();
+          // Only dispose non-cached materials (cached ones live in matCache)
+          if (obj.material && !Object.values(matCache).includes(obj.material)) {
+            obj.material.dispose();
+          }
+        });
+      }
+      // Dispose old actor meshes geometry (materials are all cached, skip)
+      if (dynamicGroup) {
+        scene.remove(dynamicGroup);
+        dynamicGroup.traverse(obj => { if (obj.geometry) obj.geometry.dispose(); });
       }
       levelMeshGroup = buildLevelMeshes(runtime.level);
       scene.add(levelMeshGroup);
+      // Build persistent actor meshes once for this level
+      dynamicGroup = buildActorMeshes(runtime.level);
+      scene.add(dynamicGroup);
       lastLevelId = runtime.level.id;
       // levelCamZ is set inside buildLevelMeshes
     }
 
-    scene.remove(dynamicGroup);
-    dynamicGroup.traverse(obj => { if (obj.geometry) obj.geometry.dispose(); });
-    dynamicGroup = buildDynamicMeshes(runtime.level, runtime.dynamicState);
-    scene.add(dynamicGroup);
+    // Update actor positions/rotations in-place — no allocations per frame
+    updateActorMeshes(runtime.level, runtime.dynamicState);
 
     // Marble position
     const marble = runtime.marble;
