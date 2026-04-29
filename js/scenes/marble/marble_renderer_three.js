@@ -490,24 +490,23 @@
         }
       }
 
-      // For slope tiles only: also draw north and west faces at the HIGH end
-      // of the ramp so it connects visually to the flat tile above it.
-      // These faces are only drawn when the ramp edge is HIGHER than the
-      // neighbour (i.e. the high end of the ramp), preventing the floating slab look.
+      // North/west faces for slope tiles: drawn when the ramp edge is LOWER than the
+      // neighbour, filling the void gap below the ramp's low end.
       const isSlope = cell.shape && cell.shape.startsWith('slope_');
       if (isSlope) {
-        // North face: at y = ty, wall top = max of north edge (nw, ne)
+        // North face: fill gap when ramp's north edge is LOWER than the tile to the north
+        // (low end of ramp descends northward — neighbour is higher, void gap below ramp edge)
         const northEdgeZ = Math.max(corners.nw, corners.ne);
         const northZ     = fillZ(tx, ty - 1);
-        if (northZ < northEdgeZ - 0.01) {
-          const nf = buildNorthFace(tx, tx + 1, ty, northZ, northEdgeZ, matWallSouth());
+        if (northEdgeZ < northZ - 0.01) {
+          const nf = buildNorthFace(tx, tx + 1, ty, northEdgeZ, northZ, matWallSouth());
           if (nf) group.add(nf);
         }
-        // West face: at x = tx, wall top = max of west edge (nw, sw)
+        // West face: fill gap when ramp's west edge is LOWER than the tile to the west
         const westEdgeZ = Math.max(corners.nw, corners.sw);
         const westZ     = fillZ(tx - 1, ty);
-        if (westZ < westEdgeZ - 0.01) {
-          const wf = buildWestFace(ty, ty + 1, tx, westZ, westEdgeZ, matWallEast());
+        if (westEdgeZ < westZ - 0.01) {
+          const wf = buildWestFace(ty, ty + 1, tx, westEdgeZ, westZ, matWallEast());
           if (wf) group.add(wf);
         }
       }
