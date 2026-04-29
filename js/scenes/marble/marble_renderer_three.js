@@ -505,20 +505,30 @@
         }
       }
 
-      // North face: at y = ty (only when this tile is higher than its north neighbour)
+      // North boundary: at y = ty — this tile is higher than its north neighbour.
+      // Camera looks from south-east, so use a south-facing quad placed at y=ty
+      // (same geometry as buildSouthFace but at the tile's north edge).
       const northEdgeZ = Math.max(corners.nw, corners.ne);
       const northNbrZ  = edgeH(tx, ty - 1, 'south');
       if (northEdgeZ > northNbrZ + 0.01) {
-        const nf = buildNorthFace(tx, tx + 1, ty, northNbrZ, northEdgeZ, matWallSouth());
-        if (nf) group.add(nf);
+        const nf = buildSouthFace(tx, tx + 1, ty, northNbrZ, northEdgeZ, matWallSouth());
+        if (nf) {
+          group.add(nf);
+          group.add(buildWallHighlight(tx, tx + 1, ty, northEdgeZ, 's'));
+        }
       }
 
-      // West face: at x = tx (only when this tile is higher than its west neighbour)
+      // West boundary: at x = tx — this tile is higher than its west neighbour.
+      // Camera looks from south-east, so use an east-facing quad placed at x=tx
+      // (same geometry as buildEastFace but at the tile's west edge).
       const westEdgeZ = Math.max(corners.nw, corners.sw);
       const westNbrZ  = edgeH(tx - 1, ty, 'east');
       if (westEdgeZ > westNbrZ + 0.01) {
-        const wf = buildWestFace(ty, ty + 1, tx, westNbrZ, westEdgeZ, matWallEast());
-        if (wf) group.add(wf);
+        const wf = buildEastFace(ty, ty + 1, tx, westNbrZ, westEdgeZ, matWallEast());
+        if (wf) {
+          group.add(wf);
+          group.add(buildWallHighlight(ty, ty + 1, tx, westEdgeZ, 'e'));
+        }
       }
     }
 
