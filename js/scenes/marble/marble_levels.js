@@ -2115,8 +2115,12 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     setSurface(level, 10, 17, { baseHeight: 14, shape: SHAPES.FLAT, crumble: { delay: 0.5, downtime: 2.0 } });
     wallRing(level, 2, 15, 14, 6, 16, {
       gaps: [
-        { x: 10, y: 15 }, { x: 11, y: 15 }, { x: 12, y: 15 }, { x: 13, y: 15 },
-        { x: 2, y: 17 }, { x: 2, y: 18 }, { x: 2, y: 19 }, { x: 2, y: 20 }
+        // North entry: x:10-15 (east wall corner x=15 included)
+        { x: 10, y: 15 }, { x: 11, y: 15 }, { x: 12, y: 15 }, { x: 13, y: 15 }, { x: 14, y: 15 }, { x: 15, y: 15 },
+        // West exit: y:17-20 (south corner y=20 included)
+        { x: 2, y: 17 }, { x: 2, y: 18 }, { x: 2, y: 19 }, { x: 2, y: 20 },
+        // South wall at y=20 needs west corner open for Leg B entry
+        { x: 3, y: 20 }, { x: 4, y: 20 }, { x: 5, y: 20 }, { x: 6, y: 20 }
       ]
     });
 
@@ -2139,8 +2143,10 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     setSurface(level, 4, 34, { baseHeight: 10, shape: SHAPES.FLAT, crumble: { delay: 0.5, downtime: 2.0 } });
     wallRing(level, 2, 32, 14, 6, 12, {
       gaps: [
-        { x: 2, y: 32 }, { x: 3, y: 32 }, { x: 4, y: 32 }, { x: 5, y: 32 },
-        { x: 10, y: 37 }, { x: 11, y: 37 }, { x: 12, y: 37 }, { x: 13, y: 37 }
+        // North entry from Leg B: x:2-6 (west wall corner x=2 included)
+        { x: 2, y: 32 }, { x: 3, y: 32 }, { x: 4, y: 32 }, { x: 5, y: 32 }, { x: 6, y: 32 },
+        // South exit to Leg C: x:10-15 (east wall corner x=15 included)
+        { x: 10, y: 37 }, { x: 11, y: 37 }, { x: 12, y: 37 }, { x: 13, y: 37 }, { x: 14, y: 37 }, { x: 15, y: 37 }
       ]
     });
 
@@ -2148,8 +2154,12 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     fillTrack(level, 10, 38, 14, 5, 10);
     wallRing(level, 10, 38, 14, 5, 12, {
       gaps: [
-        { x: 10, y: 38 }, { x: 11, y: 38 }, { x: 12, y: 38 }, { x: 13, y: 38 },
-        { x: 23, y: 38 }, { x: 23, y: 39 }, { x: 23, y: 40 }, { x: 23, y: 41 }, { x: 23, y: 42 }
+        // West entry from Turn B: x:10-15 (west wall corner x=10 included)
+        { x: 10, y: 38 }, { x: 11, y: 38 }, { x: 12, y: 38 }, { x: 13, y: 38 }, { x: 14, y: 38 }, { x: 15, y: 38 },
+        // East exit to Ramp C: full east column y:38-42 (south corner y=42 included)
+        { x: 23, y: 38 }, { x: 23, y: 39 }, { x: 23, y: 40 }, { x: 23, y: 41 }, { x: 23, y: 42 },
+        // South-west corner: x=10 at y=42
+        { x: 10, y: 42 }
       ]
     });
 
@@ -2164,9 +2174,9 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     setSurface(level, 4, 52, { baseHeight: 6, shape: SHAPES.FLAT, crumble: { delay: 0.5, downtime: 2.0 } });
     wallRing(level, 2, 49, 14, 6, 8, {
       gaps: [
-        // North entry from Ramp C (x:10-13 are interior; x=14 is not a wall tile here)
-        { x: 10, y: 49 }, { x: 11, y: 49 }, { x: 12, y: 49 }, { x: 13, y: 49 },
-        // South exit — x:10-15 (includes east wall corner at x=15)
+        // North entry from Ramp C: x:10-15 (east wall corner x=15 included)
+        { x: 10, y: 49 }, { x: 11, y: 49 }, { x: 12, y: 49 }, { x: 13, y: 49 }, { x: 14, y: 49 }, { x: 15, y: 49 },
+        // South exit: x:10-15 (east wall corner x=15 included)
         { x: 10, y: 54 }, { x: 11, y: 54 }, { x: 12, y: 54 }, { x: 13, y: 54 }, { x: 14, y: 54 }, { x: 15, y: 54 }
       ]
     });
