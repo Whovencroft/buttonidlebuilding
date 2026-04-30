@@ -25,7 +25,7 @@
 
   const ISO_ANGLE  = Math.atan(1 / Math.sqrt(2));  // ~35.26°
   const ISO_YAW    = Math.PI / 4;                  // 45°
-  const BASE_FRUSTUM = 11;
+  const BASE_FRUSTUM = 9;  // 20% zoom-in vs original 11
 
   const COL = {
     void:          0x000000,
@@ -81,6 +81,9 @@
   let lastCamZoom    = -1;
   let lastCamW       = 0;
   let lastCamH       = 0;
+  // Smoothed camera Z — follows marble height changes gradually to avoid jitter
+  let smoothCamZ     = 0;
+  let lastRenderTime = 0;  // performance.now() at last render call, for dt computation
 
   // ─── Texture helpers ─────────────────────────────────────────────────────────
 
@@ -840,8 +843,10 @@
     dynamicGroup = null;
     actorMeshMap = {};
 
-    levelCamZ   = 0;
-    lastLevelId = null;
+    levelCamZ      = 0;
+    smoothCamZ     = 0;
+    lastRenderTime = 0;
+    lastLevelId    = null;
     lastRendererW = 0;
     lastRendererH = 0;
     lastCamZoom   = -1;
@@ -894,7 +899,8 @@
       dynamicGroup = buildActorMeshes(runtime.level);
       scene.add(dynamicGroup);
       lastLevelId = runtime.level.id;
-      // levelCamZ is set inside buildLevelMeshes
+      // Seed smoothCamZ to marble's current Z so there's no pop on level load
+      smoothCamZ = runtime.marble.z;
     }
 
     // Update actor positions/rotations in-place — no allocations per frame
@@ -934,11 +940,18 @@
       lastCamH = h;
     }
 
-    // Always center on the marble — use marble XY directly, no smoothing needed
+    // Center exactly on the marble — XY tracks instantly, Z smoothed to avoid jitter
     const camX = marble.x;
     const camY = marble.y;
-    // Use level median Z as the camera anchor — completely eliminates void jitter
-    const camZ = levelCamZ;
+    // Compute per-frame dt from wall clock for smooth Z lerp
+    const now = performance.now();
+    const renderDt = lastRenderTime > 0 ? Math.min((now - lastRenderTime) / 1000, 0.1) : 0.016;
+    lastRenderTime = now;
+    // Lerp smoothCamZ toward marble.z at ~4 units/sec — fast enough to follow ramps
+    // and descents without the camera bobbing on every bump or airborne frame.
+    const CAM_Z_SPEED = 4.0;
+    smoothCamZ += (marble.z - smoothCamZ) * Math.min(1, CAM_Z_SPEED * renderDt);
+    const camZ = smoothCamZ;
 
     const dist = 30;
     camera.position.set(
