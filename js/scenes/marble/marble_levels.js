@@ -3494,9 +3494,8 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     addGraphEdge(level, { from: 'floor4', to: 'path_b', kind: 'crumble'     });
     addGraphEdge(level, { from: 'path_a', to: 'goal',   kind: 'descent'     });
     addGraphEdge(level, { from: 'path_b', to: 'goal',   kind: 'descent'     });
-    return registerLevel(level););
+     return registerLevel(level);
   }
-
   // ═══════════════════════════════════════════════════════════════════════════
   // LEVEL 10 — The Final Approach
   // Grand finale: three acts, all mechanics, multiple paths.
