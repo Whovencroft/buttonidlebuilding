@@ -1922,8 +1922,8 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     const level = createLevelShell({
       id: 'practice_green',
       name: 'Practice Green',
-      width: 42,
-      height: 38,
+      width: 70,
+      height: 52,
       killZ: -20,
       voidFloor: -10,
       start: { x: 4.5, y: 4.5 },
@@ -1972,18 +1972,83 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
       ]
     });
 
-    // Shortcut: narrow east corridor from start plateau, ramp south to mid platform
+     // Shortcut: narrow east corridor from start plateau, ramp south to mid platform
     fillTrack(level, 10, 8, 8, 2, 14);
     placeRamp(level, { x: 18, y: 8, dir: 'south', length: 5, width: 2, startZ: 14, endZ: 10 });
 
-    setGoal(level, 36, 20, 0.44);
+    // === EXTENSION: second half — fork from goal basin east wall ===
+    // Open east wall of goal basin to continue
+    // Fork junction (z=6), 10×8
+    fillTrack(level, 40, 16, 10, 8, 6);
+    wallRing(level, 40, 16, 10, 8, 8, {
+      gaps: [
+        { x: 40, y: 18 }, { x: 40, y: 19 }, { x: 40, y: 20 }, { x: 40, y: 21 },
+        { x: 49, y: 16 }, { x: 49, y: 17 }, { x: 49, y: 18 }, { x: 49, y: 19 },
+        { x: 49, y: 20 }, { x: 49, y: 21 }, { x: 49, y: 22 }, { x: 49, y: 23 }
+      ]
+    });
+    // Also open east wall of original goal basin to connect
+    setSurface(level, 39, 18, { baseHeight: 6, shape: SHAPES.FLAT });
+    setSurface(level, 39, 19, { baseHeight: 6, shape: SHAPES.FLAT });
+    setSurface(level, 39, 20, { baseHeight: 6, shape: SHAPES.FLAT });
+    setSurface(level, 39, 21, { baseHeight: 6, shape: SHAPES.FLAT });
 
-    addGraphNode(level, { id: 'start', type: 'entry', x: 4.5,  y: 4.5,  z: 14 });
-    addGraphNode(level, { id: 'mid',   type: 'hub',   x: 18.5, y: 20.5, z: 10 });
-    addGraphNode(level, { id: 'goal',  type: 'goal',  x: 36.5, y: 20.5, z: 6  });
-    addGraphEdge(level, { from: 'start', to: 'mid',  kind: 'roll'    });
-    addGraphEdge(level, { from: 'mid',   to: 'goal', kind: 'descent' });
+    // Path A (north): narrow corridor with conveyor, ramp down to lower basin
+    fillTrack(level, 50, 14, 14, 5, 6);
+    for (let cx = 52; cx < 62; cx++) {
+      for (let cy = 14; cy < 19; cy++) {
+        setSurface(level, cx, cy, { baseHeight: 6, shape: SHAPES.FLAT, conveyor: { x: 0.7, y: 0, strength: 1.2 } });
+      }
+    }
+    wallRing(level, 50, 14, 14, 5, 8, {
+      gaps: [
+        { x: 50, y: 16 }, { x: 50, y: 17 }, { x: 50, y: 18 },
+        { x: 63, y: 14 }, { x: 63, y: 15 }, { x: 63, y: 16 }, { x: 63, y: 17 }, { x: 63, y: 18 }
+      ]
+    });
+    placeRamp(level, { x: 64, y: 14, dir: 'east', length: 5, width: 5, startZ: 6, endZ: 2 });
 
+    // Path B (south): wide open path with crumble tiles and column obstacles
+    fillTrack(level, 50, 20, 14, 8, 6);
+    setSurface(level, 55, 22, { baseHeight: 6, shape: SHAPES.FLAT, crumble: { delay: 0.4, downtime: 2.0 } });
+    setSurface(level, 55, 23, { baseHeight: 6, shape: SHAPES.FLAT, crumble: { delay: 0.4, downtime: 2.0 } });
+    setSurface(level, 56, 22, { baseHeight: 6, shape: SHAPES.FLAT, crumble: { delay: 0.4, downtime: 2.0 } });
+    setSurface(level, 56, 23, { baseHeight: 6, shape: SHAPES.FLAT, crumble: { delay: 0.4, downtime: 2.0 } });
+    // Column obstacles staggered
+    setSurface(level, 53, 20, { baseHeight: 10, shape: SHAPES.FLAT });
+    setSurface(level, 53, 21, { baseHeight: 10, shape: SHAPES.FLAT });
+    setSurface(level, 59, 25, { baseHeight: 10, shape: SHAPES.FLAT });
+    setSurface(level, 59, 26, { baseHeight: 10, shape: SHAPES.FLAT });
+    wallRing(level, 50, 20, 14, 8, 8, {
+      gaps: [
+        { x: 50, y: 21 }, { x: 50, y: 22 }, { x: 50, y: 23 }, { x: 50, y: 24 }, { x: 50, y: 25 },
+        { x: 63, y: 20 }, { x: 63, y: 21 }, { x: 63, y: 22 }, { x: 63, y: 23 }, { x: 63, y: 24 }, { x: 63, y: 25 }, { x: 63, y: 26 }, { x: 63, y: 27 }
+      ]
+    });
+    placeRamp(level, { x: 64, y: 20, dir: 'east', length: 5, width: 8, startZ: 6, endZ: 2 });
+
+    // Lower goal basin (z=2), 10×18 — both paths converge
+    fillTrack(level, 58, 12, 10, 18, 2);
+    wallRing(level, 58, 12, 10, 18, 4, {
+      gaps: [
+        { x: 58, y: 14 }, { x: 58, y: 15 }, { x: 58, y: 16 }, { x: 58, y: 17 }, { x: 58, y: 18 },
+        { x: 58, y: 20 }, { x: 58, y: 21 }, { x: 58, y: 22 }, { x: 58, y: 23 }, { x: 58, y: 24 }, { x: 58, y: 25 }, { x: 58, y: 26 }, { x: 58, y: 27 }
+      ]
+    });
+    setGoal(level, 63, 20, 0.44);
+
+    addGraphNode(level, { id: 'start',   type: 'entry', x: 4.5,  y: 4.5,  z: 14 });
+    addGraphNode(level, { id: 'mid',     type: 'hub',   x: 18.5, y: 20.5, z: 10 });
+    addGraphNode(level, { id: 'fork',    type: 'fork',  x: 44.5, y: 20.5, z: 6  });
+    addGraphNode(level, { id: 'path_a',  type: 'route', x: 56.5, y: 16.5, z: 6  });
+    addGraphNode(level, { id: 'path_b',  type: 'route', x: 56.5, y: 24.5, z: 6  });
+    addGraphNode(level, { id: 'goal',    type: 'goal',  x: 63.5, y: 20.5, z: 2  });
+    addGraphEdge(level, { from: 'start',  to: 'mid',    kind: 'roll'    });
+    addGraphEdge(level, { from: 'mid',    to: 'fork',   kind: 'descent' });
+    addGraphEdge(level, { from: 'fork',   to: 'path_a', kind: 'roll',    tag: 'conveyor' });
+    addGraphEdge(level, { from: 'fork',   to: 'path_b', kind: 'roll',    tag: 'crumble'  });
+    addGraphEdge(level, { from: 'path_a', to: 'goal',   kind: 'descent' });
+    addGraphEdge(level, { from: 'path_b', to: 'goal',   kind: 'descent' });
     return registerLevel(level);
   }
 
@@ -1995,8 +2060,8 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     const level = createLevelShell({
       id: 'terrace_falls',
       name: 'Terrace Falls',
-      width: 50,
-      height: 42,
+      width: 80,
+      height: 60,
       killZ: -20,
       voidFloor: -10,
       start: { x: 4.5, y: 4.5 },
@@ -2059,17 +2124,74 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
       gaps: [{ x: 44, y: 31 }, { x: 44, y: 32 }, { x: 44, y: 33 }, { x: 44, y: 34 }]
     });
 
-    setGoal(level, 47, 33, 0.44);
+    // === EXTENSION: Terrace C and final fork ===
+    // Open east wall of goal basin to continue
+    setSurface(level, 49, 31, { baseHeight: 4, shape: SHAPES.FLAT });
+    setSurface(level, 49, 32, { baseHeight: 4, shape: SHAPES.FLAT });
+    setSurface(level, 49, 33, { baseHeight: 4, shape: SHAPES.FLAT });
+    setSurface(level, 49, 34, { baseHeight: 4, shape: SHAPES.FLAT });
+
+    // Terrace C fork junction (z=4), 14×10
+    fillTrack(level, 50, 29, 14, 10, 4);
+    wallRing(level, 50, 29, 14, 10, 6, {
+      gaps: [
+        { x: 50, y: 31 }, { x: 50, y: 32 }, { x: 50, y: 33 }, { x: 50, y: 34 },
+        { x: 56, y: 29 }, { x: 57, y: 29 }, { x: 58, y: 29 }, { x: 59, y: 29 },
+        { x: 56, y: 38 }, { x: 57, y: 38 }, { x: 58, y: 38 }, { x: 59, y: 38 }
+      ]
+    });
+
+    // Path A (north): crumble-tile bridge, narrow, fast
+    fillTrack(level, 56, 24, 5, 6, 4);
+    for (let cx = 57; cx < 60; cx++) {
+      for (let cy = 25; cy < 29; cy++) {
+        setSurface(level, cx, cy, { baseHeight: 4, shape: SHAPES.FLAT, crumble: { delay: 0.35, downtime: 2.2 } });
+      }
+    }
+    wallRing(level, 56, 24, 5, 6, 6, {
+      gaps: [
+        { x: 56, y: 29 }, { x: 57, y: 29 }, { x: 58, y: 29 }, { x: 59, y: 29 }, { x: 60, y: 29 },
+        { x: 60, y: 24 }, { x: 60, y: 25 }, { x: 60, y: 26 }, { x: 60, y: 27 }, { x: 60, y: 28 }, { x: 60, y: 29 }
+      ]
+    });
+    placeRamp(level, { x: 61, y: 24, dir: 'east', length: 5, width: 6, startZ: 4, endZ: 0 });
+
+    // Path B (south): long detour with timed gate, safe
+    fillTrack(level, 56, 39, 5, 10, 4);
+    addTimedGate(level, 'gate_tc_south', 58, 43, 6, 3, 2, 1.6, 1.4);
+    wallRing(level, 56, 39, 5, 10, 6, {
+      gaps: [
+        { x: 56, y: 38 }, { x: 57, y: 38 }, { x: 58, y: 38 }, { x: 59, y: 38 }, { x: 60, y: 38 },
+        { x: 60, y: 39 }, { x: 60, y: 40 }, { x: 60, y: 41 }, { x: 60, y: 42 }, { x: 60, y: 43 }, { x: 60, y: 44 }, { x: 60, y: 45 }, { x: 60, y: 46 }, { x: 60, y: 47 }, { x: 60, y: 48 }
+      ]
+    });
+    placeRamp(level, { x: 61, y: 39, dir: 'east', length: 5, width: 10, startZ: 4, endZ: 0 });
+
+    // Lower goal basin (z=0), 12×26 — both paths converge
+    fillTrack(level, 66, 22, 12, 26, 0);
+    wallRing(level, 66, 22, 12, 26, 2, {
+      gaps: [
+        { x: 66, y: 24 }, { x: 66, y: 25 }, { x: 66, y: 26 }, { x: 66, y: 27 }, { x: 66, y: 28 }, { x: 66, y: 29 },
+        { x: 66, y: 39 }, { x: 66, y: 40 }, { x: 66, y: 41 }, { x: 66, y: 42 }, { x: 66, y: 43 }, { x: 66, y: 44 }, { x: 66, y: 45 }, { x: 66, y: 46 }, { x: 66, y: 47 }, { x: 66, y: 48 }
+      ]
+    });
+    setGoal(level, 72, 34, 0.44);
 
     addGraphNode(level, { id: 'start',    type: 'entry', x: 4.5,  y: 4.5,  z: 16 });
     addGraphNode(level, { id: 'terraceA', type: 'fork',  x: 31.5, y: 9.5,  z: 12 });
     addGraphNode(level, { id: 'terraceB', type: 'merge', x: 31.5, y: 33.5, z: 8  });
-    addGraphNode(level, { id: 'goal',     type: 'goal',  x: 47.5, y: 33.5, z: 4  });
-    addGraphEdge(level, { from: 'start',    to: 'terraceA', kind: 'descent' });
-    addGraphEdge(level, { from: 'terraceA', to: 'terraceB', kind: 'roll',    tag: 'north_path' });
-    addGraphEdge(level, { from: 'terraceA', to: 'terraceB', kind: 'descent', tag: 'south_path' });
-    addGraphEdge(level, { from: 'terraceB', to: 'goal',     kind: 'descent' });
-
+    addGraphNode(level, { id: 'terraceC', type: 'fork',  x: 57.5, y: 33.5, z: 4  });
+    addGraphNode(level, { id: 'path_a',   type: 'route', x: 58.5, y: 26.5, z: 4  });
+    addGraphNode(level, { id: 'path_b',   type: 'route', x: 58.5, y: 43.5, z: 4  });
+    addGraphNode(level, { id: 'goal',     type: 'goal',  x: 72.5, y: 34.5, z: 0  });
+    addGraphEdge(level, { from: 'start',    to: 'terraceA', kind: 'descent'    });
+    addGraphEdge(level, { from: 'terraceA', to: 'terraceB', kind: 'roll',       tag: 'north_path' });
+    addGraphEdge(level, { from: 'terraceA', to: 'terraceB', kind: 'descent',    tag: 'south_path' });
+    addGraphEdge(level, { from: 'terraceB', to: 'terraceC', kind: 'descent'    });
+    addGraphEdge(level, { from: 'terraceC', to: 'path_a',   kind: 'crumble'    });
+    addGraphEdge(level, { from: 'terraceC', to: 'path_b',   kind: 'timed_cross'});
+    addGraphEdge(level, { from: 'path_a',   to: 'goal',     kind: 'descent'    });
+    addGraphEdge(level, { from: 'path_b',   to: 'goal',     kind: 'descent'    });
     return registerLevel(level);
   }
 
@@ -2082,7 +2204,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
       id: 'the_switchback',
       name: 'The Switchback',
       width: 38,
-      height: 66,
+      height: 120,
       killZ: -20,
       voidFloor: -10,
       start: { x: 4.5, y: 4.5 },
@@ -2180,23 +2302,89 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
       ]
     });
 
-    // Final ramp south (z=6→2), 5×6 — aligned with exit gap at x:10-15
-    placeRamp(level, { x: 10, y: 55, dir: 'south', length: 5, width: 6, startZ: 6, endZ: 2 });
+       // Ramp D south (z=6→2), 6×5 — continues from Turn C south exit
+    placeRamp(level, { x: 10, y: 55, dir: 'south', length: 6, width: 5, startZ: 6, endZ: 2 });
 
-    // Goal basin (z=2), 12×5
-    fillTrack(level, 8, 60, 12, 5, 2);
-    setGoal(level, 13, 62, 0.44);
+    // === EXTENSION: Legs D and E with fork ===
+    // Leg D: west corridor (z=2), 14×5
+    fillTrack(level, 2, 61, 14, 5, 2);
+    wallRing(level, 2, 61, 14, 5, 4, {
+      gaps: [
+        { x: 11, y: 61 }, { x: 12, y: 61 }, { x: 13, y: 61 }, { x: 14, y: 61 }, { x: 15, y: 61 },
+        { x: 2, y: 61 }, { x: 2, y: 62 }, { x: 2, y: 63 }, { x: 2, y: 64 }, { x: 2, y: 65 }
+      ]
+    });
+
+    // Turn platform D (z=2), 14×6 — fork: straight vs crumble shortcut
+    fillTrack(level, 2, 66, 14, 6, 2);
+    wallRing(level, 2, 66, 14, 6, 4, {
+      gaps: [
+        { x: 2, y: 66 }, { x: 2, y: 67 }, { x: 2, y: 68 }, { x: 2, y: 69 }, { x: 2, y: 70 }, { x: 2, y: 71 },
+        // Path A exit: east side
+        { x: 11, y: 71 }, { x: 12, y: 71 }, { x: 13, y: 71 }, { x: 14, y: 71 }, { x: 15, y: 71 },
+        // Path B exit: west side (shortcut)
+        { x: 2, y: 68 }, { x: 3, y: 68 }, { x: 4, y: 68 }, { x: 5, y: 68 }
+      ]
+    });
+    // Crumble tiles in Turn D for path B shortcut
+    setSurface(level, 3, 67, { baseHeight: 2, shape: SHAPES.FLAT, crumble: { delay: 0.3, downtime: 2.5 } });
+    setSurface(level, 4, 67, { baseHeight: 2, shape: SHAPES.FLAT, crumble: { delay: 0.3, downtime: 2.5 } });
+    setSurface(level, 3, 68, { baseHeight: 2, shape: SHAPES.FLAT, crumble: { delay: 0.3, downtime: 2.5 } });
+    setSurface(level, 4, 68, { baseHeight: 2, shape: SHAPES.FLAT, crumble: { delay: 0.3, downtime: 2.5 } });
+
+    // Path A (east): Leg E east corridor (z=2), 14×5 — with timed gate
+    fillTrack(level, 11, 72, 14, 5, 2);
+    addTimedGate(level, 'gate_leg_e', 16, 73, 4, 3, 2, 1.8, 1.2);
+    wallRing(level, 11, 72, 14, 5, 4, {
+      gaps: [
+        { x: 11, y: 71 }, { x: 12, y: 71 }, { x: 13, y: 71 }, { x: 14, y: 71 }, { x: 15, y: 71 },
+        { x: 11, y: 76 }, { x: 12, y: 76 }, { x: 13, y: 76 }, { x: 14, y: 76 }, { x: 15, y: 76 }, { x: 16, y: 76 }, { x: 17, y: 76 }, { x: 18, y: 76 }, { x: 19, y: 76 }, { x: 20, y: 76 }, { x: 21, y: 76 }, { x: 22, y: 76 }, { x: 23, y: 76 }, { x: 24, y: 76 }
+      ]
+    });
+    placeRamp(level, { x: 11, y: 77, dir: 'south', length: 5, width: 5, startZ: 2, endZ: -2 });
+
+    // Path B (west shortcut): narrow crumble corridor direct to basin
+    fillTrack(level, 2, 72, 8, 5, 2);
+    for (let cx = 3; cx < 9; cx++) {
+      for (let cy = 72; cy < 77; cy++) {
+        setSurface(level, cx, cy, { baseHeight: 2, shape: SHAPES.FLAT, crumble: { delay: 0.25, downtime: 3.0 } });
+      }
+    }
+    wallRing(level, 2, 72, 8, 5, 4, {
+      gaps: [
+        { x: 2, y: 68 }, { x: 3, y: 68 }, { x: 4, y: 68 }, { x: 5, y: 68 },
+        { x: 2, y: 72 }, { x: 2, y: 73 }, { x: 2, y: 74 }, { x: 2, y: 75 }, { x: 2, y: 76 },
+        { x: 9, y: 72 }, { x: 9, y: 73 }, { x: 9, y: 74 }, { x: 9, y: 75 }, { x: 9, y: 76 }
+      ]
+    });
+    placeRamp(level, { x: 9, y: 77, dir: 'south', length: 5, width: 5, startZ: 2, endZ: -2 });
+
+    // Final goal basin (z=-2), 20×10 — both paths converge
+    fillTrack(level, 2, 82, 20, 10, -2);
+    wallRing(level, 2, 82, 20, 10, 0, {
+      gaps: [
+        { x: 9, y: 82 }, { x: 10, y: 82 }, { x: 11, y: 82 }, { x: 12, y: 82 }, { x: 13, y: 82 },
+        { x: 11, y: 82 }, { x: 12, y: 82 }, { x: 13, y: 82 }, { x: 14, y: 82 }, { x: 15, y: 82 }
+      ]
+    });
+    setGoal(level, 12, 88, 0.44);
 
     addGraphNode(level, { id: 'start',  type: 'entry',  x: 4.5,  y: 4.5,  z: 18 });
     addGraphNode(level, { id: 'turn_a', type: 'corner', x: 8.5,  y: 18.5, z: 14 });
     addGraphNode(level, { id: 'turn_b', type: 'corner', x: 8.5,  y: 35.5, z: 10 });
     addGraphNode(level, { id: 'turn_c', type: 'corner', x: 12.5, y: 52.5, z: 6  });
-    addGraphNode(level, { id: 'goal',   type: 'goal',   x: 13.5, y: 62.5, z: 2  });
-    addGraphEdge(level, { from: 'start',  to: 'turn_a', kind: 'switchback' });
-    addGraphEdge(level, { from: 'turn_a', to: 'turn_b', kind: 'switchback' });
-    addGraphEdge(level, { from: 'turn_b', to: 'turn_c', kind: 'switchback' });
-    addGraphEdge(level, { from: 'turn_c', to: 'goal',   kind: 'descent'   });
-
+    addGraphNode(level, { id: 'turn_d', type: 'fork',   x: 8.5,  y: 69.5, z: 2  });
+    addGraphNode(level, { id: 'path_a', type: 'route',  x: 18.5, y: 74.5, z: 2  });
+    addGraphNode(level, { id: 'path_b', type: 'route',  x: 5.5,  y: 74.5, z: 2  });
+    addGraphNode(level, { id: 'goal',   type: 'goal',   x: 12.5, y: 88.5, z: -2 });
+    addGraphEdge(level, { from: 'start',  to: 'turn_a', kind: 'switchback'  });
+    addGraphEdge(level, { from: 'turn_a', to: 'turn_b', kind: 'switchback'  });
+    addGraphEdge(level, { from: 'turn_b', to: 'turn_c', kind: 'switchback'  });
+    addGraphEdge(level, { from: 'turn_c', to: 'turn_d', kind: 'switchback'  });
+    addGraphEdge(level, { from: 'turn_d', to: 'path_a', kind: 'timed_cross' });
+    addGraphEdge(level, { from: 'turn_d', to: 'path_b', kind: 'crumble'     });
+    addGraphEdge(level, { from: 'path_a', to: 'goal',   kind: 'descent'     });
+    addGraphEdge(level, { from: 'path_b', to: 'goal',   kind: 'descent'     });
     return registerLevel(level);
   }
 
@@ -2209,7 +2397,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
       id: 'canal_run',
       name: 'Canal Run',
       width: 68,
-      height: 30,
+      height: 56,
       killZ: -20,
       voidFloor: -10,
       start: { x: 4.5, y: 4.5 },
@@ -2291,26 +2479,83 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
       ]
     });
 
-    // Final ramp east (z=10→4), 5×5
-    placeRamp(level, { x: 55, y: 7, dir: 'east', length: 5, width: 5, startZ: 10, endZ: 4 });
+       // Ramp south from merge platform (z=10→6), 5×5 — into second canal section
+    placeRamp(level, { x: 55, y: 7, dir: 'south', length: 5, width: 5, startZ: 10, endZ: 6 });
 
-    // Goal basin (z=4), 6×8
-    fillTrack(level, 60, 6, 6, 8, 4);
-    wallRing(level, 60, 6, 6, 8, 6, {
-      gaps: [{ x: 60, y: 7 }, { x: 60, y: 8 }, { x: 60, y: 9 }, { x: 60, y: 10 }]
+    // === EXTENSION: second canal section ===
+    // Second fork junction (z=6), 6×14
+    fillTrack(level, 49, 15, 10, 14, 6);
+    wallRing(level, 49, 15, 10, 14, 8, {
+      gaps: [
+        // North entry from ramp
+        { x: 51, y: 15 }, { x: 52, y: 15 }, { x: 53, y: 15 }, { x: 54, y: 15 }, { x: 55, y: 15 },
+        // West exit upper lane
+        { x: 49, y: 16 }, { x: 49, y: 17 }, { x: 49, y: 18 }, { x: 49, y: 19 },
+        // West exit lower lane
+        { x: 49, y: 22 }, { x: 49, y: 23 }, { x: 49, y: 24 }, { x: 49, y: 25 }, { x: 49, y: 26 }, { x: 49, y: 27 }, { x: 49, y: 28 }
+      ]
     });
 
-    setGoal(level, 62, 10, 0.44);
+    // Upper lane (z=6), 20×4 — moving platform bridge over void
+    fillTrack(level, 29, 16, 20, 4, 6);
+    clearSurfaceRect(level, 36, 16, 6, 4);
+    addMovingBridge(level, 'bridge_canal2', [
+      { x: 36, y: 16, z: 6 },
+      { x: 39, y: 16, z: 6 }
+    ], 4, 4, 0.55);
+    wallRing(level, 29, 16, 20, 4, 8, {
+      gaps: [
+        { x: 48, y: 16 }, { x: 48, y: 17 }, { x: 48, y: 18 }, { x: 48, y: 19 },
+        { x: 29, y: 16 }, { x: 29, y: 17 }, { x: 29, y: 18 }, { x: 29, y: 19 }
+      ]
+    });
 
-    addGraphNode(level, { id: 'start',    type: 'entry', x: 4.5,  y: 6.5,  z: 14 });
-    addGraphNode(level, { id: 'junction', type: 'fork',  x: 26.5, y: 9.5,  z: 10 });
-    addGraphNode(level, { id: 'merge',    type: 'merge', x: 54.5, y: 9.5,  z: 10 });
-    addGraphNode(level, { id: 'goal',     type: 'goal',  x: 63.5, y: 10.5, z: 4  });
-    addGraphEdge(level, { from: 'start',    to: 'junction', kind: 'descent'            });
-    addGraphEdge(level, { from: 'junction', to: 'merge',    kind: 'roll', tag: 'north' });
-    addGraphEdge(level, { from: 'junction', to: 'merge',    kind: 'roll', tag: 'south' });
-    addGraphEdge(level, { from: 'merge',    to: 'goal',     kind: 'descent'            });
+    // Lower lane (z=6), 20×6 — timed gate + column obstacles
+    fillTrack(level, 29, 22, 20, 6, 6);
+    addTimedGate(level, 'gate_canal2', 35, 23, 8, 3, 2, 1.6, 1.4);
+    setSurface(level, 40, 22, { baseHeight: 10, shape: SHAPES.FLAT });
+    setSurface(level, 40, 23, { baseHeight: 10, shape: SHAPES.FLAT });
+    setSurface(level, 44, 25, { baseHeight: 10, shape: SHAPES.FLAT });
+    setSurface(level, 44, 26, { baseHeight: 10, shape: SHAPES.FLAT });
+    wallRing(level, 29, 22, 20, 6, 8, {
+      gaps: [
+        { x: 48, y: 22 }, { x: 48, y: 23 }, { x: 48, y: 24 }, { x: 48, y: 25 }, { x: 48, y: 26 }, { x: 48, y: 27 }, { x: 48, y: 28 },
+        { x: 29, y: 22 }, { x: 29, y: 23 }, { x: 29, y: 24 }, { x: 29, y: 25 }, { x: 29, y: 26 }, { x: 29, y: 27 }, { x: 29, y: 28 }
+      ]
+    });
 
+    // Second merge platform (z=6), 10×14
+    fillTrack(level, 19, 15, 10, 14, 6);
+    wallRing(level, 19, 15, 10, 14, 8, {
+      gaps: [
+        { x: 28, y: 16 }, { x: 28, y: 17 }, { x: 28, y: 18 }, { x: 28, y: 19 },
+        { x: 28, y: 22 }, { x: 28, y: 23 }, { x: 28, y: 24 }, { x: 28, y: 25 }, { x: 28, y: 26 }, { x: 28, y: 27 }, { x: 28, y: 28 },
+        { x: 22, y: 28 }, { x: 23, y: 28 }, { x: 24, y: 28 }, { x: 25, y: 28 }
+      ]
+    });
+
+    // Final ramp south (z=6→2), 5×5
+    placeRamp(level, { x: 21, y: 29, dir: 'south', length: 5, width: 5, startZ: 6, endZ: 2 });
+    // Goal basin (z=2), 14×10
+    fillTrack(level, 15, 34, 14, 10, 2);
+    wallRing(level, 15, 34, 14, 10, 4, {
+      gaps: [{ x: 21, y: 34 }, { x: 22, y: 34 }, { x: 23, y: 34 }, { x: 24, y: 34 }, { x: 25, y: 34 }]
+    });
+    setGoal(level, 22, 40, 0.44);
+
+    addGraphNode(level, { id: 'start',     type: 'entry', x: 4.5,  y: 6.5,  z: 14 });
+    addGraphNode(level, { id: 'junction1', type: 'fork',  x: 26.5, y: 9.5,  z: 10 });
+    addGraphNode(level, { id: 'merge1',    type: 'merge', x: 54.5, y: 9.5,  z: 10 });
+    addGraphNode(level, { id: 'junction2', type: 'fork',  x: 54.5, y: 22.5, z: 6  });
+    addGraphNode(level, { id: 'merge2',    type: 'merge', x: 24.5, y: 22.5, z: 6  });
+    addGraphNode(level, { id: 'goal',      type: 'goal',  x: 22.5, y: 40.5, z: 2  });
+    addGraphEdge(level, { from: 'start',     to: 'junction1', kind: 'descent'              });
+    addGraphEdge(level, { from: 'junction1', to: 'merge1',    kind: 'roll',   tag: 'north' });
+    addGraphEdge(level, { from: 'junction1', to: 'merge1',    kind: 'roll',   tag: 'south' });
+    addGraphEdge(level, { from: 'merge1',    to: 'junction2', kind: 'descent'              });
+    addGraphEdge(level, { from: 'junction2', to: 'merge2',    kind: 'platform_transfer', tag: 'upper' });
+    addGraphEdge(level, { from: 'junction2', to: 'merge2',    kind: 'timed_cross',        tag: 'lower' });
+    addGraphEdge(level, { from: 'merge2',    to: 'goal',      kind: 'descent'              });
     return registerLevel(level);
   }
 
@@ -2322,8 +2567,8 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     const level = createLevelShell({
       id: 'the_crossing',
       name: 'The Crossing',
-      width: 58,
-      height: 46,
+      width: 90,
+      height: 72,
       killZ: -20,
       voidFloor: -10,
       start: { x: 4.5, y: 5.5 },
@@ -2412,19 +2657,99 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
       gaps: [{ x: 53, y: 28 }, { x: 54, y: 28 }, { x: 55, y: 28 }, { x: 56, y: 28 }]
     });
 
-    setGoal(level, 55, 32, 0.44);
+      // === EXTENSION: second crossing section ===
+    // Open south wall of goal basin to continue
+    setSurface(level, 53, 35, { baseHeight: 4, shape: SHAPES.FLAT });
+    setSurface(level, 54, 35, { baseHeight: 4, shape: SHAPES.FLAT });
+    setSurface(level, 55, 35, { baseHeight: 4, shape: SHAPES.FLAT });
+    setSurface(level, 56, 35, { baseHeight: 4, shape: SHAPES.FLAT });
 
-    addGraphNode(level, { id: 'start',   type: 'entry', x: 4.5,  y: 5.5,  z: 14 });
-    addGraphNode(level, { id: 'bridge',  type: 'hub',   x: 23.5, y: 8.5,  z: 14 });
-    addGraphNode(level, { id: 'landing', type: 'fork',  x: 34.5, y: 9.5,  z: 14 });
-    addGraphNode(level, { id: 'merge',   type: 'merge', x: 54.5, y: 11.5, z: 10 });
-    addGraphNode(level, { id: 'goal',    type: 'goal',  x: 55.5, y: 32.5, z: 4  });
-    addGraphEdge(level, { from: 'start',   to: 'bridge',  kind: 'roll'              });
-    addGraphEdge(level, { from: 'bridge',  to: 'landing', kind: 'platform_transfer' });
-    addGraphEdge(level, { from: 'landing', to: 'merge',   kind: 'roll', tag: 'risky'  });
-    addGraphEdge(level, { from: 'landing', to: 'merge',   kind: 'roll', tag: 'safe'   });
-    addGraphEdge(level, { from: 'merge',   to: 'goal',    kind: 'descent'            });
+    // Second approach corridor (z=4), 12×8
+    fillTrack(level, 49, 36, 12, 8, 4);
+    wallRing(level, 49, 36, 12, 8, 6, {
+      gaps: [
+        { x: 53, y: 36 }, { x: 54, y: 36 }, { x: 55, y: 36 }, { x: 56, y: 36 },
+        { x: 49, y: 40 }, { x: 49, y: 41 }, { x: 49, y: 42 }, { x: 49, y: 43 },
+        { x: 55, y: 43 }, { x: 56, y: 43 }, { x: 57, y: 43 }, { x: 58, y: 43 }, { x: 59, y: 43 }, { x: 60, y: 43 }
+      ]
+    });
 
+    // Path A (west): wide void gap with moving platform bridge
+    fillTrack(level, 34, 40, 16, 4, 4);
+    clearSurfaceRect(level, 40, 40, 8, 4);
+    addMovingBridge(level, 'bridge_cross2', [
+      { x: 40, y: 40, z: 4 },
+      { x: 44, y: 40, z: 4 }
+    ], 4, 4, 0.5);
+    wallRing(level, 34, 40, 16, 4, 6, {
+      gaps: [
+        { x: 49, y: 40 }, { x: 49, y: 41 }, { x: 49, y: 42 }, { x: 49, y: 43 },
+        { x: 34, y: 40 }, { x: 34, y: 41 }, { x: 34, y: 42 }, { x: 34, y: 43 }
+      ]
+    });
+
+    // Path B (east): crumble bridge + rotating bar hazard
+    fillTrack(level, 55, 44, 20, 5, 4);
+    for (let cx = 60; cx < 68; cx++) {
+      for (let cy = 44; cy < 49; cy++) {
+        setSurface(level, cx, cy, { baseHeight: 4, shape: SHAPES.FLAT, crumble: { delay: 0.3, downtime: 2.5 } });
+      }
+    }
+    addActor(level, {
+      id: 'bar_cross2', kind: ACTOR_KINDS.ROTATING_BAR,
+      x: 63, y: 46, z: 4, topHeight: 4,
+      width: 1, height: 1, armLength: 2.2, armWidth: 0.22, angularSpeed: 1.4, fatal: true
+    });
+    wallRing(level, 55, 44, 20, 5, 6, {
+      gaps: [
+        { x: 55, y: 43 }, { x: 56, y: 43 }, { x: 57, y: 43 }, { x: 58, y: 43 }, { x: 59, y: 43 }, { x: 60, y: 43 },
+        { x: 74, y: 44 }, { x: 74, y: 45 }, { x: 74, y: 46 }, { x: 74, y: 47 }, { x: 74, y: 48 }
+      ]
+    });
+
+    // Second landing platform (z=4), 14×18 — both paths converge
+    fillTrack(level, 20, 40, 14, 18, 4);
+    wallRing(level, 20, 40, 14, 18, 6, {
+      gaps: [
+        { x: 33, y: 40 }, { x: 33, y: 41 }, { x: 33, y: 42 }, { x: 33, y: 43 },
+        { x: 74, y: 44 }, { x: 74, y: 45 }, { x: 74, y: 46 }, { x: 74, y: 47 }, { x: 74, y: 48 },
+        { x: 25, y: 57 }, { x: 26, y: 57 }, { x: 27, y: 57 }, { x: 28, y: 57 }
+      ]
+    });
+    // Connect east path into landing via east wall
+    fillTrack(level, 34, 44, 20, 14, 4);
+    wallRing(level, 34, 44, 20, 14, 6, {
+      gaps: [
+        { x: 34, y: 40 }, { x: 34, y: 41 }, { x: 34, y: 42 }, { x: 34, y: 43 },
+        { x: 53, y: 44 }, { x: 53, y: 45 }, { x: 53, y: 46 }, { x: 53, y: 47 }, { x: 53, y: 48 },
+        { x: 34, y: 57 }, { x: 35, y: 57 }, { x: 36, y: 57 }, { x: 37, y: 57 }
+      ]
+    });
+
+    // Final ramp south (z=4→0), 6×8
+    placeRamp(level, { x: 22, y: 58, dir: 'south', length: 6, width: 8, startZ: 4, endZ: 0 });
+    // Goal basin (z=0), 14×10
+    fillTrack(level, 18, 64, 14, 10, 0);
+    wallRing(level, 18, 64, 14, 10, 2, {
+      gaps: [{ x: 22, y: 64 }, { x: 23, y: 64 }, { x: 24, y: 64 }, { x: 25, y: 64 }, { x: 26, y: 64 }, { x: 27, y: 64 }, { x: 28, y: 64 }, { x: 29, y: 64 }]
+    });
+    setGoal(level, 25, 70, 0.44);
+
+    addGraphNode(level, { id: 'start',    type: 'entry', x: 4.5,  y: 5.5,  z: 14 });
+    addGraphNode(level, { id: 'bridge',   type: 'hub',   x: 23.5, y: 8.5,  z: 14 });
+    addGraphNode(level, { id: 'landing1', type: 'fork',  x: 34.5, y: 9.5,  z: 14 });
+    addGraphNode(level, { id: 'merge1',   type: 'merge', x: 54.5, y: 11.5, z: 10 });
+    addGraphNode(level, { id: 'landing2', type: 'fork',  x: 54.5, y: 40.5, z: 4  });
+    addGraphNode(level, { id: 'merge2',   type: 'merge', x: 38.5, y: 50.5, z: 4  });
+    addGraphNode(level, { id: 'goal',     type: 'goal',  x: 25.5, y: 70.5, z: 0  });
+    addGraphEdge(level, { from: 'start',    to: 'bridge',   kind: 'roll'                     });
+    addGraphEdge(level, { from: 'bridge',   to: 'landing1', kind: 'platform_transfer'        });
+    addGraphEdge(level, { from: 'landing1', to: 'merge1',   kind: 'roll', tag: 'risky'       });
+    addGraphEdge(level, { from: 'landing1', to: 'merge1',   kind: 'roll', tag: 'safe'        });
+    addGraphEdge(level, { from: 'merge1',   to: 'landing2', kind: 'descent'                  });
+    addGraphEdge(level, { from: 'landing2', to: 'merge2',   kind: 'platform_transfer', tag: 'west' });
+    addGraphEdge(level, { from: 'landing2', to: 'merge2',   kind: 'crumble',           tag: 'east' });
+    addGraphEdge(level, { from: 'merge2',   to: 'goal',     kind: 'descent'                  });
     return registerLevel(level);
   }
 
@@ -2437,7 +2762,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
       id: 'stairway_heights',
       name: 'Stairway Heights',
       width: 54,
-      height: 62,
+      height: 110,
       killZ: -20,
       voidFloor: -10,
       start: { x: 4.5, y: 4.5 },
@@ -2492,28 +2817,84 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     // Tier 4: final ramp south (z=6→2), 6×5
     placeRamp(level, { x: 25, y: 46, dir: 'south', length: 6, width: 5, startZ: 6, endZ: 2 });
 
-    // Goal basin (z=2), 14×6
-    fillTrack(level, 18, 52, 14, 6, 2);
-    wallRing(level, 18, 52, 14, 6, 4, {
-      gaps: [{ x: 25, y: 52 }, { x: 26, y: 52 }, { x: 27, y: 52 }, { x: 28, y: 52 }]
-    });
-
-    // Shortcut: drop shaft from Tier 1 landing to Tier 3 landing
+       // Shortcut: drop shaft from Tier 1 landing to Tier 3 landing
     clearSurfaceRect(level, 32, 7, 3, 28);
 
-    setGoal(level, 25, 55, 0.44);
+    // === EXTENSION: Tiers 5 and 6 with fork ===
+    // Tier 4 landing (z=2), 14×10 — fork junction
+    fillTrack(level, 18, 52, 14, 10, 2);
+    wallRing(level, 18, 52, 14, 10, 4, {
+      gaps: [
+        { x: 25, y: 52 }, { x: 26, y: 52 }, { x: 27, y: 52 }, { x: 28, y: 52 },
+        // Path A exit (west): narrow stair run
+        { x: 18, y: 55 }, { x: 18, y: 56 }, { x: 18, y: 57 }, { x: 18, y: 58 },
+        // Path B exit (east): conveyor-assisted wide path
+        { x: 31, y: 55 }, { x: 31, y: 56 }, { x: 31, y: 57 }, { x: 31, y: 58 }, { x: 31, y: 59 }, { x: 31, y: 60 }, { x: 31, y: 61 }
+      ]
+    });
+
+    // Path A (west): narrow stair run with crumble tiles, z=2→-2
+    fillTrack(level, 8, 55, 10, 14, 2);
+    for (let cx = 9; cx < 17; cx++) {
+      for (let cy = 56; cy < 68; cy++) {
+        setSurface(level, cx, cy, { baseHeight: 2, shape: SHAPES.FLAT, crumble: { delay: 0.4, downtime: 2.0 } });
+      }
+    }
+    wallRing(level, 8, 55, 10, 14, 4, {
+      gaps: [
+        { x: 17, y: 55 }, { x: 17, y: 56 }, { x: 17, y: 57 }, { x: 17, y: 58 },
+        { x: 8, y: 62 }, { x: 9, y: 62 }, { x: 10, y: 62 }, { x: 11, y: 62 }, { x: 12, y: 62 }, { x: 13, y: 62 }, { x: 14, y: 62 }, { x: 15, y: 62 }, { x: 16, y: 62 }, { x: 17, y: 62 }
+      ]
+    });
+    placeRamp(level, { x: 8, y: 63, dir: 'south', length: 5, width: 5, startZ: 2, endZ: -2 });
+
+    // Path B (east): wide conveyor-assisted descent, z=2→-2
+    fillTrack(level, 32, 55, 14, 18, 2);
+    for (let cx = 33; cx < 44; cx++) {
+      for (let cy = 56; cy < 72; cy++) {
+        setSurface(level, cx, cy, { baseHeight: 2, shape: SHAPES.FLAT, conveyor: { x: 0, y: 0.7, strength: 1.2 } });
+      }
+    }
+    addActor(level, {
+      id: 'sweeper_tier5', kind: ACTOR_KINDS.SWEEPER,
+      x: 39, y: 64, z: 2, topHeight: 2,
+      width: 1, height: 1, armLength: 2.8, armWidth: 0.22, angularSpeed: 0.8, fatal: true
+    });
+    wallRing(level, 32, 55, 14, 18, 4, {
+      gaps: [
+        { x: 32, y: 55 }, { x: 32, y: 56 }, { x: 32, y: 57 }, { x: 32, y: 58 }, { x: 32, y: 59 }, { x: 32, y: 60 }, { x: 32, y: 61 },
+        { x: 38, y: 72 }, { x: 39, y: 72 }, { x: 40, y: 72 }, { x: 41, y: 72 }, { x: 42, y: 42 }, { x: 43, y: 72 }, { x: 44, y: 72 }, { x: 45, y: 72 }
+      ]
+    });
+    placeRamp(level, { x: 38, y: 73, dir: 'south', length: 5, width: 8, startZ: 2, endZ: -2 });
+
+    // Final goal basin (z=-2), 30×10 — both paths converge
+    fillTrack(level, 6, 78, 30, 10, -2);
+    wallRing(level, 6, 78, 30, 10, 0, {
+      gaps: [
+        { x: 8, y: 78 }, { x: 9, y: 78 }, { x: 10, y: 78 }, { x: 11, y: 78 }, { x: 12, y: 78 },
+        { x: 38, y: 78 }, { x: 39, y: 78 }, { x: 40, y: 78 }, { x: 41, y: 78 }, { x: 42, y: 78 }, { x: 43, y: 78 }, { x: 44, y: 78 }, { x: 45, y: 78 }
+      ]
+    });
+    setGoal(level, 22, 84, 0.44);
 
     addGraphNode(level, { id: 'start', type: 'entry', x: 4.5,  y: 4.5,  z: 18 });
     addGraphNode(level, { id: 'tier1', type: 'hub',   x: 25.5, y: 9.5,  z: 14 });
     addGraphNode(level, { id: 'tier2', type: 'hub',   x: 25.5, y: 25.5, z: 10 });
     addGraphNode(level, { id: 'tier3', type: 'hub',   x: 25.5, y: 41.5, z: 6  });
-    addGraphNode(level, { id: 'goal',  type: 'goal',  x: 25.5, y: 55.5, z: 2  });
-    addGraphEdge(level, { from: 'start', to: 'tier1', kind: 'descent'   });
-    addGraphEdge(level, { from: 'tier1', to: 'tier2', kind: 'descent'   });
-    addGraphEdge(level, { from: 'tier1', to: 'tier3', kind: 'jump_drop', tag: 'shortcut' });
-    addGraphEdge(level, { from: 'tier2', to: 'tier3', kind: 'timed_cross' });
-    addGraphEdge(level, { from: 'tier3', to: 'goal',  kind: 'descent'   });
-
+    addGraphNode(level, { id: 'tier4', type: 'fork',  x: 25.5, y: 57.5, z: 2  });
+    addGraphNode(level, { id: 'path_a',type: 'route', x: 13.5, y: 62.5, z: 2  });
+    addGraphNode(level, { id: 'path_b',type: 'route', x: 39.5, y: 64.5, z: 2  });
+    addGraphNode(level, { id: 'goal',  type: 'goal',  x: 22.5, y: 84.5, z: -2 });
+    addGraphEdge(level, { from: 'start',  to: 'tier1',  kind: 'descent'    });
+    addGraphEdge(level, { from: 'tier1',  to: 'tier2',  kind: 'descent'    });
+    addGraphEdge(level, { from: 'tier1',  to: 'tier3',  kind: 'jump_drop', tag: 'shortcut' });
+    addGraphEdge(level, { from: 'tier2',  to: 'tier3',  kind: 'timed_cross' });
+    addGraphEdge(level, { from: 'tier3',  to: 'tier4',  kind: 'descent'    });
+    addGraphEdge(level, { from: 'tier4',  to: 'path_a', kind: 'crumble'    });
+    addGraphEdge(level, { from: 'tier4',  to: 'path_b', kind: 'roll'       });
+    addGraphEdge(level, { from: 'path_a', to: 'goal',   kind: 'descent'    });
+    addGraphEdge(level, { from: 'path_b', to: 'goal',   kind: 'descent'    });
     return registerLevel(level);
   }
 
@@ -2525,8 +2906,8 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     const level = createLevelShell({
       id: 'the_labyrinth',
       name: 'The Labyrinth',
-      width: 66,
-      height: 58,
+      width: 110,
+      height: 80,
       killZ: -20,
       voidFloor: -10,
       start: { x: 4.5, y: 28.5 },
@@ -2626,24 +3007,109 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
       gaps: [{ x: 59, y: 28 }, { x: 59, y: 29 }, { x: 59, y: 30 }, { x: 59, y: 31 }]
     });
 
-    setGoal(level, 64, 31, 0.44);
+      // === EXTENSION: second hub east of goal basin ===
+    // Open east wall of goal basin to continue
+    setSurface(level, 68, 28, { baseHeight: 4, shape: SHAPES.FLAT });
+    setSurface(level, 68, 29, { baseHeight: 4, shape: SHAPES.FLAT });
+    setSurface(level, 68, 30, { baseHeight: 4, shape: SHAPES.FLAT });
+    setSurface(level, 68, 31, { baseHeight: 4, shape: SHAPES.FLAT });
 
-    addGraphNode(level, { id: 'start', type: 'entry', x: 4.5,  y: 28.5, z: 16 });
-    addGraphNode(level, { id: 'hub',   type: 'fork',  x: 27.5, y: 29.5, z: 16 });
-    addGraphNode(level, { id: 'north', type: 'route', x: 28.5, y: 16.5, z: 12 });
-    addGraphNode(level, { id: 'east',  type: 'route', x: 46.5, y: 28.5, z: 12 });
-    addGraphNode(level, { id: 'south', type: 'route', x: 28.5, y: 42.5, z: 12 });
-    addGraphNode(level, { id: 'merge', type: 'merge', x: 44.5, y: 29.5, z: 8  });
-    addGraphNode(level, { id: 'goal',  type: 'goal',  x: 64.5, y: 31.5, z: 4  });
-    addGraphEdge(level, { from: 'start', to: 'hub',   kind: 'roll'        });
-    addGraphEdge(level, { from: 'hub',   to: 'north', kind: 'descent'     });
-    addGraphEdge(level, { from: 'hub',   to: 'east',  kind: 'roll'        });
-    addGraphEdge(level, { from: 'hub',   to: 'south', kind: 'descent'     });
-    addGraphEdge(level, { from: 'north', to: 'merge', kind: 'roll'        });
-    addGraphEdge(level, { from: 'east',  to: 'merge', kind: 'roll'        });
-    addGraphEdge(level, { from: 'south', to: 'merge', kind: 'timed_cross' });
-    addGraphEdge(level, { from: 'merge', to: 'goal',  kind: 'descent'     });
+    // Second hub (z=4), 12×12
+    fillTrack(level, 69, 24, 12, 12, 4);
+    wallRing(level, 69, 24, 12, 12, 6, {
+      gaps: [
+        { x: 69, y: 28 }, { x: 69, y: 29 }, { x: 69, y: 30 }, { x: 69, y: 31 },
+        // Wing A (north)
+        { x: 73, y: 24 }, { x: 74, y: 24 }, { x: 75, y: 24 }, { x: 76, y: 24 },
+        // Wing B (east)
+        { x: 80, y: 28 }, { x: 80, y: 29 }, { x: 80, y: 30 }, { x: 80, y: 31 }, { x: 80, y: 32 }, { x: 80, y: 33 }, { x: 80, y: 34 }, { x: 80, y: 35 },
+        // Wing C (south)
+        { x: 73, y: 35 }, { x: 74, y: 35 }, { x: 75, y: 35 }, { x: 76, y: 35 }
+      ]
+    });
 
+    // Wing A (north): crumble bridge + sweeper
+    fillTrack(level, 72, 12, 6, 12, 4);
+    for (let cx = 73; cx < 77; cx++) {
+      for (let cy = 14; cy < 22; cy++) {
+        setSurface(level, cx, cy, { baseHeight: 4, shape: SHAPES.FLAT, crumble: { delay: 0.35, downtime: 2.2 } });
+      }
+    }
+    addActor(level, {
+      id: 'sweeper_lab2', kind: ACTOR_KINDS.SWEEPER,
+      x: 75, y: 18, z: 4, topHeight: 4,
+      width: 1, height: 1, armLength: 2.5, armWidth: 0.22, angularSpeed: 1.0, fatal: true
+    });
+    wallRing(level, 72, 12, 6, 12, 6, {
+      gaps: [
+        { x: 73, y: 23 }, { x: 74, y: 23 }, { x: 75, y: 23 }, { x: 76, y: 23 }, { x: 77, y: 23 },
+        { x: 77, y: 12 }, { x: 77, y: 13 }, { x: 77, y: 14 }, { x: 77, y: 15 }, { x: 77, y: 16 }, { x: 77, y: 17 }, { x: 77, y: 18 }, { x: 77, y: 19 }, { x: 77, y: 20 }, { x: 77, y: 21 }, { x: 77, y: 22 }, { x: 77, y: 23 }
+      ]
+    });
+    placeRamp(level, { x: 78, y: 12, dir: 'east', length: 5, width: 12, startZ: 4, endZ: 0 });
+
+    // Wing B (east): timed gate corridor
+    fillTrack(level, 81, 26, 18, 12, 4);
+    addTimedGate(level, 'gate_lab2_east', 88, 28, 8, 3, 2, 1.8, 1.2);
+    wallRing(level, 81, 26, 18, 12, 6, {
+      gaps: [
+        { x: 81, y: 28 }, { x: 81, y: 29 }, { x: 81, y: 30 }, { x: 81, y: 31 }, { x: 81, y: 32 }, { x: 81, y: 33 }, { x: 81, y: 34 }, { x: 81, y: 35 },
+        { x: 98, y: 28 }, { x: 98, y: 29 }, { x: 98, y: 30 }, { x: 98, y: 31 }, { x: 98, y: 32 }, { x: 98, y: 33 }, { x: 98, y: 34 }, { x: 98, y: 35 }
+      ]
+    });
+    placeRamp(level, { x: 99, y: 26, dir: 'east', length: 5, width: 12, startZ: 4, endZ: 0 });
+
+    // Wing C (south): conveyor-assisted wide path
+    fillTrack(level, 72, 36, 6, 18, 4);
+    for (let cx = 73; cx < 77; cx++) {
+      for (let cy = 37; cy < 53; cy++) {
+        setSurface(level, cx, cy, { baseHeight: 4, shape: SHAPES.FLAT, conveyor: { x: 0, y: 0.7, strength: 1.2 } });
+      }
+    }
+    wallRing(level, 72, 36, 6, 18, 6, {
+      gaps: [
+        { x: 72, y: 35 }, { x: 73, y: 35 }, { x: 74, y: 35 }, { x: 75, y: 35 }, { x: 76, y: 35 }, { x: 77, y: 35 },
+        { x: 77, y: 36 }, { x: 77, y: 37 }, { x: 77, y: 38 }, { x: 77, y: 39 }, { x: 77, y: 40 }, { x: 77, y: 41 }, { x: 77, y: 42 }, { x: 77, y: 43 }, { x: 77, y: 44 }, { x: 77, y: 45 }, { x: 77, y: 46 }, { x: 77, y: 47 }, { x: 77, y: 48 }, { x: 77, y: 49 }, { x: 77, y: 50 }, { x: 77, y: 51 }, { x: 77, y: 52 }, { x: 77, y: 53 }
+      ]
+    });
+    placeRamp(level, { x: 78, y: 48, dir: 'east', length: 5, width: 12, startZ: 4, endZ: 0 });
+
+    // Final goal basin (z=0), 20×16 — all three wings converge
+    fillTrack(level, 83, 10, 20, 46, 0);
+    wallRing(level, 83, 10, 20, 46, 2, {
+      gaps: [
+        { x: 83, y: 12 }, { x: 83, y: 13 }, { x: 83, y: 14 }, { x: 83, y: 15 }, { x: 83, y: 16 }, { x: 83, y: 17 }, { x: 83, y: 18 }, { x: 83, y: 19 }, { x: 83, y: 20 }, { x: 83, y: 21 }, { x: 83, y: 22 }, { x: 83, y: 23 },
+        { x: 83, y: 26 }, { x: 83, y: 27 }, { x: 83, y: 28 }, { x: 83, y: 29 }, { x: 83, y: 30 }, { x: 83, y: 31 }, { x: 83, y: 32 }, { x: 83, y: 33 }, { x: 83, y: 34 }, { x: 83, y: 35 },
+        { x: 83, y: 48 }, { x: 83, y: 49 }, { x: 83, y: 50 }, { x: 83, y: 51 }, { x: 83, y: 52 }, { x: 83, y: 53 }, { x: 83, y: 54 }, { x: 83, y: 55 }
+      ]
+    });
+    setGoal(level, 93, 33, 0.44);
+
+    addGraphNode(level, { id: 'start',  type: 'entry', x: 4.5,  y: 28.5, z: 16 });
+    addGraphNode(level, { id: 'hub1',   type: 'fork',  x: 27.5, y: 29.5, z: 16 });
+    addGraphNode(level, { id: 'north1', type: 'route', x: 28.5, y: 16.5, z: 12 });
+    addGraphNode(level, { id: 'east1',  type: 'route', x: 46.5, y: 28.5, z: 12 });
+    addGraphNode(level, { id: 'south1', type: 'route', x: 28.5, y: 42.5, z: 12 });
+    addGraphNode(level, { id: 'merge1', type: 'merge', x: 44.5, y: 29.5, z: 8  });
+    addGraphNode(level, { id: 'hub2',   type: 'fork',  x: 75.5, y: 29.5, z: 4  });
+    addGraphNode(level, { id: 'wing_a', type: 'route', x: 75.5, y: 17.5, z: 4  });
+    addGraphNode(level, { id: 'wing_b', type: 'route', x: 89.5, y: 31.5, z: 4  });
+    addGraphNode(level, { id: 'wing_c', type: 'route', x: 75.5, y: 45.5, z: 4  });
+    addGraphNode(level, { id: 'goal',   type: 'goal',  x: 93.5, y: 33.5, z: 0  });
+    addGraphEdge(level, { from: 'start',  to: 'hub1',   kind: 'roll'        });
+    addGraphEdge(level, { from: 'hub1',   to: 'north1', kind: 'descent'     });
+    addGraphEdge(level, { from: 'hub1',   to: 'east1',  kind: 'roll'        });
+    addGraphEdge(level, { from: 'hub1',   to: 'south1', kind: 'descent'     });
+    addGraphEdge(level, { from: 'north1', to: 'merge1', kind: 'roll'        });
+    addGraphEdge(level, { from: 'east1',  to: 'merge1', kind: 'roll'        });
+    addGraphEdge(level, { from: 'south1', to: 'merge1', kind: 'timed_cross' });
+    addGraphEdge(level, { from: 'merge1', to: 'hub2',   kind: 'descent'     });
+    addGraphEdge(level, { from: 'hub2',   to: 'wing_a', kind: 'crumble'     });
+    addGraphEdge(level, { from: 'hub2',   to: 'wing_b', kind: 'timed_cross' });
+    addGraphEdge(level, { from: 'hub2',   to: 'wing_c', kind: 'roll'        });
+    addGraphEdge(level, { from: 'wing_a', to: 'goal',   kind: 'descent'     });
+    addGraphEdge(level, { from: 'wing_b', to: 'goal',   kind: 'descent'     });
+    addGraphEdge(level, { from: 'wing_c', to: 'goal',   kind: 'descent'     });
     return registerLevel(level);
   }
 
@@ -2656,7 +3122,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
       id: 'the_gauntlet',
       name: 'The Gauntlet',
       width: 74,
-      height: 34,
+      height: 64,
       killZ: -20,
       voidFloor: -10,
       start: { x: 4.5, y: 8.5 },
@@ -2728,18 +3194,102 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
       ]
     });
 
-    setGoal(level, 72, 11, 0.44);
+     // === EXTENSION: second gauntlet section ===
+    // Open south wall of goal basin to continue
+    setSurface(level, 70, 17, { baseHeight: 4, shape: SHAPES.FLAT });
+    setSurface(level, 71, 17, { baseHeight: 4, shape: SHAPES.FLAT });
+    setSurface(level, 72, 17, { baseHeight: 4, shape: SHAPES.FLAT });
+    setSurface(level, 73, 17, { baseHeight: 4, shape: SHAPES.FLAT });
+    setSurface(level, 74, 17, { baseHeight: 4, shape: SHAPES.FLAT });
 
-    addGraphNode(level, { id: 'start', type: 'entry', x: 4.5,  y: 8.5,  z: 18 });
-    addGraphNode(level, { id: 'risky', type: 'route', x: 38.5, y: 6.5,  z: 18 });
-    addGraphNode(level, { id: 'safe',  type: 'route', x: 38.5, y: 15.5, z: 18 });
-    addGraphNode(level, { id: 'goal',  type: 'goal',  x: 72.5, y: 11.5, z: 4  });
-    addGraphEdge(level, { from: 'start', to: 'risky', kind: 'hazard_lane' });
-    addGraphEdge(level, { from: 'start', to: 'safe',  kind: 'roll'        });
-    addGraphEdge(level, { from: 'risky', to: 'goal',  kind: 'descent'     });
-    addGraphEdge(level, { from: 'safe',  to: 'goal',  kind: 'timed_cross' });
+    // Second start platform (z=4), 10×14
+    fillTrack(level, 64, 18, 10, 14, 4);
+    wallRing(level, 64, 18, 10, 14, 6, {
+      gaps: [
+        { x: 70, y: 18 }, { x: 71, y: 18 }, { x: 72, y: 18 }, { x: 73, y: 18 },
+        // Risky lane (north)
+        { x: 64, y: 18 }, { x: 64, y: 19 }, { x: 64, y: 20 }, { x: 64, y: 21 }, { x: 64, y: 22 },
+        // Safe lane (south)
+        { x: 64, y: 26 }, { x: 64, y: 27 }, { x: 64, y: 28 }, { x: 64, y: 29 }, { x: 64, y: 30 }, { x: 64, y: 31 }
+      ]
+    });
 
-    return registerLevel(level);
+    // Risky lane 2 (north, y=18..22, 5 wide): rotating bars + spikes
+    fillTrack(level, 12, 18, 52, 5, 4);
+    addActor(level, {
+      id: 'bar_g3', kind: ACTOR_KINDS.ROTATING_BAR,
+      x: 22, y: 19, z: 4, topHeight: 4,
+      width: 1, height: 1, armLength: 2.0, armWidth: 0.22, angularSpeed: 2.2, fatal: true
+    });
+    addActor(level, {
+      id: 'bar_g4', kind: ACTOR_KINDS.ROTATING_BAR,
+      x: 38, y: 19, z: 4, topHeight: 4,
+      width: 1, height: 1, armLength: 2.0, armWidth: 0.22, angularSpeed: 2.5, fatal: true
+    });
+    addActor(level, {
+      id: 'sweeper_g2', kind: ACTOR_KINDS.SWEEPER,
+      x: 54, y: 19, z: 4, topHeight: 4,
+      width: 1, height: 1, armLength: 2.2, armWidth: 0.22, angularSpeed: 1.0, fatal: true
+    });
+    addHazardRect(level, 58, 18, 3, 4, 'gauntlet2_spikes_risky');
+    wallRing(level, 12, 18, 52, 5, 6, {
+      gaps: [
+        { x: 63, y: 18 }, { x: 63, y: 19 }, { x: 63, y: 20 }, { x: 63, y: 21 }, { x: 63, y: 22 },
+        { x: 12, y: 18 }, { x: 12, y: 19 }, { x: 12, y: 20 }, { x: 12, y: 21 }, { x: 12, y: 22 }
+      ]
+    });
+
+    // Safe lane 2 (south, y=26..31, 6 wide): crumble + timed gates
+    fillTrack(level, 12, 26, 52, 6, 4);
+    for (let cx = 22; cx < 28; cx++) {
+      for (let cy = 26; cy < 32; cy++) {
+        setSurface(level, cx, cy, { baseHeight: 4, shape: SHAPES.FLAT, crumble: { delay: 0.5, downtime: 2.5 } });
+      }
+    }
+    addTimedGate(level, 'gate_g3', 36, 27, 20, 4, 2, 1.6, 1.2);
+    addTimedGate(level, 'gate_g4', 52, 27, 20, 4, 2, 1.4, 1.0);
+    wallRing(level, 12, 26, 52, 6, 6, {
+      gaps: [
+        { x: 63, y: 26 }, { x: 63, y: 27 }, { x: 63, y: 28 }, { x: 63, y: 29 }, { x: 63, y: 30 }, { x: 63, y: 31 },
+        { x: 12, y: 26 }, { x: 12, y: 27 }, { x: 12, y: 28 }, { x: 12, y: 29 }, { x: 12, y: 30 }, { x: 12, y: 31 }
+      ]
+    });
+
+    // Second merge platform (z=4), 10×14
+    fillTrack(level, 2, 18, 10, 14, 4);
+    wallRing(level, 2, 18, 10, 14, 6, {
+      gaps: [
+        { x: 11, y: 18 }, { x: 11, y: 19 }, { x: 11, y: 20 }, { x: 11, y: 21 }, { x: 11, y: 22 },
+        { x: 11, y: 26 }, { x: 11, y: 27 }, { x: 11, y: 28 }, { x: 11, y: 29 }, { x: 11, y: 30 }, { x: 11, y: 31 },
+        { x: 5, y: 31 }, { x: 6, y: 31 }, { x: 7, y: 31 }, { x: 8, y: 31 }
+      ]
+    });
+
+    // Final ramp south (z=4→0), 5×6
+    placeRamp(level, { x: 4, y: 32, dir: 'south', length: 5, width: 6, startZ: 4, endZ: 0 });
+    // Goal basin (z=0), 14×10
+    fillTrack(level, 2, 37, 14, 10, 0);
+    wallRing(level, 2, 37, 14, 10, 2, {
+      gaps: [{ x: 4, y: 37 }, { x: 5, y: 37 }, { x: 6, y: 37 }, { x: 7, y: 37 }, { x: 8, y: 37 }, { x: 9, y: 37 }]
+    });
+    setGoal(level, 9, 43, 0.44);
+
+    addGraphNode(level, { id: 'start',  type: 'entry', x: 4.5,  y: 8.5,  z: 18 });
+    addGraphNode(level, { id: 'risky1', type: 'route', x: 38.5, y: 6.5,  z: 18 });
+    addGraphNode(level, { id: 'safe1',  type: 'route', x: 38.5, y: 15.5, z: 18 });
+    addGraphNode(level, { id: 'merge1', type: 'merge', x: 67.5, y: 11.5, z: 4  });
+    addGraphNode(level, { id: 'risky2', type: 'route', x: 38.5, y: 20.5, z: 4  });
+    addGraphNode(level, { id: 'safe2',  type: 'route', x: 38.5, y: 28.5, z: 4  });
+    addGraphNode(level, { id: 'goal',   type: 'goal',  x: 9.5,  y: 43.5, z: 0  });
+    addGraphEdge(level, { from: 'start',  to: 'risky1', kind: 'hazard_lane' });
+    addGraphEdge(level, { from: 'start',  to: 'safe1',  kind: 'roll'        });
+    addGraphEdge(level, { from: 'risky1', to: 'merge1', kind: 'descent'     });
+    addGraphEdge(level, { from: 'safe1',  to: 'merge1', kind: 'timed_cross' });
+    addGraphEdge(level, { from: 'merge1', to: 'risky2', kind: 'hazard_lane' });
+    addGraphEdge(level, { from: 'merge1', to: 'safe2',  kind: 'roll'        });
+    addGraphEdge(level, { from: 'risky2', to: 'goal',   kind: 'descent'     });
+    addGraphEdge(level, { from: 'safe2',  to: 'goal',   kind: 'timed_cross' });
+    return registerLevel(level);;
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
@@ -2750,8 +3300,8 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     const level = createLevelShell({
       id: 'tower_descent',
       name: 'Tower Descent',
-      width: 50,
-      height: 50,
+      width: 80,
+      height: 80,
       killZ: -20,
       voidFloor: -10,
       start: { x: 4.5, y: 4.5 },
@@ -2858,19 +3408,93 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
       gaps: [{ x: 11, y: 41 }, { x: 11, y: 42 }, { x: 11, y: 43 }, { x: 11, y: 44 }]
     });
 
-    setGoal(level, 6, 43, 0.44);
+    // === EXTENSION: Floors 4 and 5 with fork ===
+    // Open east wall of goal basin to continue
+    setSurface(level, 11, 41, { baseHeight: 2, shape: SHAPES.FLAT });
+    setSurface(level, 11, 42, { baseHeight: 2, shape: SHAPES.FLAT });
+    setSurface(level, 11, 43, { baseHeight: 2, shape: SHAPES.FLAT });
+    setSurface(level, 11, 44, { baseHeight: 2, shape: SHAPES.FLAT });
+
+    // Floor 4 fork junction (z=2), 28×5
+    fillTrack(level, 12, 39, 28, 5, 2);
+    addActor(level, {
+      id: 'bar_floor4', kind: ACTOR_KINDS.ROTATING_BAR,
+      x: 26, y: 40, z: 2, topHeight: 2,
+      width: 1, height: 1, armLength: 2.0, armWidth: 0.22, angularSpeed: 2.0, fatal: true
+    });
+    wallRing(level, 12, 39, 28, 5, 4, {
+      gaps: [
+        { x: 12, y: 39 }, { x: 12, y: 40 }, { x: 12, y: 41 }, { x: 12, y: 42 }, { x: 12, y: 43 },
+        // Path A: spiral continues east
+        { x: 39, y: 39 }, { x: 39, y: 40 }, { x: 39, y: 41 }, { x: 39, y: 42 }, { x: 39, y: 43 },
+        // Path B: shortcut south drop
+        { x: 22, y: 43 }, { x: 23, y: 43 }, { x: 24, y: 43 }, { x: 25, y: 43 }
+      ]
+    });
+
+    // Path A: Floor 4 east corridor (z=2), 28×5
+    fillTrack(level, 40, 39, 28, 5, 2);
+    addTimedGate(level, 'gate_floor4', 50, 40, 12, 3, 2, 1.8, 1.2);
+    wallRing(level, 40, 39, 28, 5, 4, {
+      gaps: [
+        { x: 40, y: 39 }, { x: 40, y: 40 }, { x: 40, y: 41 }, { x: 40, y: 42 }, { x: 40, y: 43 },
+        { x: 67, y: 39 }, { x: 67, y: 40 }, { x: 67, y: 41 }, { x: 67, y: 42 }, { x: 67, y: 43 }
+      ]
+    });
+    // Ramp south (z=2→-2), 5×5
+    placeRamp(level, { x: 64, y: 44, dir: 'south', length: 5, width: 5, startZ: 2, endZ: -2 });
+    // Floor 5 east corridor (z=-2), 28×5
+    fillTrack(level, 40, 49, 28, 5, -2);
+    wallRing(level, 40, 49, 28, 5, 0, {
+      gaps: [
+        { x: 67, y: 44 }, { x: 67, y: 45 }, { x: 67, y: 46 }, { x: 67, y: 47 }, { x: 67, y: 48 }, { x: 67, y: 49 }, { x: 67, y: 50 }, { x: 67, y: 51 }, { x: 67, y: 52 }, { x: 67, y: 53 },
+        { x: 40, y: 49 }, { x: 40, y: 50 }, { x: 40, y: 51 }, { x: 40, y: 52 }, { x: 40, y: 53 }
+      ]
+    });
+    placeRamp(level, { x: 40, y: 54, dir: 'west', length: 5, width: 5, startZ: -2, endZ: -6 });
+
+    // Path B: crumble shortcut south
+    fillTrack(level, 20, 44, 6, 14, 2);
+    for (let cx = 21; cx < 25; cx++) {
+      for (let cy = 45; cy < 57; cy++) {
+        setSurface(level, cx, cy, { baseHeight: 2, shape: SHAPES.FLAT, crumble: { delay: 0.3, downtime: 2.5 } });
+      }
+    }
+    wallRing(level, 20, 44, 6, 14, 4, {
+      gaps: [
+        { x: 22, y: 43 }, { x: 23, y: 43 }, { x: 24, y: 43 }, { x: 25, y: 43 },
+        { x: 20, y: 50 }, { x: 20, y: 51 }, { x: 20, y: 52 }, { x: 20, y: 53 }, { x: 20, y: 54 }, { x: 20, y: 55 }, { x: 20, y: 56 }, { x: 20, y: 57 }
+      ]
+    });
+    placeRamp(level, { x: 20, y: 58, dir: 'west', length: 5, width: 8, startZ: 2, endZ: -6 });
+
+    // Final goal basin (z=-6), 28×10 — both paths converge
+    fillTrack(level, 2, 54, 28, 10, -6);
+    wallRing(level, 2, 54, 28, 10, -4, {
+      gaps: [
+        { x: 15, y: 54 }, { x: 16, y: 54 }, { x: 17, y: 54 }, { x: 18, y: 54 }, { x: 19, y: 54 },
+        { x: 2, y: 58 }, { x: 3, y: 58 }, { x: 4, y: 58 }, { x: 5, y: 58 }, { x: 6, y: 58 }, { x: 7, y: 58 }, { x: 8, y: 58 }, { x: 9, y: 58 }, { x: 10, y: 58 }, { x: 11, y: 58 }, { x: 12, y: 58 }, { x: 13, y: 58 }, { x: 14, y: 58 }, { x: 15, y: 58 }, { x: 16, y: 58 }, { x: 17, y: 58 }, { x: 18, y: 58 }, { x: 19, y: 58 }, { x: 20, y: 58 }, { x: 21, y: 58 }, { x: 22, y: 58 }, { x: 23, y: 58 }, { x: 24, y: 58 }, { x: 25, y: 58 }, { x: 26, y: 58 }, { x: 27, y: 58 }, { x: 28, y: 58 }, { x: 29, y: 58 }
+      ]
+    });
+    setGoal(level, 15, 60, 0.44);
 
     addGraphNode(level, { id: 'start',  type: 'entry', x: 4.5,  y: 4.5,  z: 22 });
     addGraphNode(level, { id: 'floor1', type: 'hub',   x: 24.5, y: 6.5,  z: 22 });
     addGraphNode(level, { id: 'floor2', type: 'hub',   x: 14.5, y: 16.5, z: 14 });
     addGraphNode(level, { id: 'floor3', type: 'hub',   x: 24.5, y: 31.5, z: 6  });
-    addGraphNode(level, { id: 'goal',   type: 'goal',  x: 6.5,  y: 43.5, z: 2  });
+    addGraphNode(level, { id: 'floor4', type: 'fork',  x: 24.5, y: 41.5, z: 2  });
+    addGraphNode(level, { id: 'path_a', type: 'route', x: 54.5, y: 51.5, z: -2 });
+    addGraphNode(level, { id: 'path_b', type: 'route', x: 23.5, y: 51.5, z: 2  });
+    addGraphNode(level, { id: 'goal',   type: 'goal',  x: 15.5, y: 60.5, z: -6 });
     addGraphEdge(level, { from: 'start',  to: 'floor1', kind: 'roll'        });
     addGraphEdge(level, { from: 'floor1', to: 'floor2', kind: 'switchback'  });
     addGraphEdge(level, { from: 'floor2', to: 'floor3', kind: 'timed_cross' });
-    addGraphEdge(level, { from: 'floor3', to: 'goal',   kind: 'descent'     });
-
-    return registerLevel(level);
+    addGraphEdge(level, { from: 'floor3', to: 'floor4', kind: 'descent'     });
+    addGraphEdge(level, { from: 'floor4', to: 'path_a', kind: 'timed_cross' });
+    addGraphEdge(level, { from: 'floor4', to: 'path_b', kind: 'crumble'     });
+    addGraphEdge(level, { from: 'path_a', to: 'goal',   kind: 'descent'     });
+    addGraphEdge(level, { from: 'path_b', to: 'goal',   kind: 'descent'     });
+    return registerLevel(level););
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
@@ -2881,8 +3505,8 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     const level = createLevelShell({
       id: 'the_final_approach',
       name: 'The Final Approach',
-      width: 82,
-      height: 74,
+      width: 120,
+      height: 120,
       killZ: -20,
       voidFloor: -10,
       start: { x: 5.5, y: 5.5 },
@@ -2988,7 +3612,94 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
       ]
     });
 
-    setGoal(level, 64, 68, 0.44);
+      // === ACT 5 EXTENSION: The Grand Finale ===
+    // Open south wall of goal basin to continue into ACT 5
+    for (let cx = 56; cx < 72; cx++) {
+      setSurface(level, cx, 73, { baseHeight: 2, shape: SHAPES.FLAT });
+    }
+
+    // ACT 5 — Three-path arena (z=2), 60×20
+    fillTrack(level, 30, 74, 60, 20, 2);
+    wallRing(level, 30, 74, 60, 20, 4, {
+      gaps: [
+        // North entry from goal basin
+        { x: 56, y: 74 }, { x: 57, y: 74 }, { x: 58, y: 74 }, { x: 59, y: 74 }, { x: 60, y: 74 }, { x: 61, y: 74 }, { x: 62, y: 74 }, { x: 63, y: 74 }, { x: 64, y: 74 }, { x: 65, y: 74 }, { x: 66, y: 74 }, { x: 67, y: 74 }, { x: 68, y: 74 }, { x: 69, y: 74 }, { x: 70, y: 74 }, { x: 71, y: 74 },
+        // Path A exit (west)
+        { x: 30, y: 78 }, { x: 30, y: 79 }, { x: 30, y: 80 }, { x: 30, y: 81 }, { x: 30, y: 82 },
+        // Path B exit (south-centre)
+        { x: 52, y: 93 }, { x: 53, y: 93 }, { x: 54, y: 93 }, { x: 55, y: 93 }, { x: 56, y: 93 }, { x: 57, y: 93 }, { x: 58, y: 93 }, { x: 59, y: 93 },
+        // Path C exit (east)
+        { x: 89, y: 78 }, { x: 89, y: 79 }, { x: 89, y: 80 }, { x: 89, y: 81 }, { x: 89, y: 82 }
+      ]
+    });
+    // Arena hazards
+    addActor(level, {
+      id: 'bar_act5_a', kind: ACTOR_KINDS.ROTATING_BAR,
+      x: 50, y: 82, z: 2, topHeight: 2,
+      width: 1, height: 1, armLength: 3.0, armWidth: 0.22, angularSpeed: 1.5, fatal: true
+    });
+    addActor(level, {
+      id: 'bar_act5_b', kind: ACTOR_KINDS.ROTATING_BAR,
+      x: 70, y: 82, z: 2, topHeight: 2,
+      width: 1, height: 1, armLength: 3.0, armWidth: 0.22, angularSpeed: -1.8, fatal: true
+    });
+    addTimedGate(level, 'gate_act5', 50, 88, 20, 8, 2, 2.2, 1.0);
+
+    // Path A (west): moving platform sequence
+    fillTrack(level, 14, 76, 16, 8, 2);
+    clearSurfaceRect(level, 20, 76, 6, 8);
+    addMovingBridge(level, 'bridge_act5a', [
+      { x: 20, y: 76, z: 2 },
+      { x: 23, y: 76, z: 2 }
+    ], 6, 8, 0.45);
+    wallRing(level, 14, 76, 16, 8, 4, {
+      gaps: [
+        { x: 29, y: 78 }, { x: 29, y: 79 }, { x: 29, y: 80 }, { x: 29, y: 81 }, { x: 29, y: 82 },
+        { x: 14, y: 78 }, { x: 14, y: 79 }, { x: 14, y: 80 }, { x: 14, y: 81 }, { x: 14, y: 82 }
+      ]
+    });
+    placeRamp(level, { x: 14, y: 84, dir: 'south', length: 6, width: 8, startZ: 2, endZ: -2 });
+
+    // Path B (south): crumble descent
+    fillTrack(level, 48, 94, 14, 12, 2);
+    for (let cx = 49; cx < 61; cx++) {
+      for (let cy = 95; cy < 105; cy++) {
+        setSurface(level, cx, cy, { baseHeight: 2, shape: SHAPES.FLAT, crumble: { delay: 0.3, downtime: 2.5 } });
+      }
+    }
+    wallRing(level, 48, 94, 14, 12, 4, {
+      gaps: [
+        { x: 52, y: 93 }, { x: 53, y: 93 }, { x: 54, y: 93 }, { x: 55, y: 93 }, { x: 56, y: 93 }, { x: 57, y: 93 }, { x: 58, y: 93 }, { x: 59, y: 93 }, { x: 60, y: 93 },
+        { x: 52, y: 105 }, { x: 53, y: 105 }, { x: 54, y: 105 }, { x: 55, y: 105 }, { x: 56, y: 105 }, { x: 57, y: 105 }, { x: 58, y: 105 }, { x: 59, y: 105 }, { x: 60, y: 105 }
+      ]
+    });
+    placeRamp(level, { x: 50, y: 106, dir: 'south', length: 6, width: 8, startZ: 2, endZ: -2 });
+
+    // Path C (east): sweeper gauntlet
+    fillTrack(level, 90, 76, 16, 8, 2);
+    addActor(level, {
+      id: 'sweeper_act5', kind: ACTOR_KINDS.SWEEPER,
+      x: 98, y: 80, z: 2, topHeight: 2,
+      width: 1, height: 1, armLength: 2.8, armWidth: 0.22, angularSpeed: 1.2, fatal: true
+    });
+    wallRing(level, 90, 76, 16, 8, 4, {
+      gaps: [
+        { x: 90, y: 78 }, { x: 90, y: 79 }, { x: 90, y: 80 }, { x: 90, y: 81 }, { x: 90, y: 82 },
+        { x: 105, y: 78 }, { x: 105, y: 79 }, { x: 105, y: 80 }, { x: 105, y: 81 }, { x: 105, y: 82 }
+      ]
+    });
+    placeRamp(level, { x: 100, y: 84, dir: 'south', length: 6, width: 8, startZ: 2, endZ: -2 });
+
+    // Grand finale basin (z=-2), 60×14 — all three paths converge
+    fillTrack(level, 14, 90, 92, 14, -2);
+    wallRing(level, 14, 90, 92, 14, 0, {
+      gaps: [
+        { x: 14, y: 90 }, { x: 15, y: 90 }, { x: 16, y: 90 }, { x: 17, y: 90 }, { x: 18, y: 90 }, { x: 19, y: 90 }, { x: 20, y: 90 }, { x: 21, y: 90 },
+        { x: 50, y: 90 }, { x: 51, y: 90 }, { x: 52, y: 90 }, { x: 53, y: 90 }, { x: 54, y: 90 }, { x: 55, y: 90 }, { x: 56, y: 90 }, { x: 57, y: 90 },
+        { x: 98, y: 90 }, { x: 99, y: 90 }, { x: 100, y: 90 }, { x: 101, y: 90 }, { x: 102, y: 90 }, { x: 103, y: 90 }, { x: 104, y: 90 }, { x: 105, y: 90 }
+      ]
+    });
+    setGoal(level, 60, 98, 0.44);
 
     addGraphNode(level, { id: 'start',   type: 'entry', x: 5.5,  y: 5.5,  z: 24 });
     addGraphNode(level, { id: 'path_a',  type: 'route', x: 38.5, y: 4.5,  z: 24 });
@@ -2996,7 +3707,12 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     addGraphNode(level, { id: 'path_c',  type: 'route', x: 34.5, y: 14.5, z: 24 });
     addGraphNode(level, { id: 'citadel', type: 'hub',   x: 70.5, y: 11.5, z: 18 });
     addGraphNode(level, { id: 'act3',    type: 'hub',   x: 64.5, y: 35.5, z: 12 });
-    addGraphNode(level, { id: 'goal',    type: 'goal',  x: 64.5, y: 68.5, z: 2  });
+    addGraphNode(level, { id: 'act4',    type: 'hub',   x: 64.5, y: 68.5, z: 2  });
+    addGraphNode(level, { id: 'arena',   type: 'fork',  x: 60.5, y: 83.5, z: 2  });
+    addGraphNode(level, { id: 'wing_a',  type: 'route', x: 22.5, y: 80.5, z: 2  });
+    addGraphNode(level, { id: 'wing_b',  type: 'route', x: 55.5, y: 99.5, z: 2  });
+    addGraphNode(level, { id: 'wing_c',  type: 'route', x: 98.5, y: 80.5, z: 2  });
+    addGraphNode(level, { id: 'goal',    type: 'goal',  x: 60.5, y: 98.5, z: -2 });
     addGraphEdge(level, { from: 'start',   to: 'path_a',  kind: 'platform_transfer' });
     addGraphEdge(level, { from: 'start',   to: 'path_b',  kind: 'roll'              });
     addGraphEdge(level, { from: 'start',   to: 'path_c',  kind: 'roll'              });
@@ -3004,8 +3720,14 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     addGraphEdge(level, { from: 'path_b',  to: 'citadel', kind: 'hazard_lane'       });
     addGraphEdge(level, { from: 'path_c',  to: 'citadel', kind: 'roll'              });
     addGraphEdge(level, { from: 'citadel', to: 'act3',    kind: 'descent'           });
-    addGraphEdge(level, { from: 'act3',    to: 'goal',    kind: 'descent'           });
-
+    addGraphEdge(level, { from: 'act3',    to: 'act4',    kind: 'descent'           });
+    addGraphEdge(level, { from: 'act4',    to: 'arena',   kind: 'descent'           });
+    addGraphEdge(level, { from: 'arena',   to: 'wing_a',  kind: 'platform_transfer' });
+    addGraphEdge(level, { from: 'arena',   to: 'wing_b',  kind: 'crumble'           });
+    addGraphEdge(level, { from: 'arena',   to: 'wing_c',  kind: 'hazard_lane'       });
+    addGraphEdge(level, { from: 'wing_a',  to: 'goal',    kind: 'descent'           });
+    addGraphEdge(level, { from: 'wing_b',  to: 'goal',    kind: 'descent'           });
+    addGraphEdge(level, { from: 'wing_c',  to: 'goal',    kind: 'descent'           });
     return registerLevel(level);
   }
 
