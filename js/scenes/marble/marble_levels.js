@@ -2125,46 +2125,45 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     });
 
     // Leg B: west corridor (z=14), 14×5
+    // Marble enters from west (x=2, from Turn A) and exits east (x=15) to Ramp B
     fillTrack(level, 2, 21, 14, 5, 14);
     wallRing(level, 2, 21, 14, 5, 16, {
       gaps: [
+        // West entry from Turn A: full west column y:21-25
         { x: 2, y: 21 }, { x: 2, y: 22 }, { x: 2, y: 23 }, { x: 2, y: 24 }, { x: 2, y: 25 },
+        // East exit to Ramp B: full east column y:21-25
         { x: 15, y: 21 }, { x: 15, y: 22 }, { x: 15, y: 23 }, { x: 15, y: 24 }, { x: 15, y: 25 }
       ]
     });
-
-    // Ramp B south (z=14→10), 6×5
-    placeRamp(level, { x: 2, y: 26, dir: 'south', length: 6, width: 5, startZ: 14, endZ: 10 });
-
-    // Turn platform B (z=10), 14×6 — crumble
+    // Ramp B south (z=14→10), 6×5 — now on EAST side of Leg B (S-shape)
+    placeRamp(level, { x: 11, y: 26, dir: 'south', length: 6, width: 5, startZ: 14, endZ: 10 });
+    // Turn platform B (z=10), 14×6 — crumble on inner corner
     fillTrack(level, 2, 32, 14, 6, 10);
-    setSurface(level, 4, 33, { baseHeight: 10, shape: SHAPES.FLAT, crumble: { delay: 0.5, downtime: 2.0 } });
-    setSurface(level, 5, 33, { baseHeight: 10, shape: SHAPES.FLAT, crumble: { delay: 0.5, downtime: 2.0 } });
-    setSurface(level, 4, 34, { baseHeight: 10, shape: SHAPES.FLAT, crumble: { delay: 0.5, downtime: 2.0 } });
+    setSurface(level, 12, 33, { baseHeight: 10, shape: SHAPES.FLAT, crumble: { delay: 0.5, downtime: 2.0 } });
+    setSurface(level, 13, 33, { baseHeight: 10, shape: SHAPES.FLAT, crumble: { delay: 0.5, downtime: 2.0 } });
+    setSurface(level, 12, 34, { baseHeight: 10, shape: SHAPES.FLAT, crumble: { delay: 0.5, downtime: 2.0 } });
     wallRing(level, 2, 32, 14, 6, 12, {
       gaps: [
-        // North entry from Leg B: x:2-6 (west wall corner x=2 included)
-        { x: 2, y: 32 }, { x: 3, y: 32 }, { x: 4, y: 32 }, { x: 5, y: 32 }, { x: 6, y: 32 },
-        // South exit to Leg C: x:10-15 (east wall corner x=15 included)
-        { x: 10, y: 37 }, { x: 11, y: 37 }, { x: 12, y: 37 }, { x: 13, y: 37 }, { x: 14, y: 37 }, { x: 15, y: 37 }
+        // North entry from Ramp B (east side): x:11-15 — 5 tiles wide
+        { x: 11, y: 32 }, { x: 12, y: 32 }, { x: 13, y: 32 }, { x: 14, y: 32 }, { x: 15, y: 32 },
+        // South exit to Leg C (west side): x:2-7 — 6 tiles wide
+        { x: 2, y: 37 }, { x: 3, y: 37 }, { x: 4, y: 37 }, { x: 5, y: 37 }, { x: 6, y: 37 }, { x: 7, y: 37 }
       ]
     });
-
-    // Leg C: east corridor (z=10), 14×5
-    fillTrack(level, 10, 38, 14, 5, 10);
-    wallRing(level, 10, 38, 14, 5, 12, {
+    // Leg C: east corridor (z=10), 14×5 — now exits from west side of Turn B
+    fillTrack(level, 2, 38, 14, 5, 10);
+    wallRing(level, 2, 38, 14, 5, 12, {
       gaps: [
-        // West entry from Turn B: x:10-15 (west wall corner x=10 included)
-        { x: 10, y: 38 }, { x: 11, y: 38 }, { x: 12, y: 38 }, { x: 13, y: 38 }, { x: 14, y: 38 }, { x: 15, y: 38 },
+        // West entry from Turn B: x:2-7 — 6 tiles wide
+        { x: 2, y: 38 }, { x: 3, y: 38 }, { x: 4, y: 38 }, { x: 5, y: 38 }, { x: 6, y: 38 }, { x: 7, y: 38 },
         // East exit to Ramp C: full east column y:38-42 (south corner y=42 included)
-        { x: 23, y: 38 }, { x: 23, y: 39 }, { x: 23, y: 40 }, { x: 23, y: 41 }, { x: 23, y: 42 },
-        // South-west corner: x=10 at y=42
-        { x: 10, y: 42 }
+        { x: 15, y: 38 }, { x: 15, y: 39 }, { x: 15, y: 40 }, { x: 15, y: 41 }, { x: 15, y: 42 },
+        // South-east corner open
+        { x: 15, y: 42 }
       ]
     });
-
-    // Ramp C south (z=10→6), 6×5
-    placeRamp(level, { x: 10, y: 43, dir: 'south', length: 6, width: 5, startZ: 10, endZ: 6 });
+    // Ramp C south (z=10→6), 6×5 — aligned with Leg C east exit at x:11-15
+    placeRamp(level, { x: 11, y: 43, dir: 'south', length: 6, width: 5, startZ: 10, endZ: 6 });
 
     // Turn platform C (z=6), 14×6
     // Exit gap on south wall at x:10-14 — aligned with where marble arrives from Ramp C
@@ -2174,8 +2173,8 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     setSurface(level, 4, 52, { baseHeight: 6, shape: SHAPES.FLAT, crumble: { delay: 0.5, downtime: 2.0 } });
     wallRing(level, 2, 49, 14, 6, 8, {
       gaps: [
-        // North entry from Ramp C: x:10-15 (east wall corner x=15 included)
-        { x: 10, y: 49 }, { x: 11, y: 49 }, { x: 12, y: 49 }, { x: 13, y: 49 }, { x: 14, y: 49 }, { x: 15, y: 49 },
+        // North entry from Ramp C: x:11-15 (aligned with Ramp C at x:11-15)
+        { x: 11, y: 49 }, { x: 12, y: 49 }, { x: 13, y: 49 }, { x: 14, y: 49 }, { x: 15, y: 49 },
         // South exit: x:10-15 (east wall corner x=15 included)
         { x: 10, y: 54 }, { x: 11, y: 54 }, { x: 12, y: 54 }, { x: 13, y: 54 }, { x: 14, y: 54 }, { x: 15, y: 54 }
       ]
