@@ -59,6 +59,10 @@
     hazardSide:    0xdc2626,
     conveyorTop:   0x0891b2,
     conveyorSide:  0x0e7490,
+    crumbleTop:    0x7c5c3a,   // warm brown — crumble tile base
+    crumbleDark:   0x4a3520,   // dark brown grid lines
+    iceTop:        0xbae6fd,   // pale cyan — ice tile base
+    iceDark:       0x7dd3fc,   // slightly deeper cyan grid
   };
 
   // ─── Module state ────────────────────────────────────────────────────────────
@@ -140,6 +144,8 @@
   let texGoalTop    = null;
   let texConvTop    = null;
   let texHazardTop  = null;
+  let texCrumbleTop = null;
+  let texIceTop     = null;
 
   /**
    * Hazard stripe texture: diagonal red/dark-red stripes.
@@ -169,13 +175,33 @@
     return tex;
   }
 
+  function makeCrumbleTexture(size) {
+    const cv = document.createElement('canvas');
+    cv.width = cv.height = size;
+    const ctx = cv.getContext('2d');
+    ctx.fillStyle = '#' + COL.crumbleTop.toString(16).padStart(6,'0');
+    ctx.fillRect(0, 0, size, size);
+    // Crack lines
+    ctx.strokeStyle = '#' + COL.crumbleDark.toString(16).padStart(6,'0');
+    ctx.lineWidth = Math.max(2, size / 48);
+    ctx.beginPath(); ctx.moveTo(0, 0);       ctx.lineTo(size*0.4, size*0.5); ctx.lineTo(size, size*0.3); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(size*0.6, 0); ctx.lineTo(size*0.3, size*0.7); ctx.lineTo(size, size); ctx.stroke();
+    ctx.lineWidth = Math.max(1, size / 128);
+    ctx.strokeRect(0, 0, size, size);
+    const tex = new THREE.CanvasTexture(cv);
+    tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+    return tex;
+  }
+
   function ensureTextures() {
     if (texTileTop) return;
-    texTileTop   = makeTileTopTexture(256, COL.tileTop,    COL.tileGrid);
-    texBounceTop = makeTileTopTexture(128, COL.bounceTop,  COL.bounceDark);
-    texGoalTop   = makeCheckerTexture(128, COL.goalLight,  COL.goalDark, 0xaa8800, 4);
-    texConvTop   = makeTileTopTexture(128, COL.conveyorTop,COL.conveyorSide);
-    texHazardTop = makeHazardTexture(128);
+    texTileTop    = makeTileTopTexture(256, COL.tileTop,     COL.tileGrid);
+    texBounceTop  = makeTileTopTexture(128, COL.bounceTop,   COL.bounceDark);
+    texGoalTop    = makeCheckerTexture(128, COL.goalLight,   COL.goalDark, 0xaa8800, 4);
+    texConvTop    = makeTileTopTexture(128, COL.conveyorTop, COL.conveyorSide);
+    texHazardTop  = makeHazardTexture(128);
+    texCrumbleTop = makeCrumbleTexture(128);
+    texIceTop     = makeTileTopTexture(128, COL.iceTop,      COL.iceDark);
   }
 
   // ─── Material cache ──────────────────────────────────────────────────────────
@@ -186,10 +212,12 @@
     return matCache[key];
   }
 
-  function matTileTop(bounce, conveyor, goal) {
-    if (goal)     return getMat('goal_top',   () => new THREE.MeshLambertMaterial({ map: texGoalTop }));
-    if (bounce)   return getMat('bounce_top', () => new THREE.MeshLambertMaterial({ map: texBounceTop }));
-    if (conveyor) return getMat('conv_top',   () => new THREE.MeshLambertMaterial({ map: texConvTop }));
+  function matTileTop(bounce, conveyor, goal, crumble, ice) {
+    if (goal)     return getMat('goal_top',    () => new THREE.MeshLambertMaterial({ map: texGoalTop }));
+    if (bounce)   return getMat('bounce_top',  () => new THREE.MeshLambertMaterial({ map: texBounceTop }));
+    if (conveyor) return getMat('conv_top',    () => new THREE.MeshLambertMaterial({ map: texConvTop }));
+    if (crumble)  return getMat('crumble_top', () => new THREE.MeshLambertMaterial({ map: texCrumbleTop }));
+    if (ice)      return getMat('ice_top',     () => new THREE.MeshLambertMaterial({ map: texIceTop, shininess: 120 }));
     return getMat('tile_top', () => new THREE.MeshLambertMaterial({ map: texTileTop }));
   }
   // Ramp material: same tile-top texture as flat tiles so ramps read as part
@@ -518,14 +546,15 @@
 
     // ── Pass 1: Tile tops ────────────────────────────────────────────────────
     for (const { tx, ty, cell } of tiles) {
-      const isGoal     = ML.getTriggerCell(level, tx, ty)?.kind === 'goal';
+       const isGoal     = ML.getTriggerCell(level, tx, ty)?.kind === 'goal';
       const isBounce   = !!cell.bounce;
       const isConveyor = !!cell.conveyor;
-
+      const isCrumble  = !!cell.crumble;
+      const isIce      = !isCrumble && !isBounce && !isConveyor && (cell.friction ?? 1) < 0.45;
       if (!cell.shape || cell.shape === 'flat') {
         const z = cell.baseHeight;
-        const matKey = isGoal ? 'goal_top' : isBounce ? 'bounce_top' : isConveyor ? 'conv_top' : 'tile_top';
-        const mat    = matTileTop(isBounce, isConveyor, isGoal);
+        const matKey = isGoal ? 'goal_top' : isBounce ? 'bounce_top' : isConveyor ? 'conv_top' : isCrumble ? 'crumble_top' : isIce ? 'ice_top' : 'tile_top';
+        const mat    = matTileTop(isBounce, isConveyor, isGoal, isCrumble, isIce);
         batch.quad(matKey, mat,
           [tx, z, ty,  tx+1, z, ty,  tx, z, ty+1,  tx+1, z, ty+1],
           NUP, UV01, IDX_TOP);
