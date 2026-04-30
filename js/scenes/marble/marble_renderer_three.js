@@ -423,9 +423,52 @@
 
   // ─── Level mesh builder ──────────────────────────────────────────────────────
 
+  // ─── GeoBatch: accumulate quads per material key, flush to one mesh per key ─
+  // All geometry in buildLevelMeshes is flat quads with position/normal/uv.
+  // Batching reduces thousands of draw calls to ~9 (one per material type).
+  class GeoBatch {
+    constructor() { this._b = {}; }
+    _bucket(key, mat) {
+      if (!this._b[key]) this._b[key] = { pos:[], nrm:[], uvs:[], idx:[], mat, vc:0 };
+      return this._b[key];
+    }
+    // pos: flat [x,y,z]×4, nrm: flat [nx,ny,nz]×4, uvs: flat [u,v]×4, idx: [i0..i5] local 0-3
+    quad(key, mat, pos, nrm, uvs, idx) {
+      const b = this._bucket(key, mat);
+      const base = b.vc;
+      for (let i=0;i<12;i++){b.pos.push(pos[i]);b.nrm.push(nrm[i]);}
+      for (let i=0;i<8;i++) b.uvs.push(uvs[i]);
+      for (let i=0;i<6;i++) b.idx.push(base+idx[i]);
+      b.vc += 4;
+    }
+    flush(group) {
+      for (const key of Object.keys(this._b)) {
+        const b = this._b[key];
+        if (!b.vc) continue;
+        const geo = new THREE.BufferGeometry();
+        geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(b.pos), 3));
+        geo.setAttribute('normal',   new THREE.BufferAttribute(new Float32Array(b.nrm), 3));
+        geo.setAttribute('uv',       new THREE.BufferAttribute(new Float32Array(b.uvs), 2));
+        geo.setIndex(b.idx);
+        const mesh = new THREE.Mesh(geo, b.mat);
+        mesh.receiveShadow = true;
+        group.add(mesh);
+      }
+    }
+  }
+
   function buildLevelMeshes(level) {
     const ML = window.MarbleLevels;
     const group = new THREE.Group();
+    const batch = new GeoBatch();
+
+    // Shared quad data helpers
+    const NUP  = [0,1,0, 0,1,0, 0,1,0, 0,1,0];
+    const NS   = [0,0,1, 0,0,1, 0,0,1, 0,0,1];
+    const NE   = [1,0,0, 1,0,0, 1,0,0, 1,0,0];
+    const UV01 = [0,0, 1,0, 0,1, 1,1];
+    const IDX_CW  = [0,1,2, 1,3,2]; // south-face / top winding
+    const IDX_CCW = [0,2,1, 1,2,3]; // east-face winding
 
     // Collect non-void tiles
     const tiles = [];
@@ -445,27 +488,7 @@
       levelCamZ = 0;
     }
 
-    // ── Pass 1: Tile tops ────────────────────────────────────────────────────
-    for (const { tx, ty, cell } of tiles) {
-      const isGoal     = ML.getTriggerCell(level, tx, ty)?.kind === 'goal';
-      const isBounce   = !!cell.bounce;
-      const isConveyor = !!cell.conveyor;
-
-      if (!cell.shape || cell.shape === 'flat') {
-        group.add(buildTileTopMesh(tx, ty, cell.baseHeight, 1, 1,
-          matTileTop(isBounce, isConveyor, isGoal)));
-      } else {
-        group.add(buildSlopeMesh(tx, ty, cell));
-      }
-    }
-
-    // ── Pass 2: Wall faces — all four edges ──────────────────────────────────
-    // For every tile, draw a wall face on any edge where this tile's edge height
-    // is HIGHER than the neighbouring tile's shared-boundary edge height.
-    // Uses per-edge corner heights (not fillZ max) so slope tiles compare correctly.
-
     // Helper: get the height of a cell's edge at the shared boundary with a neighbour.
-    // Returns 0 for void or out-of-bounds.
     const edgeH = (ttx, tty, edge) => {
       const nc = ML.getSurfaceCell(level, ttx, tty);
       if (!nc || nc.kind === 'void') return 0;
@@ -479,6 +502,27 @@
       return nc.baseHeight;
     };
 
+    // ── Pass 1: Tile tops ────────────────────────────────────────────────────
+    for (const { tx, ty, cell } of tiles) {
+      const isGoal     = ML.getTriggerCell(level, tx, ty)?.kind === 'goal';
+      const isBounce   = !!cell.bounce;
+      const isConveyor = !!cell.conveyor;
+
+      if (!cell.shape || cell.shape === 'flat') {
+        const z = cell.baseHeight;
+        const matKey = isGoal ? 'goal_top' : isBounce ? 'bounce_top' : isConveyor ? 'conv_top' : 'tile_top';
+        const mat    = matTileTop(isBounce, isConveyor, isGoal);
+        batch.quad(matKey, mat,
+          [tx, z, ty,  tx+1, z, ty,  tx, z, ty+1,  tx+1, z, ty+1],
+          NUP, UV01, IDX_CW);
+      } else {
+        // Slope: keep as individual mesh (needs computeVertexNormals)
+        group.add(buildSlopeMesh(tx, ty, cell));
+      }
+    }
+
+    // ── Pass 2: Wall faces — all four edges ──────────────────────────────────
+    const W_HL = 0.06;
     for (const { tx, ty, cell } of tiles) {
       const corners = ML.getSurfaceCornerHeights
         ? ML.getSurfaceCornerHeights(cell)
@@ -488,52 +532,63 @@
       const southEdgeZ = Math.max(corners.sw, corners.se);
       const southNbrZ  = edgeH(tx, ty + 1, 'north');
       if (southEdgeZ > southNbrZ + 0.01) {
-        const sf = buildSouthFace(tx, tx + 1, ty + 1, southNbrZ, southEdgeZ, matWallSouth());
-        if (sf) {
-          group.add(sf);
-          group.add(buildWallHighlight(tx, tx + 1, ty + 1, southEdgeZ, 's'));
-        }
+        const fy = ty + 1;
+        batch.quad('wall_s', matWallSouth(),
+          [tx, southNbrZ, fy,  tx+1, southNbrZ, fy,  tx, southEdgeZ, fy,  tx+1, southEdgeZ, fy],
+          NS, UV01, IDX_CW);
+        // highlight strip
+        const hy = southEdgeZ + 0.004;
+        batch.quad('wall_hl', matWallHighlight(),
+          [tx, hy, fy-W_HL,  tx+1, hy, fy-W_HL,  tx, hy, fy,  tx+1, hy, fy],
+          NUP, UV01, IDX_CW);
       }
 
       // East face: at x = tx+1
       const eastEdgeZ = Math.max(corners.ne, corners.se);
       const eastNbrZ  = edgeH(tx + 1, ty, 'west');
       if (eastEdgeZ > eastNbrZ + 0.01) {
-        const ef = buildEastFace(ty, ty + 1, tx + 1, eastNbrZ, eastEdgeZ, matWallEast());
-        if (ef) {
-          group.add(ef);
-          group.add(buildWallHighlight(ty, ty + 1, tx + 1, eastEdgeZ, 'e'));
-        }
+        const fx = tx + 1;
+        batch.quad('wall_e', matWallEast(),
+          [fx, eastNbrZ, ty,  fx, eastNbrZ, ty+1,  fx, eastEdgeZ, ty,  fx, eastEdgeZ, ty+1],
+          NE, UV01, IDX_CCW);
+        // highlight strip
+        const hy = eastEdgeZ + 0.004;
+        batch.quad('wall_hl', matWallHighlight(),
+          [fx-W_HL, hy, ty,  fx-W_HL, hy, ty+1,  fx, hy, ty,  fx, hy, ty+1],
+          NUP, UV01, IDX_CW);
       }
 
-      // North boundary: at y = ty — this tile is higher than its north neighbour.
-      // Camera looks from south-east, so use a south-facing quad placed at y=ty
-      // (same geometry as buildSouthFace but at the tile's north edge).
+      // North boundary: at y = ty (south-facing quad at north edge)
       const northEdgeZ = Math.max(corners.nw, corners.ne);
       const northNbrZ  = edgeH(tx, ty - 1, 'south');
       if (northEdgeZ > northNbrZ + 0.01) {
-        const nf = buildSouthFace(tx, tx + 1, ty, northNbrZ, northEdgeZ, matWallSouth());
-        if (nf) {
-          group.add(nf);
-          group.add(buildWallHighlight(tx, tx + 1, ty, northEdgeZ, 's'));
-        }
+        const fy = ty;
+        batch.quad('wall_s', matWallSouth(),
+          [tx, northNbrZ, fy,  tx+1, northNbrZ, fy,  tx, northEdgeZ, fy,  tx+1, northEdgeZ, fy],
+          NS, UV01, IDX_CW);
+        const hy = northEdgeZ + 0.004;
+        batch.quad('wall_hl', matWallHighlight(),
+          [tx, hy, fy-W_HL,  tx+1, hy, fy-W_HL,  tx, hy, fy,  tx+1, hy, fy],
+          NUP, UV01, IDX_CW);
       }
 
-      // West boundary: at x = tx — this tile is higher than its west neighbour.
-      // Camera looks from south-east, so use an east-facing quad placed at x=tx
-      // (same geometry as buildEastFace but at the tile's west edge).
+      // West boundary: at x = tx (east-facing quad at west edge)
       const westEdgeZ = Math.max(corners.nw, corners.sw);
       const westNbrZ  = edgeH(tx - 1, ty, 'east');
       if (westEdgeZ > westNbrZ + 0.01) {
-        const wf = buildEastFace(ty, ty + 1, tx, westNbrZ, westEdgeZ, matWallEast());
-        if (wf) {
-          group.add(wf);
-          group.add(buildWallHighlight(ty, ty + 1, tx, westEdgeZ, 'e'));
-        }
+        const fx = tx;
+        batch.quad('wall_e', matWallEast(),
+          [fx, westNbrZ, ty,  fx, westNbrZ, ty+1,  fx, westEdgeZ, ty,  fx, westEdgeZ, ty+1],
+          NE, UV01, IDX_CCW);
+        const hy = westEdgeZ + 0.004;
+        batch.quad('wall_hl', matWallHighlight(),
+          [fx-W_HL, hy, ty,  fx-W_HL, hy, ty+1,  fx, hy, ty,  fx, hy, ty+1],
+          NUP, UV01, IDX_CW);
       }
     }
 
     // ── Pass 3: Blockers ─────────────────────────────────────────────────────
+    // Blockers are rare — keep as individual meshes (buildBoxGroup)
     for (let ty = 0; ty < level.height; ty++) {
       for (let tx = 0; tx < level.width; tx++) {
         const blk = ML.getBlockerCell(level, tx, ty);
@@ -554,11 +609,13 @@
         if (trig?.kind !== 'hazard') continue;
         const cell = ML.getSurfaceCell(level, tx, ty);
         if (!cell) continue;
-        // Use buildTileTopMesh — identical approach to goal overlay (which works).
         const z = (ML.getSurfaceTopZ ? ML.getSurfaceTopZ(cell) : cell.baseHeight) + 0.05;
-        group.add(buildTileTopMesh(tx, ty, z, 1, 1, matHazard()));
+        batch.quad('hazard', matHazard(),
+          [tx, z, ty,  tx+1, z, ty,  tx, z, ty+1,  tx+1, z, ty+1],
+          NUP, UV01, IDX_CW);
       }
     }
+
     // ── Pass 5: Goal trigger visuals ─────────────────────────────────────────
     for (let ty = 0; ty < level.height; ty++) {
       for (let tx = 0; tx < level.width; tx++) {
@@ -567,8 +624,11 @@
         const cell = ML.getSurfaceCell(level, tx, ty);
         if (!cell) continue;
         const z = cell.baseHeight + 0.02;
-        group.add(buildTileTopMesh(tx, ty, z, 1, 1,
-          getMat('goal_overlay', () => new THREE.MeshLambertMaterial({ map: texGoalTop }))));
+        batch.quad('goal_overlay',
+          getMat('goal_overlay', () => new THREE.MeshLambertMaterial({ map: texGoalTop })),
+          [tx, z, ty,  tx+1, z, ty,  tx, z, ty+1,  tx+1, z, ty+1],
+          NUP, UV01, IDX_CW);
+        // Goal pole — individual mesh (one per level)
         const pole = new THREE.Mesh(
           new THREE.CylinderGeometry(0.04, 0.04, 1.2, 8),
           getMat('pole', () => new THREE.MeshLambertMaterial({ color: 0xffd700 }))
@@ -577,6 +637,9 @@
         group.add(pole);
       }
     }
+
+    // Flush all batched quads into the group
+    batch.flush(group);
 
     return group;
   }
