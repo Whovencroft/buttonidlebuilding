@@ -2164,15 +2164,15 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     setSurface(level, 4, 52, { baseHeight: 6, shape: SHAPES.FLAT, crumble: { delay: 0.5, downtime: 2.0 } });
     wallRing(level, 2, 49, 14, 6, 8, {
       gaps: [
-        // North entry from Ramp C
+        // North entry from Ramp C (x:10-13 are interior; x=14 is not a wall tile here)
         { x: 10, y: 49 }, { x: 11, y: 49 }, { x: 12, y: 49 }, { x: 13, y: 49 },
-        // South exit — 5 tiles wide at x:10-14, directly below the ramp C entry
-        { x: 10, y: 54 }, { x: 11, y: 54 }, { x: 12, y: 54 }, { x: 13, y: 54 }, { x: 14, y: 54 }
+        // South exit — x:10-15 (includes east wall corner at x=15)
+        { x: 10, y: 54 }, { x: 11, y: 54 }, { x: 12, y: 54 }, { x: 13, y: 54 }, { x: 14, y: 54 }, { x: 15, y: 54 }
       ]
     });
 
-    // Final ramp south (z=6→2), 5×5 — aligned with exit gap at x:10-14
-    placeRamp(level, { x: 10, y: 55, dir: 'south', length: 5, width: 5, startZ: 6, endZ: 2 });
+    // Final ramp south (z=6→2), 5×6 — aligned with exit gap at x:10-15
+    placeRamp(level, { x: 10, y: 55, dir: 'south', length: 5, width: 6, startZ: 6, endZ: 2 });
 
     // Goal basin (z=2), 12×5
     fillTrack(level, 8, 60, 12, 5, 2);
