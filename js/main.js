@@ -737,7 +737,7 @@ try {
       dt = 1 / 60;
     }
 
-    dt = Math.min(dt, 1);
+    dt = Math.min(dt, 0.1); // clamp to 100ms max — prevents physics catch-up after GC pauses
     sceneManager.update(dt, { state });
     frameHandle = requestAnimationFrame(frame);
   }

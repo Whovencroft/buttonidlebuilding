@@ -1,6 +1,7 @@
 (() => {
   const FIXED_DT = 1 / 120;
   const MAX_PHYSICS_STEPS = 8;
+  const MAX_REPLAY_FRAMES = 21600; // 3 minutes at 120fps — prevents GC pressure from unbounded arrays
 
   function create(api) {
     const { config, elements, getState, applyMarbleReward, switchScene, saveNow } = api;
@@ -279,11 +280,10 @@
 
     function recordStepInput(stepInput) {
       if (playback || !runtime?.replay) return;
-      runtime.replay.frames.push({
-        x: Number(stepInput.axis.x.toFixed(4)),
-        y: Number(stepInput.axis.y.toFixed(4)),
-        j: stepInput.jumpPressed ? 1 : 0
-      });
+      if (runtime.replay.frames.length >= MAX_REPLAY_FRAMES) return; // cap to prevent GC pressure
+      const ax = Math.round(stepInput.axis.x * 10000) / 10000;
+      const ay = Math.round(stepInput.axis.y * 10000) / 10000;
+      runtime.replay.frames.push({ x: ax, y: ay, j: stepInput.jumpPressed ? 1 : 0 });
     }
 
     function stepSimulation(dt) {
