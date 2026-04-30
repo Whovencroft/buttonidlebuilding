@@ -2208,7 +2208,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     const level = createLevelShell({
       id: 'canal_run',
       name: 'Canal Run',
-      width: 62,
+      width: 68,
       height: 30,
       killZ: -20,
       voidFloor: -10,
@@ -2260,8 +2260,20 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
       ]
     });
 
-    // Lower (south) lane (z=10), 20×6 — wider, no conveyor
+    // Lower (south) lane (z=10), 20×6 — wider, column obstacles staggered
     fillTrack(level, 29, 8, 20, 6, 10);
+    // Column pair 1: north side, leaves gap on south (y:11-13)
+    setSurface(level, 33, 8,  { baseHeight: 14, shape: SHAPES.FLAT });
+    setSurface(level, 33, 9,  { baseHeight: 14, shape: SHAPES.FLAT });
+    setSurface(level, 33, 10, { baseHeight: 14, shape: SHAPES.FLAT });
+    // Column pair 2: south side, leaves gap on north (y:8-10)
+    setSurface(level, 38, 11, { baseHeight: 14, shape: SHAPES.FLAT });
+    setSurface(level, 38, 12, { baseHeight: 14, shape: SHAPES.FLAT });
+    setSurface(level, 38, 13, { baseHeight: 14, shape: SHAPES.FLAT });
+    // Column pair 3: north side again
+    setSurface(level, 43, 8,  { baseHeight: 14, shape: SHAPES.FLAT });
+    setSurface(level, 43, 9,  { baseHeight: 14, shape: SHAPES.FLAT });
+    setSurface(level, 43, 10, { baseHeight: 14, shape: SHAPES.FLAT });
     wallRing(level, 29, 8, 20, 6, 12, {
       gaps: [
         { x: 29, y: 8 }, { x: 29, y: 9 }, { x: 29, y: 10 }, { x: 29, y: 11 }, { x: 29, y: 12 }, { x: 29, y: 13 },
@@ -2288,7 +2300,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
       gaps: [{ x: 60, y: 7 }, { x: 60, y: 8 }, { x: 60, y: 9 }, { x: 60, y: 10 }]
     });
 
-    setGoal(level, 63, 10, 0.44);
+    setGoal(level, 62, 10, 0.44);
 
     addGraphNode(level, { id: 'start',    type: 'entry', x: 4.5,  y: 6.5,  z: 14 });
     addGraphNode(level, { id: 'junction', type: 'fork',  x: 26.5, y: 9.5,  z: 10 });
