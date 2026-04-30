@@ -796,10 +796,7 @@
     ensureRenderer(canvas);
     if (!renderer || !THREE) return;
 
-    // Only call setSize when dimensions actually change
-    if (renderer.domElement.width !== w || renderer.domElement.height !== h) {
-      renderer.setSize(w, h, false);
-    }
+    renderer.setSize(w, h, false);
 
     // Perf logging: log renderer info every 120 frames
     _perfFrameCount++;
