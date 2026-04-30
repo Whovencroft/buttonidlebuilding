@@ -467,8 +467,13 @@
     const NS   = [0,0,1, 0,0,1, 0,0,1, 0,0,1];
     const NE   = [1,0,0, 1,0,0, 1,0,0, 1,0,0];
     const UV01 = [0,0, 1,0, 0,1, 1,1];
-    const IDX_CW  = [0,1,2, 1,3,2]; // south-face / top winding
-    const IDX_CCW = [0,2,1, 1,2,3]; // east-face winding
+    // Winding conventions (Three.js right-handed, Y-up, CCW = front-face):
+    //   IDX_TOP: vertices (tx,z,ty),(tx+1,z,ty),(tx,z,ty+1),(tx+1,z,ty+1)  → normal +Y
+    //   IDX_S:   vertices (x0,zBot,fy),(x1,zBot,fy),(x0,zTop,fy),(x1,zTop,fy) → normal +Z
+    //   IDX_E:   vertices (fx,zBot,z0),(fx,zBot,z1),(fx,zTop,z0),(fx,zTop,z1) → normal +X
+    const IDX_TOP = [0,2,1, 2,3,1]; // horizontal top faces  — verified: normal +Y
+    const IDX_S   = [0,1,2, 1,3,2]; // south/north wall faces — verified: normal +Z
+    const IDX_E   = [0,2,1, 1,2,3]; // east/west wall faces   — verified: normal +X
 
     // Collect non-void tiles
     const tiles = [];
@@ -514,7 +519,7 @@
         const mat    = matTileTop(isBounce, isConveyor, isGoal);
         batch.quad(matKey, mat,
           [tx, z, ty,  tx+1, z, ty,  tx, z, ty+1,  tx+1, z, ty+1],
-          NUP, UV01, IDX_CW);
+          NUP, UV01, IDX_TOP);
       } else {
         // Slope: keep as individual mesh (needs computeVertexNormals)
         group.add(buildSlopeMesh(tx, ty, cell));
@@ -535,12 +540,12 @@
         const fy = ty + 1;
         batch.quad('wall_s', matWallSouth(),
           [tx, southNbrZ, fy,  tx+1, southNbrZ, fy,  tx, southEdgeZ, fy,  tx+1, southEdgeZ, fy],
-          NS, UV01, IDX_CW);
+          NS, UV01, IDX_S);
         // highlight strip
         const hy = southEdgeZ + 0.004;
         batch.quad('wall_hl', matWallHighlight(),
           [tx, hy, fy-W_HL,  tx+1, hy, fy-W_HL,  tx, hy, fy,  tx+1, hy, fy],
-          NUP, UV01, IDX_CW);
+          NUP, UV01, IDX_TOP);
       }
 
       // East face: at x = tx+1
@@ -550,12 +555,12 @@
         const fx = tx + 1;
         batch.quad('wall_e', matWallEast(),
           [fx, eastNbrZ, ty,  fx, eastNbrZ, ty+1,  fx, eastEdgeZ, ty,  fx, eastEdgeZ, ty+1],
-          NE, UV01, IDX_CCW);
+          NE, UV01, IDX_E);
         // highlight strip
         const hy = eastEdgeZ + 0.004;
         batch.quad('wall_hl', matWallHighlight(),
           [fx-W_HL, hy, ty,  fx-W_HL, hy, ty+1,  fx, hy, ty,  fx, hy, ty+1],
-          NUP, UV01, IDX_CW);
+          NUP, UV01, IDX_TOP);
       }
 
       // North boundary: at y = ty (south-facing quad at north edge)
@@ -565,11 +570,11 @@
         const fy = ty;
         batch.quad('wall_s', matWallSouth(),
           [tx, northNbrZ, fy,  tx+1, northNbrZ, fy,  tx, northEdgeZ, fy,  tx+1, northEdgeZ, fy],
-          NS, UV01, IDX_CW);
+          NS, UV01, IDX_S);
         const hy = northEdgeZ + 0.004;
         batch.quad('wall_hl', matWallHighlight(),
           [tx, hy, fy-W_HL,  tx+1, hy, fy-W_HL,  tx, hy, fy,  tx+1, hy, fy],
-          NUP, UV01, IDX_CW);
+          NUP, UV01, IDX_TOP);
       }
 
       // West boundary: at x = tx (east-facing quad at west edge)
@@ -579,11 +584,11 @@
         const fx = tx;
         batch.quad('wall_e', matWallEast(),
           [fx, westNbrZ, ty,  fx, westNbrZ, ty+1,  fx, westEdgeZ, ty,  fx, westEdgeZ, ty+1],
-          NE, UV01, IDX_CCW);
+          NE, UV01, IDX_E);
         const hy = westEdgeZ + 0.004;
         batch.quad('wall_hl', matWallHighlight(),
           [fx-W_HL, hy, ty,  fx-W_HL, hy, ty+1,  fx, hy, ty,  fx, hy, ty+1],
-          NUP, UV01, IDX_CW);
+          NUP, UV01, IDX_TOP);
       }
     }
 
@@ -612,7 +617,7 @@
         const z = (ML.getSurfaceTopZ ? ML.getSurfaceTopZ(cell) : cell.baseHeight) + 0.05;
         batch.quad('hazard', matHazard(),
           [tx, z, ty,  tx+1, z, ty,  tx, z, ty+1,  tx+1, z, ty+1],
-          NUP, UV01, IDX_CW);
+          NUP, UV01, IDX_TOP);
       }
     }
 
@@ -627,7 +632,7 @@
         batch.quad('goal_overlay',
           getMat('goal_overlay', () => new THREE.MeshLambertMaterial({ map: texGoalTop })),
           [tx, z, ty,  tx+1, z, ty,  tx, z, ty+1,  tx+1, z, ty+1],
-          NUP, UV01, IDX_CW);
+          NUP, UV01, IDX_TOP);
         // Goal pole — individual mesh (one per level)
         const pole = new THREE.Mesh(
           new THREE.CylinderGeometry(0.04, 0.04, 1.2, 8),
