@@ -75,6 +75,12 @@
   let dragArrowGroup = null;
   // Fixed camera Z anchor computed once per level load
   let levelCamZ      = 0;
+  // Guards to avoid redundant GPU state changes every frame
+  let lastRendererW  = 0;
+  let lastRendererH  = 0;
+  let lastCamZoom    = -1;
+  let lastCamW       = 0;
+  let lastCamH       = 0;
 
   // ─── Texture helpers ─────────────────────────────────────────────────────────
 
@@ -216,7 +222,7 @@
     geo.rotateX(-Math.PI / 2);
     const mesh = new THREE.Mesh(geo, mat);
     mesh.position.set(tx + w / 2, z, ty + d / 2);
-    mesh.receiveShadow = true;
+
     return mesh;
   }
 
@@ -253,7 +259,7 @@
     geo.setAttribute('uv',       new THREE.BufferAttribute(uvs, 2));
     geo.setIndex(indices);
     const mesh = new THREE.Mesh(geo, mat);
-    mesh.receiveShadow = true;
+
     return mesh;
   }
 
@@ -281,7 +287,7 @@
     geo.setAttribute('uv',       new THREE.BufferAttribute(uvs, 2));
     geo.setIndex(indices);
     const mesh = new THREE.Mesh(geo, mat);
-    mesh.receiveShadow = true;
+
     return mesh;
   }
   /**
@@ -309,7 +315,7 @@
     geo.setAttribute('uv',       new THREE.BufferAttribute(uvs, 2));
     geo.setIndex(indices);
     const mesh = new THREE.Mesh(geo, mat);
-    mesh.receiveShadow = true;
+
     return mesh;
   }
   /**
@@ -338,7 +344,7 @@
     geo.setAttribute('uv',       new THREE.BufferAttribute(uvs, 2));
     geo.setIndex(indices);
     const mesh = new THREE.Mesh(geo, mat);
-    mesh.receiveShadow = true;
+
     return mesh;
   }
 
@@ -451,7 +457,7 @@
         geo.setAttribute('uv',       new THREE.BufferAttribute(new Float32Array(b.uvs), 2));
         geo.setIndex(b.idx);
         const mesh = new THREE.Mesh(geo, b.mat);
-        mesh.receiveShadow = true;
+    
         group.add(mesh);
       }
     }
@@ -740,7 +746,7 @@
       new THREE.SphereGeometry(r, 24, 16),
       new THREE.MeshPhongMaterial({ color: COL.marbleTop, emissive: 0x0a1020, shininess: 80, specular: 0x7dd3fc })
     );
-    sphere.castShadow = true;
+
 
     const ring = new THREE.Mesh(
       new THREE.TorusGeometry(r * 1.05, r * 0.08, 8, 32),
@@ -806,8 +812,7 @@
 
     renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.shadowMap.enabled = false; // Disabled: shadow cost too high for large levels
     renderer.setClearColor(COL.void, 1);
 
     scene = new THREE.Scene();
@@ -817,13 +822,6 @@
 
     const sun = new THREE.DirectionalLight(0xffffff, 0.70);
     sun.position.set(-8, 20, -6);
-    sun.castShadow = true;
-    sun.shadow.mapSize.width  = 1024;
-    sun.shadow.mapSize.height = 1024;
-    sun.shadow.camera.near = 0.5;
-    sun.shadow.camera.far  = 200;
-    sun.shadow.camera.left = sun.shadow.camera.bottom = -50;
-    sun.shadow.camera.right = sun.shadow.camera.top   =  50;
     scene.add(sun);
 
     const fill = new THREE.DirectionalLight(0xaaccff, 0.20);
@@ -844,6 +842,11 @@
 
     levelCamZ   = 0;
     lastLevelId = null;
+    lastRendererW = 0;
+    lastRendererH = 0;
+    lastCamZoom   = -1;
+    lastCamW      = 0;
+    lastCamH      = 0;
   }
 
   // ─── Main render function ────────────────────────────────────────────────────
@@ -861,7 +864,12 @@
     ensureRenderer(canvas);
     if (!renderer || !THREE) return;
 
-    renderer.setSize(w, h, false);
+    // Only call setSize when dimensions actually change — avoids framebuffer resize every frame
+    if (w !== lastRendererW || h !== lastRendererH) {
+      renderer.setSize(w, h, false);
+      lastRendererW = w;
+      lastRendererH = h;
+    }
 
     if (runtime.level.id !== lastLevelId) {
       // Dispose old level geometry AND materials (prevents GPU leak on level switch)
@@ -918,7 +926,13 @@
 
     // Camera — XY follows marble, Z is fixed to level median (no vibration)
     const zoom = runtime.camera?.zoom ?? 1;
-    updateCameraFrustum(camera, w, h, zoom);
+    // Only update projection matrix when zoom or viewport dimensions change
+    if (zoom !== lastCamZoom || w !== lastCamW || h !== lastCamH) {
+      updateCameraFrustum(camera, w, h, zoom);
+      lastCamZoom = zoom;
+      lastCamW = w;
+      lastCamH = h;
+    }
 
     // Always center on the marble — use marble XY directly, no smoothing needed
     const camX = marble.x;

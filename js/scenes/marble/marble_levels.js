@@ -2162,8 +2162,10 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     setSurface(level, 11, 51, { baseHeight: 6, shape: SHAPES.FLAT, crumble: { delay: 0.5, downtime: 2.0 } });
     wallRing(level, 2, 49, 14, 6, 8, {
       gaps: [
+        // North entry from Ramp C
         { x: 10, y: 49 }, { x: 11, y: 49 }, { x: 12, y: 49 }, { x: 13, y: 49 },
-        { x: 2, y: 52 }, { x: 2, y: 53 }, { x: 2, y: 54 }
+        // South exit to final ramp — 4 tiles wide, aligned with ramp x:2-5
+        { x: 2, y: 54 }, { x: 3, y: 54 }, { x: 4, y: 54 }, { x: 5, y: 54 }
       ]
     });
 
