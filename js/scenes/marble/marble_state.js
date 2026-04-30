@@ -1,7 +1,7 @@
 (() => {
   const FIXED_DT = 1 / 120;
   const MAX_PHYSICS_STEPS = 8;
-  const MAX_REPLAY_FRAMES = 21600; // 3 minutes at 120fps — prevents GC pressure from unbounded arrays
+  const MAX_REPLAY_FRAMES = 21600; // 3 min at 120fps — prevents GC pressure from unbounded replay arrays
 
   function create(api) {
     const { config, elements, getState, applyMarbleReward, switchScene, saveNow } = api;
@@ -314,7 +314,6 @@
       if (runtime.status === 'running') {
         runtime.accumulator = Math.min(runtime.accumulator + dt, runtime.fixedStep * MAX_PHYSICS_STEPS);
         let steps = 0;
-        const _physStart = performance.now();
         while (runtime.accumulator >= runtime.fixedStep && steps < MAX_PHYSICS_STEPS) {
           const result = stepSimulation(runtime.fixedStep);
           runtime.accumulator -= runtime.fixedStep;
@@ -329,13 +328,6 @@
             applyCompletion(result);
             break;
           }
-        }
-        const _physMs = performance.now() - _physStart;
-        // Log physics cost every ~120 frames or when it spikes above 4ms
-        if (!window._physFrameCount) window._physFrameCount = 0;
-        window._physFrameCount++;
-        if (window._physFrameCount % 120 === 0 || _physMs > 4) {
-          console.log(`[Physics] steps=${steps} ms=${_physMs.toFixed(2)} tick=${runtime.simTick}`);
         }
       }
 

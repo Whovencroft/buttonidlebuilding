@@ -780,9 +780,6 @@
 
   // ─── Main render function ────────────────────────────────────────────────────
 
-  let _perfFrameCount = 0;
-  let _perfLastTime = 0;
-
   function render(runtime, canvas) {
     if (!canvas) return;
 
@@ -797,16 +794,6 @@
     if (!renderer || !THREE) return;
 
     renderer.setSize(w, h, false);
-
-    // Perf logging: log renderer info every 120 frames
-    _perfFrameCount++;
-    if (_perfFrameCount % 120 === 0) {
-      const now = performance.now();
-      const fps = _perfLastTime ? (120 / ((now - _perfLastTime) / 1000)).toFixed(1) : '?';
-      _perfLastTime = now;
-      const info = renderer.info;
-      console.log(`[MarbleRenderer] fps=${fps} geo=${info.memory.geometries} tex=${info.memory.textures} prog=${info.programs?.length ?? '?'} calls=${info.render.calls} tris=${info.render.triangles} sceneObjs=${scene.children.length}`);
-    }
 
     if (runtime.level.id !== lastLevelId) {
       // Dispose old level geometry AND materials (prevents GPU leak on level switch)
