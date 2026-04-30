@@ -2416,7 +2416,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
       id: 'stairway_heights',
       name: 'Stairway Heights',
       width: 54,
-      height: 54,
+      height: 62,
       killZ: -20,
       voidFloor: -10,
       start: { x: 4.5, y: 4.5 },
