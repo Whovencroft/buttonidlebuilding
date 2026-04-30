@@ -2082,7 +2082,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
       id: 'the_switchback',
       name: 'The Switchback',
       width: 38,
-      height: 54,
+      height: 66,
       killZ: -20,
       voidFloor: -10,
       start: { x: 4.5, y: 4.5 },
@@ -2156,29 +2156,29 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     // Ramp C south (z=10→6), 6×5
     placeRamp(level, { x: 10, y: 43, dir: 'south', length: 6, width: 5, startZ: 10, endZ: 6 });
 
-    // Turn platform C (z=6), 14×4
-    fillTrack(level, 2, 49, 14, 4, 6);
-    setSurface(level, 10, 50, { baseHeight: 6, shape: SHAPES.FLAT, crumble: { delay: 0.5, downtime: 2.0 } });
-    setSurface(level, 11, 50, { baseHeight: 6, shape: SHAPES.FLAT, crumble: { delay: 0.5, downtime: 2.0 } });
-    wallRing(level, 2, 49, 14, 4, 8, {
+    // Turn platform C (z=6), 14×6
+    fillTrack(level, 2, 49, 14, 6, 6);
+    setSurface(level, 10, 51, { baseHeight: 6, shape: SHAPES.FLAT, crumble: { delay: 0.5, downtime: 2.0 } });
+    setSurface(level, 11, 51, { baseHeight: 6, shape: SHAPES.FLAT, crumble: { delay: 0.5, downtime: 2.0 } });
+    wallRing(level, 2, 49, 14, 6, 8, {
       gaps: [
         { x: 10, y: 49 }, { x: 11, y: 49 }, { x: 12, y: 49 }, { x: 13, y: 49 },
-        { x: 2, y: 50 }, { x: 2, y: 51 }
+        { x: 2, y: 52 }, { x: 2, y: 53 }, { x: 2, y: 54 }
       ]
     });
 
-    // Final ramp west (z=6→2), 4×4
-    placeRamp(level, { x: 2, y: 50, dir: 'south', length: 4, width: 4, startZ: 6, endZ: 2 });
+    // Final ramp south (z=6→2), 5×4
+    placeRamp(level, { x: 2, y: 55, dir: 'south', length: 5, width: 4, startZ: 6, endZ: 2 });
 
-    // Goal basin (z=2), 10×4
-    fillTrack(level, 2, 54, 10, 4, 2);
-    setGoal(level, 6, 56, 0.44);
+    // Goal basin (z=2), 12×5
+    fillTrack(level, 2, 60, 12, 5, 2);
+    setGoal(level, 7, 62, 0.44);
 
     addGraphNode(level, { id: 'start',  type: 'entry',  x: 4.5,  y: 4.5,  z: 18 });
     addGraphNode(level, { id: 'turn_a', type: 'corner', x: 8.5,  y: 18.5, z: 14 });
     addGraphNode(level, { id: 'turn_b', type: 'corner', x: 8.5,  y: 35.5, z: 10 });
-    addGraphNode(level, { id: 'turn_c', type: 'corner', x: 8.5,  y: 51.5, z: 6  });
-    addGraphNode(level, { id: 'goal',   type: 'goal',   x: 6.5,  y: 56.5, z: 2  });
+    addGraphNode(level, { id: 'turn_c', type: 'corner', x: 6.5,  y: 52.5, z: 6  });
+    addGraphNode(level, { id: 'goal',   type: 'goal',   x: 7.5,  y: 62.5, z: 2  });
     addGraphEdge(level, { from: 'start',  to: 'turn_a', kind: 'switchback' });
     addGraphEdge(level, { from: 'turn_a', to: 'turn_b', kind: 'switchback' });
     addGraphEdge(level, { from: 'turn_b', to: 'turn_c', kind: 'switchback' });
