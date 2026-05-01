@@ -3838,9 +3838,17 @@ setGoal(level, 93, 33, 0.44);
     });
     wallRing(level, 12, 39, 28, 5, 4, {
       gaps: [
+        // West entry (from old goal basin)
         { x: 12, y: 39 }, { x: 12, y: 40 }, { x: 12, y: 41 }, { x: 12, y: 42 }, { x: 12, y: 43 },
+        // North entry (from Floor 3 south corridor) — was missing, caused blocking wall
+        { x: 13, y: 39 }, { x: 14, y: 39 }, { x: 15, y: 39 }, { x: 16, y: 39 }, { x: 17, y: 39 },
+        { x: 18, y: 39 }, { x: 19, y: 39 }, { x: 20, y: 39 }, { x: 21, y: 39 }, { x: 22, y: 39 },
+        { x: 23, y: 39 }, { x: 24, y: 39 }, { x: 25, y: 39 }, { x: 26, y: 39 }, { x: 27, y: 39 },
+        { x: 28, y: 39 }, { x: 29, y: 39 }, { x: 30, y: 39 }, { x: 31, y: 39 }, { x: 32, y: 39 },
+        { x: 33, y: 39 }, { x: 34, y: 39 }, { x: 35, y: 39 }, { x: 36, y: 39 }, { x: 37, y: 39 },
+        { x: 38, y: 39 }, { x: 39, y: 39 },
         // Path A: spiral continues east
-        { x: 39, y: 39 }, { x: 39, y: 40 }, { x: 39, y: 41 }, { x: 39, y: 42 }, { x: 39, y: 43 },
+        { x: 39, y: 40 }, { x: 39, y: 41 }, { x: 39, y: 42 }, { x: 39, y: 43 },
         // Path B: shortcut south drop
         { x: 22, y: 43 }, { x: 23, y: 43 }, { x: 24, y: 43 }, { x: 25, y: 43 }
       ]
