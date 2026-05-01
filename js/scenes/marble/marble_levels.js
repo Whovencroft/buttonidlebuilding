@@ -1395,7 +1395,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     });
     // Hazard near goal
     addHazardRect(level, 48, 12, 1, 2, 'goal_guard');
-    setSurface(level, 44, 13, { baseHeight: 5, shape: SHAPES.FLAT, conveyor: { x: 0.6, y: 0, strength: 1.1 } });
+    setSurface(level, 44, 13, { baseHeight: 5, shape: SHAPES.FLAT, conveyor: { x: 0.6, y: 0, strength: 2.4 } });
     setSurface(level, 46, 13, { baseHeight: 5, shape: SHAPES.FLAT, bounce: 5.2 });
     // Goal on flat track tile (NOT a bounce tile)
     setSurface(level, 50, 13, { baseHeight: 5, shape: SHAPES.FLAT });
@@ -1466,7 +1466,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
       ]
     });
     addHazardRect(level, 18, 11, 2, 1, 'switchback_spikes');
-    setSurface(level, 14, 10, { baseHeight: 14, shape: SHAPES.FLAT, conveyor: { x: -0.5, y: 0, strength: 1.0 } });
+    setSurface(level, 14, 10, { baseHeight: 14, shape: SHAPES.FLAT, conveyor: { x: -0.5, y: 0, strength: 2.2 } });
 
     // ─ Connector B: flat bridge from terrace B west exit to ramp B  (x=4..6, y=11..12)
     fillTrack(level, 4, 11, 3, 3, 14);
@@ -1514,7 +1514,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     setSurface(level, 20, 35, { baseHeight: 2, shape: SHAPES.FLAT });
     setGoal(level, 20, 35, 0.44);
     addHazardRect(level, 14, 34, 2, 1, 'goal_guard');
-    setSurface(level, 10, 34, { baseHeight: 2, shape: SHAPES.FLAT, conveyor: { x: 0.6, y: 0, strength: 1.0 } });
+    setSurface(level, 10, 34, { baseHeight: 2, shape: SHAPES.FLAT, conveyor: { x: 0.6, y: 0, strength: 2.2 } });
 
     // Overhead platforms removed — they overlapped the play area and obscured the marble
 
@@ -1587,7 +1587,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
       ]
     });
     addHazardRect(level, 26, 20, 2, 1, 'shaft_spikes');
-    setSurface(level, 24, 22, { baseHeight: 8, shape: SHAPES.FLAT, conveyor: { x: -0.5, y: 0, strength: 1.0 } });
+    setSurface(level, 24, 22, { baseHeight: 8, shape: SHAPES.FLAT, conveyor: { x: -0.5, y: 0, strength: 2.2 } });
 
     // ─ Mid shaft: ramp from z=15 down to z=6
     placeRamp(level, { x: 30, y: 13, dir: 'south', length: 6, width: 3, startZ: 15, endZ: 6 });
@@ -1633,7 +1633,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     });
     // Hazard near goal
     addHazardRect(level, 26, 33, 2, 1, 'goal_guard');
-    setSurface(level, 22, 34, { baseHeight: 4, shape: SHAPES.FLAT, conveyor: { x: 0.6, y: 0, strength: 1.1 } });
+    setSurface(level, 22, 34, { baseHeight: 4, shape: SHAPES.FLAT, conveyor: { x: 0.6, y: 0, strength: 2.4 } });
     setSurface(level, 30, 34, { baseHeight: 4, shape: SHAPES.FLAT, crumble: { delay: 0.22, downtime: 2.2 } });
     // Goal on flat track tile
     setSurface(level, 36, 34, { baseHeight: 4, shape: SHAPES.FLAT });
@@ -1728,7 +1728,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     addTimedGate(level, 'gate_goal', 56, 27, 5, 1, 6, 1.5, 1.0);
     // Hazard near goal
     addHazardRect(level, 58, 25, 2, 1, 'goal_guard');
-    setSurface(level, 57, 28, { baseHeight: 6, shape: SHAPES.FLAT, conveyor: { x: 0.5, y: 0, strength: 1.0 } });
+    setSurface(level, 57, 28, { baseHeight: 6, shape: SHAPES.FLAT, conveyor: { x: 0.5, y: 0, strength: 2.2 } });
     // Goal on flat track tile (NOT a bounce tile) — within bounds (width=64, so max x=63)
     setSurface(level, 61, 28, { baseHeight: 6, shape: SHAPES.FLAT });
     setGoal(level, 61, 28, 0.44);
@@ -1761,7 +1761,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     addHazardRect(level, 35, 27, 2, 1, 'transfer_spikes');
 
     // ─ Conveyor and bounce tiles (not on goal)
-    setSurface(level, 22, 33, { baseHeight: 10, shape: SHAPES.FLAT, conveyor: { x: 0.5, y: 0, strength: 1.0 } });
+    setSurface(level, 22, 33, { baseHeight: 10, shape: SHAPES.FLAT, conveyor: { x: 0.5, y: 0, strength: 2.2 } });
     setSurface(level, 37, 31, { baseHeight: 8, shape: SHAPES.FLAT, bounce: 5.2 });
 
     // ─ Route graph
@@ -1877,7 +1877,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
       ]
     });
     addHazardRect(level, 44, 24, 2, 2, 'central_spikes');
-    setSurface(level, 52, 25, { baseHeight: 4, shape: SHAPES.FLAT, conveyor: { x: -0.5, y: 0, strength: 1.0 } });
+    setSurface(level, 52, 25, { baseHeight: 4, shape: SHAPES.FLAT, conveyor: { x: -0.5, y: 0, strength: 2.2 } });
 
     // ─ Goal corridor: ramp from core (z=4) down to goal basin (z=2)
     widePath(level, [{ x: 38, y: 26 }, { x: 30, y: 26 }], 4, 3);
@@ -1892,7 +1892,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     });
     // Hazard near goal
     addHazardRect(level, 14, 24, 2, 1, 'goal_guard');
-    setSurface(level, 12, 26, { baseHeight: 2, shape: SHAPES.FLAT, conveyor: { x: 0.6, y: 0, strength: 1.0 } });
+    setSurface(level, 12, 26, { baseHeight: 2, shape: SHAPES.FLAT, conveyor: { x: 0.6, y: 0, strength: 2.2 } });
     // Goal on flat track tile (NOT a bounce tile)
     setSurface(level, 20, 26, { baseHeight: 2, shape: SHAPES.FLAT });
     setGoal(level, 20, 26, 0.44);
@@ -2001,7 +2001,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     fillTrack(level, 50, 14, 18, 6, 6);
     for (let cx = 52; cx < 66; cx++) {
       for (let cy = 14; cy < 20; cy++) {
-        setSurface(level, cx, cy, { baseHeight: 6, shape: SHAPES.FLAT, conveyor: { x: 0.6, y: 0, strength: 1.0 } });
+        setSurface(level, cx, cy, { baseHeight: 6, shape: SHAPES.FLAT, conveyor: { x: 0.6, y: 0, strength: 2.2 } });
       }
     }
     wallRing(level, 50, 14, 18, 6, 8, {
@@ -2162,8 +2162,8 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     fillTrack(level, 28, 8, 5, 20, 8);  // vertical connector from north path
     // Crumble section on approach to ramp
     for (let cx = 28; cx < 36; cx++) {
-      setSurface(level, cx, 31, { baseHeight: 8, shape: SHAPES.FLAT, crumble: { delay: 0.35, downtime: 2.0 } });
-      setSurface(level, cx, 32, { baseHeight: 8, shape: SHAPES.FLAT, crumble: { delay: 0.35, downtime: 2.0 } });
+      setSurface(level, cx, 31, { baseHeight: 8, shape: SHAPES.FLAT, crumble: { delay: 0.10, downtime: 1.0 } });
+      setSurface(level, cx, 32, { baseHeight: 8, shape: SHAPES.FLAT, crumble: { delay: 0.10, downtime: 1.0 } });
     }
     addTimedGate(level, 'gate_l2_b', 34, 30, 6, 4, 2, 1.6, 1.2);
     wallRing(level, 24, 28, 18, 10, 10, {
@@ -2203,7 +2203,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     fillTrack(level, 56, 24, 5, 6, 4);
     for (let cx = 57; cx < 60; cx++) {
       for (let cy = 25; cy < 29; cy++) {
-        setSurface(level, cx, cy, { baseHeight: 4, shape: SHAPES.FLAT, crumble: { delay: 0.35, downtime: 2.2 } });
+        setSurface(level, cx, cy, { baseHeight: 4, shape: SHAPES.FLAT, crumble: { delay: 0.10, downtime: 1.0 } });
       }
     }
     wallRing(level, 56, 24, 5, 6, 6, {
@@ -2233,7 +2233,11 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
         { x: 66, y: 39 }, { x: 66, y: 40 }, { x: 66, y: 41 }, { x: 66, y: 42 }, { x: 66, y: 43 }, { x: 66, y: 44 }, { x: 66, y: 45 }, { x: 66, y: 46 }, { x: 66, y: 47 }, { x: 66, y: 48 }
       ]
     });
-    setGoal(level, 72, 34, 0.44);
+        // Random push tiles — unpredictable direction changes
+    setSurface(level, 22, 18, { baseHeight: 14, shape: SHAPES.FLAT, conveyor: { x: 0, y: 2.8, strength: 2.8 } });
+    setSurface(level, 38, 26, { baseHeight: 10, shape: SHAPES.FLAT, conveyor: { x: -2.5, y: 0, strength: 2.5 } });
+    setSurface(level, 55, 34, { baseHeight: 6, shape: SHAPES.FLAT, conveyor: { x: 2.2, y: 2.2, strength: 3.0 } });
+setGoal(level, 72, 34, 0.44);
 
     addGraphNode(level, { id: 'start',    type: 'entry', x: 4.5,  y: 4.5,  z: 16 });
     addGraphNode(level, { id: 'terraceA', type: 'fork',  x: 31.5, y: 9.5,  z: 12 });
@@ -2290,9 +2294,9 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
 
     // Turn platform A (z=14), 14×6 — crumble at inner corner
     fillTrack(level, 2, 15, 14, 6, 14);
-    setSurface(level, 10, 16, { baseHeight: 14, shape: SHAPES.FLAT, crumble: { delay: 0.5, downtime: 2.0 } });
-    setSurface(level, 11, 16, { baseHeight: 14, shape: SHAPES.FLAT, crumble: { delay: 0.5, downtime: 2.0 } });
-    setSurface(level, 10, 17, { baseHeight: 14, shape: SHAPES.FLAT, crumble: { delay: 0.5, downtime: 2.0 } });
+    setSurface(level, 10, 16, { baseHeight: 14, shape: SHAPES.FLAT, crumble: { delay: 0.10, downtime: 1.0 } });
+    setSurface(level, 11, 16, { baseHeight: 14, shape: SHAPES.FLAT, crumble: { delay: 0.10, downtime: 1.0 } });
+    setSurface(level, 10, 17, { baseHeight: 14, shape: SHAPES.FLAT, crumble: { delay: 0.10, downtime: 1.0 } });
     wallRing(level, 2, 15, 14, 6, 16, {
       gaps: [
         // North entry: x:10-15 (east wall corner x=15 included)
@@ -2319,9 +2323,9 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     placeRamp(level, { x: 11, y: 26, dir: 'south', length: 6, width: 5, startZ: 14, endZ: 10 });
     // Turn platform B (z=10), 14×6 — crumble on inner corner
     fillTrack(level, 2, 32, 14, 6, 10);
-    setSurface(level, 12, 33, { baseHeight: 10, shape: SHAPES.FLAT, crumble: { delay: 0.5, downtime: 2.0 } });
-    setSurface(level, 13, 33, { baseHeight: 10, shape: SHAPES.FLAT, crumble: { delay: 0.5, downtime: 2.0 } });
-    setSurface(level, 12, 34, { baseHeight: 10, shape: SHAPES.FLAT, crumble: { delay: 0.5, downtime: 2.0 } });
+    setSurface(level, 12, 33, { baseHeight: 10, shape: SHAPES.FLAT, crumble: { delay: 0.10, downtime: 1.0 } });
+    setSurface(level, 13, 33, { baseHeight: 10, shape: SHAPES.FLAT, crumble: { delay: 0.10, downtime: 1.0 } });
+    setSurface(level, 12, 34, { baseHeight: 10, shape: SHAPES.FLAT, crumble: { delay: 0.10, downtime: 1.0 } });
     wallRing(level, 2, 32, 14, 6, 12, {
       gaps: [
         // North entry from Ramp B (east side): x:11-15 — 5 tiles wide
@@ -2348,9 +2352,9 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     // Turn platform C (z=6), 14×6
     // Exit gap on south wall at x:10-14 — aligned with where marble arrives from Ramp C
     fillTrack(level, 2, 49, 14, 6, 6);
-    setSurface(level, 4, 51, { baseHeight: 6, shape: SHAPES.FLAT, crumble: { delay: 0.5, downtime: 2.0 } });
-    setSurface(level, 5, 51, { baseHeight: 6, shape: SHAPES.FLAT, crumble: { delay: 0.5, downtime: 2.0 } });
-    setSurface(level, 4, 52, { baseHeight: 6, shape: SHAPES.FLAT, crumble: { delay: 0.5, downtime: 2.0 } });
+    setSurface(level, 4, 51, { baseHeight: 6, shape: SHAPES.FLAT, crumble: { delay: 0.10, downtime: 1.0 } });
+    setSurface(level, 5, 51, { baseHeight: 6, shape: SHAPES.FLAT, crumble: { delay: 0.10, downtime: 1.0 } });
+    setSurface(level, 4, 52, { baseHeight: 6, shape: SHAPES.FLAT, crumble: { delay: 0.10, downtime: 1.0 } });
     wallRing(level, 2, 49, 14, 6, 8, {
       gaps: [
         // North entry from Ramp C: x:11-15 (aligned with Ramp C at x:11-15)
@@ -2385,10 +2389,10 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
       ]
     });
     // Crumble tiles in Turn D for path B shortcut
-    setSurface(level, 3, 67, { baseHeight: 2, shape: SHAPES.FLAT, crumble: { delay: 0.3, downtime: 2.5 } });
-    setSurface(level, 4, 67, { baseHeight: 2, shape: SHAPES.FLAT, crumble: { delay: 0.3, downtime: 2.5 } });
-    setSurface(level, 3, 68, { baseHeight: 2, shape: SHAPES.FLAT, crumble: { delay: 0.3, downtime: 2.5 } });
-    setSurface(level, 4, 68, { baseHeight: 2, shape: SHAPES.FLAT, crumble: { delay: 0.3, downtime: 2.5 } });
+    setSurface(level, 3, 67, { baseHeight: 2, shape: SHAPES.FLAT, crumble: { delay: 0.10, downtime: 1.0 } });
+    setSurface(level, 4, 67, { baseHeight: 2, shape: SHAPES.FLAT, crumble: { delay: 0.10, downtime: 1.0 } });
+    setSurface(level, 3, 68, { baseHeight: 2, shape: SHAPES.FLAT, crumble: { delay: 0.10, downtime: 1.0 } });
+    setSurface(level, 4, 68, { baseHeight: 2, shape: SHAPES.FLAT, crumble: { delay: 0.10, downtime: 1.0 } });
 
     // Path A (east): Leg E east corridor (z=2), 14×5 — with timed gate
     fillTrack(level, 11, 72, 14, 5, 2);
@@ -2401,7 +2405,9 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     });
     wallRing(level, 11, 72, 14, 5, 4, {
       gaps: [
-        { x: 11, y: 71 }, { x: 12, y: 71 }, { x: 13, y: 71 }, { x: 14, y: 71 }, { x: 15, y: 71 },
+        // North entry from Turn D south exit (y=71 gaps match Turn D's east exit)
+        { x: 11, y: 72 }, { x: 12, y: 72 }, { x: 13, y: 72 }, { x: 14, y: 72 }, { x: 15, y: 72 },
+        // South exit to ramp
         { x: 11, y: 76 }, { x: 12, y: 76 }, { x: 13, y: 76 }, { x: 14, y: 76 }, { x: 15, y: 76 }, { x: 16, y: 76 }, { x: 17, y: 76 }, { x: 18, y: 76 }, { x: 19, y: 76 }, { x: 20, y: 76 }, { x: 21, y: 76 }, { x: 22, y: 76 }, { x: 23, y: 76 }, { x: 24, y: 76 }
       ]
     });
@@ -2411,7 +2417,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     fillTrack(level, 2, 72, 8, 5, 2);
     for (let cx = 3; cx < 9; cx++) {
       for (let cy = 72; cy < 77; cy++) {
-        setSurface(level, cx, cy, { baseHeight: 2, shape: SHAPES.FLAT, crumble: { delay: 0.25, downtime: 3.0 } });
+        setSurface(level, cx, cy, { baseHeight: 2, shape: SHAPES.FLAT, crumble: { delay: 0.10, downtime: 1.0 } });
       }
     }
     wallRing(level, 2, 72, 8, 5, 4, {
@@ -2431,7 +2437,12 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
         { x: 11, y: 82 }, { x: 12, y: 82 }, { x: 13, y: 82 }, { x: 14, y: 82 }, { x: 15, y: 82 }
       ]
     });
-    setGoal(level, 12, 88, 0.44);
+        // Random push tiles — unpredictable direction changes
+    setSurface(level, 8, 22, { baseHeight: 14, shape: SHAPES.FLAT, conveyor: { x: 2.8, y: 0, strength: 2.8 } });
+    setSurface(level, 5, 38, { baseHeight: 10, shape: SHAPES.FLAT, conveyor: { x: 0, y: -2.5, strength: 2.5 } });
+    setSurface(level, 12, 52, { baseHeight: 6, shape: SHAPES.FLAT, conveyor: { x: -2.2, y: 2.2, strength: 3.0 } });
+    setSurface(level, 8, 68, { baseHeight: 2, shape: SHAPES.FLAT, conveyor: { x: 2.5, y: -2.5, strength: 3.2 } });
+setGoal(level, 12, 88, 0.44);
 
     addGraphNode(level, { id: 'start',  type: 'entry',  x: 4.5,  y: 4.5,  z: 18 });
     addGraphNode(level, { id: 'turn_a', type: 'corner', x: 8.5,  y: 18.5, z: 14 });
@@ -2501,7 +2512,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     fillTrack(level, 29, 4, 20, 4, 10);
     for (let cx = 31; cx < 47; cx++) {
       for (let cy = 4; cy < 8; cy++) {
-        setSurface(level, cx, cy, { baseHeight: 10, shape: SHAPES.FLAT, conveyor: { x: 0.8, y: 0, strength: 1.4 } });
+        setSurface(level, cx, cy, { baseHeight: 10, shape: SHAPES.FLAT, conveyor: { x: 0.8, y: 0, strength: 3.1 } });
       }
     }
     addHazardRect(level, 36, 5, 2, 2, 'canal_spikes_north');
@@ -2525,8 +2536,8 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     fillTrack(level, 29, 8, 20, 6, 10);
     // Crumble section
     for (let cx = 33; cx < 40; cx++) {
-      setSurface(level, cx, 10, { baseHeight: 10, shape: SHAPES.FLAT, crumble: { delay: 0.35, downtime: 2.0 } });
-      setSurface(level, cx, 11, { baseHeight: 10, shape: SHAPES.FLAT, crumble: { delay: 0.35, downtime: 2.0 } });
+      setSurface(level, cx, 10, { baseHeight: 10, shape: SHAPES.FLAT, crumble: { delay: 0.10, downtime: 1.0 } });
+      setSurface(level, cx, 11, { baseHeight: 10, shape: SHAPES.FLAT, crumble: { delay: 0.10, downtime: 1.0 } });
     }
     addActor(level, {
       id: 'bar_canal_s', kind: ACTOR_KINDS.ROTATING_BAR,
@@ -2595,6 +2606,16 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
       { x: 36, y: 16, z: 6 },
       { x: 39, y: 16, z: 6 }
     ], 4, 4, 0.55);
+    // Hazard strip on west landing — can't loiter waiting for platform
+    addHazardRect(level, 33, 16, 3, 4, 'canal_bridge_west_spikes');
+    // Hazard strip on east landing — must step off platform quickly
+    addHazardRect(level, 42, 16, 3, 4, 'canal_bridge_east_spikes');
+    // Sweeper guarding the east landing
+    addActor(level, {
+      id: 'sweeper_canal_bridge', kind: ACTOR_KINDS.SWEEPER,
+      x: 46, y: 18, z: 6, topHeight: 6,
+      width: 1, height: 1, armLength: 1.8, armWidth: 0.22, angularSpeed: 2.0, fatal: true
+    });
     wallRing(level, 29, 16, 20, 4, 8, {
       gaps: [
         { x: 48, y: 16 }, { x: 48, y: 17 }, { x: 48, y: 18 }, { x: 48, y: 19 },
@@ -2633,7 +2654,13 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     wallRing(level, 15, 34, 14, 10, 4, {
       gaps: [{ x: 21, y: 34 }, { x: 22, y: 34 }, { x: 23, y: 34 }, { x: 24, y: 34 }, { x: 25, y: 34 }]
     });
-    setGoal(level, 22, 40, 0.44);
+        // Random push tiles — unpredictable direction changes
+    setSurface(level, 32, 6, { baseHeight: 10, shape: SHAPES.FLAT, conveyor: { x: 0, y: 3.0, strength: 3.0 } });
+    setSurface(level, 44, 10, { baseHeight: 10, shape: SHAPES.FLAT, conveyor: { x: -2.8, y: 0, strength: 2.8 } });
+    setSurface(level, 38, 18, { baseHeight: 6, shape: SHAPES.FLAT, conveyor: { x: 2.5, y: 2.5, strength: 3.2 } });
+    setSurface(level, 25, 24, { baseHeight: 6, shape: SHAPES.FLAT, conveyor: { x: -3.0, y: 2.0, strength: 3.5 } });
+    setSurface(level, 20, 36, { baseHeight: 2, shape: SHAPES.FLAT, conveyor: { x: 2.8, y: -2.8, strength: 3.5 } });
+setGoal(level, 22, 40, 0.44);
 
     addGraphNode(level, { id: 'start',     type: 'entry', x: 4.5,  y: 6.5,  z: 14 });
     addGraphNode(level, { id: 'junction1', type: 'fork',  x: 26.5, y: 9.5,  z: 10 });
@@ -2786,7 +2813,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     fillTrack(level, 55, 44, 20, 5, 4);
     for (let cx = 60; cx < 68; cx++) {
       for (let cy = 44; cy < 49; cy++) {
-        setSurface(level, cx, cy, { baseHeight: 4, shape: SHAPES.FLAT, crumble: { delay: 0.3, downtime: 2.5 } });
+        setSurface(level, cx, cy, { baseHeight: 4, shape: SHAPES.FLAT, crumble: { delay: 0.10, downtime: 1.0 } });
       }
     }
     addActor(level, {
@@ -2827,6 +2854,31 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     wallRing(level, 18, 64, 14, 10, 2, {
       gaps: [{ x: 22, y: 64 }, { x: 23, y: 64 }, { x: 24, y: 64 }, { x: 25, y: 64 }, { x: 26, y: 64 }, { x: 27, y: 64 }, { x: 28, y: 64 }, { x: 29, y: 64 }]
     });
+        // Random push tiles — unpredictable direction changes
+    setSurface(level, 30, 10, { baseHeight: 14, shape: SHAPES.FLAT, conveyor: { x: 0, y: 3.2, strength: 3.2 } });
+    setSurface(level, 55, 18, { baseHeight: 10, shape: SHAPES.FLAT, conveyor: { x: -3.0, y: 0, strength: 3.0 } });
+    setSurface(level, 42, 30, { baseHeight: 6, shape: SHAPES.FLAT, conveyor: { x: 3.2, y: -3.2, strength: 3.5 } });
+    setSurface(level, 20, 45, { baseHeight: 4, shape: SHAPES.FLAT, conveyor: { x: -2.8, y: 2.8, strength: 3.2 } });
+    setSurface(level, 60, 55, { baseHeight: 4, shape: SHAPES.FLAT, conveyor: { x: 3.5, y: 3.5, strength: 3.5 } });
+    // Sweepers guarding the goal basin entry
+    addActor(level, {
+      id: 'sweeper_l5_goal_a', kind: ACTOR_KINDS.SWEEPER,
+      x: 22, y: 62, z: 4, topHeight: 4,
+      width: 1, height: 1, armLength: 2.5, armWidth: 0.22, angularSpeed: 1.8, fatal: true
+    });
+    addActor(level, {
+      id: 'sweeper_l5_goal_b', kind: ACTOR_KINDS.SWEEPER,
+      x: 32, y: 62, z: 4, topHeight: 4,
+      width: 1, height: 1, armLength: 2.5, armWidth: 0.22, angularSpeed: -2.0, fatal: true
+    });
+    // Rotating bar mid-basin
+    addActor(level, {
+      id: 'bar_l5_goal', kind: ACTOR_KINDS.ROTATING_BAR,
+      x: 27, y: 66, z: 4, topHeight: 4,
+      width: 1, height: 1, armLength: 2.2, armWidth: 0.22, angularSpeed: 2.2, fatal: true
+    });
+    // Hazard strip blocking direct run to goal
+    addHazardRect(level, 20, 68, 16, 2, 'l5_goal_spikes');
     setGoal(level, 25, 70, 0.44);
 
     addGraphNode(level, { id: 'start',    type: 'entry', x: 4.5,  y: 5.5,  z: 14 });
@@ -2939,7 +2991,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     fillTrack(level, 8, 55, 10, 14, 2);
     for (let cx = 9; cx < 17; cx++) {
       for (let cy = 56; cy < 68; cy++) {
-        setSurface(level, cx, cy, { baseHeight: 2, shape: SHAPES.FLAT, crumble: { delay: 0.4, downtime: 2.0 } });
+        setSurface(level, cx, cy, { baseHeight: 2, shape: SHAPES.FLAT, crumble: { delay: 0.10, downtime: 1.0 } });
       }
     }
     wallRing(level, 8, 55, 10, 14, 4, {
@@ -2954,7 +3006,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     fillTrack(level, 32, 55, 14, 18, 2);
     for (let cx = 33; cx < 44; cx++) {
       for (let cy = 56; cy < 72; cy++) {
-        setSurface(level, cx, cy, { baseHeight: 2, shape: SHAPES.FLAT, conveyor: { x: 0, y: 0.7, strength: 1.2 } });
+        setSurface(level, cx, cy, { baseHeight: 2, shape: SHAPES.FLAT, conveyor: { x: 0, y: 0.7, strength: 2.6 } });
       }
     }
     addHazardRect(level, 34, 65, 4, 3, 'l6_ext_spikes');
@@ -2979,7 +3031,14 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
         { x: 38, y: 78 }, { x: 39, y: 78 }, { x: 40, y: 78 }, { x: 41, y: 78 }, { x: 42, y: 78 }, { x: 43, y: 78 }, { x: 44, y: 78 }, { x: 45, y: 78 }
       ]
     });
-    setGoal(level, 22, 84, 0.44);
+        // Random push tiles — unpredictable direction changes
+    setSurface(level, 18, 20, { baseHeight: 14, shape: SHAPES.FLAT, conveyor: { x: 3.2, y: 0, strength: 3.2 } });
+    setSurface(level, 8, 38, { baseHeight: 10, shape: SHAPES.FLAT, conveyor: { x: 0, y: -3.0, strength: 3.0 } });
+    setSurface(level, 22, 52, { baseHeight: 6, shape: SHAPES.FLAT, conveyor: { x: -3.2, y: 3.2, strength: 3.5 } });
+    setSurface(level, 14, 68, { baseHeight: 2, shape: SHAPES.FLAT, conveyor: { x: 3.5, y: -3.5, strength: 3.5 } });
+    setSurface(level, 30, 78, { baseHeight: 2, shape: SHAPES.FLAT, conveyor: { x: -3.0, y: -3.0, strength: 3.5 } });
+    setSurface(level, 10, 88, { baseHeight: -2, shape: SHAPES.FLAT, conveyor: { x: 3.5, y: 3.5, strength: 3.5 } });
+setGoal(level, 22, 84, 0.44);
 
     addGraphNode(level, { id: 'start', type: 'entry', x: 4.5,  y: 4.5,  z: 18 });
     addGraphNode(level, { id: 'tier1', type: 'hub',   x: 25.5, y: 9.5,  z: 14 });
@@ -3060,7 +3119,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     // Crumble tiles near exit
     for (let cx = 30; cx < 36; cx++) {
       for (let cy = 13; cy < 17; cy++) {
-        setSurface(level, cx, cy, { baseHeight: 12, shape: SHAPES.FLAT, crumble: { delay: 0.4, downtime: 2.0 } });
+        setSurface(level, cx, cy, { baseHeight: 12, shape: SHAPES.FLAT, crumble: { delay: 0.10, downtime: 1.0 } });
       }
     }
     placeRamp(level, { x: 22, y: 20, dir: 'north', length: 4, width: 4, startZ: 16, endZ: 12 });
@@ -3088,7 +3147,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     });
     for (let cx = 42; cx < 46; cx++) {
       for (let cy = 26; cy < 30; cy++) {
-        setSurface(level, cx, cy, { baseHeight: 12, shape: SHAPES.FLAT, crumble: { delay: 0.35, downtime: 2.2 } });
+        setSurface(level, cx, cy, { baseHeight: 12, shape: SHAPES.FLAT, crumble: { delay: 0.10, downtime: 1.0 } });
       }
     }
     wallRing(level, 36, 25, 20, 8, 14, {
@@ -3161,7 +3220,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     fillTrack(level, 72, 12, 6, 12, 4);
     for (let cx = 73; cx < 77; cx++) {
       for (let cy = 14; cy < 22; cy++) {
-        setSurface(level, cx, cy, { baseHeight: 4, shape: SHAPES.FLAT, crumble: { delay: 0.35, downtime: 2.2 } });
+        setSurface(level, cx, cy, { baseHeight: 4, shape: SHAPES.FLAT, crumble: { delay: 0.10, downtime: 1.0 } });
       }
     }
     addActor(level, {
@@ -3171,8 +3230,12 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     });
     wallRing(level, 72, 12, 6, 12, 6, {
       gaps: [
-        { x: 73, y: 23 }, { x: 74, y: 23 }, { x: 75, y: 23 }, { x: 76, y: 23 }, { x: 77, y: 23 },
-        { x: 77, y: 12 }, { x: 77, y: 13 }, { x: 77, y: 14 }, { x: 77, y: 15 }, { x: 77, y: 16 }, { x: 77, y: 17 }, { x: 77, y: 18 }, { x: 77, y: 19 }, { x: 77, y: 20 }, { x: 77, y: 21 }, { x: 77, y: 22 }, { x: 77, y: 23 }
+        // South exit to ramp (full south wall open)
+        { x: 72, y: 23 }, { x: 73, y: 23 }, { x: 74, y: 23 }, { x: 75, y: 23 }, { x: 76, y: 23 }, { x: 77, y: 23 },
+        // East wall fully open (ramp is immediately east)
+        { x: 77, y: 12 }, { x: 77, y: 13 }, { x: 77, y: 14 }, { x: 77, y: 15 }, { x: 77, y: 16 },
+        { x: 77, y: 17 }, { x: 77, y: 18 }, { x: 77, y: 19 }, { x: 77, y: 20 }, { x: 77, y: 21 },
+        { x: 77, y: 22 }, { x: 77, y: 23 }
       ]
     });
     placeRamp(level, { x: 78, y: 12, dir: 'east', length: 5, width: 12, startZ: 4, endZ: 0 });
@@ -3205,7 +3268,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     });
     for (let cx = 73; cx < 77; cx++) {
       for (let cy = 37; cy < 53; cy++) {
-        setSurface(level, cx, cy, { baseHeight: 4, shape: SHAPES.FLAT, conveyor: { x: 0, y: 0.7, strength: 1.2 } });
+        setSurface(level, cx, cy, { baseHeight: 4, shape: SHAPES.FLAT, conveyor: { x: 0, y: 0.7, strength: 2.6 } });
       }
     }
     wallRing(level, 72, 36, 6, 18, 6, {
@@ -3251,7 +3314,15 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
         { x: 83, y: 48 }, { x: 83, y: 49 }, { x: 83, y: 50 }, { x: 83, y: 51 }, { x: 83, y: 52 }, { x: 83, y: 53 }, { x: 83, y: 54 }, { x: 83, y: 55 }
       ]
     });
-    setGoal(level, 93, 33, 0.44);
+        // Random push tiles — unpredictable direction changes
+    setSurface(level, 22, 26, { baseHeight: 16, shape: SHAPES.FLAT, conveyor: { x: 3.5, y: 0, strength: 3.5 } });
+    setSurface(level, 28, 16, { baseHeight: 12, shape: SHAPES.FLAT, conveyor: { x: 0, y: -3.2, strength: 3.2 } });
+    setSurface(level, 45, 28, { baseHeight: 12, shape: SHAPES.FLAT, conveyor: { x: -3.5, y: 3.5, strength: 3.5 } });
+    setSurface(level, 24, 42, { baseHeight: 12, shape: SHAPES.FLAT, conveyor: { x: 3.2, y: 3.2, strength: 3.5 } });
+    setSurface(level, 75, 18, { baseHeight: 4, shape: SHAPES.FLAT, conveyor: { x: -3.5, y: -3.5, strength: 3.5 } });
+    setSurface(level, 90, 32, { baseHeight: 4, shape: SHAPES.FLAT, conveyor: { x: 3.5, y: -3.5, strength: 3.5 } });
+    setSurface(level, 75, 46, { baseHeight: 4, shape: SHAPES.FLAT, conveyor: { x: -3.5, y: 3.5, strength: 3.5 } });
+setGoal(level, 93, 33, 0.44);
 
     addGraphNode(level, { id: 'start',  type: 'entry', x: 4.5,  y: 28.5, z: 16 });
     addGraphNode(level, { id: 'hub1',   type: 'fork',  x: 27.5, y: 29.5, z: 16 });
@@ -3344,7 +3415,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     // Crumble section (x:18-26) — full width of narrow lane
     for (let cx = 18; cx < 27; cx++) {
       for (let cy = 13; cy < 16; cy++) {
-        setSurface(level, cx, cy, { baseHeight: 18, shape: SHAPES.FLAT, crumble: { delay: 0.18, downtime: 3.0 } });
+        setSurface(level, cx, cy, { baseHeight: 18, shape: SHAPES.FLAT, crumble: { delay: 0.18, downtime: 1.0 } });
       }
     }
     // Three hazard strips forcing precise navigation
@@ -3457,28 +3528,28 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     // Crumble floor around pillar 1 — can't stop near it
     for (let cx = 18; cx < 24; cx++) {
       for (let cy = 24; cy < 32; cy++) {
-        setSurface(level, cx, cy, { baseHeight: 4, shape: SHAPES.FLAT, friction: 0.20, crumble: { delay: 0.25, downtime: 2.5 } });
+        setSurface(level, cx, cy, { baseHeight: 4, shape: SHAPES.FLAT, friction: 0.20, crumble: { delay: 0.10, downtime: 1.0 } });
       }
     }
     // Column 2 (x:32-33, y:24-29) — blocks right side
     addHazardRect(level, 32, 24, 2, 6, 'pillar_g2_2');
     for (let cx = 30; cx < 36; cx++) {
       for (let cy = 24; cy < 32; cy++) {
-        setSurface(level, cx, cy, { baseHeight: 4, shape: SHAPES.FLAT, friction: 0.20, crumble: { delay: 0.25, downtime: 2.5 } });
+        setSurface(level, cx, cy, { baseHeight: 4, shape: SHAPES.FLAT, friction: 0.20, crumble: { delay: 0.10, downtime: 1.0 } });
       }
     }
     // Column 3 (x:44-45, y:26-31) — blocks left side again
     addHazardRect(level, 44, 26, 2, 6, 'pillar_g2_3');
     for (let cx = 42; cx < 48; cx++) {
       for (let cy = 24; cy < 32; cy++) {
-        setSurface(level, cx, cy, { baseHeight: 4, shape: SHAPES.FLAT, friction: 0.20, crumble: { delay: 0.25, downtime: 2.5 } });
+        setSurface(level, cx, cy, { baseHeight: 4, shape: SHAPES.FLAT, friction: 0.20, crumble: { delay: 0.10, downtime: 1.0 } });
       }
     }
     // Column 4 (x:56-57, y:24-29) — final pillar before exit
     addHazardRect(level, 56, 24, 2, 6, 'pillar_g2_4');
     for (let cx = 54; cx < 60; cx++) {
       for (let cy = 24; cy < 32; cy++) {
-        setSurface(level, cx, cy, { baseHeight: 4, shape: SHAPES.FLAT, friction: 0.20, crumble: { delay: 0.25, downtime: 2.5 } });
+        setSurface(level, cx, cy, { baseHeight: 4, shape: SHAPES.FLAT, friction: 0.20, crumble: { delay: 0.10, downtime: 1.0 } });
       }
     }
     // Two timed gates — must navigate pillars AND time the gates
@@ -3512,7 +3583,67 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
       gaps: [{ x: 4, y: 37 }, { x: 5, y: 37 }, { x: 6, y: 37 }, { x: 7, y: 37 },
              { x: 8, y: 37 }, { x: 9, y: 37 }, { x: 10, y: 37 }, { x: 11, y: 37 }]
     });
-    setGoal(level, 9, 46, 0.44);
+    // === SECTION 3: Final gauntlet corridor — narrow, ice, sweepers ===
+    // Open south wall of goal basin to continue
+    setSurface(level, 6, 52, { baseHeight: 2, shape: SHAPES.FLAT });
+    setSurface(level, 7, 52, { baseHeight: 2, shape: SHAPES.FLAT });
+    setSurface(level, 8, 52, { baseHeight: 2, shape: SHAPES.FLAT });
+    setSurface(level, 9, 52, { baseHeight: 2, shape: SHAPES.FLAT });
+    setSurface(level, 10, 52, { baseHeight: 2, shape: SHAPES.FLAT });
+    // Third corridor (z=2), 60×5 — ice floor, 3 sweepers, crumble sections, hazard strips
+    fillTrack(level, 6, 53, 60, 5, 2);
+    // Ice floor throughout
+    for (let cx = 7; cx < 65; cx++) {
+      for (let cy = 53; cy < 58; cy++) {
+        setSurface(level, cx, cy, { baseHeight: 2, shape: SHAPES.FLAT, friction: 0.18 });
+      }
+    }
+    // Crumble sections (very fast — 0.08s)
+    for (let cx = 18; cx < 26; cx++) {
+      setSurface(level, cx, 54, { baseHeight: 2, shape: SHAPES.FLAT, crumble: { delay: 0.08, downtime: 1.0 } });
+      setSurface(level, cx, 55, { baseHeight: 2, shape: SHAPES.FLAT, crumble: { delay: 0.08, downtime: 1.0 } });
+      setSurface(level, cx, 56, { baseHeight: 2, shape: SHAPES.FLAT, crumble: { delay: 0.08, downtime: 1.0 } });
+    }
+    for (let cx = 44; cx < 52; cx++) {
+      setSurface(level, cx, 54, { baseHeight: 2, shape: SHAPES.FLAT, crumble: { delay: 0.08, downtime: 1.0 } });
+      setSurface(level, cx, 55, { baseHeight: 2, shape: SHAPES.FLAT, crumble: { delay: 0.08, downtime: 1.0 } });
+      setSurface(level, cx, 56, { baseHeight: 2, shape: SHAPES.FLAT, crumble: { delay: 0.08, downtime: 1.0 } });
+    }
+    // Sweepers spaced along the corridor
+    addActor(level, {
+      id: 'sweeper_g3_a', kind: ACTOR_KINDS.SWEEPER,
+      x: 22, y: 55, z: 2, topHeight: 2,
+      width: 1, height: 1, armLength: 2.2, armWidth: 0.22, angularSpeed: 2.2, fatal: true
+    });
+    addActor(level, {
+      id: 'sweeper_g3_b', kind: ACTOR_KINDS.SWEEPER,
+      x: 38, y: 55, z: 2, topHeight: 2,
+      width: 1, height: 1, armLength: 2.2, armWidth: 0.22, angularSpeed: -2.5, fatal: true
+    });
+    addActor(level, {
+      id: 'sweeper_g3_c', kind: ACTOR_KINDS.SWEEPER,
+      x: 55, y: 55, z: 2, topHeight: 2,
+      width: 1, height: 1, armLength: 2.2, armWidth: 0.22, angularSpeed: 2.8, fatal: true
+    });
+    // Hazard strips
+    addHazardRect(level, 30, 53, 3, 5, 'g3_spikes_a');
+    addHazardRect(level, 48, 53, 3, 5, 'g3_spikes_b');
+    // Timed gate near the end
+    addTimedGate(level, 'gate_g3_final', 58, 54, 5, 3, 2, 1.2, 0.8);
+    wallRing(level, 6, 53, 60, 5, 4, {
+      gaps: [
+        { x: 6, y: 53 }, { x: 6, y: 54 }, { x: 6, y: 55 }, { x: 6, y: 56 }, { x: 6, y: 57 },
+        { x: 65, y: 53 }, { x: 65, y: 54 }, { x: 65, y: 55 }, { x: 65, y: 56 }, { x: 65, y: 57 }
+      ]
+    });
+    // Final goal basin (z=2), 10×10
+    fillTrack(level, 66, 51, 10, 10, 2);
+    wallRing(level, 66, 51, 10, 10, 4, {
+      gaps: [
+        { x: 66, y: 53 }, { x: 66, y: 54 }, { x: 66, y: 55 }, { x: 66, y: 56 }, { x: 66, y: 57 }
+      ]
+    });
+    setGoal(level, 71, 56, 0.44);
 
     addGraphNode(level, { id: 'start',  type: 'entry', x: 4.5,  y: 8.5,  z: 18 });
     addGraphNode(level, { id: 'risky1', type: 'route', x: 38.5, y: 6.5,  z: 18 });
@@ -3579,8 +3710,8 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
 
     // Floor 2: west corridor (z=14), 28×5
     fillTrack(level, 2, 14, 28, 5, 14);
-    setSurface(level, 4, 15, { baseHeight: 14, shape: SHAPES.FLAT, crumble: { delay: 0.4, downtime: 2.0 } });
-    setSurface(level, 5, 15, { baseHeight: 14, shape: SHAPES.FLAT, crumble: { delay: 0.4, downtime: 2.0 } });
+    setSurface(level, 4, 15, { baseHeight: 14, shape: SHAPES.FLAT, crumble: { delay: 0.10, downtime: 1.0 } });
+    setSurface(level, 5, 15, { baseHeight: 14, shape: SHAPES.FLAT, crumble: { delay: 0.10, downtime: 1.0 } });
     wallRing(level, 2, 14, 28, 5, 16, {
       gaps: [
         { x: 2, y: 14 }, { x: 2, y: 15 }, { x: 2, y: 16 }, { x: 2, y: 17 }, { x: 2, y: 18 },
@@ -3701,7 +3832,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     // Crumble section mid-corridor
     for (let cx = 46; cx < 54; cx++) {
       for (let cy = 50; cy < 53; cy++) {
-        setSurface(level, cx, cy, { baseHeight: -2, shape: SHAPES.FLAT, crumble: { delay: 0.2, downtime: 2.5 } });
+        setSurface(level, cx, cy, { baseHeight: -2, shape: SHAPES.FLAT, crumble: { delay: 0.10, downtime: 1.0 } });
       }
     }
     // Two sweepers
@@ -3728,7 +3859,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     fillTrack(level, 20, 44, 6, 14, 2);
     for (let cx = 21; cx < 25; cx++) {
       for (let cy = 45; cy < 57; cy++) {
-        setSurface(level, cx, cy, { baseHeight: 2, shape: SHAPES.FLAT, crumble: { delay: 0.3, downtime: 2.5 } });
+        setSurface(level, cx, cy, { baseHeight: 2, shape: SHAPES.FLAT, crumble: { delay: 0.10, downtime: 1.0 } });
       }
     }
     wallRing(level, 20, 44, 6, 14, 4, {
@@ -3813,9 +3944,9 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
       width: 1, height: 1, armLength: 2.8, armWidth: 0.22, angularSpeed: 1.1, fatal: true
     });
     for (let cx = 36; cx < 42; cx++) {
-      setSurface(level, cx, 8,  { baseHeight: 24, shape: SHAPES.FLAT, crumble: { delay: 0.4, downtime: 2.2 } });
-      setSurface(level, cx, 9,  { baseHeight: 24, shape: SHAPES.FLAT, crumble: { delay: 0.4, downtime: 2.2 } });
-      setSurface(level, cx, 10, { baseHeight: 24, shape: SHAPES.FLAT, crumble: { delay: 0.4, downtime: 2.2 } });
+      setSurface(level, cx, 8,  { baseHeight: 24, shape: SHAPES.FLAT, crumble: { delay: 0.10, downtime: 1.0 } });
+      setSurface(level, cx, 9,  { baseHeight: 24, shape: SHAPES.FLAT, crumble: { delay: 0.10, downtime: 1.0 } });
+      setSurface(level, cx, 10, { baseHeight: 24, shape: SHAPES.FLAT, crumble: { delay: 0.10, downtime: 1.0 } });
     }
     placeRamp(level, { x: 50, y: 7, dir: 'east', length: 6, width: 5, startZ: 24, endZ: 18 });
 
@@ -3823,7 +3954,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     fillTrack(level, 14, 12, 40, 5, 24);
     for (let cx = 20; cx < 50; cx++) {
       for (let cy = 12; cy < 17; cy++) {
-        setSurface(level, cx, cy, { baseHeight: 24, shape: SHAPES.FLAT, conveyor: { x: 0.7, y: 0, strength: 1.3 } });
+        setSurface(level, cx, cy, { baseHeight: 24, shape: SHAPES.FLAT, conveyor: { x: 0.7, y: 0, strength: 2.9 } });
       }
     }
     // Rotating bar mid-corridor — marble must time passage while being pushed by conveyor
@@ -3834,19 +3965,51 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     });
     placeRamp(level, { x: 54, y: 12, dir: 'east', length: 6, width: 5, startZ: 24, endZ: 18 });
 
-    // ACT 2 — Central citadel (z=18), 24×20
+    // ACT 2 — Central citadel (z=18), 24×20 — dense obstacle field
     fillTrack(level, 58, 2, 24, 20, 18);
+    // Ice floor — marble slides into obstacles
+    for (let cx = 59; cx < 81; cx++) {
+      for (let cy = 3; cy < 21; cy++) {
+        setSurface(level, cx, cy, { baseHeight: 18, shape: SHAPES.FLAT, friction: 0.20 });
+      }
+    }
+    // Rotating bars — two counter-rotating, two more added
     addActor(level, {
       id: 'bar_fa1', kind: ACTOR_KINDS.ROTATING_BAR,
-      x: 66, y: 8, z: 18, topHeight: 18,
-      width: 1, height: 1, armLength: 2.2, armWidth: 0.22, angularSpeed: 1.9, fatal: true
+      x: 64, y: 7, z: 18, topHeight: 18,
+      width: 1, height: 1, armLength: 2.5, armWidth: 0.22, angularSpeed: 2.2, fatal: true
     });
     addActor(level, {
       id: 'bar_fa2', kind: ACTOR_KINDS.ROTATING_BAR,
-      x: 74, y: 14, z: 18, topHeight: 18,
-      width: 1, height: 1, armLength: 2.2, armWidth: 0.22, angularSpeed: -1.7, fatal: true
+      x: 76, y: 7, z: 18, topHeight: 18,
+      width: 1, height: 1, armLength: 2.5, armWidth: 0.22, angularSpeed: -2.0, fatal: true
     });
-    addTimedGate(level, 'gate_fa2', 70, 4, 20, 3, 2, 2.0, 1.2);
+    addActor(level, {
+      id: 'bar_fa3', kind: ACTOR_KINDS.ROTATING_BAR,
+      x: 64, y: 16, z: 18, topHeight: 18,
+      width: 1, height: 1, armLength: 2.5, armWidth: 0.22, angularSpeed: -2.4, fatal: true
+    });
+    addActor(level, {
+      id: 'bar_fa4', kind: ACTOR_KINDS.ROTATING_BAR,
+      x: 76, y: 16, z: 18, topHeight: 18,
+      width: 1, height: 1, armLength: 2.5, armWidth: 0.22, angularSpeed: 2.6, fatal: true
+    });
+    // Sweepers guarding the exits
+    addActor(level, {
+      id: 'sweeper_act2_a', kind: ACTOR_KINDS.SWEEPER,
+      x: 70, y: 4, z: 18, topHeight: 18,
+      width: 1, height: 1, armLength: 2.8, armWidth: 0.22, angularSpeed: 1.8, fatal: true
+    });
+    addActor(level, {
+      id: 'sweeper_act2_b', kind: ACTOR_KINDS.SWEEPER,
+      x: 70, y: 19, z: 18, topHeight: 18,
+      width: 1, height: 1, armLength: 2.8, armWidth: 0.22, angularSpeed: -2.0, fatal: true
+    });
+    // Hazard strips creating forced corridors
+    addHazardRect(level, 60, 10, 4, 4, 'act2_spikes_a');
+    addHazardRect(level, 72, 10, 4, 4, 'act2_spikes_b');
+    // Timed gate blocking the south exit
+    addTimedGate(level, 'gate_fa2', 66, 20, 8, 3, 2, 1.6, 1.0);
     addElevator(level, 'elev_fa1', 78, 10, 6, 18, 3, 3, 1.0, 5.0);
     wallRing(level, 58, 2, 24, 20, 20, {
       gaps: [
@@ -3892,7 +4055,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     // Crumble section before the ramp
     for (let cx = 58; cx < 78; cx++) {
       for (let cy = 53; cy < 56; cy++) {
-        setSurface(level, cx, cy, { baseHeight: 6, shape: SHAPES.FLAT, crumble: { delay: 0.2, downtime: 2.5 } });
+        setSurface(level, cx, cy, { baseHeight: 6, shape: SHAPES.FLAT, crumble: { delay: 0.10, downtime: 1.0 } });
       }
     }
     // Timed gate blocking the ramp entry
@@ -3976,28 +4139,33 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     // Timed gate blocking south path exit
     addTimedGate(level, 'gate_act5', 52, 91, 6, 3, 2, 1.6, 0.9);
 
-    // Path A (west): NARROW 3-tile corridor with mandatory platform gap
-    // Corridor is only 3 tiles wide — cannot go around the gap
-    fillTrack(level, 4, 78, 10, 3, 2);   // west landing (3 wide)
-    // Void gap x:14-25 — 12 tiles, impossible to jump, platform is the only way
-    fillTrack(level, 26, 78, 4, 3, 2);   // east landing (3 wide)
-    // Platform travels the full gap — 4 tiles wide, 3 tiles tall
+    // Path A (west): MANDATORY PLATFORM CROSSING
+    // West approach — 3-tile wide corridor leading to the gap
+    fillTrack(level, 4, 78, 8, 3, 2);
+    // Crumble tiles on west approach — can't wait here
+    for (let cx = 5; cx < 12; cx++) {
+      setSurface(level, cx, 78, { baseHeight: 2, shape: SHAPES.FLAT, crumble: { delay: 0.08, downtime: 1.0 } });
+      setSurface(level, cx, 79, { baseHeight: 2, shape: SHAPES.FLAT, crumble: { delay: 0.08, downtime: 1.0 } });
+      setSurface(level, cx, 80, { baseHeight: 2, shape: SHAPES.FLAT, crumble: { delay: 0.08, downtime: 1.0 } });
+    }
+    // Void gap x:12-25 — 14 tiles wide, physically impossible to cross without platform
+    // Platform: 5 tiles wide, travels the full gap slowly
     addMovingBridge(level, 'bridge_act5a', [
-      { x: 14, y: 78, z: 2 },
-      { x: 22, y: 78, z: 2 }
-    ], 4, 3, 0.28);
-    // Hazard strip on east landing — must step off platform quickly
-    addHazardRect(level, 26, 78, 2, 3, 'path_a_spikes');
-    // Sweeper at the end of east landing
+      { x: 12, y: 78, z: 2 },
+      { x: 21, y: 78, z: 2 }
+    ], 5, 3, 0.20);
+    // East landing — 3-tile wide, hazard strip + sweeper
+    fillTrack(level, 26, 78, 4, 3, 2);
+    addHazardRect(level, 26, 78, 2, 3, 'path_a_spikes_land');
     addActor(level, {
       id: 'sweeper_path_a', kind: ACTOR_KINDS.SWEEPER,
       x: 28, y: 79, z: 2, topHeight: 2,
-      width: 1, height: 1, armLength: 1.4, armWidth: 0.22, angularSpeed: 2.0, fatal: true
+      width: 1, height: 1, armLength: 1.6, armWidth: 0.22, angularSpeed: 2.5, fatal: true
     });
     wallRing(level, 4, 78, 26, 3, 4, {
       gaps: [
-        { x: 29, y: 78 }, { x: 29, y: 79 }, { x: 29, y: 80 },
-        { x: 4, y: 78 }, { x: 4, y: 79 }, { x: 4, y: 80 }
+        { x: 4, y: 78 }, { x: 4, y: 79 }, { x: 4, y: 80 },
+        { x: 29, y: 78 }, { x: 29, y: 79 }, { x: 29, y: 80 }
       ]
     });
     placeRamp(level, { x: 4, y: 81, dir: 'south', length: 6, width: 3, startZ: 2, endZ: -2 });
@@ -4007,7 +4175,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     // All crumble — fast delay, must move quickly
     for (let cx = 52; cx < 58; cx++) {
       for (let cy = 95; cy < 105; cy++) {
-        setSurface(level, cx, cy, { baseHeight: 2, shape: SHAPES.FLAT, crumble: { delay: 0.18, downtime: 3.0 } });
+        setSurface(level, cx, cy, { baseHeight: 2, shape: SHAPES.FLAT, crumble: { delay: 0.18, downtime: 1.0 } });
       }
     }
     // Sweeper mid-corridor — must time it while crumble disappears under you
