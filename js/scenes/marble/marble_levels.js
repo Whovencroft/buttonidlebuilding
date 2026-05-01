@@ -2091,9 +2091,16 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     fillTrack(level, 74, 12, 14, 16, 2);
     wallRing(level, 74, 12, 14, 16, 4, {
       gaps: [
+        // West entry from path A ramp (y:14-19)
         { x: 74, y: 14 }, { x: 74, y: 15 }, { x: 74, y: 16 }, { x: 74, y: 17 }, { x: 74, y: 18 }, { x: 74, y: 19 },
+        // West entry from path B ramp (y:20-25)
         { x: 74, y: 20 }, { x: 74, y: 21 }, { x: 74, y: 22 }, { x: 74, y: 23 }, { x: 74, y: 24 }, { x: 74, y: 25 },
-        { x: 87, y: 16 }, { x: 87, y: 17 }, { x: 87, y: 18 }, { x: 87, y: 19 }, { x: 87, y: 20 }, { x: 87, y: 21 }
+        // East exit to platform approach (y:16-21)
+        { x: 87, y: 16 }, { x: 87, y: 17 }, { x: 87, y: 18 }, { x: 87, y: 19 }, { x: 87, y: 20 }, { x: 87, y: 21 },
+        // South exit to descent ramp (y:28 = south wall of 74,12,14,16 → y=12+16=28)
+        { x: 74, y: 27 }, { x: 75, y: 27 }, { x: 76, y: 27 }, { x: 77, y: 27 },
+        { x: 78, y: 27 }, { x: 79, y: 27 }, { x: 80, y: 27 }, { x: 81, y: 27 },
+        { x: 82, y: 27 }, { x: 83, y: 27 }, { x: 84, y: 27 }, { x: 85, y: 27 }, { x: 86, y: 27 }, { x: 87, y: 27 }
       ]
     });
 
@@ -2116,8 +2123,13 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     fillTrack(level, 104, 16, 8, 6, 2);
     wallRing(level, 104, 16, 8, 6, 4, {
       gaps: [
+        // West entry from platform
         { x: 104, y: 17 }, { x: 104, y: 18 }, { x: 104, y: 19 }, { x: 104, y: 20 },
-        { x: 111, y: 17 }, { x: 111, y: 18 }, { x: 111, y: 19 }, { x: 111, y: 20 }
+        // East wall — open so marble can continue east if needed
+        { x: 111, y: 17 }, { x: 111, y: 18 }, { x: 111, y: 19 }, { x: 111, y: 20 },
+        // South exit to descent ramp (y=22 = south wall of 104,16,8,6 → y=16+6=22)
+        { x: 104, y: 21 }, { x: 105, y: 21 }, { x: 106, y: 21 }, { x: 107, y: 21 },
+        { x: 108, y: 21 }, { x: 109, y: 21 }, { x: 110, y: 21 }, { x: 111, y: 21 }
       ]
     });
 

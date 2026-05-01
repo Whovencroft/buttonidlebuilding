@@ -10,8 +10,12 @@
   const GROUND_SNAP = 0.14;
   const LEDGE_FALL_HORIZONTAL_DAMPING = 0.55;
   const LEDGE_FALL_DOWNWARD_KICK = -0.4;
-  const AIR_IDLE_DRAG = 0.968;
-  const AIR_ACTIVE_DRAG = 0.985;
+  // Air drag tuned for 90% horizontal momentum preservation over a ~0.6s jump arc.
+  // At 60fps a 0.6s jump = ~36 frames.
+  // 0.9971^36 ≈ 0.90  (idle — no steering input while airborne)
+  // 0.9985^36 ≈ 0.95  (active — player steers during jump)
+  const AIR_IDLE_DRAG = 0.9971;
+  const AIR_ACTIVE_DRAG = 0.9985;
   const HAZARD_TRIGGER_RADIUS = 0.28;
 
   const VERTICAL_GRAVITY = -22.5;
