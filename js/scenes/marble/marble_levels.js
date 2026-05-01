@@ -550,7 +550,13 @@
       const actorState = getActorWorldState(actor, runtime);
       if (actorState.active === false) continue;
       const rect = getActorTopRect(actor, actorState);
-      if (x < rect.minX || x > rect.maxX || y < rect.minY || y > rect.maxY) continue;
+      // PLATFORM CLIP FIX: use a small edge tolerance so the marble is still
+      // considered "on" the platform when a support sample point lands just
+      // outside the rect edge. Without this, edge landings return null and
+      // the marble clips through.
+      const PLAT_EDGE_TOL = 0.15;
+      if (x < rect.minX - PLAT_EDGE_TOL || x > rect.maxX + PLAT_EDGE_TOL ||
+          y < rect.minY - PLAT_EDGE_TOL || y > rect.maxY + PLAT_EDGE_TOL) continue;
 
       const sample = {
         source: 'actor',
@@ -927,7 +933,13 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
       if (actor.kind === ACTOR_KINDS.MOVING_PLATFORM || actor.kind === ACTOR_KINDS.ELEVATOR) {
         const rect = getActorTopRect(actor, actorState);
         if (marbleBottom > rect.z + 0.04) continue;
-        if (supportZ !== null && supportZ !== undefined && supportZ >= rect.z - 0.04) continue;
+        // PLATFORM CLIP FIX: use a larger tolerance (0.22 instead of 0.04) to
+        // account for the platform's own vertical movement between frames.
+        // The old 0.04 tolerance caused the platform to push the marble sideways
+        // instead of supporting it when the platform moved upward slightly.
+        const platformDeltaZ = Math.abs(actorState.dz ?? 0);
+        const supportTolerance = 0.22 + platformDeltaZ * 2.0;
+        if (supportZ !== null && supportZ !== undefined && supportZ >= rect.z - supportTolerance) continue;
         const closestX = clamp(x, rect.minX, rect.maxX);
         const closestY = clamp(y, rect.minY, rect.maxY);
         const dx = x - closestX;

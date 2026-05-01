@@ -536,6 +536,27 @@ function moveGrounded(runtime, dt) {
           return surface;
         }
       }
+
+      // PLATFORM CLIP FIX: if the marble is falling and a moving platform
+      // surface exists at the target position, check if the marble's downward
+      // path crossed the platform top surface this sub-step. This catches
+      // cases where the platform moved upward into the marble's path between
+      // frames, which the normal landing check misses because it only tests
+      // the final position.
+      if (marble.vz < -0.5 && surface && surface.source === 'actor') {
+        const platformTop = surface.z + marble.collisionRadius;
+        // The platform may have risen since startZ was sampled — use the
+        // platform's own dz to reconstruct where it was at the start of
+        // this sub-step.
+        const platformDz = surface.actorState?.dz ?? 0;
+        const platformTopAtStart = platformTop - platformDz;
+        if (startZ >= platformTopAtStart && marble.z <= platformTop) {
+          marble.grounded = true;
+          marble.z = platformTop;
+          marble.vz = 0;
+          return surface;
+        }
+      }
     }
 
     marble.grounded = false;
