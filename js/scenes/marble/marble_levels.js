@@ -1014,6 +1014,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
       marble.z += support.actorState.dz;
     }
 
+  }
   function registerLevel(level) {
     MAIN_LEVEL_IDS.push(level.id);
     return level;
@@ -2094,7 +2095,6 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     addGraphEdge(level, { from: 'merge',    to: 'platform', kind: 'roll',    tag: 'platform' });
     addGraphEdge(level, { from: 'platform', to: 'goal',     kind: 'descent' });
     return registerLevel(level);
-  }
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
