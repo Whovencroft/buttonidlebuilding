@@ -817,11 +817,13 @@ function shouldFailFromVoidFall(runtime) {
     }
 
     runtime.timerMs += dt * 1000;
+    const timeLimit = runtime.level.timeLimit ?? 60;
+    if (runtime.timerMs >= timeLimit * 1000) return fail(runtime, 'timeout');
     updateCamera(runtime, dt);
 
     const triggerResult = evaluateTriggers(runtime, groundSurface);
     if (triggerResult) return triggerResult;
-        if (shouldFailFromVoidFall(runtime)) return fail(runtime, 'fall');
+    if (shouldFailFromVoidFall(runtime)) return fail(runtime, 'fall');
 
     runtime.lastResult = null;
     return null;

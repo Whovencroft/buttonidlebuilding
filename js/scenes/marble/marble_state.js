@@ -17,8 +17,7 @@
     const refs = {
       canvas: null,
       stageName: null,
-      timer: null,
-      best: null,
+      countdown: null,
       overlay: null,
       overlayTitle: null,
       overlayBody: null,
@@ -43,11 +42,8 @@
         <div class="marble-stage">
           <canvas class="marble-canvas"></canvas>
           <div class="marble-hud">
-            <div class="pill-line">
-              <span class="pill">Stage: <strong data-marble-stage-name></strong></span>
-              <span class="pill">Time: <strong data-marble-timer>0.00s</strong></span>
-              <span class="pill">Best: <strong data-marble-best>--</strong></span>
-            </div>
+            <div class="marble-countdown" data-marble-countdown>60</div>
+            <div class="marble-stage-label"><span data-marble-stage-name></span></div>
             <div class="marble-level-strip" data-marble-level-strip></div>
           </div>
           <div class="marble-help">Drag to roll • Tap to jump • R restart • Esc return</div>
@@ -58,7 +54,7 @@
               <div class="marble-overlay-actions">
                 <button class="action-btn" data-marble-restart>Restart</button>
                 <button class="action-btn" data-marble-next hidden>Next Level</button>
-                <button class="action-btn" data-marble-return>Return to Button Scene</button>
+                <button class="action-btn" data-marble-return>Return</button>
               </div>
             </div>
           </div>
@@ -67,8 +63,7 @@
 
       refs.canvas = root.querySelector('.marble-canvas');
       refs.stageName = root.querySelector('[data-marble-stage-name]');
-      refs.timer = root.querySelector('[data-marble-timer]');
-      refs.best = root.querySelector('[data-marble-best]');
+      refs.countdown = root.querySelector('[data-marble-countdown]');
       refs.overlay = root.querySelector('[data-marble-overlay]');
       refs.overlayTitle = root.querySelector('[data-marble-overlay-title]');
       refs.overlayBody = root.querySelector('[data-marble-overlay-body]');
@@ -246,16 +241,17 @@
       const rewardText = mainLevelIndex < 0
         ? 'Generated graph course complete. Replay saved for inspection.'
         : alreadyClaimed
-          ? 'Reward already claimed. Best time updated if improved.'
-          : `Reward granted: ${result.reward?.presses || 0} presses.`;
+          ? 'Best time updated if improved.'
+          : '';
 
       const unlockText = nextLevelId && !nextWasUnlocked && nextIsUnlocked
         ? ` Level ${window.MarbleLevels.getLevelIndex(nextLevelId) + 1} unlocked.`
         : '';
 
+      const completionBody = `${runtime.level.name} cleared in ${(result.bestTimeMs / 1000).toFixed(2)}s.${unlockText}${rewardText ? ' ' + rewardText : ''}`;
       showOverlay(
         playback ? 'Replay Complete' : 'Stage Cleared',
-        `${runtime.level.name} complete in ${(result.bestTimeMs / 1000).toFixed(2)}s. ${rewardText}${unlockText}`,
+        completionBody,
         { showNext: !playback && !!(nextLevelId && nextIsUnlocked) }
       );
     }
@@ -264,6 +260,7 @@
       persistCompletedReplay(result);
       let reasonText = 'Run failed. Restart and try again.';
       if (result.reason === 'fall') reasonText = 'You fell off the course. Restart and try again.';
+      else if (result.reason === 'timeout') reasonText = "Time's up! You didn't reach the end in time. Restart and try again.";
       else if (String(result.reason).includes('hazard') || String(result.reason).includes('bar') || String(result.reason).includes('sweeper')) reasonText = 'A hazard caught the marble. Restart and try again.';
       showOverlay(playback ? 'Replay Failed' : 'Course Failed', reasonText);
     }
@@ -338,9 +335,12 @@
     function render() {
       if (!runtime || !refs.canvas) return;
       refs.stageName.textContent = runtime.level.name;
-      refs.timer.textContent = `${(runtime.timerMs / 1000).toFixed(2)}s`;
-      const bestMs = marbleSlice().bestTimes[runtime.level.id];
-      refs.best.textContent = bestMs ? `${(bestMs / 1000).toFixed(2)}s` : '--';
+      const timeLimit = runtime.level.timeLimit ?? 60;
+      const remaining = Math.max(0, timeLimit - runtime.timerMs / 1000);
+      const remainingCeil = Math.ceil(remaining);
+      refs.countdown.textContent = remainingCeil;
+      refs.countdown.classList.toggle('marble-countdown--urgent', remainingCeil <= 10);
+      refs.countdown.classList.toggle('marble-countdown--critical', remainingCeil <= 5);
       // Expose drag state to renderer for arrow overlay
       if (input) runtime.dragInput = input.getDragState();
       window.MarbleRenderer.render(runtime, refs.canvas);

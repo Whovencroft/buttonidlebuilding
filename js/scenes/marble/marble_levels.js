@@ -1939,6 +1939,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
       killZ: -20,
       voidFloor: -10,
       start: { x: 4.5, y: 4.5 },
+      timeLimit: 60,
       reward: { presses: 3000, claimKey: 'practice_green' },
       templates: ['intro', 'single_path', 'shortcut']
     });
@@ -2122,6 +2123,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
       killZ: -20,
       voidFloor: -10,
       start: { x: 4.5, y: 4.5 },
+      timeLimit: 60,
       reward: { presses: 5000, claimKey: 'terrace_falls' },
       templates: ['fork_rejoin', 'terrace']
     });
@@ -2282,6 +2284,7 @@ setGoal(level, 72, 34, 0.44);
       killZ: -20,
       voidFloor: -10,
       start: { x: 4.5, y: 4.5 },
+      timeLimit: 60,
       reward: { presses: 8000, claimKey: 'the_switchback' },
       templates: ['switchback', 'crumble']
     });
@@ -2488,6 +2491,7 @@ setGoal(level, 12, 88, 0.44);
       killZ: -20,
       voidFloor: -10,
       start: { x: 4.5, y: 4.5 },
+      timeLimit: 60,
       reward: { presses: 12000, claimKey: 'canal_run' },
       templates: ['canal', 'conveyor', 'fork_rejoin']
     });
@@ -2727,6 +2731,7 @@ setGoal(level, 22, 40, 0.44);
       killZ: -20,
       voidFloor: -10,
       start: { x: 4.5, y: 5.5 },
+      timeLimit: 60,
       reward: { presses: 18000, claimKey: 'the_crossing' },
       templates: ['platform_bridge', 'fork_rejoin', 'rotating_bar']
     });
@@ -2948,6 +2953,7 @@ setGoal(level, 22, 40, 0.44);
       killZ: -20,
       voidFloor: -10,
       start: { x: 4.5, y: 4.5 },
+      timeLimit: 60,
       reward: { presses: 26000, claimKey: 'stairway_heights' },
       templates: ['staircase', 'timed_gate', 'drop_shortcut']
     });
@@ -3109,6 +3115,7 @@ setGoal(level, 22, 84, 0.44);
       killZ: -20,
       voidFloor: -10,
       start: { x: 4.5, y: 28.5 },
+      timeLimit: 60,
       reward: { presses: 36000, claimKey: 'the_labyrinth' },
       templates: ['labyrinth', 'sweeper', 'crumble_bridge', 'timed_gate']
     });
@@ -3401,6 +3408,7 @@ setGoal(level, 93, 33, 0.44);
       killZ: -20,
       voidFloor: -10,
       start: { x: 4.5, y: 8.5 },
+      timeLimit: 60,
       reward: { presses: 50000, claimKey: 'the_gauntlet' },
       templates: ['gauntlet', 'dual_lane', 'all_hazards']
     });
@@ -3712,6 +3720,7 @@ setGoal(level, 93, 33, 0.44);
       killZ: -20,
       voidFloor: -10,
       start: { x: 4.5, y: 4.5 },
+      timeLimit: 60,
       reward: { presses: 70000, claimKey: 'tower_descent' },
       templates: ['spiral', 'elevator', 'all_hazards']
     });
@@ -3962,6 +3971,7 @@ setGoal(level, 93, 33, 0.44);
       killZ: -20,
       voidFloor: -10,
       start: { x: 5.5, y: 5.5 },
+      timeLimit: 60,
       reward: { presses: 100000, claimKey: 'the_final_approach' },
       templates: ['finale', 'all_mechanics', 'multi_act']
     });
