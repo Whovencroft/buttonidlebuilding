@@ -1940,8 +1940,9 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
       ]
     });
 
-    // Main corridor east (z=14), 16×5
+    // Main corridor east (z=14), 16×5 — hazard strip mid-corridor
     fillTrack(level, 10, 5, 16, 5, 14);
+    addHazardRect(level, 18, 6, 2, 3, 'l1_corridor_spikes');
     wallRing(level, 10, 5, 16, 5, 16, {
       gaps: [
         { x: 10, y: 5 }, { x: 10, y: 6 }, { x: 10, y: 7 }, { x: 10, y: 8 }, { x: 10, y: 9 },
@@ -1952,8 +1953,21 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     // Wide ramp south (z=14→10), 6 tiles × 5 wide
     placeRamp(level, { x: 10, y: 10, dir: 'south', length: 6, width: 5, startZ: 14, endZ: 10 });
 
-    // Mid platform (z=10), 16×8
+    // Mid platform (z=10), 16×8 — sweeper + crumble + timed gate
     fillTrack(level, 10, 16, 16, 8, 10);
+    // Crumble section mid-platform
+    for (let cx = 14; cx < 22; cx++) {
+      setSurface(level, cx, 18, { baseHeight: 10, shape: SHAPES.FLAT, crumble: { delay: 0.4, downtime: 2.0 } });
+      setSurface(level, cx, 19, { baseHeight: 10, shape: SHAPES.FLAT, crumble: { delay: 0.4, downtime: 2.0 } });
+    }
+    // Sweeper guarding the ramp exit
+    addActor(level, {
+      id: 'sweeper_l1_mid', kind: ACTOR_KINDS.SWEEPER,
+      x: 22, y: 19, z: 10, topHeight: 10,
+      width: 1, height: 1, armLength: 2.5, armWidth: 0.22, angularSpeed: 1.2, fatal: true
+    });
+    // Timed gate before ramp
+    addTimedGate(level, 'gate_l1', 24, 18, 4, 4, 2, 1.8, 1.4);
     wallRing(level, 10, 16, 16, 8, 12, {
       gaps: [
         { x: 10, y: 16 }, { x: 11, y: 16 }, { x: 12, y: 16 }, { x: 13, y: 16 }, { x: 14, y: 16 },
@@ -2008,17 +2022,23 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     });
     placeRamp(level, { x: 64, y: 14, dir: 'east', length: 5, width: 5, startZ: 6, endZ: 2 });
 
-    // Path B (south): wide open path with crumble tiles and column obstacles
+    // Path B (south): crumble tiles, column obstacles, rotating bar
     fillTrack(level, 50, 20, 14, 8, 6);
-    setSurface(level, 55, 22, { baseHeight: 6, shape: SHAPES.FLAT, crumble: { delay: 0.4, downtime: 2.0 } });
-    setSurface(level, 55, 23, { baseHeight: 6, shape: SHAPES.FLAT, crumble: { delay: 0.4, downtime: 2.0 } });
-    setSurface(level, 56, 22, { baseHeight: 6, shape: SHAPES.FLAT, crumble: { delay: 0.4, downtime: 2.0 } });
-    setSurface(level, 56, 23, { baseHeight: 6, shape: SHAPES.FLAT, crumble: { delay: 0.4, downtime: 2.0 } });
+    setSurface(level, 55, 22, { baseHeight: 6, shape: SHAPES.FLAT, crumble: { delay: 0.3, downtime: 2.0 } });
+    setSurface(level, 55, 23, { baseHeight: 6, shape: SHAPES.FLAT, crumble: { delay: 0.3, downtime: 2.0 } });
+    setSurface(level, 56, 22, { baseHeight: 6, shape: SHAPES.FLAT, crumble: { delay: 0.3, downtime: 2.0 } });
+    setSurface(level, 56, 23, { baseHeight: 6, shape: SHAPES.FLAT, crumble: { delay: 0.3, downtime: 2.0 } });
     // Column obstacles staggered
     setSurface(level, 53, 20, { baseHeight: 10, shape: SHAPES.FLAT });
     setSurface(level, 53, 21, { baseHeight: 10, shape: SHAPES.FLAT });
     setSurface(level, 59, 25, { baseHeight: 10, shape: SHAPES.FLAT });
     setSurface(level, 59, 26, { baseHeight: 10, shape: SHAPES.FLAT });
+    // Rotating bar mid-path
+    addActor(level, {
+      id: 'bar_l1_pathb', kind: ACTOR_KINDS.ROTATING_BAR,
+      x: 58, y: 23, z: 6, topHeight: 6,
+      width: 1, height: 1, armLength: 2.5, armWidth: 0.22, angularSpeed: 1.6, fatal: true
+    });
     wallRing(level, 50, 20, 14, 8, 8, {
       gaps: [
         { x: 50, y: 21 }, { x: 50, y: 22 }, { x: 50, y: 23 }, { x: 50, y: 24 }, { x: 50, y: 25 },
@@ -2087,8 +2107,15 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     // Ramp east to Terrace A (z=16→12), 6×5
     placeRamp(level, { x: 18, y: 5, dir: 'east', length: 6, width: 5, startZ: 16, endZ: 12 });
 
-    // Terrace A (z=12), 14×10 — fork
+    // Terrace A (z=12), 14×10 — fork + sweeper + hazard strip
     fillTrack(level, 24, 4, 14, 10, 12);
+    // Sweeper guarding the fork
+    addActor(level, {
+      id: 'sweeper_l2_a', kind: ACTOR_KINDS.SWEEPER,
+      x: 31, y: 8, z: 12, topHeight: 12,
+      width: 1, height: 1, armLength: 2.5, armWidth: 0.22, angularSpeed: 1.1, fatal: true
+    });
+    addHazardRect(level, 26, 7, 2, 3, 'l2_terrace_a_spikes');
     wallRing(level, 24, 4, 14, 10, 14, {
       gaps: [
         { x: 24, y: 5 }, { x: 24, y: 6 }, { x: 24, y: 7 }, { x: 24, y: 8 },
@@ -2105,9 +2132,15 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     fillTrack(level, 28, 14, 5, 8, 12);
     placeRamp(level, { x: 28, y: 22, dir: 'south', length: 6, width: 5, startZ: 12, endZ: 8 });
 
-    // Terrace B (z=8), 18×10 — paths rejoin
+    // Terrace B (z=8), 18×10 — paths rejoin + crumble + timed gate
     fillTrack(level, 24, 28, 18, 10, 8);
     fillTrack(level, 28, 8, 5, 20, 8);  // vertical connector from north path
+    // Crumble section on approach to ramp
+    for (let cx = 28; cx < 36; cx++) {
+      setSurface(level, cx, 31, { baseHeight: 8, shape: SHAPES.FLAT, crumble: { delay: 0.35, downtime: 2.0 } });
+      setSurface(level, cx, 32, { baseHeight: 8, shape: SHAPES.FLAT, crumble: { delay: 0.35, downtime: 2.0 } });
+    }
+    addTimedGate(level, 'gate_l2_b', 34, 30, 6, 4, 2, 1.6, 1.2);
     wallRing(level, 24, 28, 18, 10, 10, {
       gaps: [
         { x: 28, y: 28 }, { x: 29, y: 28 }, { x: 30, y: 28 }, { x: 31, y: 28 },
@@ -2335,6 +2368,12 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     // Path A (east): Leg E east corridor (z=2), 14×5 — with timed gate
     fillTrack(level, 11, 72, 14, 5, 2);
     addTimedGate(level, 'gate_leg_e', 16, 73, 4, 3, 2, 1.8, 1.2);
+    // Sweeper on the approach to the final gate
+    addActor(level, {
+      id: 'sweeper_l3_final', kind: ACTOR_KINDS.SWEEPER,
+      x: 18, y: 74, z: 2, topHeight: 2,
+      width: 1, height: 1, armLength: 2.0, armWidth: 0.22, angularSpeed: 1.4, fatal: true
+    });
     wallRing(level, 11, 72, 14, 5, 4, {
       gaps: [
         { x: 11, y: 71 }, { x: 12, y: 71 }, { x: 13, y: 71 }, { x: 14, y: 71 }, { x: 15, y: 71 },
@@ -2444,6 +2483,12 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     // Second hazard strip and timed gate — can't just fly through on conveyor
     addHazardRect(level, 42, 4, 2, 4, 'canal_spikes_north2');
     addTimedGate(level, 'gate_canal_north', 32, 4, 10, 3, 2, 1.6, 1.2);
+    // Sweeper guarding the exit
+    addActor(level, {
+      id: 'sweeper_canal_n', kind: ACTOR_KINDS.SWEEPER,
+      x: 44, y: 5, z: 10, topHeight: 10,
+      width: 1, height: 1, armLength: 1.8, armWidth: 0.22, angularSpeed: 1.3, fatal: true
+    });
     wallRing(level, 29, 4, 20, 4, 12, {
       gaps: [
         { x: 29, y: 4 }, { x: 29, y: 5 }, { x: 29, y: 6 }, { x: 29, y: 7 },
@@ -2451,8 +2496,18 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
       ]
     });
 
-    // Lower (south) lane (z=10), 20×6 — wider, column obstacles staggered
+    // Lower (south) lane (z=10), 20×6 — wider, column obstacles + rotating bar
     fillTrack(level, 29, 8, 20, 6, 10);
+    // Crumble section
+    for (let cx = 33; cx < 40; cx++) {
+      setSurface(level, cx, 10, { baseHeight: 10, shape: SHAPES.FLAT, crumble: { delay: 0.35, downtime: 2.0 } });
+      setSurface(level, cx, 11, { baseHeight: 10, shape: SHAPES.FLAT, crumble: { delay: 0.35, downtime: 2.0 } });
+    }
+    addActor(level, {
+      id: 'bar_canal_s', kind: ACTOR_KINDS.ROTATING_BAR,
+      x: 42, y: 11, z: 10, topHeight: 10,
+      width: 1, height: 1, armLength: 2.5, armWidth: 0.22, angularSpeed: 1.5, fatal: true
+    });
     // Column pair 1: north side (2 wide), leaves gap on south (y:11-13)
     setSurface(level, 33, 8,  { baseHeight: 14, shape: SHAPES.FLAT });
     setSurface(level, 33, 9,  { baseHeight: 14, shape: SHAPES.FLAT });
@@ -2676,8 +2731,10 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     setSurface(level, 55, 35, { baseHeight: 4, shape: SHAPES.FLAT });
     setSurface(level, 56, 35, { baseHeight: 4, shape: SHAPES.FLAT });
 
-    // Second approach corridor (z=4), 12×8
+    // Second approach corridor (z=4), 12×8 — hazard strips + timed gate
     fillTrack(level, 49, 36, 12, 8, 4);
+    addHazardRect(level, 51, 38, 2, 4, 'l5_approach_spikes');
+    addTimedGate(level, 'gate_l5_approach', 53, 37, 6, 4, 2, 1.8, 1.2);
     wallRing(level, 49, 36, 12, 8, 6, {
       gaps: [
         { x: 53, y: 36 }, { x: 54, y: 36 }, { x: 55, y: 36 }, { x: 56, y: 36 },
@@ -2826,6 +2883,14 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
       ]
     });
 
+    // Sweeper on Tier 3 — guards the ramp entry
+    addActor(level, {
+      id: 'sweeper_l6_t3', kind: ACTOR_KINDS.SWEEPER,
+      x: 27, y: 41, z: 6, topHeight: 6,
+      width: 1, height: 1, armLength: 2.5, armWidth: 0.22, angularSpeed: 1.3, fatal: true
+    });
+    // Timed gate before Tier 4 ramp
+    addTimedGate(level, 'gate_l6_t3', 22, 43, 6, 3, 2, 1.6, 1.2);
     // Tier 4: final ramp south (z=6→2), 6×5
     placeRamp(level, { x: 25, y: 46, dir: 'south', length: 6, width: 5, startZ: 6, endZ: 2 });
 
@@ -2867,6 +2932,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
         setSurface(level, cx, cy, { baseHeight: 2, shape: SHAPES.FLAT, conveyor: { x: 0, y: 0.7, strength: 1.2 } });
       }
     }
+    addHazardRect(level, 34, 65, 4, 3, 'l6_ext_spikes');
     addActor(level, {
       id: 'sweeper_tier5', kind: ACTOR_KINDS.SWEEPER,
       x: 39, y: 64, z: 2, topHeight: 2,
@@ -3219,6 +3285,12 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     // ── NORTH LANE (y=4..8, 5 wide): SWEEPER GAUNTLET — timing puzzle ──────
     // Three sweepers spaced evenly; no gaps to skip between them
     fillTrack(level, 12, 4, 52, 5, 18);
+    // Ice floor in north lane — marble slides into sweepers
+    for (let cx = 13; cx < 63; cx++) {
+      for (let cy = 4; cy < 9; cy++) {
+        setSurface(level, cx, cy, { baseHeight: 18, shape: SHAPES.FLAT, friction: 0.22 });
+      }
+    }
     addActor(level, {
       id: 'sweeper_g1a', kind: ACTOR_KINDS.SWEEPER,
       x: 20, y: 6, z: 18, topHeight: 18,
@@ -3281,14 +3353,22 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     placeRamp(level, { x: 64, y: 4, dir: 'east', length: 6, width: 5, startZ: 18, endZ: 4 });
     // Descent ramp (z=18→4), south lane
     placeRamp(level, { x: 64, y: 13, dir: 'east', length: 6, width: 3, startZ: 18, endZ: 4 });
-    // Merge basin (z=4), 4×14 — fully enclosed east wall (no skip off level edge)
+    // Merge basin (z=4), 4×14 — open south wall so marble flows into section 2
     fillTrack(level, 70, 4, 4, 14, 4);
+    // Ice floor in merge basin — marble slides into section 2 fast
+    for (let cx = 70; cx < 74; cx++) {
+      for (let cy = 4; cy < 18; cy++) {
+        setSurface(level, cx, cy, { baseHeight: 4, shape: SHAPES.FLAT, friction: 0.22 });
+      }
+    }
     wallRing(level, 70, 4, 4, 14, 6, {
       gaps: [
         // Entry from north lane ramp
         { x: 70, y: 4 }, { x: 70, y: 5 }, { x: 70, y: 6 }, { x: 70, y: 7 }, { x: 70, y: 8 },
         // Entry from south lane ramp
-        { x: 70, y: 13 }, { x: 70, y: 14 }, { x: 70, y: 15 }
+        { x: 70, y: 13 }, { x: 70, y: 14 }, { x: 70, y: 15 },
+        // South exit — open wall so marble flows into section 2
+        { x: 70, y: 17 }, { x: 71, y: 17 }, { x: 72, y: 17 }, { x: 73, y: 17 }
       ]
     });
      // === EXTENSION: second gauntlet section ===
@@ -3306,8 +3386,9 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
         { x: 70, y: 18 }, { x: 71, y: 18 }, { x: 72, y: 18 }, { x: 73, y: 18 },
         // Risky lane (north)
         { x: 64, y: 18 }, { x: 64, y: 19 }, { x: 64, y: 20 }, { x: 64, y: 21 }, { x: 64, y: 22 },
-        // Safe lane (south, narrow)
-        { x: 64, y: 27 }, { x: 64, y: 28 }, { x: 64, y: 29 }
+        // Safe lane (south, wider pillar maze)
+        { x: 64, y: 24 }, { x: 64, y: 25 }, { x: 64, y: 26 }, { x: 64, y: 27 },
+        { x: 64, y: 28 }, { x: 64, y: 29 }, { x: 64, y: 30 }, { x: 64, y: 31 }
       ]
     });
 
@@ -3336,26 +3417,54 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
       ]
     });
 
-    // Safe lane 2 (south, y=27..29, 3 wide — NARROW): crumble + 3 timed gates + sweeper
-    fillTrack(level, 12, 27, 52, 3, 4);
-    // Ice floor — marble slides into gates
+    // Safe lane 2 (south, y=24..31, 8 wide): ICE PILLAR MAZE
+    // Ice floor shoots marble into pillar hazards — must navigate carefully
+    fillTrack(level, 12, 24, 52, 8, 4);
+    // Full ice floor — marble slides uncontrollably
     for (let cx = 13; cx < 63; cx++) {
-      setSurface(level, cx, 28, { baseHeight: 4, shape: SHAPES.FLAT, friction: 0.22 });
-    }
-    // Crumble section near start
-    for (let cx = 18; cx < 26; cx++) {
-      for (let cy = 27; cy < 30; cy++) {
-        setSurface(level, cx, cy, { baseHeight: 4, shape: SHAPES.FLAT, crumble: { delay: 0.18, downtime: 3.0 } });
+      for (let cy = 24; cy < 32; cy++) {
+        setSurface(level, cx, cy, { baseHeight: 4, shape: SHAPES.FLAT, friction: 0.20 });
       }
     }
-    // Three timed gates — tight timing on narrow ice lane
-    addTimedGate(level, 'gate_g3', 30, 27, 8, 3, 2, 1.4, 0.9);
-    addTimedGate(level, 'gate_g4', 42, 27, 8, 3, 2, 1.2, 0.8);
-    addTimedGate(level, 'gate_g5', 54, 27, 8, 3, 2, 1.0, 0.7);
-    wallRing(level, 12, 27, 52, 3, 6, {
+    // Pillar columns (hazard tiles) — ice shoots marble straight into them
+    // Column 1 (x:20-21, y:25-30) — blocks left side
+    addHazardRect(level, 20, 25, 2, 6, 'pillar_g2_1');
+    // Crumble floor around pillar 1 — can't stop near it
+    for (let cx = 18; cx < 24; cx++) {
+      for (let cy = 24; cy < 32; cy++) {
+        setSurface(level, cx, cy, { baseHeight: 4, shape: SHAPES.FLAT, friction: 0.20, crumble: { delay: 0.25, downtime: 2.5 } });
+      }
+    }
+    // Column 2 (x:32-33, y:24-29) — blocks right side
+    addHazardRect(level, 32, 24, 2, 6, 'pillar_g2_2');
+    for (let cx = 30; cx < 36; cx++) {
+      for (let cy = 24; cy < 32; cy++) {
+        setSurface(level, cx, cy, { baseHeight: 4, shape: SHAPES.FLAT, friction: 0.20, crumble: { delay: 0.25, downtime: 2.5 } });
+      }
+    }
+    // Column 3 (x:44-45, y:26-31) — blocks left side again
+    addHazardRect(level, 44, 26, 2, 6, 'pillar_g2_3');
+    for (let cx = 42; cx < 48; cx++) {
+      for (let cy = 24; cy < 32; cy++) {
+        setSurface(level, cx, cy, { baseHeight: 4, shape: SHAPES.FLAT, friction: 0.20, crumble: { delay: 0.25, downtime: 2.5 } });
+      }
+    }
+    // Column 4 (x:56-57, y:24-29) — final pillar before exit
+    addHazardRect(level, 56, 24, 2, 6, 'pillar_g2_4');
+    for (let cx = 54; cx < 60; cx++) {
+      for (let cy = 24; cy < 32; cy++) {
+        setSurface(level, cx, cy, { baseHeight: 4, shape: SHAPES.FLAT, friction: 0.20, crumble: { delay: 0.25, downtime: 2.5 } });
+      }
+    }
+    // Two timed gates — must navigate pillars AND time the gates
+    addTimedGate(level, 'gate_g3', 26, 24, 6, 8, 2, 1.6, 1.0);
+    addTimedGate(level, 'gate_g4', 50, 24, 6, 8, 2, 1.3, 0.9);
+    wallRing(level, 12, 24, 52, 8, 6, {
       gaps: [
-        { x: 63, y: 27 }, { x: 63, y: 28 }, { x: 63, y: 29 },
-        { x: 12, y: 27 }, { x: 12, y: 28 }, { x: 12, y: 29 }
+        { x: 63, y: 24 }, { x: 63, y: 25 }, { x: 63, y: 26 }, { x: 63, y: 27 },
+        { x: 63, y: 28 }, { x: 63, y: 29 }, { x: 63, y: 30 }, { x: 63, y: 31 },
+        { x: 12, y: 24 }, { x: 12, y: 25 }, { x: 12, y: 26 }, { x: 12, y: 27 },
+        { x: 12, y: 28 }, { x: 12, y: 29 }, { x: 12, y: 30 }, { x: 12, y: 31 }
       ]
     });
 
@@ -3364,19 +3473,21 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     wallRing(level, 2, 18, 10, 14, 6, {
       gaps: [
         { x: 11, y: 18 }, { x: 11, y: 19 }, { x: 11, y: 20 }, { x: 11, y: 21 }, { x: 11, y: 22 },
-        { x: 11, y: 27 }, { x: 11, y: 28 }, { x: 11, y: 29 },
-        { x: 5, y: 29 }, { x: 6, y: 29 }, { x: 7, y: 29 }, { x: 8, y: 29 }
+        { x: 11, y: 24 }, { x: 11, y: 25 }, { x: 11, y: 26 }, { x: 11, y: 27 },
+        { x: 11, y: 28 }, { x: 11, y: 29 }, { x: 11, y: 30 }, { x: 11, y: 31 },
+        { x: 5, y: 31 }, { x: 6, y: 31 }, { x: 7, y: 31 }, { x: 8, y: 31 }
       ]
     });
 
-    // Final ramp south (z=4→0), 5×4
-    placeRamp(level, { x: 4, y: 30, dir: 'south', length: 5, width: 4, startZ: 4, endZ: 0 });
-    // Goal basin (z=0), 14×10
-    fillTrack(level, 2, 35, 14, 10, 0);
-    wallRing(level, 2, 35, 14, 10, 2, {
-      gaps: [{ x: 4, y: 35 }, { x: 5, y: 35 }, { x: 6, y: 35 }, { x: 7, y: 35 }, { x: 8, y: 35 }, { x: 9, y: 35 }]
+    // Final ramp south (z=4→0), 5×8 — covers full width of pillar maze exit
+    placeRamp(level, { x: 4, y: 32, dir: 'south', length: 5, width: 8, startZ: 4, endZ: 0 });
+    // Goal basin (z=0), 14×14
+    fillTrack(level, 2, 37, 14, 14, 0);
+    wallRing(level, 2, 37, 14, 14, 2, {
+      gaps: [{ x: 4, y: 37 }, { x: 5, y: 37 }, { x: 6, y: 37 }, { x: 7, y: 37 },
+             { x: 8, y: 37 }, { x: 9, y: 37 }, { x: 10, y: 37 }, { x: 11, y: 37 }]
     });
-    setGoal(level, 9, 41, 0.44);
+    setGoal(level, 9, 46, 0.44);
 
     addGraphNode(level, { id: 'start',  type: 'entry', x: 4.5,  y: 8.5,  z: 18 });
     addGraphNode(level, { id: 'risky1', type: 'route', x: 38.5, y: 6.5,  z: 18 });
@@ -3737,18 +3848,39 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     fillTrack(level, 76, 28, 6, 6, 18);
     placeRamp(level, { x: 58, y: 34, dir: 'south', length: 8, width: 6, startZ: 18, endZ: 6 });
 
-    // ACT 4 — Final descent and goal
+    // ACT 4 — Final descent and goal — filled with hazards
     fillTrack(level, 56, 42, 24, 14, 6);
-    placeRamp(level, { x: 56, y: 56, dir: 'south', length: 6, width: 14, startZ: 6, endZ: 2 });
+    // Sweepers guarding the descent
+    addActor(level, {
+      id: 'sweeper_act4a', kind: ACTOR_KINDS.SWEEPER,
+      x: 62, y: 46, z: 6, topHeight: 6,
+      width: 1, height: 1, armLength: 3.0, armWidth: 0.22, angularSpeed: 1.5, fatal: true
+    });
+    addActor(level, {
+      id: 'sweeper_act4b', kind: ACTOR_KINDS.SWEEPER,
+      x: 72, y: 50, z: 6, topHeight: 6,
+      width: 1, height: 1, armLength: 3.0, armWidth: 0.22, angularSpeed: -1.8, fatal: true
+    });
+    // Hazard strips forcing navigation around sweepers
+    addHazardRect(level, 56, 44, 4, 6, 'act4_spikes_a');
+    addHazardRect(level, 76, 48, 4, 6, 'act4_spikes_b');
+    // Crumble section before the ramp
+    for (let cx = 58; cx < 78; cx++) {
+      for (let cy = 53; cy < 56; cy++) {
+        setSurface(level, cx, cy, { baseHeight: 6, shape: SHAPES.FLAT, crumble: { delay: 0.2, downtime: 2.5 } });
+      }
+    }
+    // Timed gate blocking the ramp entry
+    addTimedGate(level, 'gate_act4', 60, 56, 12, 3, 2, 1.6, 1.0);
+    // Narrow ramp — only 6 tiles wide, not 14 (forces precise entry)
+    placeRamp(level, { x: 60, y: 56, dir: 'south', length: 6, width: 8, startZ: 6, endZ: 2 });
 
     // Goal basin (z=2), 16×12
     fillTrack(level, 56, 62, 16, 12, 2);
     wallRing(level, 56, 62, 16, 12, 4, {
       gaps: [
-        { x: 56, y: 62 }, { x: 57, y: 62 }, { x: 58, y: 62 }, { x: 59, y: 62 },
         { x: 60, y: 62 }, { x: 61, y: 62 }, { x: 62, y: 62 }, { x: 63, y: 62 },
-        { x: 64, y: 62 }, { x: 65, y: 62 }, { x: 66, y: 62 }, { x: 67, y: 62 },
-        { x: 68, y: 62 }, { x: 69, y: 62 }, { x: 70, y: 62 }, { x: 71, y: 62 }
+        { x: 64, y: 62 }, { x: 65, y: 62 }, { x: 66, y: 62 }, { x: 67, y: 62 }
       ]
     });
 
@@ -3769,15 +3901,21 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     wallRing(level, 30, 74, 60, 20, 4, {
       gaps: [
         // North entry from goal basin
-        { x: 56, y: 74 }, { x: 57, y: 74 }, { x: 58, y: 74 }, { x: 59, y: 74 }, { x: 60, y: 74 }, { x: 61, y: 74 }, { x: 62, y: 74 }, { x: 63, y: 74 }, { x: 64, y: 74 }, { x: 65, y: 74 }, { x: 66, y: 74 }, { x: 67, y: 74 }, { x: 68, y: 74 }, { x: 69, y: 74 }, { x: 70, y: 74 }, { x: 71, y: 74 },
-        // Path A exit (west)
-        { x: 30, y: 78 }, { x: 30, y: 79 }, { x: 30, y: 80 }, { x: 30, y: 81 }, { x: 30, y: 82 },
-        // Path B exit (south-centre)
-        { x: 52, y: 93 }, { x: 53, y: 93 }, { x: 54, y: 93 }, { x: 55, y: 93 }, { x: 56, y: 93 }, { x: 57, y: 93 }, { x: 58, y: 93 }, { x: 59, y: 93 },
-        // Path C exit (east)
-        { x: 89, y: 78 }, { x: 89, y: 79 }, { x: 89, y: 80 }, { x: 89, y: 81 }, { x: 89, y: 82 }
+        { x: 60, y: 74 }, { x: 61, y: 74 }, { x: 62, y: 74 }, { x: 63, y: 74 },
+        { x: 64, y: 74 }, { x: 65, y: 74 }, { x: 66, y: 74 }, { x: 67, y: 74 },
+        // Path A exit (west) — narrow 3-tile
+        { x: 30, y: 78 }, { x: 30, y: 79 }, { x: 30, y: 80 },
+        // Path B exit (south-centre) — narrow 5-tile
+        { x: 53, y: 93 }, { x: 54, y: 93 }, { x: 55, y: 93 }, { x: 56, y: 93 }, { x: 57, y: 93 },
+        // Path C exit (east) — narrow 3-tile
+        { x: 89, y: 78 }, { x: 89, y: 79 }, { x: 89, y: 80 }
       ]
     });
+    // Additional hazard strips to create corridors through the arena
+    addHazardRect(level, 36, 76, 3, 8, 'arena_col_1');
+    addHazardRect(level, 46, 82, 3, 8, 'arena_col_2');
+    addHazardRect(level, 68, 76, 3, 8, 'arena_col_3');
+    addHazardRect(level, 78, 82, 3, 8, 'arena_col_4');
     // Arena hazards — dense obstacle field on ice floor
     // Row 1: sweepers guarding path exits
     addActor(level, {
@@ -3809,47 +3947,60 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     // Hazard strips blocking direct routes to exits
     addHazardRect(level, 32, 78, 4, 6, 'act5_spikes_west');
     addHazardRect(level, 84, 78, 4, 6, 'act5_spikes_east');
-    addHazardRect(level, 52, 89, 16, 3, 'act5_spikes_south');
+    addHazardRect(level, 52, 89, 8, 3, 'act5_spikes_south');
     // Timed gate blocking south path exit
-    addTimedGate(level, 'gate_act5', 50, 91, 12, 3, 2, 1.8, 0.9);
+    addTimedGate(level, 'gate_act5', 52, 91, 6, 3, 2, 1.6, 0.9);
 
-    // Path A (west): moving platform over a WIDE gap — must wait for platform
-    fillTrack(level, 4, 76, 10, 6, 2);   // landing pad west
-    fillTrack(level, 22, 76, 8, 6, 2);   // landing pad east
-    // Wide void gap (x:14-21) — 8 tiles, platform is only way across
-    clearSurfaceRect(level, 14, 76, 8, 6);
+    // Path A (west): NARROW 3-tile corridor with mandatory platform gap
+    // Corridor is only 3 tiles wide — cannot go around the gap
+    fillTrack(level, 4, 78, 10, 3, 2);   // west landing (3 wide)
+    // Void gap x:14-25 — 12 tiles, impossible to jump, platform is the only way
+    fillTrack(level, 26, 78, 4, 3, 2);   // east landing (3 wide)
+    // Platform travels the full gap — 4 tiles wide, 3 tiles tall
     addMovingBridge(level, 'bridge_act5a', [
-      { x: 14, y: 76, z: 2 },
-      { x: 18, y: 76, z: 2 }
-    ], 4, 6, 0.35);
-    // Sweeper on landing pad east — must time platform AND sweeper
+      { x: 14, y: 78, z: 2 },
+      { x: 22, y: 78, z: 2 }
+    ], 4, 3, 0.28);
+    // Hazard strip on east landing — must step off platform quickly
+    addHazardRect(level, 26, 78, 2, 3, 'path_a_spikes');
+    // Sweeper at the end of east landing
     addActor(level, {
       id: 'sweeper_path_a', kind: ACTOR_KINDS.SWEEPER,
-      x: 25, y: 79, z: 2, topHeight: 2,
-      width: 1, height: 1, armLength: 2.5, armWidth: 0.22, angularSpeed: 1.6, fatal: true
+      x: 28, y: 79, z: 2, topHeight: 2,
+      width: 1, height: 1, armLength: 1.4, armWidth: 0.22, angularSpeed: 2.0, fatal: true
     });
-    wallRing(level, 4, 76, 26, 6, 4, {
+    wallRing(level, 4, 78, 26, 3, 4, {
       gaps: [
         { x: 29, y: 78 }, { x: 29, y: 79 }, { x: 29, y: 80 },
         { x: 4, y: 78 }, { x: 4, y: 79 }, { x: 4, y: 80 }
       ]
     });
-    placeRamp(level, { x: 4, y: 82, dir: 'south', length: 6, width: 4, startZ: 2, endZ: -2 });
+    placeRamp(level, { x: 4, y: 81, dir: 'south', length: 6, width: 3, startZ: 2, endZ: -2 });
 
-    // Path B (south): crumble descent
-    fillTrack(level, 48, 94, 14, 12, 2);
-    for (let cx = 49; cx < 61; cx++) {
+    // Path B (south): crumble descent — narrow 6-tile corridor with sweeper + hazard
+    fillTrack(level, 51, 94, 8, 12, 2);
+    // All crumble — fast delay, must move quickly
+    for (let cx = 52; cx < 58; cx++) {
       for (let cy = 95; cy < 105; cy++) {
-        setSurface(level, cx, cy, { baseHeight: 2, shape: SHAPES.FLAT, crumble: { delay: 0.3, downtime: 2.5 } });
+        setSurface(level, cx, cy, { baseHeight: 2, shape: SHAPES.FLAT, crumble: { delay: 0.18, downtime: 3.0 } });
       }
     }
-    wallRing(level, 48, 94, 14, 12, 4, {
+    // Sweeper mid-corridor — must time it while crumble disappears under you
+    addActor(level, {
+      id: 'sweeper_path_b', kind: ACTOR_KINDS.SWEEPER,
+      x: 55, y: 100, z: 2, topHeight: 2,
+      width: 1, height: 1, armLength: 2.5, armWidth: 0.22, angularSpeed: 1.4, fatal: true
+    });
+    // Hazard strip near exit
+    addHazardRect(level, 52, 102, 6, 2, 'path_b_spikes');
+    wallRing(level, 51, 94, 8, 12, 4, {
       gaps: [
-        { x: 52, y: 93 }, { x: 53, y: 93 }, { x: 54, y: 93 }, { x: 55, y: 93 }, { x: 56, y: 93 }, { x: 57, y: 93 }, { x: 58, y: 93 }, { x: 59, y: 93 }, { x: 60, y: 93 },
-        { x: 52, y: 105 }, { x: 53, y: 105 }, { x: 54, y: 105 }, { x: 55, y: 105 }, { x: 56, y: 105 }, { x: 57, y: 105 }, { x: 58, y: 105 }, { x: 59, y: 105 }, { x: 60, y: 105 }
+        { x: 53, y: 93 }, { x: 54, y: 93 }, { x: 55, y: 93 }, { x: 56, y: 93 }, { x: 57, y: 93 },
+        { x: 53, y: 105 }, { x: 54, y: 105 }, { x: 55, y: 105 }, { x: 56, y: 105 }, { x: 57, y: 105 }
       ]
     });
-    placeRamp(level, { x: 50, y: 106, dir: 'south', length: 6, width: 8, startZ: 2, endZ: -2 });
+    // Narrow ramp — only 5 tiles wide
+    placeRamp(level, { x: 52, y: 106, dir: 'south', length: 6, width: 5, startZ: 2, endZ: -2 });
 
     // Path C (east): triple sweeper gauntlet on narrow 3-tile corridor
     fillTrack(level, 90, 78, 16, 3, 2);
@@ -3874,7 +4025,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
         { x: 105, y: 78 }, { x: 105, y: 79 }, { x: 105, y: 80 }
       ]
     });
-    placeRamp(level, { x: 100, y: 81, dir: 'south', length: 6, width: 4, startZ: 2, endZ: -2 });
+    placeRamp(level, { x: 101, y: 81, dir: 'south', length: 6, width: 3, startZ: 2, endZ: -2 });
 
     // Grand finale basin (z=-2), 60×14 — all three paths converge
     fillTrack(level, 14, 90, 92, 14, -2);
