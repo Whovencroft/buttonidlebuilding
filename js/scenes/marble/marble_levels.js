@@ -2588,14 +2588,20 @@ setGoal(level, 12, 88, 0.44);
     fillTrack(level, 49, 3, 10, 12, 10);
     wallRing(level, 49, 3, 10, 12, 12, {
       gaps: [
+        // North lane entry (y:4-7)
         { x: 49, y: 4 }, { x: 49, y: 5 }, { x: 49, y: 6 }, { x: 49, y: 7 },
+        // South lane entry (y:8-13) — was missing, caused marble to fall off south edge
         { x: 49, y: 8 }, { x: 49, y: 9 }, { x: 49, y: 10 }, { x: 49, y: 11 }, { x: 49, y: 12 }, { x: 49, y: 13 },
+        // East exit to ramp (x:54, y:7-10)
         { x: 54, y: 7 }, { x: 54, y: 8 }, { x: 54, y: 9 }, { x: 54, y: 10 }
       ]
     });
 
        // Ramp south from merge platform (z=10→6), 5×5 — into second canal section
     placeRamp(level, { x: 55, y: 7, dir: 'south', length: 5, width: 5, startZ: 10, endZ: 6 });
+    // Connector strip (z=6), 5×3 — fills gap between ramp landing (y:12) and junction entry (y:15)
+    // Without this, the marble falls into void between the ramp and the junction.
+    fillTrack(level, 51, 12, 5, 3, 6);
 
     // === EXTENSION: second canal section ===
     // Second fork junction (z=6), 6×14
