@@ -3282,19 +3282,19 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     // Risky lane 2 (north, y=18..22, 5 wide): rotating bars + spikes
     fillTrack(level, 12, 18, 52, 5, 4);
     addActor(level, {
-      id: 'bar_g3', kind: ACTOR_KINDS.ROTATING_BAR,
+      id: 'sweeper_g2a', kind: ACTOR_KINDS.SWEEPER,
       x: 22, y: 19, z: 4, topHeight: 4,
-      width: 1, height: 1, armLength: 2.0, armWidth: 0.22, angularSpeed: 2.2, fatal: true
+      width: 1, height: 1, armLength: 2.2, armWidth: 0.22, angularSpeed: 1.1, fatal: true
     });
     addActor(level, {
-      id: 'bar_g4', kind: ACTOR_KINDS.ROTATING_BAR,
+      id: 'sweeper_g2b', kind: ACTOR_KINDS.SWEEPER,
       x: 38, y: 19, z: 4, topHeight: 4,
-      width: 1, height: 1, armLength: 2.0, armWidth: 0.22, angularSpeed: 2.5, fatal: true
+      width: 1, height: 1, armLength: 2.2, armWidth: 0.22, angularSpeed: -1.4, fatal: true
     });
     addActor(level, {
-      id: 'sweeper_g2', kind: ACTOR_KINDS.SWEEPER,
+      id: 'sweeper_g2c', kind: ACTOR_KINDS.SWEEPER,
       x: 54, y: 19, z: 4, topHeight: 4,
-      width: 1, height: 1, armLength: 2.2, armWidth: 0.22, angularSpeed: 1.0, fatal: true
+      width: 1, height: 1, armLength: 2.2, armWidth: 0.22, angularSpeed: 1.7, fatal: true
     });
     addHazardRect(level, 58, 18, 3, 4, 'gauntlet2_spikes_risky');
     wallRing(level, 12, 18, 52, 5, 6, {
@@ -3354,7 +3354,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     addGraphEdge(level, { from: 'merge1', to: 'safe2',  kind: 'roll'        });
     addGraphEdge(level, { from: 'risky2', to: 'goal',   kind: 'descent'     });
     addGraphEdge(level, { from: 'safe2',  to: 'goal',   kind: 'timed_cross' });
-    return registerLevel(level);;
+    return registerLevel(level);
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
@@ -3502,8 +3502,10 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     addTimedGate(level, 'gate_floor4', 50, 40, 12, 3, 2, 1.8, 1.2);
     wallRing(level, 40, 39, 28, 5, 4, {
       gaps: [
+        // West entry (from fork junction)
         { x: 40, y: 39 }, { x: 40, y: 40 }, { x: 40, y: 41 }, { x: 40, y: 42 }, { x: 40, y: 43 },
-        { x: 67, y: 39 }, { x: 67, y: 40 }, { x: 67, y: 41 }, { x: 67, y: 42 }, { x: 67, y: 43 }
+        // South exit (to ramp at x:64-68, y=44)
+        { x: 64, y: 43 }, { x: 65, y: 43 }, { x: 66, y: 43 }, { x: 67, y: 43 }
       ]
     });
     // Ramp south (z=2→-2), 5×5
