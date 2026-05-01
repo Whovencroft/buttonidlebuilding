@@ -3937,16 +3937,36 @@ setGoal(level, 93, 33, 0.44);
       ]
     });
 
-    // ACT 1 — Path A (north): moving platform bridge, timed gate
-    fillTrack(level, 14, 2, 16, 5, 24);
-    clearSurfaceRect(level, 30, 2, 8, 5);
+    // ACT 1 — Path A (north): MANDATORY platform crossing
+    // Narrow 3-tile approach with crumble — can't loiter waiting for platform.
+    // 18-tile void gap — physically impossible to jump across.
+    // Platform is 3 wide and slow (0.18 speed) — must time it carefully.
+    // Sweeper on landing pad — must step off quickly.
+    // Timed gate at ramp entry — must navigate past sweeper before gate closes.
+    fillTrack(level, 14, 2, 14, 3, 24);  // narrow 3-tile approach
+    // Crumble on the last 6 tiles of approach — can't stand still waiting
+    for (let cx = 22; cx < 28; cx++) {
+      for (let cy = 2; cy < 5; cy++) {
+        setSurface(level, cx, cy, { baseHeight: 24, shape: SHAPES.FLAT, crumble: { delay: 0.08, downtime: 1.2 } });
+      }
+    }
+    // 18-tile void — the platform is the ONLY way across
+    clearSurfaceRect(level, 28, 2, 18, 3);
     addMovingBridge(level, 'bridge_fa1', [
-      { x: 30, y: 2, z: 24 },
-      { x: 33, y: 2, z: 24 }
-    ], 4, 4, 0.55);
-    fillTrack(level, 38, 2, 14, 5, 24);
-    addTimedGate(level, 'gate_fa1', 44, 3, 26, 3, 2, 1.8, 1.4);
-    placeRamp(level, { x: 52, y: 2, dir: 'east', length: 6, width: 5, startZ: 24, endZ: 18 });
+      { x: 28, y: 2, z: 24 },
+      { x: 40, y: 2, z: 24 }
+    ], 3, 3, 0.18);
+    // Landing pad — 8 tiles, then ramp
+    fillTrack(level, 46, 2, 10, 3, 24);
+    // Sweeper guards the landing — must step off platform and dodge immediately
+    addActor(level, {
+      id: 'sweeper_fa_path_a', kind: ACTOR_KINDS.SWEEPER,
+      x: 48, y: 3, z: 24, topHeight: 24,
+      width: 1, height: 1, armLength: 1.8, armWidth: 0.22, angularSpeed: 2.4, fatal: true
+    });
+    // Timed gate just before the ramp — tight timing
+    addTimedGate(level, 'gate_fa1', 52, 2, 26, 3, 2, 1.4, 1.0);
+    placeRamp(level, { x: 55, y: 2, dir: 'east', length: 6, width: 3, startZ: 24, endZ: 18 });
 
     // ACT 1 — Path B (center): sweeper + crumble
     fillTrack(level, 14, 7, 36, 5, 24);

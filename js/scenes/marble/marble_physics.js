@@ -345,8 +345,11 @@
     marble.vy += (worldInput.y * GROUND_STEER_ACCEL + downhillY * SLOPE_ACCEL) * dt;
 
     if (conveyor) {
-      marble.vx += conveyor.x * conveyor.strength * 1.1 * dt;
-      marble.vy += conveyor.y * conveyor.strength * 1.1 * dt;
+      // Conveyor multiplier boosted to 3.0 (was 1.1) — conveyors now push
+      // hard enough to meaningfully affect marble trajectory and force
+      // players to actively counteract them.
+      marble.vx += conveyor.x * conveyor.strength * 3.0 * dt;
+      marble.vy += conveyor.y * conveyor.strength * 3.0 * dt;
     }
 
     // Ice tiles (friction < 0.4): very low drag, speed builds uncontrollably
@@ -469,7 +472,11 @@ function moveGrounded(runtime, dt) {
     const totalDz = marble.vz * dt;
 
     const horizontalSteps = Math.ceil(Math.hypot(totalDx, totalDy) / MOVE_STEP);
-    const verticalStepSize = Math.max(0.12, marble.collisionRadius * 0.6);
+    // PLATFORM CLIP FIX: use a much smaller vertical step size so a fast-falling
+    // marble cannot skip over a platform surface in a single sub-step.
+    // The old value (0.12-0.21) was too large relative to the effective platform
+    // thickness (near zero), causing clip-through on jump landings.
+    const verticalStepSize = Math.max(0.04, marble.collisionRadius * 0.18);
     const verticalSteps = Math.ceil(Math.abs(totalDz) / verticalStepSize);
     const steps = Math.max(1, horizontalSteps, verticalSteps);
     const stepDt = dt / steps;
@@ -479,6 +486,23 @@ function moveGrounded(runtime, dt) {
       const stepDx = marble.vx * stepDt;
       const stepDy = marble.vy * stepDt;
       const targetZ = marble.z + marble.vz * stepDt;
+
+      // PLATFORM CLIP FIX: before moving, check if a platform surface exists
+      // at the current position and the marble is about to cross its top.
+      // This catches the case where the marble arrives exactly at the platform
+      // level at the start of a sub-step rather than the end.
+      if (marble.vz <= 0) {
+        const preSurface = getLandingSupport(runtime, marble.x, marble.y, marble.supportRadius);
+        if (preSurface) {
+          const preLandZ = preSurface.z + marble.collisionRadius + (preSurface.landingPad ? 0.35 : GROUND_SNAP);
+          if (marble.z >= preLandZ && targetZ <= preLandZ) {
+            marble.grounded = true;
+            marble.z = preSurface.z + marble.collisionRadius;
+            marble.vz = 0;
+            return preSurface;
+          }
+        }
+      }
 
       const previewSupport = getLandingSupport(
         runtime,
