@@ -114,7 +114,7 @@
       } : null,
       bounce: patch.bounce ?? 0,
       crumble: patch.crumble ? {
-        delay: patch.crumble.delay ?? 0.32,
+        delay: patch.crumble.delay ?? 0.15,
         downtime: patch.crumble.downtime ?? 1.8,
         respawnEase: patch.crumble.respawnEase ?? 0.5
       } : null,
@@ -1396,7 +1396,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     // Hazard near goal
     addHazardRect(level, 48, 12, 1, 2, 'goal_guard');
     setSurface(level, 44, 13, { baseHeight: 5, shape: SHAPES.FLAT, conveyor: { x: 0.6, y: 0, strength: 1.1 } });
-    setSurface(level, 46, 13, { baseHeight: 5, shape: SHAPES.FLAT, bounce: 3.8 });
+    setSurface(level, 46, 13, { baseHeight: 5, shape: SHAPES.FLAT, bounce: 5.2 });
     // Goal on flat track tile (NOT a bounce tile)
     setSurface(level, 50, 13, { baseHeight: 5, shape: SHAPES.FLAT });
     setGoal(level, 50, 13, 0.44);
@@ -1483,7 +1483,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
       ]
     });
     addHazardRect(level, 10, 19, 2, 1, 'switchback_spikes');
-    setSurface(level, 18, 18, { baseHeight: 10, shape: SHAPES.FLAT, bounce: 3.5 });
+    setSurface(level, 18, 18, { baseHeight: 10, shape: SHAPES.FLAT, bounce: 5.2 });
 
     // ─ Ramp C: x=25..27, y=19..22 (4 tiles south, z=10→6)
     placeRamp(level, { x: 25, y: 19, dir: 'south', length: 4, width: 3, startZ: 10, endZ: 6 });
@@ -1610,7 +1610,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
       ]
     });
     addHazardRect(level, 38, 22, 2, 1, 'shaft_spikes');
-    setSurface(level, 36, 24, { baseHeight: 4, shape: SHAPES.FLAT, bounce: 3.2 });
+    setSurface(level, 36, 24, { baseHeight: 4, shape: SHAPES.FLAT, bounce: 5.2 });
 
     // ─ Merge corridor: all three shafts connect here (z=4)
     // Left shaft connects via ramp down from z=8 to z=4
@@ -1762,7 +1762,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
 
     // ─ Conveyor and bounce tiles (not on goal)
     setSurface(level, 22, 33, { baseHeight: 10, shape: SHAPES.FLAT, conveyor: { x: 0.5, y: 0, strength: 1.0 } });
-    setSurface(level, 37, 31, { baseHeight: 8, shape: SHAPES.FLAT, bounce: 3.5 });
+    setSurface(level, 37, 31, { baseHeight: 8, shape: SHAPES.FLAT, bounce: 5.2 });
 
     // ─ Route graph
     addGraphNode(level, { id: 'start',   type: 'entry',  x: 5.5,  y: 33.5, z: 12 });
@@ -3230,7 +3230,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     // Bounce pad between hazard strips (x:38-41) — lets marble clear the second strip
     for (let cx = 38; cx < 42; cx++) {
       for (let cy = 13; cy < 17; cy++) {
-        setSurface(level, cx, cy, { baseHeight: 18, shape: SHAPES.FLAT, bounce: 3.5 });
+        setSurface(level, cx, cy, { baseHeight: 18, shape: SHAPES.FLAT, bounce: 5.2 });
       }
     }
     // Rotating bar near end (x:54)

@@ -349,11 +349,17 @@
       marble.vy += conveyor.y * conveyor.strength * 1.1 * dt;
     }
 
-    const drag = Math.pow(0.972 / Math.max(0.45, friction), dt * 60);
+    // Ice tiles (friction < 0.4): very low drag, speed builds uncontrollably
+    // Normal tiles: standard drag formula
+    const isIce = friction < 0.4;
+    const dragBase = isIce ? 0.998 : 0.972;
+    const drag = Math.pow(dragBase / Math.max(0.40, friction), dt * 60);
     marble.vx *= drag;
     marble.vy *= drag;
 
-    clampSpeed(marble, MAX_GROUND_SPEED * clamp(1.2 / friction, 0.78, 1.35));
+    // Ice tiles allow much higher speed; normal tiles cap at 1.35x
+    const speedMult = isIce ? clamp(1.2 / friction, 1.0, 4.5) : clamp(1.2 / friction, 0.78, 1.35);
+    clampSpeed(marble, MAX_GROUND_SPEED * speedMult);
   }
 
   function applyAirForces(runtime, inputAxis, dt) {

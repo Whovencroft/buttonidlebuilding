@@ -75,6 +75,7 @@
   let lastLevelId    = null;
   let dynamicGroup   = null;
   let actorMeshMap   = {};   // actorId -> { group, kind } — persistent per level
+  let crumbleMeshMap = {};   // 'tx,ty' -> THREE.Group — individual crumble tile meshes, toggled per-frame
   let marbleMesh     = null;
   let dragArrowGroup = null;
   // Fixed camera Z anchor computed once per level load
@@ -545,19 +546,36 @@
     };
 
     // ── Pass 1: Tile tops ────────────────────────────────────────────────────
+    crumbleMeshMap = {}; // reset for this level
     for (const { tx, ty, cell } of tiles) {
-       const isGoal     = ML.getTriggerCell(level, tx, ty)?.kind === 'goal';
+      const isGoal     = ML.getTriggerCell(level, tx, ty)?.kind === 'goal';
       const isBounce   = !!cell.bounce;
       const isConveyor = !!cell.conveyor;
       const isCrumble  = !!cell.crumble;
       const isIce      = !isCrumble && !isBounce && !isConveyor && (cell.friction ?? 1) < 0.45;
       if (!cell.shape || cell.shape === 'flat') {
         const z = cell.baseHeight;
-        const matKey = isGoal ? 'goal_top' : isBounce ? 'bounce_top' : isConveyor ? 'conv_top' : isCrumble ? 'crumble_top' : isIce ? 'ice_top' : 'tile_top';
-        const mat    = matTileTop(isBounce, isConveyor, isGoal, isCrumble, isIce);
-        batch.quad(matKey, mat,
-          [tx, z, ty,  tx+1, z, ty,  tx, z, ty+1,  tx+1, z, ty+1],
-          NUP, UV01, IDX_TOP);
+        if (isCrumble) {
+          // Crumble tiles get individual meshes so they can be hidden when broken
+          const geo = new THREE.BufferGeometry();
+          const pos = new Float32Array([tx,z,ty, tx+1,z,ty, tx,z,ty+1, tx+1,z,ty+1]);
+          const nor = new Float32Array([0,1,0, 0,1,0, 0,1,0, 0,1,0]);
+          const uv  = new Float32Array([0,0, 1,0, 0,1, 1,1]);
+          const idx = new Uint16Array([0,2,1, 2,3,1]);
+          geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+          geo.setAttribute('normal',   new THREE.BufferAttribute(nor, 3));
+          geo.setAttribute('uv',       new THREE.BufferAttribute(uv,  2));
+          geo.setIndex(new THREE.BufferAttribute(idx, 1));
+          const mesh = new THREE.Mesh(geo, getMat('crumble_top', () => new THREE.MeshLambertMaterial({ map: texCrumbleTop })));
+          group.add(mesh);
+          crumbleMeshMap[`${tx},${ty}`] = mesh;
+        } else {
+          const matKey = isGoal ? 'goal_top' : isBounce ? 'bounce_top' : isConveyor ? 'conv_top' : isIce ? 'ice_top' : 'tile_top';
+          const mat    = matTileTop(isBounce, isConveyor, isGoal, false, isIce);
+          batch.quad(matKey, mat,
+            [tx, z, ty,  tx+1, z, ty,  tx, z, ty+1,  tx+1, z, ty+1],
+            NUP, UV01, IDX_TOP);
+        }
       } else {
         // Slope: keep as individual mesh (needs computeVertexNormals)
         group.add(buildSlopeMesh(tx, ty, cell));
@@ -770,6 +788,18 @@
     }
   }
 
+  // Update crumble tile visibility each frame based on dynamic crumble state
+  function updateCrumbleMeshes(dynState) {
+    if (!dynState) return;
+    const broken = dynState.crumble || {};
+    for (const key of Object.keys(crumbleMeshMap)) {
+      const mesh = crumbleMeshMap[key];
+      if (!mesh) continue;
+      const state = broken[key];
+      mesh.visible = !(state && state.broken);
+    }
+  }
+
   // ─── Marble mesh ─────────────────────────────────────────────────────────────
 
   function buildMarbleMesh() {
@@ -871,6 +901,7 @@
 
     dynamicGroup = null;
     actorMeshMap = {};
+    crumbleMeshMap = {};
 
     levelCamZ      = 0;
     smoothCamZ     = 0;
@@ -934,6 +965,8 @@
 
     // Update actor positions/rotations in-place — no allocations per frame
     updateActorMeshes(runtime.level, runtime.dynamicState);
+    // Show/hide crumble tiles based on dynamic crumble state
+    updateCrumbleMeshes(runtime.dynamicState);
 
     // Marble position
     const marble = runtime.marble;
