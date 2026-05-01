@@ -2655,6 +2655,12 @@ setGoal(level, 12, 88, 0.44);
       ]
     });
 
+    // Connector strip bridging 1-tile gap between lower lane west wall (x=29)
+    // and second merge platform east wall (x=28) at y:22-28, z=6.
+    // Without this, the marble exits the lower lane at x=29 and falls into
+    // the void because there is no floor tile at x=28 before the merge platform.
+    fillTrack(level, 28, 22, 1, 7, 6);
+
     // Second merge platform (z=6), 10×14
     fillTrack(level, 19, 15, 10, 14, 6);
     wallRing(level, 19, 15, 10, 14, 8, {
@@ -2672,12 +2678,24 @@ setGoal(level, 12, 88, 0.44);
     wallRing(level, 15, 34, 14, 10, 4, {
       gaps: [{ x: 21, y: 34 }, { x: 22, y: 34 }, { x: 23, y: 34 }, { x: 24, y: 34 }, { x: 25, y: 34 }]
     });
-        // Random push tiles — unpredictable direction changes
-    setSurface(level, 32, 6, { baseHeight: 10, shape: SHAPES.FLAT, conveyor: { x: 0, y: 3.0, strength: 3.0 } });
-    setSurface(level, 44, 10, { baseHeight: 10, shape: SHAPES.FLAT, conveyor: { x: -2.8, y: 0, strength: 2.8 } });
-    setSurface(level, 38, 18, { baseHeight: 6, shape: SHAPES.FLAT, conveyor: { x: 2.5, y: 2.5, strength: 3.2 } });
-    setSurface(level, 25, 24, { baseHeight: 6, shape: SHAPES.FLAT, conveyor: { x: -3.0, y: 2.0, strength: 3.5 } });
-    setSurface(level, 20, 36, { baseHeight: 2, shape: SHAPES.FLAT, conveyor: { x: 2.8, y: -2.8, strength: 3.5 } });
+    // Random push tiles — unpredictable direction changes
+    // Existing tiles on upper sections
+    setSurface(level, 32, 6,  { baseHeight: 10, shape: SHAPES.FLAT, conveyor: { x: 0,    y: 3.0,  strength: 3.0 } });
+    setSurface(level, 44, 10, { baseHeight: 10, shape: SHAPES.FLAT, conveyor: { x: -2.8, y: 0,    strength: 2.8 } });
+    setSurface(level, 38, 18, { baseHeight: 6,  shape: SHAPES.FLAT, conveyor: { x: 2.5,  y: 2.5,  strength: 3.2 } });
+    setSurface(level, 25, 24, { baseHeight: 6,  shape: SHAPES.FLAT, conveyor: { x: -3.0, y: 2.0,  strength: 3.5 } });
+    // New randomizers on second merge platform — push toward the ramp or sideways
+    setSurface(level, 21, 17, { baseHeight: 6,  shape: SHAPES.FLAT, conveyor: { x: -2.8, y: 2.8,  strength: 3.5 } });
+    setSurface(level, 24, 20, { baseHeight: 6,  shape: SHAPES.FLAT, conveyor: { x: 3.0,  y: -1.5, strength: 3.2 } });
+    setSurface(level, 20, 25, { baseHeight: 6,  shape: SHAPES.FLAT, conveyor: { x: -3.0, y: 3.0,  strength: 3.5 } });
+    setSurface(level, 26, 27, { baseHeight: 6,  shape: SHAPES.FLAT, conveyor: { x: 2.5,  y: 2.0,  strength: 3.0 } });
+    // Randomizers on the final ramp approach — push diagonally to knock marble off the narrow ramp
+    setSurface(level, 22, 29, { baseHeight: 5,  shape: SHAPES.FLAT, conveyor: { x: -3.0, y: 1.5,  strength: 3.5 } });
+    setSurface(level, 23, 31, { baseHeight: 4,  shape: SHAPES.FLAT, conveyor: { x: 2.8,  y: -2.0, strength: 3.2 } });
+    // Randomizers in the goal basin — push marble away from the goal
+    setSurface(level, 20, 36, { baseHeight: 2,  shape: SHAPES.FLAT, conveyor: { x: 2.8,  y: -2.8, strength: 3.5 } });
+    setSurface(level, 25, 38, { baseHeight: 2,  shape: SHAPES.FLAT, conveyor: { x: -3.0, y: 3.0,  strength: 3.5 } });
+    setSurface(level, 18, 40, { baseHeight: 2,  shape: SHAPES.FLAT, conveyor: { x: 3.0,  y: 2.5,  strength: 3.2 } });
 setGoal(level, 22, 40, 0.44);
 
     addGraphNode(level, { id: 'start',     type: 'entry', x: 4.5,  y: 6.5,  z: 14 });
@@ -4432,6 +4450,7 @@ function registerGeneratedLevel(level) {
     getActorBlockingOverlaps,
     getHazardContacts,
     resolveSupportInteraction,
+    isCrumbleBroken,
     setGoal
   };
 })();

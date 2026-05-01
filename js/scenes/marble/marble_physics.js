@@ -223,6 +223,15 @@
         if (!surface || surface.kind === 'void') continue;
         if (surface.shape !== 'flat') continue;
 
+        // CRUMBLE WALL-TELEPORT FIX: if this tile is a crumble tile that is
+        // currently broken, do NOT treat it as a wall blocker. The marble
+        // should fall through the void, not be pushed sideways/upward by the
+        // wall collision resolver. Without this, a marble standing next to a
+        // wall on a crumble tile gets pushed onto top of the wall when the
+        // tile breaks, because the collision push vector has an upward
+        // component in isometric space.
+        if (surface.crumble && window.MarbleLevels.isCrumbleBroken(runtime.dynamicState, tx, ty)) continue;
+
         const fz = surface.baseHeight;
         if (fz <= marbleBottom + MAX_STEP_UP + 0.04) continue;
 
@@ -382,10 +391,15 @@
   clampSpeed(marble, MAX_AIR_SPEED);
 }
 
-function moveGrounded(runtime, dt) {
+  function moveGrounded(runtime, dt) {
   const marble = runtime.marble;
   let currentSurface = getGroundSupport(runtime, marble.x, marble.y, marble.supportRadius);
   if (!currentSurface) {
+    // CRUMBLE WALL-TELEPORT FIX: apply a downward kick immediately when the
+    // marble loses ground support (e.g. crumble tile just broke). This
+    // prevents the marble from floating at the old z for one frame, which
+    // combined with nearby wall tiles could push it upward onto the wall top.
+    if (marble.vz >= 0) marble.vz = LEDGE_FALL_DOWNWARD_KICK;
     marble.grounded = false;
     return null;
   }
