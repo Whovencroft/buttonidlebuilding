@@ -4,17 +4,18 @@
  * Unified input system for the marble scene.
  *
  * PRIMARY: Drag-to-move (mouse + touch)
- *   - Drag starts on the marble (or anywhere on canvas for convenience)
+ *   - Drag starts anywhere on the canvas
  *   - Drag direction is projected from screen space into isometric world space
  *   - Drag length scales the applied force (longer drag = more force)
  *   - Force is applied as a continuous axis while dragging, then released
  *   - On release, a one-shot impulse proportional to drag length is applied
  *
- * Keyboard: non-movement keys only.
- *   - Space: jump
+ * JUMP: fires on pointer/touch RELEASE (mouse button up or finger lift).
+ *   - Every release triggers a jump, regardless of drag distance.
+ *   - This replaces the old tap-to-jump and spacebar-to-jump mechanics.
+ *   - Spacebar still works as a fallback for keyboard-only users.
  *   - R: restart  (consumed by marble_state.js)
  *   - Escape: return (consumed by marble_state.js)
- *   Arrow keys and WASD are intentionally NOT supported.
  *
  * Isometric world projection:
  *   The isometric camera is oriented at 45° yaw, ~35.26° pitch.
@@ -31,10 +32,8 @@
   const MAX_DRAG_PX = 120;
   // Maximum force magnitude (world units/s²) at full drag
   const MAX_FORCE   = 1.0;
-  // Tap threshold: drags shorter than this are treated as taps (no force)
+  // Minimum drag distance to register as a drag (below = treated as stationary)
   const TAP_THRESHOLD_PX = 8;
-  // Jump: tap the marble (short drag < TAP_THRESHOLD_PX) to jump
-  const JUMP_ON_TAP = true;
 
   function createInput() {
     // ── Non-movement key state ────────────────────────────────────────────
@@ -94,14 +93,17 @@
       if (!dragActive || e.pointerId !== dragPointer) return;
       e.preventDefault();
 
-      const dx = e.clientX - dragStartX;
-      const dy = e.clientY - dragStartY;
+      const dx   = e.clientX - dragStartX;
+      const dy   = e.clientY - dragStartY;
       const dist = Math.hypot(dx, dy);
 
-      if (dist < TAP_THRESHOLD_PX && JUMP_ON_TAP) {
-        pendingJump = true;
-      } else if (dist >= TAP_THRESHOLD_PX) {
-        // Convert screen drag to world-space impulse
+      // JUMP ON RELEASE: every pointer/touch release triggers a jump.
+      // This replaces the old tap-to-jump mechanic — the player holds to steer
+      // and releases to jump, making the controls feel more intuitive on mobile.
+      pendingJump = true;
+
+      // If the release was a meaningful drag, also apply the impulse.
+      if (dist >= TAP_THRESHOLD_PX) {
         const { wx, wy } = screenToWorld(dx, dy);
         const magnitude  = Math.min(dist / MAX_DRAG_PX, 1.0) * MAX_FORCE;
         pendingImpulse   = { wx, wy, magnitude };
@@ -113,6 +115,9 @@
 
     function onPointerCancel(e) {
       if (e.pointerId === dragPointer) {
+        // Treat cancel the same as release — fire a jump so the player
+        // isn't left hanging mid-air if the browser interrupts the gesture.
+        pendingJump = true;
         dragActive  = false;
         dragPointer = null;
       }
@@ -209,7 +214,8 @@
      * Consumes the pending impulse and jump flag.
      */
     function buildStepInput() {
-      const axis        = getAxis();
+      const axis = getAxis();
+      // Jump fires on pointer release OR spacebar press
       const jumpPressed = consumeBufferedPress('Space') || pendingJump;
       pendingJump       = false;
 

@@ -46,7 +46,7 @@
             <div class="marble-stage-label"><span data-marble-stage-name></span></div>
             <div class="marble-level-strip" data-marble-level-strip></div>
           </div>
-          <div class="marble-help">Drag to roll • Tap to jump • R restart • Esc return</div>
+          <div class="marble-help">Drag to roll • Release to jump • R restart • Esc return</div>
           <div class="marble-overlay" data-marble-overlay hidden>
             <div class="marble-overlay-card">
               <div class="popup-title" data-marble-overlay-title>Marble Branch</div>

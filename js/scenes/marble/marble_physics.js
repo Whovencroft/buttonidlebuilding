@@ -575,24 +575,43 @@
         }
       }
 
-      // PLATFORM CLIP FIX: if the marble is falling and a moving platform
-      // surface exists at the target position, check if the marble's downward
-      // path crossed the platform top surface this sub-step. This catches
-      // cases where the platform moved upward into the marble's path between
-      // frames, which the normal landing check misses because it only tests
-      // the final position.
-      if (marble.vz < -0.5 && surface && surface.source === 'actor') {
-        const platformTop = surface.z + marble.collisionRadius;
-        // The platform may have risen since startZ was sampled — use the
-        // platform's own dz to reconstruct where it was at the start of
-        // this sub-step.
-        const platformDz = surface.actorState?.dz ?? 0;
-        const platformTopAtStart = platformTop - platformDz;
-        if (startZ >= platformTopAtStart && marble.z <= platformTop) {
-          marble.grounded = true;
-          marble.z = platformTop;
-          marble.vz = 0;
-          return surface;
+      // PLATFORM HITBOX FIX: dedicated center-point platform sweep.
+      // The standard getLandingSupport uses a 16-point radius spread, which
+      // can miss narrow platforms when most sample points fall outside the
+      // platform rect. This pass checks only the marble center XY against
+      // every platform's rect with a generous tolerance, then tests whether
+      // the marble's vertical path crossed the platform top this sub-step.
+      // This is the primary landing detection for moving platforms.
+      if (marble.vz <= 0) {
+        const directSurface = window.MarbleLevels.sampleActorSurfaceDirect(
+          runtime.level, runtime.dynamicState, marble.x, marble.y, startZ + 0.1
+        );
+        if (directSurface) {
+          const platTop = directSurface.z + marble.collisionRadius;
+          // Check if the marble's path this sub-step crossed the platform top.
+          // Use a generous slab: platform top down to top-1.5 so a fast-falling
+          // marble that overshoots by up to 1.5 units still lands cleanly.
+          const platSlab = directSurface.z - 1.5;
+          const crossedDown = startZ >= platTop - 0.05 && marble.z <= platTop;
+          const withinSlab  = marble.z >= platSlab;
+          if (crossedDown && withinSlab) {
+            marble.grounded = true;
+            marble.z = directSurface.z + marble.collisionRadius;
+            marble.vz = 0;
+            return directSurface;
+          }
+          // Also catch the case where the platform rose up into the marble
+          // between frames (platform dz > 0).
+          const platformDz = directSurface.actorState?.dz ?? 0;
+          if (platformDz > 0) {
+            const platTopAtStart = platTop - platformDz;
+            if (startZ >= platTopAtStart && marble.z <= platTop) {
+              marble.grounded = true;
+              marble.z = directSurface.z + marble.collisionRadius;
+              marble.vz = 0;
+              return directSurface;
+            }
+          }
         }
       }
     }

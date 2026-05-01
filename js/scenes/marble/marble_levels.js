@@ -538,6 +538,12 @@
     };
   }
 
+  // PLATFORM HITBOX FIX: sampleActorSurface now uses a generous edge tolerance
+  // (0.35 instead of 0.15) so that the multi-sample support spread in
+  // sampleSupportSurface can detect the platform even when the marble center
+  // is near the platform edge. The old 0.15 tolerance was too tight — many of
+  // the 16 sample offsets would miss the platform rect, driving the support
+  // ratio below the 0.28 landing threshold and causing fall-through.
   function sampleActorSurface(level, runtime, x, y) {
     if (!runtime?.actors) return null;
     let best = null;
@@ -550,11 +556,11 @@
       const actorState = getActorWorldState(actor, runtime);
       if (actorState.active === false) continue;
       const rect = getActorTopRect(actor, actorState);
-      // PLATFORM CLIP FIX: use a small edge tolerance so the marble is still
-      // considered "on" the platform when a support sample point lands just
-      // outside the rect edge. Without this, edge landings return null and
-      // the marble clips through.
-      const PLAT_EDGE_TOL = 0.15;
+      // Generous edge tolerance: 0.35 tiles. This ensures that even when the
+      // marble center is up to 0.35 tiles outside the platform edge, the
+      // sample still registers as a hit. Combined with the multi-sample spread
+      // in sampleSupportSurface, this gives reliable landing detection.
+      const PLAT_EDGE_TOL = 0.35;
       if (x < rect.minX - PLAT_EDGE_TOL || x > rect.maxX + PLAT_EDGE_TOL ||
           y < rect.minY - PLAT_EDGE_TOL || y > rect.maxY + PLAT_EDGE_TOL) continue;
 
@@ -581,6 +587,47 @@
       }
     }
 
+    return best;
+  }
+
+  // Direct center-point actor surface check — used by the physics engine's
+  // platform sweep pass. Unlike sampleActorSurface (which is called from the
+  // multi-sample spread), this checks only the marble center XY against the
+  // platform rect with a very generous tolerance. Returns the highest platform
+  // surface below the given maxZ, or null if none found.
+  function sampleActorSurfaceDirect(level, runtime, x, y, maxZ) {
+    if (!runtime?.actors) return null;
+    let best = null;
+    const TOL = 0.45; // generous — marble center must be within 0.45 tiles of platform edge
+    for (const actor of level.actors) {
+      if (actor.kind !== ACTOR_KINDS.MOVING_PLATFORM && actor.kind !== ACTOR_KINDS.ELEVATOR) continue;
+      const actorState = getActorWorldState(actor, runtime);
+      if (actorState.active === false) continue;
+      const rect = getActorTopRect(actor, actorState);
+      // Only consider platforms at or below the marble's current position
+      if (rect.z > maxZ + 0.05) continue;
+      if (x < rect.minX - TOL || x > rect.maxX + TOL ||
+          y < rect.minY - TOL || y > rect.maxY + TOL) continue;
+      if (!best || rect.z > best.z) {
+        best = {
+          source: 'actor',
+          actor,
+          actorState,
+          tx: Math.floor(x),
+          ty: Math.floor(y),
+          u: x - Math.floor(x),
+          v: y - Math.floor(y),
+          z: rect.z,
+          gradient: { gx: 0, gy: 0 },
+          trigger: null,
+          friction: actor.friction ?? 1,
+          conveyor: actor.conveyor ?? null,
+          bounce: actor.bounce ?? 0,
+          failType: null,
+          landingPad: false
+        };
+      }
+    }
     return best;
   }
 
@@ -2075,21 +2122,26 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     });
 
     // === SECTION 5: Final descent and goal ===
-    // Wide ramp south (z=2→-2), 6 tiles long × 24 wide — very forgiving
-    placeRamp(level, { x: 88, y: 28, dir: 'south', length: 6, width: 24, startZ: 2, endZ: -2 });
-    // Goal basin (z=-2), 24×12
-    fillTrack(level, 88, 34, 24, 12, -2);
-    wallRing(level, 88, 34, 24, 12, 0, {
+    // Ramp south from merge area (z=2→-2), 6 tiles long × 14 wide
+    placeRamp(level, { x: 74, y: 28, dir: 'south', length: 6, width: 14, startZ: 2, endZ: -2 });
+    // South corridor from east landing (x:104-111) down to goal basin
+    // This fixes the dead-end: after crossing the platform, marble can go south
+    placeRamp(level, { x: 104, y: 22, dir: 'south', length: 6, width: 8, startZ: 2, endZ: -2 });
+    // Goal basin (z=-2), 38×12 — wide enough to catch marble from both approaches
+    fillTrack(level, 74, 34, 38, 12, -2);
+    wallRing(level, 74, 34, 38, 12, 0, {
       gaps: [
-        { x: 88, y: 34 }, { x: 89, y: 34 }, { x: 90, y: 34 }, { x: 91, y: 34 },
-        { x: 92, y: 34 }, { x: 93, y: 34 }, { x: 94, y: 34 }, { x: 95, y: 34 },
-        { x: 96, y: 34 }, { x: 97, y: 34 }, { x: 98, y: 34 }, { x: 99, y: 34 },
-        { x: 100, y: 34 }, { x: 101, y: 34 }, { x: 102, y: 34 }, { x: 103, y: 34 },
+        // North wall: both ramp exits open into basin
+        { x: 74, y: 34 }, { x: 75, y: 34 }, { x: 76, y: 34 }, { x: 77, y: 34 },
+        { x: 78, y: 34 }, { x: 79, y: 34 }, { x: 80, y: 34 }, { x: 81, y: 34 },
+        { x: 82, y: 34 }, { x: 83, y: 34 }, { x: 84, y: 34 }, { x: 85, y: 34 },
+        { x: 86, y: 34 }, { x: 87, y: 34 },
         { x: 104, y: 34 }, { x: 105, y: 34 }, { x: 106, y: 34 }, { x: 107, y: 34 },
         { x: 108, y: 34 }, { x: 109, y: 34 }, { x: 110, y: 34 }, { x: 111, y: 34 }
       ]
     });
-    setGoal(level, 100, 40, 0.44);
+    // Goal centered in the wide basin — easy to find
+    setGoal(level, 90, 40, 0.55);
 
     addGraphNode(level, { id: 'start',    type: 'entry', x: 4.5,   y: 4.5,  z: 14 });
     addGraphNode(level, { id: 'mid',      type: 'hub',   x: 18.5,  y: 20.5, z: 10 });
@@ -2097,14 +2149,15 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     addGraphNode(level, { id: 'path_a',   type: 'route', x: 58.5,  y: 17.5, z: 6  });
     addGraphNode(level, { id: 'path_b',   type: 'route', x: 58.5,  y: 23.5, z: 6  });
     addGraphNode(level, { id: 'merge',    type: 'hub',   x: 80.5,  y: 20.5, z: 2  });
-    addGraphNode(level, { id: 'platform', type: 'route', x: 100.5, y: 19.5, z: 2  });
-    addGraphNode(level, { id: 'goal',     type: 'goal',  x: 100.5, y: 40.5, z: -2 });
+    addGraphNode(level, { id: 'platform', type: 'route', x: 107.5, y: 19.5, z: 2  });
+    addGraphNode(level, { id: 'goal',     type: 'goal',  x: 90.5,  y: 40.5, z: -2 });
     addGraphEdge(level, { from: 'start',    to: 'mid',      kind: 'roll'    });
     addGraphEdge(level, { from: 'mid',      to: 'fork',     kind: 'descent' });
     addGraphEdge(level, { from: 'fork',     to: 'path_a',   kind: 'roll',    tag: 'conveyor' });
     addGraphEdge(level, { from: 'fork',     to: 'path_b',   kind: 'roll',    tag: 'crumble'  });
     addGraphEdge(level, { from: 'path_a',   to: 'merge',    kind: 'descent' });
     addGraphEdge(level, { from: 'path_b',   to: 'merge',    kind: 'descent' });
+    addGraphEdge(level, { from: 'merge',    to: 'goal',     kind: 'descent' });
     addGraphEdge(level, { from: 'merge',    to: 'platform', kind: 'roll',    tag: 'platform' });
     addGraphEdge(level, { from: 'platform', to: 'goal',     kind: 'descent' });
     return registerLevel(level);
@@ -2624,9 +2677,11 @@ setGoal(level, 12, 88, 0.44);
     // Upper lane (z=6), 20×4 — moving platform bridge over void
     fillTrack(level, 29, 16, 20, 4, 6);
     clearSurfaceRect(level, 36, 16, 6, 4);
+    // Bridge starts 2 tiles onto the west landing and ends 2 tiles onto the
+    // east landing — marble can board from either side without standing at the edge.
     addMovingBridge(level, 'bridge_canal2', [
-      { x: 36, y: 16, z: 6 },
-      { x: 39, y: 16, z: 6 }
+      { x: 34, y: 16, z: 6 },
+      { x: 41, y: 16, z: 6 }
     ], 4, 4, 0.55);
     // Hazard strip on west landing — can't loiter waiting for platform
     addHazardRect(level, 33, 16, 3, 4, 'canal_bridge_west_spikes');
@@ -2752,10 +2807,11 @@ setGoal(level, 22, 40, 0.44);
     });
 
     // Gap: 6 tiles void (x=22..27) — already void by default
-    // Moving platform bridge
+    // Moving platform bridge — starts 2 tiles onto the west landing so the
+    // marble can board it without standing right at the void edge.
     addMovingBridge(level, 'bridge_main', [
-      { x: 22, y: 6, z: 14 },
-      { x: 24, y: 6, z: 14 }
+      { x: 20, y: 6, z: 14 },
+      { x: 26, y: 6, z: 14 }
     ], 4, 4, 0.6);
 
     // East landing platform (z=14), 12×10
@@ -4001,9 +4057,11 @@ setGoal(level, 93, 33, 0.44);
     }
     // 18-tile void — the platform is the ONLY way across
     clearSurfaceRect(level, 28, 2, 18, 3);
+    // Bridge starts 2 tiles onto the west landing so the marble can board
+    // without standing right at the void edge. Ends 2 tiles onto east landing.
     addMovingBridge(level, 'bridge_fa1', [
-      { x: 28, y: 2, z: 24 },
-      { x: 40, y: 2, z: 24 }
+      { x: 26, y: 2, z: 24 },
+      { x: 43, y: 2, z: 24 }
     ], 3, 3, 0.18);
     // Landing pad — 8 tiles, then ramp
     fillTrack(level, 46, 2, 10, 3, 24);
@@ -4110,9 +4168,10 @@ setGoal(level, 93, 33, 0.44);
     // ACT 3 — Safe path (south, 6 wide): moving platform bridge
     fillTrack(level, 58, 28, 20, 6, 18);
     clearSurfaceRect(level, 68, 28, 8, 6);
+    // Bridge starts 2 tiles onto the west landing, ends 2 tiles onto east landing.
     addMovingBridge(level, 'bridge_fa2', [
-      { x: 68, y: 28, z: 18 },
-      { x: 72, y: 28, z: 18 }
+      { x: 66, y: 28, z: 18 },
+      { x: 74, y: 28, z: 18 }
     ], 4, 5, 0.5);
     fillTrack(level, 76, 28, 6, 6, 18);
     placeRamp(level, { x: 58, y: 34, dir: 'south', length: 8, width: 6, startZ: 18, endZ: 6 });
@@ -4230,10 +4289,11 @@ setGoal(level, 93, 33, 0.44);
       setSurface(level, cx, 80, { baseHeight: 2, shape: SHAPES.FLAT, crumble: { delay: 0.10, downtime: 1.0 } });
     }
     // Void gap x:12-25 — 14 tiles wide, physically impossible to cross without platform
-    // Platform: 5 tiles wide, travels the full gap slowly
+    // Platform: 5 tiles wide, travels the full gap slowly.
+    // Starts 2 tiles onto the west landing, ends 2 tiles onto east landing.
     addMovingBridge(level, 'bridge_act5a', [
-      { x: 12, y: 78, z: 2 },
-      { x: 21, y: 78, z: 2 }
+      { x: 10, y: 78, z: 2 },
+      { x: 22, y: 78, z: 2 }
     ], 5, 3, 0.20);
     // East landing — 3-tile wide, hazard strip + sweeper
     fillTrack(level, 26, 78, 4, 3, 2);
@@ -4470,6 +4530,7 @@ function registerGeneratedLevel(level) {
     sampleWalkableSurface,
     sampleVisualSurface,
     sampleSupportSurface,
+    sampleActorSurfaceDirect,
     createDynamicState,
     advanceDynamicState,
     getActorBlockingOverlaps,
