@@ -3800,8 +3800,15 @@ setGoal(level, 93, 33, 0.44);
     });
     wallRing(level, 12, 34, 28, 5, 4, {
       gaps: [
+        // West entry (from Floor 3 east corridor ramp)
         { x: 12, y: 34 }, { x: 12, y: 35 }, { x: 12, y: 36 }, { x: 12, y: 37 }, { x: 12, y: 38 },
-        { x: 12, y: 39 }, { x: 12, y: 40 }, { x: 12, y: 41 }, { x: 12, y: 42 }, { x: 12, y: 43 }
+        // South exit (to Floor 4 fork junction) — was missing, caused blocking wall
+        { x: 13, y: 38 }, { x: 14, y: 38 }, { x: 15, y: 38 }, { x: 16, y: 38 }, { x: 17, y: 38 },
+        { x: 18, y: 38 }, { x: 19, y: 38 }, { x: 20, y: 38 }, { x: 21, y: 38 }, { x: 22, y: 38 },
+        { x: 23, y: 38 }, { x: 24, y: 38 }, { x: 25, y: 38 }, { x: 26, y: 38 }, { x: 27, y: 38 },
+        { x: 28, y: 38 }, { x: 29, y: 38 }, { x: 30, y: 38 }, { x: 31, y: 38 }, { x: 32, y: 38 },
+        { x: 33, y: 38 }, { x: 34, y: 38 }, { x: 35, y: 38 }, { x: 36, y: 38 }, { x: 37, y: 38 },
+        { x: 38, y: 38 }, { x: 39, y: 38 }
       ]
     });
 

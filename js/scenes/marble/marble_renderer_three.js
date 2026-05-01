@@ -727,10 +727,19 @@
       }
 
       if (kind === ML.ACTOR_KINDS.ROTATING_BAR || kind === ML.ACTOR_KINDS.SWEEPER) {
-        const len = actor.length ?? 3;
-        const geo = new THREE.BoxGeometry(len, 0.15, 0.3);
+        // SWEEPER HIT FIX: use armLength * 2 so the visual arm exactly matches
+        // the hit detection radius. The old code used actor.length (never set)
+        // which defaulted to 3 regardless of armLength, causing a mismatch.
+        // The arm mesh is offset by armLength/2 along +X so the pivot is at the
+        // actor center (matching the hit detection which sweeps from center out).
+        const armLen = actor.armLength ?? 1.5;
+        const len = armLen * 2;
+        const geo = new THREE.BoxGeometry(len, 0.15, actor.armWidth ?? 0.26);
         const mat = getMat('haz_bar', () => new THREE.MeshLambertMaterial({ color: COL.hazardTop }));
         const mesh = new THREE.Mesh(geo, mat);
+        // No offset needed — BoxGeometry is centered, hit detection sweeps
+        // from center to armLength in the angle direction, so the visual
+        // arm centered on the pivot is correct.
         actorGroup = new THREE.Group();
         actorGroup.add(mesh);
         actorMeshMap[actor.id] = { group: actorGroup, kind, mesh };
