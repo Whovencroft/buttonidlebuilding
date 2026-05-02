@@ -2172,8 +2172,49 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
         { x: 108, y: 34 }, { x: 109, y: 34 }, { x: 110, y: 34 }, { x: 111, y: 34 }
       ]
     });
-    // Goal centered in the wide basin — easy to find
-    setGoal(level, 90, 40, 0.55);
+    // === SECTION 6: Extended finale — timed gate + sweeper corridor ===
+    // Open south wall of goal basin to continue
+    for (let cx = 78; cx < 100; cx++) {
+      setSurface(level, cx, 45, { baseHeight: -2, shape: SHAPES.FLAT });
+    }
+    // Narrow corridor (z=-2), 38×6 — timed gate + sweeper + crumble
+    fillTrack(level, 74, 46, 38, 6, -2);
+    // Crumble section mid-corridor
+    for (let cx = 82; cx < 96; cx++) {
+      for (let cy = 47; cy < 51; cy++) {
+        setSurface(level, cx, cy, { baseHeight: -2, shape: SHAPES.FLAT, crumble: { delay: 0.10, downtime: 1.0 } });
+      }
+    }
+    // Timed gate blocking the corridor
+    addTimedGate(level, 'gate_s1_ext', 84, 47, 8, 4, -2, 1.8, 1.2);
+    // Sweeper guarding the exit
+    addActor(level, {
+      id: 'sweeper_s1_ext', kind: ACTOR_KINDS.SWEEPER,
+      x: 100, y: 49, z: -2, topHeight: -2,
+      width: 1, height: 1, armLength: 2.0, armWidth: 0.22, angularSpeed: 1.6, fatal: true
+    });
+    // Void-edge conveyors — push marble toward north/south void edges
+    setSurface(level, 78, 46, { baseHeight: -2, shape: SHAPES.FLAT, conveyor: { x: 2.5, y: -3.2, strength: 3.5 } });
+    setSurface(level, 90, 51, { baseHeight: -2, shape: SHAPES.FLAT, conveyor: { x: -2.8, y: 3.0, strength: 3.5 } });
+    setSurface(level, 106, 46, { baseHeight: -2, shape: SHAPES.FLAT, conveyor: { x: 3.0, y: -2.8, strength: 3.5 } });
+    wallRing(level, 74, 46, 38, 6, 0, {
+      gaps: [
+        { x: 74, y: 46 }, { x: 75, y: 46 }, { x: 76, y: 46 }, { x: 77, y: 46 },
+        { x: 78, y: 46 }, { x: 79, y: 46 }, { x: 80, y: 46 }, { x: 81, y: 46 },
+        { x: 82, y: 46 }, { x: 83, y: 46 }, { x: 84, y: 46 }, { x: 85, y: 46 },
+        { x: 86, y: 46 }, { x: 87, y: 46 }, { x: 88, y: 46 }, { x: 89, y: 46 },
+        { x: 90, y: 46 }, { x: 91, y: 46 }, { x: 92, y: 46 }, { x: 93, y: 46 },
+        { x: 94, y: 46 }, { x: 95, y: 46 }, { x: 96, y: 46 }, { x: 97, y: 46 },
+        { x: 98, y: 46 }, { x: 99, y: 46 },
+        { x: 111, y: 47 }, { x: 111, y: 48 }, { x: 111, y: 49 }, { x: 111, y: 50 }, { x: 111, y: 51 }
+      ]
+    });
+    // Final goal basin (z=-2), 10×10 — deeper and harder to reach
+    fillTrack(level, 112, 45, 10, 10, -2);
+    wallRing(level, 112, 45, 10, 10, 0, {
+      gaps: [{ x: 112, y: 47 }, { x: 112, y: 48 }, { x: 112, y: 49 }, { x: 112, y: 50 }, { x: 112, y: 51 }]
+    });
+    setGoal(level, 117, 50, 0.55);
 
     addGraphNode(level, { id: 'start',    type: 'entry', x: 4.5,   y: 4.5,  z: 14 });
     addGraphNode(level, { id: 'mid',      type: 'hub',   x: 18.5,  y: 20.5, z: 10 });
@@ -2182,16 +2223,20 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     addGraphNode(level, { id: 'path_b',   type: 'route', x: 58.5,  y: 23.5, z: 6  });
     addGraphNode(level, { id: 'merge',    type: 'hub',   x: 80.5,  y: 20.5, z: 2  });
     addGraphNode(level, { id: 'platform', type: 'route', x: 107.5, y: 19.5, z: 2  });
-    addGraphNode(level, { id: 'goal',     type: 'goal',  x: 90.5,  y: 40.5, z: -2 });
+    addGraphNode(level, { id: 'basin',    type: 'hub',   x: 90.5,  y: 40.5, z: -2 });
+    addGraphNode(level, { id: 'ext',      type: 'route', x: 92.5,  y: 49.5, z: -2 });
+    addGraphNode(level, { id: 'goal',     type: 'goal',  x: 117.5, y: 50.5, z: -2 });
     addGraphEdge(level, { from: 'start',    to: 'mid',      kind: 'roll'    });
     addGraphEdge(level, { from: 'mid',      to: 'fork',     kind: 'descent' });
     addGraphEdge(level, { from: 'fork',     to: 'path_a',   kind: 'roll',    tag: 'conveyor' });
     addGraphEdge(level, { from: 'fork',     to: 'path_b',   kind: 'roll',    tag: 'crumble'  });
     addGraphEdge(level, { from: 'path_a',   to: 'merge',    kind: 'descent' });
     addGraphEdge(level, { from: 'path_b',   to: 'merge',    kind: 'descent' });
-    addGraphEdge(level, { from: 'merge',    to: 'goal',     kind: 'descent' });
+    addGraphEdge(level, { from: 'merge',    to: 'basin',    kind: 'descent' });
     addGraphEdge(level, { from: 'merge',    to: 'platform', kind: 'roll',    tag: 'platform' });
-    addGraphEdge(level, { from: 'platform', to: 'goal',     kind: 'descent' });
+    addGraphEdge(level, { from: 'platform', to: 'basin',    kind: 'descent' });
+    addGraphEdge(level, { from: 'basin',    to: 'ext',      kind: 'roll'    });
+    addGraphEdge(level, { from: 'ext',      to: 'goal',     kind: 'timed_cross' });
     return registerLevel(level);
   }
 
@@ -2335,11 +2380,70 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
         { x: 66, y: 39 }, { x: 66, y: 40 }, { x: 66, y: 41 }, { x: 66, y: 42 }, { x: 66, y: 43 }, { x: 66, y: 44 }, { x: 66, y: 45 }, { x: 66, y: 46 }, { x: 66, y: 47 }, { x: 66, y: 48 }
       ]
     });
-        // Random push tiles — unpredictable direction changes
-    setSurface(level, 22, 18, { baseHeight: 12, shape: SHAPES.FLAT, conveyor: { x: 0, y: 2.8, strength: 2.8 } });
-    setSurface(level, 38, 26, { baseHeight: 8, shape: SHAPES.FLAT, conveyor: { x: -2.5, y: 0, strength: 2.5 } });
+    // Random push tiles — unpredictable direction changes (diagonal only)
+    setSurface(level, 22, 18, { baseHeight: 12, shape: SHAPES.FLAT, conveyor: { x: 2.2, y: 2.8, strength: 3.0 } });
+    setSurface(level, 38, 26, { baseHeight: 8, shape: SHAPES.FLAT, conveyor: { x: -2.5, y: 2.0, strength: 2.8 } });
     setSurface(level, 55, 34, { baseHeight: 4, shape: SHAPES.FLAT, conveyor: { x: 2.2, y: 2.2, strength: 3.0 } });
-setGoal(level, 72, 34, 0.44);
+
+    // === EXTENSION: Terrace D — crumble bridge + sweeper + new goal ===
+    // Open east wall of lower goal basin to continue
+    for (let cy = 24; cy < 48; cy++) {
+      setSurface(level, 77, cy, { baseHeight: 0, shape: SHAPES.FLAT });
+    }
+    // Terrace D approach (z=0), 4×26
+    fillTrack(level, 78, 22, 4, 26, 0);
+    wallRing(level, 78, 22, 4, 26, 2, {
+      gaps: [
+        { x: 78, y: 24 }, { x: 78, y: 25 }, { x: 78, y: 26 }, { x: 78, y: 27 },
+        { x: 78, y: 28 }, { x: 78, y: 29 }, { x: 78, y: 30 }, { x: 78, y: 31 },
+        { x: 78, y: 32 }, { x: 78, y: 33 }, { x: 78, y: 34 }, { x: 78, y: 35 },
+        { x: 78, y: 36 }, { x: 78, y: 37 }, { x: 78, y: 38 }, { x: 78, y: 39 },
+        { x: 78, y: 40 }, { x: 78, y: 41 }, { x: 78, y: 42 }, { x: 78, y: 43 },
+        { x: 78, y: 44 }, { x: 78, y: 45 }, { x: 78, y: 46 }, { x: 78, y: 47 },
+        { x: 81, y: 28 }, { x: 81, y: 29 }, { x: 81, y: 30 }, { x: 81, y: 31 },
+        { x: 81, y: 40 }, { x: 81, y: 41 }, { x: 81, y: 42 }, { x: 81, y: 43 }
+      ]
+    });
+    // Crumble bridge north fork (z=0), 14×4
+    fillTrack(level, 82, 26, 14, 4, 0);
+    for (let cx = 83; cx < 95; cx++) {
+      for (let cy = 27; cy < 30; cy++) {
+        setSurface(level, cx, cy, { baseHeight: 0, shape: SHAPES.FLAT, crumble: { delay: 0.10, downtime: 1.0 } });
+      }
+    }
+    wallRing(level, 82, 26, 14, 4, 2, {
+      gaps: [
+        { x: 82, y: 28 }, { x: 82, y: 29 }, { x: 82, y: 30 }, { x: 82, y: 31 },
+        { x: 95, y: 26 }, { x: 95, y: 27 }, { x: 95, y: 28 }, { x: 95, y: 29 }
+      ]
+    });
+    // Sweeper corridor south fork (z=0), 14×4
+    fillTrack(level, 82, 38, 14, 4, 0);
+    addActor(level, {
+      id: 'sweeper_l2_ext', kind: ACTOR_KINDS.SWEEPER,
+      x: 89, y: 40, z: 0, topHeight: 0,
+      width: 1, height: 1, armLength: 1.8, armWidth: 0.22, angularSpeed: 1.4, fatal: true
+    });
+    wallRing(level, 82, 38, 14, 4, 2, {
+      gaps: [
+        { x: 82, y: 40 }, { x: 82, y: 41 }, { x: 82, y: 42 }, { x: 82, y: 43 },
+        { x: 95, y: 38 }, { x: 95, y: 39 }, { x: 95, y: 40 }, { x: 95, y: 41 }
+      ]
+    });
+    // Void-edge conveyors on Terrace D — push toward east void
+    setSurface(level, 79, 22, { baseHeight: 0, shape: SHAPES.FLAT, conveyor: { x: 3.0, y: -2.5, strength: 3.5 } });
+    setSurface(level, 80, 47, { baseHeight: 0, shape: SHAPES.FLAT, conveyor: { x: 2.8, y: 3.2, strength: 3.5 } });
+    setSurface(level, 93, 28, { baseHeight: 0, shape: SHAPES.FLAT, conveyor: { x: 3.2, y: -2.8, strength: 3.5 } });
+    setSurface(level, 93, 40, { baseHeight: 0, shape: SHAPES.FLAT, conveyor: { x: 3.2, y: 2.8, strength: 3.5 } });
+    // Final goal basin (z=0), 10×14 — both forks converge
+    fillTrack(level, 96, 24, 10, 22, 0);
+    wallRing(level, 96, 24, 10, 22, 2, {
+      gaps: [
+        { x: 96, y: 26 }, { x: 96, y: 27 }, { x: 96, y: 28 }, { x: 96, y: 29 },
+        { x: 96, y: 38 }, { x: 96, y: 39 }, { x: 96, y: 40 }, { x: 96, y: 41 }
+      ]
+    });
+    setGoal(level, 101, 34, 0.44);
 
     addGraphNode(level, { id: 'start',    type: 'entry', x: 4.5,  y: 4.5,  z: 16 });
     addGraphNode(level, { id: 'terraceA', type: 'fork',  x: 31.5, y: 9.5,  z: 12 });
@@ -2347,15 +2451,22 @@ setGoal(level, 72, 34, 0.44);
     addGraphNode(level, { id: 'terraceC', type: 'fork',  x: 57.5, y: 33.5, z: 4  });
     addGraphNode(level, { id: 'path_a',   type: 'route', x: 58.5, y: 26.5, z: 4  });
     addGraphNode(level, { id: 'path_b',   type: 'route', x: 58.5, y: 43.5, z: 4  });
-    addGraphNode(level, { id: 'goal',     type: 'goal',  x: 72.5, y: 34.5, z: 0  });
+    addGraphNode(level, { id: 'terraceD', type: 'fork',  x: 79.5, y: 34.5, z: 0  });
+    addGraphNode(level, { id: 'td_north', type: 'route', x: 88.5, y: 27.5, z: 0  });
+    addGraphNode(level, { id: 'td_south', type: 'route', x: 88.5, y: 40.5, z: 0  });
+    addGraphNode(level, { id: 'goal',     type: 'goal',  x: 101.5, y: 34.5, z: 0 });
     addGraphEdge(level, { from: 'start',    to: 'terraceA', kind: 'descent'    });
     addGraphEdge(level, { from: 'terraceA', to: 'terraceB', kind: 'roll',       tag: 'north_path' });
     addGraphEdge(level, { from: 'terraceA', to: 'terraceB', kind: 'descent',    tag: 'south_path' });
     addGraphEdge(level, { from: 'terraceB', to: 'terraceC', kind: 'descent'    });
     addGraphEdge(level, { from: 'terraceC', to: 'path_a',   kind: 'crumble'    });
     addGraphEdge(level, { from: 'terraceC', to: 'path_b',   kind: 'timed_cross'});
-    addGraphEdge(level, { from: 'path_a',   to: 'goal',     kind: 'descent'    });
-    addGraphEdge(level, { from: 'path_b',   to: 'goal',     kind: 'descent'    });
+    addGraphEdge(level, { from: 'path_a',   to: 'terraceD', kind: 'descent'    });
+    addGraphEdge(level, { from: 'path_b',   to: 'terraceD', kind: 'descent'    });
+    addGraphEdge(level, { from: 'terraceD', to: 'td_north', kind: 'crumble'    });
+    addGraphEdge(level, { from: 'terraceD', to: 'td_south', kind: 'hazard_lane'});
+    addGraphEdge(level, { from: 'td_north', to: 'goal',     kind: 'descent'    });
+    addGraphEdge(level, { from: 'td_south', to: 'goal',     kind: 'descent'    });
     return registerLevel(level);
   }
 
@@ -2540,11 +2651,16 @@ setGoal(level, 72, 34, 0.44);
         { x: 11, y: 82 }, { x: 12, y: 82 }, { x: 13, y: 82 }, { x: 14, y: 82 }, { x: 15, y: 82 }
       ]
     });
-        // Random push tiles — unpredictable direction changes
-    setSurface(level, 8, 22, { baseHeight: 14, shape: SHAPES.FLAT, conveyor: { x: 2.8, y: 0, strength: 2.8 } });
-    setSurface(level, 5, 38, { baseHeight: 10, shape: SHAPES.FLAT, conveyor: { x: 0, y: -2.5, strength: 2.5 } });
+    // Random push tiles — all diagonal/randomized
+    setSurface(level, 8, 22, { baseHeight: 14, shape: SHAPES.FLAT, conveyor: { x: 2.8, y: -2.2, strength: 3.0 } });
+    setSurface(level, 5, 38, { baseHeight: 10, shape: SHAPES.FLAT, conveyor: { x: -2.0, y: -2.5, strength: 2.8 } });
     setSurface(level, 12, 52, { baseHeight: 6, shape: SHAPES.FLAT, conveyor: { x: -2.2, y: 2.2, strength: 3.0 } });
     setSurface(level, 8, 68, { baseHeight: 2, shape: SHAPES.FLAT, conveyor: { x: 2.5, y: -2.5, strength: 3.2 } });
+    // Void-edge conveyors — push toward outer void edges on each leg
+    setSurface(level, 15, 4, { baseHeight: 18, shape: SHAPES.FLAT, conveyor: { x: 3.0, y: -2.8, strength: 3.5 } });
+    setSurface(level, 2, 21, { baseHeight: 14, shape: SHAPES.FLAT, conveyor: { x: -3.2, y: 2.5, strength: 3.5 } });
+    setSurface(level, 15, 38, { baseHeight: 10, shape: SHAPES.FLAT, conveyor: { x: 3.0, y: 2.8, strength: 3.5 } });
+    setSurface(level, 2, 61, { baseHeight: 2, shape: SHAPES.FLAT, conveyor: { x: -3.2, y: -2.5, strength: 3.5 } });
 setGoal(level, 12, 88, 0.44);
 
     addGraphNode(level, { id: 'start',  type: 'entry',  x: 4.5,  y: 4.5,  z: 18 });
@@ -2790,8 +2906,8 @@ setGoal(level, 12, 88, 0.44);
     });
     // Random push tiles — unpredictable direction changes
     // Existing tiles on upper sections
-    setSurface(level, 32, 6,  { baseHeight: 6,  shape: SHAPES.FLAT, conveyor: { x: 0,    y: 3.0,  strength: 3.0 } });
-    setSurface(level, 44, 10, { baseHeight: 10, shape: SHAPES.FLAT, conveyor: { x: -2.8, y: 0,    strength: 2.8 } });
+    setSurface(level, 32, 6,  { baseHeight: 6,  shape: SHAPES.FLAT, conveyor: { x: 2.2,  y: 3.0,  strength: 3.2 } });
+    setSurface(level, 44, 10, { baseHeight: 10, shape: SHAPES.FLAT, conveyor: { x: -2.8, y: -2.0, strength: 3.0 } });
     setSurface(level, 38, 18, { baseHeight: 6,  shape: SHAPES.FLAT, conveyor: { x: 2.5,  y: 2.5,  strength: 3.2 } });
     setSurface(level, 25, 24, { baseHeight: 6,  shape: SHAPES.FLAT, conveyor: { x: -3.0, y: 2.0,  strength: 3.5 } });
     // New randomizers on second merge platform — push toward the ramp or sideways
@@ -2806,6 +2922,11 @@ setGoal(level, 12, 88, 0.44);
     setSurface(level, 20, 36, { baseHeight: 2,  shape: SHAPES.FLAT, conveyor: { x: 2.8,  y: -2.8, strength: 3.5 } });
     setSurface(level, 25, 38, { baseHeight: 2,  shape: SHAPES.FLAT, conveyor: { x: -3.0, y: 3.0,  strength: 3.5 } });
     setSurface(level, 18, 40, { baseHeight: 2,  shape: SHAPES.FLAT, conveyor: { x: 3.0,  y: 2.5,  strength: 3.2 } });
+    // Void-edge conveyors — push marble toward outer void edges of each canal lane
+    setSurface(level, 29, 4, { baseHeight: 10, shape: SHAPES.FLAT, conveyor: { x: -3.0, y: -2.8, strength: 3.5 } });
+    setSurface(level, 47, 7, { baseHeight: 10, shape: SHAPES.FLAT, conveyor: { x: 3.2, y: -2.5, strength: 3.5 } });
+    setSurface(level, 29, 13, { baseHeight: 10, shape: SHAPES.FLAT, conveyor: { x: -2.8, y: 3.0, strength: 3.5 } });
+    setSurface(level, 47, 13, { baseHeight: 10, shape: SHAPES.FLAT, conveyor: { x: 3.0, y: 3.2, strength: 3.5 } });
 setGoal(level, 22, 40, 0.44);
 
     addGraphNode(level, { id: 'start',     type: 'entry', x: 4.5,  y: 6.5,  z: 14 });
@@ -3006,9 +3127,9 @@ setGoal(level, 22, 40, 0.44);
     wallRing(level, 18, 64, 14, 10, 2, {
       gaps: [{ x: 22, y: 64 }, { x: 23, y: 64 }, { x: 24, y: 64 }, { x: 25, y: 64 }, { x: 26, y: 64 }, { x: 27, y: 64 }, { x: 28, y: 64 }, { x: 29, y: 64 }]
     });
-        // Random push tiles — unpredictable direction changes
-    setSurface(level, 30, 10, { baseHeight: 14, shape: SHAPES.FLAT, conveyor: { x: 0, y: 3.2, strength: 3.2 } });
-    setSurface(level, 55, 18, { baseHeight: 10, shape: SHAPES.FLAT, conveyor: { x: -3.0, y: 0, strength: 3.0 } });
+    // Random push tiles — all diagonal/randomized
+    setSurface(level, 30, 10, { baseHeight: 14, shape: SHAPES.FLAT, conveyor: { x: 2.5, y: 3.2, strength: 3.5 } });
+    setSurface(level, 55, 18, { baseHeight: 10, shape: SHAPES.FLAT, conveyor: { x: -3.0, y: -2.2, strength: 3.2 } });
     setSurface(level, 54, 10, { baseHeight: 10, shape: SHAPES.FLAT, conveyor: { x: 3.2, y: -3.2, strength: 3.5 } });
     setSurface(level, 20, 45, { baseHeight: 4, shape: SHAPES.FLAT, conveyor: { x: -2.8, y: 2.8, strength: 3.2 } });
     setSurface(level, 60, 55, { baseHeight: 4, shape: SHAPES.FLAT, conveyor: { x: 3.5, y: 3.5, strength: 3.5 } });
@@ -3186,13 +3307,20 @@ setGoal(level, 22, 40, 0.44);
         { x: 38, y: 78 }, { x: 39, y: 78 }, { x: 40, y: 78 }, { x: 41, y: 78 }, { x: 42, y: 78 }, { x: 43, y: 78 }, { x: 44, y: 78 }, { x: 45, y: 78 }
       ]
     });
-        // Random push tiles — unpredictable direction changes
-    setSurface(level, 18, 20, { baseHeight: 10, shape: SHAPES.FLAT, conveyor: { x: 3.2, y: 0, strength: 3.2 } });
-    setSurface(level, 22, 38, { baseHeight: 6,  shape: SHAPES.FLAT, conveyor: { x: 0, y: -3.0, strength: 3.0 } });
+    // Random push tiles — all diagonal/randomized
+    setSurface(level, 18, 20, { baseHeight: 10, shape: SHAPES.FLAT, conveyor: { x: 3.2, y: -2.5, strength: 3.5 } });
+    setSurface(level, 22, 38, { baseHeight: 6,  shape: SHAPES.FLAT, conveyor: { x: -2.2, y: -3.0, strength: 3.2 } });
     setSurface(level, 22, 52, { baseHeight: 2,  shape: SHAPES.FLAT, conveyor: { x: -3.2, y: 3.2, strength: 3.5 } });
     setSurface(level, 14, 68, { baseHeight: 2,  shape: SHAPES.FLAT, conveyor: { x: 3.5, y: -3.5, strength: 3.5 } });
     setSurface(level, 30, 78, { baseHeight: -2, shape: SHAPES.FLAT, conveyor: { x: -3.0, y: -3.0, strength: 3.5 } });
     setSurface(level, 10, 84, { baseHeight: -2, shape: SHAPES.FLAT, conveyor: { x: 3.5, y: 3.5, strength: 3.5 } });
+    // Void-edge conveyors — push marble toward outer void edges on each tier
+    setSurface(level, 18, 4, { baseHeight: 14, shape: SHAPES.FLAT, conveyor: { x: -3.2, y: -2.8, strength: 3.5 } });
+    setSurface(level, 31, 4, { baseHeight: 14, shape: SHAPES.FLAT, conveyor: { x: 3.0, y: -3.2, strength: 3.5 } });
+    setSurface(level, 18, 36, { baseHeight: 6, shape: SHAPES.FLAT, conveyor: { x: -3.0, y: 2.5, strength: 3.5 } });
+    setSurface(level, 31, 44, { baseHeight: 6, shape: SHAPES.FLAT, conveyor: { x: 3.2, y: 3.0, strength: 3.5 } });
+    setSurface(level, 8, 55, { baseHeight: 2, shape: SHAPES.FLAT, conveyor: { x: -3.2, y: 2.8, strength: 3.5 } });
+    setSurface(level, 44, 72, { baseHeight: 2, shape: SHAPES.FLAT, conveyor: { x: 3.5, y: 3.0, strength: 3.5 } });
 setGoal(level, 22, 84, 0.44);
 
     addGraphNode(level, { id: 'start', type: 'entry', x: 4.5,  y: 4.5,  z: 18 });
@@ -3486,13 +3614,20 @@ setGoal(level, 22, 84, 0.44);
       ]
     });
         // Random push tiles — unpredictable direction changes
-    setSurface(level, 22, 26, { baseHeight: 16, shape: SHAPES.FLAT, conveyor: { x: 3.5, y: 0, strength: 3.5 } });
-    setSurface(level, 28, 16, { baseHeight: 12, shape: SHAPES.FLAT, conveyor: { x: 0, y: -3.2, strength: 3.2 } });
+    setSurface(level, 22, 26, { baseHeight: 16, shape: SHAPES.FLAT, conveyor: { x: 3.5, y: -2.5, strength: 3.8 } });
+    setSurface(level, 28, 16, { baseHeight: 12, shape: SHAPES.FLAT, conveyor: { x: -2.2, y: -3.2, strength: 3.5 } });
     setSurface(level, 45, 28, { baseHeight: 12, shape: SHAPES.FLAT, conveyor: { x: -3.5, y: 3.5, strength: 3.5 } });
     setSurface(level, 24, 42, { baseHeight: 12, shape: SHAPES.FLAT, conveyor: { x: 3.2, y: 3.2, strength: 3.5 } });
     setSurface(level, 75, 18, { baseHeight: 4, shape: SHAPES.FLAT, conveyor: { x: -3.5, y: -3.5, strength: 3.5 } });
     setSurface(level, 90, 32, { baseHeight: 4, shape: SHAPES.FLAT, conveyor: { x: 3.5, y: -3.5, strength: 3.5 } });
     setSurface(level, 75, 46, { baseHeight: 4, shape: SHAPES.FLAT, conveyor: { x: -3.5, y: 3.5, strength: 3.5 } });
+    // Void-edge conveyors — push marble toward outer void edges of each wing
+    setSurface(level, 18, 12, { baseHeight: 12, shape: SHAPES.FLAT, conveyor: { x: -3.2, y: -3.0, strength: 3.8 } });
+    setSurface(level, 36, 12, { baseHeight: 12, shape: SHAPES.FLAT, conveyor: { x: 3.5, y: -2.8, strength: 3.8 } });
+    setSurface(level, 36, 36, { baseHeight: 12, shape: SHAPES.FLAT, conveyor: { x: 3.2, y: 3.5, strength: 3.8 } });
+    setSurface(level, 18, 44, { baseHeight: 12, shape: SHAPES.FLAT, conveyor: { x: -3.5, y: 3.2, strength: 3.8 } });
+    setSurface(level, 83, 10, { baseHeight: 4, shape: SHAPES.FLAT, conveyor: { x: 2.8, y: -3.5, strength: 3.8 } });
+    setSurface(level, 83, 54, { baseHeight: 4, shape: SHAPES.FLAT, conveyor: { x: 2.8, y: 3.5, strength: 3.8 } });
 setGoal(level, 93, 33, 0.44);
 
     addGraphNode(level, { id: 'start',  type: 'entry', x: 4.5,  y: 28.5, z: 16 });
@@ -3562,18 +3697,22 @@ setGoal(level, 93, 33, 0.44);
     addActor(level, {
       id: 'sweeper_g1a', kind: ACTOR_KINDS.SWEEPER,
       x: 20, y: 6, z: 18, topHeight: 18,
-      width: 1, height: 1, armLength: 2.1, armWidth: 0.22, angularSpeed: 1.0, fatal: true
+      width: 1, height: 1, armLength: 2.1, armWidth: 0.22, angularSpeed: 1.5, fatal: true
     });
     addActor(level, {
       id: 'sweeper_g1b', kind: ACTOR_KINDS.SWEEPER,
       x: 34, y: 6, z: 18, topHeight: 18,
-      width: 1, height: 1, armLength: 2.1, armWidth: 0.22, angularSpeed: -1.2, fatal: true
+      width: 1, height: 1, armLength: 2.1, armWidth: 0.22, angularSpeed: -1.8, fatal: true
     });
     addActor(level, {
       id: 'sweeper_g1c', kind: ACTOR_KINDS.SWEEPER,
       x: 50, y: 6, z: 18, topHeight: 18,
-      width: 1, height: 1, armLength: 2.1, armWidth: 0.22, angularSpeed: 1.4, fatal: true
+      width: 1, height: 1, armLength: 2.1, armWidth: 0.22, angularSpeed: 2.1, fatal: true
     });
+    // Void-edge conveyors in north lane — push marble toward south void edge (off the lane)
+    setSurface(level, 26, 4, { baseHeight: 18, shape: SHAPES.FLAT, friction: 0.22, conveyor: { x: 1.8, y: -3.2, strength: 3.5 } });
+    setSurface(level, 42, 8, { baseHeight: 18, shape: SHAPES.FLAT, friction: 0.22, conveyor: { x: -2.2, y: 3.0, strength: 3.5 } });
+    setSurface(level, 56, 4, { baseHeight: 18, shape: SHAPES.FLAT, friction: 0.22, conveyor: { x: 2.5, y: -2.8, strength: 3.5 } });
     wallRing(level, 12, 4, 52, 5, 20, {
       gaps: [
         { x: 12, y: 4 }, { x: 12, y: 5 }, { x: 12, y: 6 }, { x: 12, y: 7 }, { x: 12, y: 8 },
@@ -3669,18 +3808,21 @@ setGoal(level, 93, 33, 0.44);
     addActor(level, {
       id: 'sweeper_g2a', kind: ACTOR_KINDS.SWEEPER,
       x: 22, y: 19, z: 4, topHeight: 4,
-      width: 1, height: 1, armLength: 2.2, armWidth: 0.22, angularSpeed: 1.1, fatal: true
+      width: 1, height: 1, armLength: 2.2, armWidth: 0.22, angularSpeed: 1.7, fatal: true
     });
     addActor(level, {
       id: 'sweeper_g2b', kind: ACTOR_KINDS.SWEEPER,
       x: 38, y: 19, z: 4, topHeight: 4,
-      width: 1, height: 1, armLength: 2.2, armWidth: 0.22, angularSpeed: -1.4, fatal: true
+      width: 1, height: 1, armLength: 2.2, armWidth: 0.22, angularSpeed: -2.0, fatal: true
     });
     addActor(level, {
       id: 'sweeper_g2c', kind: ACTOR_KINDS.SWEEPER,
       x: 54, y: 19, z: 4, topHeight: 4,
-      width: 1, height: 1, armLength: 2.2, armWidth: 0.22, angularSpeed: 1.7, fatal: true
+      width: 1, height: 1, armLength: 2.2, armWidth: 0.22, angularSpeed: 2.3, fatal: true
     });
+    // Void-edge conveyors in risky lane 2 — push marble toward north void edge
+    setSurface(level, 28, 18, { baseHeight: 4, shape: SHAPES.FLAT, conveyor: { x: 2.0, y: -3.0, strength: 3.5 } });
+    setSurface(level, 46, 22, { baseHeight: 4, shape: SHAPES.FLAT, conveyor: { x: -2.5, y: 3.2, strength: 3.5 } });
     addHazardRect(level, 58, 18, 3, 4, 'gauntlet2_spikes_risky');
     wallRing(level, 12, 18, 52, 5, 6, {
       gaps: [
@@ -3803,8 +3945,12 @@ setGoal(level, 93, 33, 0.44);
     // Hazard strips
     addHazardRect(level, 30, 53, 3, 5, 'g3_spikes_a');
     addHazardRect(level, 48, 53, 3, 5, 'g3_spikes_b');
-    // Timed gate near the end
-    addTimedGate(level, 'gate_g3_final', 58, 54, 5, 3, 2, 1.2, 0.8);
+    // Void-edge conveyors in Section 3 corridor — push toward north/south void edges
+    setSurface(level, 30, 53, { baseHeight: 2, shape: SHAPES.FLAT, friction: 0.18, conveyor: { x: 2.2, y: -3.0, strength: 3.5 } });
+    setSurface(level, 48, 57, { baseHeight: 2, shape: SHAPES.FLAT, friction: 0.18, conveyor: { x: -2.5, y: 3.2, strength: 3.5 } });
+    setSurface(level, 60, 53, { baseHeight: 2, shape: SHAPES.FLAT, friction: 0.18, conveyor: { x: 3.0, y: -2.8, strength: 3.5 } });
+    // Timed gate near the end — tighter timing than before
+    addTimedGate(level, 'gate_g3_final', 58, 54, 5, 3, 2, 1.0, 0.7);
     wallRing(level, 6, 53, 60, 5, 4, {
       gaps: [
         { x: 6, y: 53 }, { x: 6, y: 54 }, { x: 6, y: 55 }, { x: 6, y: 56 }, { x: 6, y: 57 },
@@ -3955,6 +4101,13 @@ setGoal(level, 93, 33, 0.44);
     // Elevator shortcuts
     addElevator(level, 'elev_a', 6, 24, 2, 10, 3, 3, 0.9, 5.0);
     addElevator(level, 'elev_b', 6, 34, 2, 10, 3, 3, 0.9, 5.0);
+    // Void-edge conveyors — push marble toward outer void edges on each floor
+    setSurface(level, 12, 4, { baseHeight: 22, shape: SHAPES.FLAT, conveyor: { x: -3.2, y: -2.8, strength: 3.5 } });
+    setSurface(level, 38, 8, { baseHeight: 22, shape: SHAPES.FLAT, conveyor: { x: 3.5, y: -3.0, strength: 3.5 } });
+    setSurface(level, 2, 14, { baseHeight: 14, shape: SHAPES.FLAT, conveyor: { x: -3.5, y: 2.8, strength: 3.5 } });
+    setSurface(level, 28, 18, { baseHeight: 14, shape: SHAPES.FLAT, conveyor: { x: 3.0, y: 3.2, strength: 3.5 } });
+    setSurface(level, 12, 29, { baseHeight: 6, shape: SHAPES.FLAT, conveyor: { x: -3.2, y: 3.5, strength: 3.5 } });
+    setSurface(level, 38, 33, { baseHeight: 6, shape: SHAPES.FLAT, conveyor: { x: 3.5, y: 3.0, strength: 3.5 } });
 
     // Goal basin (z=2), 10×8
     fillTrack(level, 2, 39, 10, 8, 2);
@@ -4166,6 +4319,11 @@ setGoal(level, 93, 33, 0.44);
     }
     placeRamp(level, { x: 50, y: 7, dir: 'east', length: 6, width: 5, startZ: 24, endZ: 18 });
 
+    // Void-edge conveyors in ACT 1 paths — push toward outer void edges
+    setSurface(level, 14, 2, { baseHeight: 24, shape: SHAPES.FLAT, conveyor: { x: -3.0, y: -3.2, strength: 3.5 } });
+    setSurface(level, 55, 2, { baseHeight: 24, shape: SHAPES.FLAT, conveyor: { x: 3.2, y: -3.0, strength: 3.5 } });
+    setSurface(level, 14, 11, { baseHeight: 24, shape: SHAPES.FLAT, conveyor: { x: -3.2, y: 3.0, strength: 3.5 } });
+    setSurface(level, 55, 16, { baseHeight: 24, shape: SHAPES.FLAT, conveyor: { x: 3.0, y: 3.2, strength: 3.5 } });
     // ACT 1 — Path C (south): conveyor assist + rotating bar mid-corridor
     fillTrack(level, 14, 12, 40, 5, 24);
     for (let cx = 20; cx < 50; cx++) {
@@ -4255,6 +4413,11 @@ setGoal(level, 93, 33, 0.44);
     fillTrack(level, 76, 28, 6, 6, 18);
     placeRamp(level, { x: 58, y: 34, dir: 'south', length: 8, width: 6, startZ: 18, endZ: 6 });
 
+    // Void-edge conveyors in ACT 2 citadel — push toward outer void edges
+    setSurface(level, 58, 2, { baseHeight: 18, shape: SHAPES.FLAT, friction: 0.20, conveyor: { x: -3.2, y: -3.0, strength: 3.8 } });
+    setSurface(level, 81, 2, { baseHeight: 18, shape: SHAPES.FLAT, friction: 0.20, conveyor: { x: 3.5, y: -3.2, strength: 3.8 } });
+    setSurface(level, 58, 20, { baseHeight: 18, shape: SHAPES.FLAT, friction: 0.20, conveyor: { x: -3.0, y: 3.5, strength: 3.8 } });
+    setSurface(level, 81, 20, { baseHeight: 18, shape: SHAPES.FLAT, friction: 0.20, conveyor: { x: 3.2, y: 3.5, strength: 3.8 } });
     // ACT 4 — Final descent and goal — filled with hazards
     fillTrack(level, 56, 42, 24, 14, 6);
     // Sweepers guarding the descent
@@ -4328,17 +4491,17 @@ setGoal(level, 93, 33, 0.44);
     addActor(level, {
       id: 'sweeper_act5_a', kind: ACTOR_KINDS.SWEEPER,
       x: 40, y: 80, z: 2, topHeight: 2,
-      width: 1, height: 1, armLength: 3.2, armWidth: 0.22, angularSpeed: 1.4, fatal: true
+      width: 1, height: 1, armLength: 3.2, armWidth: 0.22, angularSpeed: 2.1, fatal: true
     });
     addActor(level, {
       id: 'sweeper_act5_b', kind: ACTOR_KINDS.SWEEPER,
       x: 60, y: 80, z: 2, topHeight: 2,
-      width: 1, height: 1, armLength: 3.2, armWidth: 0.22, angularSpeed: -1.7, fatal: true
+      width: 1, height: 1, armLength: 3.2, armWidth: 0.22, angularSpeed: -2.5, fatal: true
     });
     addActor(level, {
       id: 'sweeper_act5_c', kind: ACTOR_KINDS.SWEEPER,
       x: 80, y: 80, z: 2, topHeight: 2,
-      width: 1, height: 1, armLength: 3.2, armWidth: 0.22, angularSpeed: 2.0, fatal: true
+      width: 1, height: 1, armLength: 3.2, armWidth: 0.22, angularSpeed: 2.8, fatal: true
     });
     // Row 2: rotating bars mid-arena
     addActor(level, {
@@ -4355,8 +4518,15 @@ setGoal(level, 93, 33, 0.44);
     addHazardRect(level, 32, 78, 4, 6, 'act5_spikes_west');
     addHazardRect(level, 84, 78, 4, 6, 'act5_spikes_east');
     addHazardRect(level, 52, 89, 8, 3, 'act5_spikes_south');
-    // Timed gate blocking south path exit
-    addTimedGate(level, 'gate_act5', 52, 91, 6, 3, 2, 1.6, 0.9);
+    // Timed gate blocking south path exit — tighter timing
+    addTimedGate(level, 'gate_act5', 52, 91, 6, 3, 2, 1.2, 0.7);
+    // Void-edge conveyors in ACT 5 arena — push marble toward void edges
+    setSurface(level, 32, 74, { baseHeight: 2, shape: SHAPES.FLAT, friction: 0.20, conveyor: { x: -3.2, y: -3.0, strength: 3.8 } });
+    setSurface(level, 88, 74, { baseHeight: 2, shape: SHAPES.FLAT, friction: 0.20, conveyor: { x: 3.2, y: -3.0, strength: 3.8 } });
+    setSurface(level, 32, 92, { baseHeight: 2, shape: SHAPES.FLAT, friction: 0.20, conveyor: { x: -3.0, y: 3.2, strength: 3.8 } });
+    setSurface(level, 88, 92, { baseHeight: 2, shape: SHAPES.FLAT, friction: 0.20, conveyor: { x: 3.0, y: 3.2, strength: 3.8 } });
+    setSurface(level, 60, 74, { baseHeight: 2, shape: SHAPES.FLAT, friction: 0.20, conveyor: { x: 2.5, y: -3.5, strength: 3.8 } });
+    setSurface(level, 55, 92, { baseHeight: 2, shape: SHAPES.FLAT, friction: 0.20, conveyor: { x: -2.8, y: 3.5, strength: 3.8 } });
 
     // Path A (west): MANDATORY PLATFORM CROSSING
     // West approach — 3-tile wide corridor leading to the gap
@@ -4420,17 +4590,17 @@ setGoal(level, 93, 33, 0.44);
     addActor(level, {
       id: 'sweeper_act5a', kind: ACTOR_KINDS.SWEEPER,
       x: 94, y: 79, z: 2, topHeight: 2,
-      width: 1, height: 1, armLength: 1.4, armWidth: 0.22, angularSpeed: 1.5, fatal: true
+      width: 1, height: 1, armLength: 1.4, armWidth: 0.22, angularSpeed: 2.2, fatal: true
     });
     addActor(level, {
       id: 'sweeper_act5b', kind: ACTOR_KINDS.SWEEPER,
       x: 99, y: 79, z: 2, topHeight: 2,
-      width: 1, height: 1, armLength: 1.4, armWidth: 0.22, angularSpeed: -1.9, fatal: true
+      width: 1, height: 1, armLength: 1.4, armWidth: 0.22, angularSpeed: -2.6, fatal: true
     });
     addActor(level, {
       id: 'sweeper_act5c', kind: ACTOR_KINDS.SWEEPER,
       x: 104, y: 79, z: 2, topHeight: 2,
-      width: 1, height: 1, armLength: 1.4, armWidth: 0.22, angularSpeed: 2.2, fatal: true
+      width: 1, height: 1, armLength: 1.4, armWidth: 0.22, angularSpeed: 3.0, fatal: true
     });
     wallRing(level, 90, 78, 16, 3, 4, {
       gaps: [

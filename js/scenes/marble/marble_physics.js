@@ -116,7 +116,23 @@
   }
 
   function getGroundSupport(runtime, x, y, radius) {
-    return sampleSupport(runtime, x, y, radius, GROUND_SUPPORT_CLEARANCE, MIN_GROUNDED_SUPPORT_RATIO);
+    const staticSupport = sampleSupport(runtime, x, y, radius, GROUND_SUPPORT_CLEARANCE, MIN_GROUNDED_SUPPORT_RATIO);
+    if (staticSupport) return staticSupport;
+    // PLATFORM GROUND FIX: if the multi-sample spread misses a narrow platform,
+    // fall back to the center-point direct check so the marble stays grounded
+    // on the platform while rolling across it (not just on landing).
+    const marble = runtime.marble;
+    const actorSurface = window.MarbleLevels.sampleActorSurfaceDirect(
+      runtime.level, runtime.dynamicState, x, y, marble.z
+    );
+    if (actorSurface) {
+      const platTop = actorSurface.z + (marble.collisionRadius ?? 0.5);
+      // Only treat as ground if marble is within 0.6 units above platform top
+      if (marble.z <= platTop + 0.6 && marble.z >= actorSurface.z - 1.5) {
+        return { ...actorSurface, gradient: { gx: 0, gy: 0 } };
+      }
+    }
+    return null;
   }
 
   function getLandingSupport(runtime, x, y, radius) {
