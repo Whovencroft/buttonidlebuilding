@@ -1454,7 +1454,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     });
     // Hazard near goal
     addHazardRect(level, 48, 12, 1, 2, 'goal_guard');
-    setSurface(level, 44, 13, { baseHeight: 5, shape: SHAPES.FLAT, conveyor: { x: 0.6, y: 0, strength: 2.4 } });
+    setSurface(level, 44, 13, { baseHeight: 5, shape: SHAPES.FLAT, conveyor: { x: 2.8, y: -2.2, strength: 3.2 } });  // diagonal: pushes toward hazard
     setSurface(level, 46, 13, { baseHeight: 5, shape: SHAPES.FLAT, bounce: 5.2 });
     // Goal on flat track tile (NOT a bounce tile)
     setSurface(level, 50, 13, { baseHeight: 5, shape: SHAPES.FLAT });
@@ -1525,7 +1525,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
       ]
     });
     addHazardRect(level, 18, 11, 2, 1, 'switchback_spikes');
-    setSurface(level, 14, 10, { baseHeight: 14, shape: SHAPES.FLAT, conveyor: { x: -0.5, y: 0, strength: 2.2 } });
+    setSurface(level, 14, 10, { baseHeight: 14, shape: SHAPES.FLAT, conveyor: { x: -2.5, y: 1.8, strength: 3.0 } });  // diagonal: pushes toward wall
 
     // ─ Connector B: flat bridge from terrace B west exit to ramp B  (x=4..6, y=11..12)
     fillTrack(level, 4, 11, 3, 3, 14);
@@ -1573,7 +1573,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     setSurface(level, 20, 35, { baseHeight: 2, shape: SHAPES.FLAT });
     setGoal(level, 20, 35, 0.44);
     addHazardRect(level, 14, 34, 2, 1, 'goal_guard');
-    setSurface(level, 10, 34, { baseHeight: 2, shape: SHAPES.FLAT, conveyor: { x: 0.6, y: 0, strength: 2.2 } });
+    setSurface(level, 10, 34, { baseHeight: 2, shape: SHAPES.FLAT, conveyor: { x: 2.2, y: 2.5, strength: 3.0 } });  // diagonal: pushes toward void edge
 
     // Overhead platforms removed — they overlapped the play area and obscured the marble
 
@@ -1646,7 +1646,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
       ]
     });
     addHazardRect(level, 26, 20, 2, 1, 'shaft_spikes');
-    setSurface(level, 24, 22, { baseHeight: 8, shape: SHAPES.FLAT, conveyor: { x: -0.5, y: 0, strength: 2.2 } });
+    setSurface(level, 24, 22, { baseHeight: 8, shape: SHAPES.FLAT, conveyor: { x: -2.8, y: 2.2, strength: 3.2 } });  // diagonal: pushes toward wall
 
     // ─ Mid shaft: ramp from z=15 down to z=6
     placeRamp(level, { x: 30, y: 13, dir: 'south', length: 6, width: 3, startZ: 15, endZ: 6 });
@@ -1690,9 +1690,12 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
         { x: 32, y: 28 }, { x: 33, y: 28 }     // north entry (right)
       ]
     });
+    // Void-edge conveyors: push marble toward west void edge in goal basin
+    setSurface(level, 12, 30, { baseHeight: 4, shape: SHAPES.FLAT, conveyor: { x: -3.2, y: 2.5, strength: 3.5 } });
+    setSurface(level, 16, 36, { baseHeight: 4, shape: SHAPES.FLAT, conveyor: { x: 2.8, y: -3.0, strength: 3.5 } });
     // Hazard near goal
     addHazardRect(level, 26, 33, 2, 1, 'goal_guard');
-    setSurface(level, 22, 34, { baseHeight: 4, shape: SHAPES.FLAT, conveyor: { x: 0.6, y: 0, strength: 2.4 } });
+    setSurface(level, 22, 34, { baseHeight: 4, shape: SHAPES.FLAT, conveyor: { x: 2.5, y: -2.0, strength: 3.0 } });  // diagonal: pushes away from goal
     setSurface(level, 30, 34, { baseHeight: 4, shape: SHAPES.FLAT, crumble: { delay: 0.10, downtime: 2.2 } });
     // Goal on flat track tile
     setSurface(level, 36, 34, { baseHeight: 4, shape: SHAPES.FLAT });
@@ -1741,6 +1744,9 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
 
     // ─ Bridge corridor A→B (moving platform traverses this)
     widePath(level, [{ x: 11, y: 33 }, { x: 17, y: 33 }], 12, 3);
+    // Void-edge conveyors in bridge corridors: push marble toward void gap
+    setSurface(level, 13, 33, { baseHeight: 12, shape: SHAPES.FLAT, conveyor: { x: 2.8, y: -3.0, strength: 3.5 } });
+    setSurface(level, 15, 34, { baseHeight: 12, shape: SHAPES.FLAT, conveyor: { x: -3.2, y: 2.5, strength: 3.5 } });
 
     // ─ Tower B (z=10)
     fillTrack(level, 17, 28, 9, 9, 10);
@@ -1753,6 +1759,8 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
 
     // ─ Bridge corridor B→C
     widePath(level, [{ x: 25, y: 31 }, { x: 32, y: 31 }], 10, 3);
+    setSurface(level, 27, 31, { baseHeight: 10, shape: SHAPES.FLAT, conveyor: { x: 3.0, y: -2.8, strength: 3.5 } });
+    setSurface(level, 30, 32, { baseHeight: 10, shape: SHAPES.FLAT, conveyor: { x: -2.5, y: 3.2, strength: 3.5 } });
 
     // ─ Tower C (z=8)
     fillTrack(level, 32, 26, 9, 9, 8);
@@ -1765,6 +1773,8 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
 
     // ─ Bridge corridor C→D
     widePath(level, [{ x: 40, y: 29 }, { x: 47, y: 29 }], 8, 3);
+    setSurface(level, 42, 29, { baseHeight: 8, shape: SHAPES.FLAT, conveyor: { x: -3.0, y: -2.8, strength: 3.5 } });
+    setSurface(level, 45, 30, { baseHeight: 8, shape: SHAPES.FLAT, conveyor: { x: 2.8, y: 3.0, strength: 3.5 } });
 
     // ─ Tower D (z=6)
     fillTrack(level, 47, 24, 9, 9, 6);
@@ -1787,7 +1797,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     addTimedGate(level, 'gate_goal', 56, 27, 5, 1, 6, 1.5, 1.0);
     // Hazard near goal
     addHazardRect(level, 58, 25, 2, 1, 'goal_guard');
-    setSurface(level, 57, 28, { baseHeight: 6, shape: SHAPES.FLAT, conveyor: { x: 0.5, y: 0, strength: 2.2 } });
+    setSurface(level, 57, 28, { baseHeight: 6, shape: SHAPES.FLAT, conveyor: { x: 2.5, y: -2.5, strength: 3.2 } });  // diagonal: pushes toward void
     // Goal on flat track tile (NOT a bounce tile) — within bounds (width=64, so max x=63)
     setSurface(level, 61, 28, { baseHeight: 6, shape: SHAPES.FLAT });
     setGoal(level, 61, 28, 0.44);
@@ -1820,7 +1830,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     addHazardRect(level, 35, 27, 2, 1, 'transfer_spikes');
 
     // ─ Conveyor and bounce tiles (not on goal)
-    setSurface(level, 22, 33, { baseHeight: 10, shape: SHAPES.FLAT, conveyor: { x: 0.5, y: 0, strength: 2.2 } });
+    setSurface(level, 22, 33, { baseHeight: 10, shape: SHAPES.FLAT, conveyor: { x: -2.2, y: 2.8, strength: 3.0 } });  // diagonal: pushes toward wall
     setSurface(level, 37, 31, { baseHeight: 8, shape: SHAPES.FLAT, bounce: 5.2 });
 
     // ─ Route graph
@@ -1936,7 +1946,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
       ]
     });
     addHazardRect(level, 44, 24, 2, 2, 'central_spikes');
-    setSurface(level, 52, 25, { baseHeight: 4, shape: SHAPES.FLAT, conveyor: { x: -0.5, y: 0, strength: 2.2 } });
+    setSurface(level, 52, 25, { baseHeight: 4, shape: SHAPES.FLAT, conveyor: { x: -2.8, y: -2.5, strength: 3.2 } });  // diagonal: pushes toward void
 
     // ─ Goal corridor: ramp from core (z=4) down to goal basin (z=2)
     widePath(level, [{ x: 38, y: 26 }, { x: 30, y: 26 }], 4, 3);
@@ -1951,7 +1961,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     });
     // Hazard near goal
     addHazardRect(level, 14, 24, 2, 1, 'goal_guard');
-    setSurface(level, 12, 26, { baseHeight: 2, shape: SHAPES.FLAT, conveyor: { x: 0.6, y: 0, strength: 2.2 } });
+    setSurface(level, 12, 26, { baseHeight: 2, shape: SHAPES.FLAT, conveyor: { x: 2.2, y: -2.8, strength: 3.2 } });  // diagonal: pushes away from goal
     // Goal on flat track tile (NOT a bounce tile)
     setSurface(level, 20, 26, { baseHeight: 2, shape: SHAPES.FLAT });
     setGoal(level, 20, 26, 0.44);
@@ -2061,9 +2071,15 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     fillTrack(level, 50, 14, 18, 6, 6);
     for (let cx = 52; cx < 66; cx++) {
       for (let cy = 14; cy < 20; cy++) {
-        setSurface(level, cx, cy, { baseHeight: 6, shape: SHAPES.FLAT, conveyor: { x: 0.6, y: 0, strength: 2.2 } });
+        // Diagonal conveyor: pushes marble toward south void edge
+        const cxOff = (cx % 3) - 1;  // -1, 0, or 1 based on column
+        setSurface(level, cx, cy, { baseHeight: 6, shape: SHAPES.FLAT, conveyor: { x: 2.0 + cxOff * 0.4, y: -1.8, strength: 2.8 } });
       }
     }
+    // Void-edge conveyors: north wall of path A corridor pushes marble toward south void
+    setSurface(level, 53, 14, { baseHeight: 6, shape: SHAPES.FLAT, conveyor: { x: -2.5, y: -3.0, strength: 3.5 } });
+    setSurface(level, 58, 14, { baseHeight: 6, shape: SHAPES.FLAT, conveyor: { x: 2.8, y: -3.2, strength: 3.5 } });
+    setSurface(level, 63, 14, { baseHeight: 6, shape: SHAPES.FLAT, conveyor: { x: -3.0, y: -2.8, strength: 3.5 } });
     wallRing(level, 50, 14, 18, 6, 8, {
       gaps: [
         { x: 50, y: 14 }, { x: 50, y: 15 }, { x: 50, y: 16 }, { x: 50, y: 17 }, { x: 50, y: 18 }, { x: 50, y: 19 },
@@ -2089,6 +2105,10 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
 
     // === SECTION 3: Merge landing — both paths rejoin ===
     fillTrack(level, 74, 12, 14, 16, 2);
+    // Void-edge conveyors in merge landing: push marble toward east void edge (toward platform)
+    setSurface(level, 75, 13, { baseHeight: 2, shape: SHAPES.FLAT, conveyor: { x: 3.2, y: -2.5, strength: 3.5 } });
+    setSurface(level, 80, 13, { baseHeight: 2, shape: SHAPES.FLAT, conveyor: { x: -2.8, y: -3.0, strength: 3.5 } });
+    setSurface(level, 85, 13, { baseHeight: 2, shape: SHAPES.FLAT, conveyor: { x: 3.0, y: -2.8, strength: 3.5 } });
     wallRing(level, 74, 12, 14, 16, 4, {
       gaps: [
         // West entry from path A ramp (y:14-19)
@@ -2273,7 +2293,8 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     wallRing(level, 50, 29, 14, 10, 6, {
       gaps: [
         { x: 50, y: 31 }, { x: 50, y: 32 }, { x: 50, y: 33 }, { x: 50, y: 34 },
-        { x: 56, y: 29 }, { x: 57, y: 29 }, { x: 58, y: 29 }, { x: 59, y: 29 },
+        // North wall: include x:60 to match crumble bridge room south wall gap
+        { x: 56, y: 29 }, { x: 57, y: 29 }, { x: 58, y: 29 }, { x: 59, y: 29 }, { x: 60, y: 29 },
         { x: 56, y: 38 }, { x: 57, y: 38 }, { x: 58, y: 38 }, { x: 59, y: 38 }
       ]
     });
@@ -2670,9 +2691,10 @@ setGoal(level, 12, 88, 0.44);
 
        // Ramp south from merge platform (z=10→6), 5×5 — into second canal section
     placeRamp(level, { x: 55, y: 7, dir: 'south', length: 5, width: 5, startZ: 10, endZ: 6 });
-    // Connector strip (z=6), 5×3 — fills gap between ramp landing (y:12) and junction entry (y:15)
-    // Without this, the marble falls into void between the ramp and the junction.
-    fillTrack(level, 51, 12, 5, 3, 6);
+    // Connector strip (z=6), 9×3 — fills gap between ramp landing (y:12) and junction entry (y:15)
+    // Width extended to 9 (x:51-59) to cover the full ramp width (x:55-59) plus the junction entry (x:51-55).
+    // Without this, marble arriving at x:56-59,y:11 off the ramp falls into void at y:12.
+    fillTrack(level, 51, 12, 9, 3, 6);
 
     // === EXTENSION: second canal section ===
     // Second fork junction (z=6), 6×14
@@ -2871,9 +2893,8 @@ setGoal(level, 22, 40, 0.44);
       ]
     });
 
-    // Lower (south) path: 20×6 (z=14→10) — wider, no hazards
-    fillTrack(level, 34, 14, 20, 6, 14);
-    placeRamp(level, { x: 34, y: 20, dir: 'south', length: 3, width: 6, startZ: 14, endZ: 10 });
+    // Lower (south) path: 20×6 (z=10) — wider, no hazards
+    // Note: removed duplicate placeRamp that was being overwritten by fillTrack anyway
     fillTrack(level, 34, 14, 20, 6, 10);
     wallRing(level, 34, 14, 20, 6, 12, {
       gaps: [
@@ -2920,6 +2941,8 @@ setGoal(level, 22, 40, 0.44);
       ]
     });
 
+    // Bridge x:33 (1-tile void between second landing east wall x:33 and Path A west wall x:34)
+    fillTrack(level, 33, 40, 1, 4, 4);
     // Path A (west): wide void gap with moving platform bridge
     fillTrack(level, 34, 40, 16, 4, 4);
     clearSurfaceRect(level, 40, 40, 8, 4);
@@ -2936,6 +2959,8 @@ setGoal(level, 22, 40, 0.44);
       ]
     });
 
+    // Bridge x:54 (1-tile void between connector east wall x:53 and Path B west wall x:55)
+    fillTrack(level, 54, 44, 1, 5, 4);
     // Path B (east): crumble bridge + rotating bar hazard
     fillTrack(level, 55, 44, 20, 5, 4);
     for (let cx = 60; cx < 68; cx++) {
@@ -3134,7 +3159,9 @@ setGoal(level, 22, 40, 0.44);
     fillTrack(level, 32, 55, 14, 18, 2);
     for (let cx = 33; cx < 44; cx++) {
       for (let cy = 56; cy < 72; cy++) {
-        setSurface(level, cx, cy, { baseHeight: 2, shape: SHAPES.FLAT, conveyor: { x: 0, y: 0.7, strength: 2.6 } });
+        // Diagonal conveyor: pushes marble toward east void edge
+        const cyOff = (cy % 3) - 1;  // -1, 0, or 1 based on row
+        setSurface(level, cx, cy, { baseHeight: 2, shape: SHAPES.FLAT, conveyor: { x: 1.8, y: 2.2 + cyOff * 0.4, strength: 2.8 } });
       }
     }
     addHazardRect(level, 34, 65, 4, 3, 'l6_ext_spikes');
@@ -3388,7 +3415,10 @@ setGoal(level, 22, 84, 0.44);
     wallRing(level, 81, 26, 18, 12, 6, {
       gaps: [
         { x: 81, y: 28 }, { x: 81, y: 29 }, { x: 81, y: 30 }, { x: 81, y: 31 }, { x: 81, y: 32 }, { x: 81, y: 33 }, { x: 81, y: 34 }, { x: 81, y: 35 },
-        { x: 98, y: 28 }, { x: 98, y: 29 }, { x: 98, y: 30 }, { x: 98, y: 31 }, { x: 98, y: 32 }, { x: 98, y: 33 }, { x: 98, y: 34 }, { x: 98, y: 35 }
+        // East wall: full ramp width y:26-37 so marble can exit at any y position
+        { x: 98, y: 26 }, { x: 98, y: 27 },
+        { x: 98, y: 28 }, { x: 98, y: 29 }, { x: 98, y: 30 }, { x: 98, y: 31 }, { x: 98, y: 32 }, { x: 98, y: 33 }, { x: 98, y: 34 }, { x: 98, y: 35 },
+        { x: 98, y: 36 }, { x: 98, y: 37 }
       ]
     });
     placeRamp(level, { x: 99, y: 26, dir: 'east', length: 5, width: 12, startZ: 4, endZ: 0 });
@@ -3403,7 +3433,9 @@ setGoal(level, 22, 84, 0.44);
     });
     for (let cx = 73; cx < 77; cx++) {
       for (let cy = 37; cy < 53; cy++) {
-        setSurface(level, cx, cy, { baseHeight: 4, shape: SHAPES.FLAT, conveyor: { x: 0, y: 0.7, strength: 2.6 } });
+        // Diagonal conveyor: pushes marble toward south void edge
+        const cxOff2 = (cx % 3) - 1;  // -1, 0, or 1 based on column
+        setSurface(level, cx, cy, { baseHeight: 4, shape: SHAPES.FLAT, conveyor: { x: -1.8 + cxOff2 * 0.4, y: 2.2, strength: 2.8 } });
       }
     }
     wallRing(level, 72, 36, 6, 18, 6, {
@@ -3728,12 +3760,9 @@ setGoal(level, 93, 33, 0.44);
              { x: 8, y: 37 }, { x: 9, y: 37 }, { x: 10, y: 37 }, { x: 11, y: 37 }]
     });
     // === SECTION 3: Final gauntlet corridor — narrow, ice, sweepers ===
-    // Open south wall of goal basin to continue
-    setSurface(level, 6, 52, { baseHeight: 2, shape: SHAPES.FLAT });
-    setSurface(level, 7, 52, { baseHeight: 2, shape: SHAPES.FLAT });
-    setSurface(level, 8, 52, { baseHeight: 2, shape: SHAPES.FLAT });
-    setSurface(level, 9, 52, { baseHeight: 2, shape: SHAPES.FLAT });
-    setSurface(level, 10, 52, { baseHeight: 2, shape: SHAPES.FLAT });
+    // Bridge y:51-52 (2-tile void between first goal basin south wall y:50 and third corridor north wall y:53)
+    // Also bridge y:52 open-south-wall tiles which were floating in void
+    fillTrack(level, 6, 51, 10, 2, 2);
     // Bridge x:65 (1-tile void between third corridor east wall x:65 and final goal basin west wall x:66)
     fillTrack(level, 65, 53, 1, 5, 2);
     // Third corridor (z=2), 60×5 — ice floor, 3 sweepers, crumble sections, hazard strips
@@ -4141,7 +4170,9 @@ setGoal(level, 93, 33, 0.44);
     fillTrack(level, 14, 12, 40, 5, 24);
     for (let cx = 20; cx < 50; cx++) {
       for (let cy = 12; cy < 17; cy++) {
-        setSurface(level, cx, cy, { baseHeight: 24, shape: SHAPES.FLAT, conveyor: { x: 0.7, y: 0, strength: 2.9 } });
+        // Diagonal conveyor: pushes marble toward south void edge
+        const cxOff3 = (cx % 3) - 1;  // -1, 0, or 1 based on column
+        setSurface(level, cx, cy, { baseHeight: 24, shape: SHAPES.FLAT, conveyor: { x: 2.2 + cxOff3 * 0.4, y: -1.8, strength: 3.0 } });
       }
     }
     // Rotating bar mid-corridor — marble must time passage while being pushed by conveyor
