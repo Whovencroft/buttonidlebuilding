@@ -588,28 +588,30 @@
       // This is the primary landing detection for moving platforms.
       if (marble.vz <= 0) {
         const directSurface = window.MarbleLevels.sampleActorSurfaceDirect(
-          runtime.level, runtime.dynamicState, marble.x, marble.y, startZ + 0.1
+          runtime.level, runtime.dynamicState, marble.x, marble.y, startZ + 0.2
         );
         if (directSurface) {
           const platTop = directSurface.z + marble.collisionRadius;
-          // Check if the marble's path this sub-step crossed the platform top.
-          // Use a generous slab: platform top down to top-1.5 so a fast-falling
-          // marble that overshoots by up to 1.5 units still lands cleanly.
-          const platSlab = directSurface.z - 1.5;
-          const crossedDown = startZ >= platTop - 0.05 && marble.z <= platTop;
-          const withinSlab  = marble.z >= platSlab;
-          if (crossedDown && withinSlab) {
+          // Generous slab: platform top down to top-2.0 so a fast-falling
+          // marble that overshoots by up to 2 units still lands cleanly.
+          const platSlab = directSurface.z - 2.0;
+          // Case 1: marble crossed the platform top this sub-step (normal landing)
+          const crossedDown = startZ >= platTop - 0.08 && marble.z <= platTop;
+          // Case 2: marble ended below platform top but within the slab
+          // (fell through in a previous sub-step, catch it now)
+          const alreadyBelow = marble.z < platTop && marble.z >= platSlab;
+          const withinSlab   = marble.z >= platSlab;
+          if ((crossedDown || alreadyBelow) && withinSlab) {
             marble.grounded = true;
             marble.z = directSurface.z + marble.collisionRadius;
             marble.vz = 0;
             return directSurface;
           }
-          // Also catch the case where the platform rose up into the marble
-          // between frames (platform dz > 0).
+          // Case 3: platform rose up into the marble between frames (dz > 0)
           const platformDz = directSurface.actorState?.dz ?? 0;
           if (platformDz > 0) {
             const platTopAtStart = platTop - platformDz;
-            if (startZ >= platTopAtStart && marble.z <= platTop) {
+            if (startZ >= platTopAtStart - 0.08 && marble.z <= platTop + platformDz) {
               marble.grounded = true;
               marble.z = directSurface.z + marble.collisionRadius;
               marble.vz = 0;

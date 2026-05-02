@@ -2291,6 +2291,8 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
         { x: 60, y: 24 }, { x: 60, y: 25 }, { x: 60, y: 26 }, { x: 60, y: 27 }, { x: 60, y: 28 }, { x: 60, y: 29 }
       ]
     });
+    // Bridge the 1-tile void at x:60 between the crumble bridge room (x:56-59) and the ramp (x:61-65)
+    fillTrack(level, 60, 24, 1, 6, 4);
     placeRamp(level, { x: 61, y: 24, dir: 'east', length: 5, width: 6, startZ: 4, endZ: 0 });
 
     // Path B (south): long detour with timed gate, safe
@@ -2313,9 +2315,9 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
       ]
     });
         // Random push tiles — unpredictable direction changes
-    setSurface(level, 22, 18, { baseHeight: 14, shape: SHAPES.FLAT, conveyor: { x: 0, y: 2.8, strength: 2.8 } });
-    setSurface(level, 38, 26, { baseHeight: 10, shape: SHAPES.FLAT, conveyor: { x: -2.5, y: 0, strength: 2.5 } });
-    setSurface(level, 55, 34, { baseHeight: 6, shape: SHAPES.FLAT, conveyor: { x: 2.2, y: 2.2, strength: 3.0 } });
+    setSurface(level, 22, 18, { baseHeight: 12, shape: SHAPES.FLAT, conveyor: { x: 0, y: 2.8, strength: 2.8 } });
+    setSurface(level, 38, 26, { baseHeight: 8, shape: SHAPES.FLAT, conveyor: { x: -2.5, y: 0, strength: 2.5 } });
+    setSurface(level, 55, 34, { baseHeight: 4, shape: SHAPES.FLAT, conveyor: { x: 2.2, y: 2.2, strength: 3.0 } });
 setGoal(level, 72, 34, 0.44);
 
     addGraphNode(level, { id: 'start',    type: 'entry', x: 4.5,  y: 4.5,  z: 16 });
@@ -2712,13 +2714,28 @@ setGoal(level, 12, 88, 0.44);
       ]
     });
 
-    // Lower lane (z=6), 20×6 — timed gate + column obstacles
+    // Lower lane (z=6), 20×6 — timed gate + column obstacles + sweeper + crumble + hazard strip
     fillTrack(level, 29, 22, 20, 6, 6);
     addTimedGate(level, 'gate_canal2', 35, 23, 8, 3, 2, 1.6, 1.4);
+    // Column pair 1: north side, leaves gap on south
     setSurface(level, 40, 22, { baseHeight: 10, shape: SHAPES.FLAT });
     setSurface(level, 40, 23, { baseHeight: 10, shape: SHAPES.FLAT });
+    // Column pair 2: south side, leaves gap on north
     setSurface(level, 44, 25, { baseHeight: 10, shape: SHAPES.FLAT });
     setSurface(level, 44, 26, { baseHeight: 10, shape: SHAPES.FLAT });
+    // Crumble tiles in the middle of the lane — marble must move quickly
+    for (let cx = 37; cx < 42; cx++) {
+      setSurface(level, cx, 24, { baseHeight: 6, shape: SHAPES.FLAT, crumble: { delay: 0.10, downtime: 1.0 } });
+      setSurface(level, cx, 25, { baseHeight: 6, shape: SHAPES.FLAT, crumble: { delay: 0.10, downtime: 1.0 } });
+    }
+    // Hazard strip near the exit — can't just roll straight through
+    addHazardRect(level, 43, 22, 2, 3, 'canal2_lower_spikes');
+    // Sweeper guarding the lane exit
+    addActor(level, {
+      id: 'sweeper_canal2_lower', kind: ACTOR_KINDS.SWEEPER,
+      x: 46, y: 24, z: 6, topHeight: 6,
+      width: 1, height: 1, armLength: 1.8, armWidth: 0.22, angularSpeed: 1.6, fatal: true
+    });
     wallRing(level, 29, 22, 20, 6, 8, {
       gaps: [
         { x: 48, y: 22 }, { x: 48, y: 23 }, { x: 48, y: 24 }, { x: 48, y: 25 }, { x: 48, y: 26 }, { x: 48, y: 27 }, { x: 48, y: 28 },
@@ -2751,7 +2768,7 @@ setGoal(level, 12, 88, 0.44);
     });
     // Random push tiles — unpredictable direction changes
     // Existing tiles on upper sections
-    setSurface(level, 32, 6,  { baseHeight: 10, shape: SHAPES.FLAT, conveyor: { x: 0,    y: 3.0,  strength: 3.0 } });
+    setSurface(level, 32, 6,  { baseHeight: 6,  shape: SHAPES.FLAT, conveyor: { x: 0,    y: 3.0,  strength: 3.0 } });
     setSurface(level, 44, 10, { baseHeight: 10, shape: SHAPES.FLAT, conveyor: { x: -2.8, y: 0,    strength: 2.8 } });
     setSurface(level, 38, 18, { baseHeight: 6,  shape: SHAPES.FLAT, conveyor: { x: 2.5,  y: 2.5,  strength: 3.2 } });
     setSurface(level, 25, 24, { baseHeight: 6,  shape: SHAPES.FLAT, conveyor: { x: -3.0, y: 2.0,  strength: 3.5 } });
@@ -2837,8 +2854,7 @@ setGoal(level, 22, 40, 0.44);
     });
 
     // Upper (north) path: 16×4 (z=14→10) — rotating bar
-    fillTrack(level, 34, 0, 16, 5, 14);
-    placeRamp(level, { x: 34, y: 0, dir: 'north', length: 3, width: 5, startZ: 14, endZ: 10 });
+    // NOTE: removed disconnected north ramp (was going off-map to y<0)
     fillTrack(level, 34, 0, 16, 4, 10);
     addActor(level, {
       id: 'bar_upper',
@@ -2911,6 +2927,8 @@ setGoal(level, 22, 40, 0.44);
       { x: 40, y: 40, z: 4 },
       { x: 44, y: 40, z: 4 }
     ], 4, 4, 0.5);
+    // Bridge the gap between the platform's eastern edge (x:47) and the east landing (x:48)
+    fillTrack(level, 46, 40, 2, 4, 4);
     wallRing(level, 34, 40, 16, 4, 6, {
       gaps: [
         { x: 49, y: 40 }, { x: 49, y: 41 }, { x: 49, y: 42 }, { x: 49, y: 43 },
@@ -2966,7 +2984,7 @@ setGoal(level, 22, 40, 0.44);
         // Random push tiles — unpredictable direction changes
     setSurface(level, 30, 10, { baseHeight: 14, shape: SHAPES.FLAT, conveyor: { x: 0, y: 3.2, strength: 3.2 } });
     setSurface(level, 55, 18, { baseHeight: 10, shape: SHAPES.FLAT, conveyor: { x: -3.0, y: 0, strength: 3.0 } });
-    setSurface(level, 42, 30, { baseHeight: 6, shape: SHAPES.FLAT, conveyor: { x: 3.2, y: -3.2, strength: 3.5 } });
+    setSurface(level, 54, 10, { baseHeight: 10, shape: SHAPES.FLAT, conveyor: { x: 3.2, y: -3.2, strength: 3.5 } });
     setSurface(level, 20, 45, { baseHeight: 4, shape: SHAPES.FLAT, conveyor: { x: -2.8, y: 2.8, strength: 3.2 } });
     setSurface(level, 60, 55, { baseHeight: 4, shape: SHAPES.FLAT, conveyor: { x: 3.5, y: 3.5, strength: 3.5 } });
     // Sweepers guarding the goal basin entry
@@ -3128,7 +3146,7 @@ setGoal(level, 22, 40, 0.44);
     wallRing(level, 32, 55, 14, 18, 4, {
       gaps: [
         { x: 32, y: 55 }, { x: 32, y: 56 }, { x: 32, y: 57 }, { x: 32, y: 58 }, { x: 32, y: 59 }, { x: 32, y: 60 }, { x: 32, y: 61 },
-        { x: 38, y: 72 }, { x: 39, y: 72 }, { x: 40, y: 72 }, { x: 41, y: 72 }, { x: 42, y: 42 }, { x: 43, y: 72 }, { x: 44, y: 72 }, { x: 45, y: 72 }
+        { x: 38, y: 72 }, { x: 39, y: 72 }, { x: 40, y: 72 }, { x: 41, y: 72 }, { x: 42, y: 72 }, { x: 43, y: 72 }, { x: 44, y: 72 }, { x: 45, y: 72 }
       ]
     });
     placeRamp(level, { x: 38, y: 73, dir: 'south', length: 5, width: 8, startZ: 2, endZ: -2 });
@@ -3142,12 +3160,12 @@ setGoal(level, 22, 40, 0.44);
       ]
     });
         // Random push tiles — unpredictable direction changes
-    setSurface(level, 18, 20, { baseHeight: 14, shape: SHAPES.FLAT, conveyor: { x: 3.2, y: 0, strength: 3.2 } });
-    setSurface(level, 8, 38, { baseHeight: 10, shape: SHAPES.FLAT, conveyor: { x: 0, y: -3.0, strength: 3.0 } });
-    setSurface(level, 22, 52, { baseHeight: 6, shape: SHAPES.FLAT, conveyor: { x: -3.2, y: 3.2, strength: 3.5 } });
-    setSurface(level, 14, 68, { baseHeight: 2, shape: SHAPES.FLAT, conveyor: { x: 3.5, y: -3.5, strength: 3.5 } });
-    setSurface(level, 30, 78, { baseHeight: 2, shape: SHAPES.FLAT, conveyor: { x: -3.0, y: -3.0, strength: 3.5 } });
-    setSurface(level, 10, 88, { baseHeight: -2, shape: SHAPES.FLAT, conveyor: { x: 3.5, y: 3.5, strength: 3.5 } });
+    setSurface(level, 18, 20, { baseHeight: 10, shape: SHAPES.FLAT, conveyor: { x: 3.2, y: 0, strength: 3.2 } });
+    setSurface(level, 22, 38, { baseHeight: 6,  shape: SHAPES.FLAT, conveyor: { x: 0, y: -3.0, strength: 3.0 } });
+    setSurface(level, 22, 52, { baseHeight: 2,  shape: SHAPES.FLAT, conveyor: { x: -3.2, y: 3.2, strength: 3.5 } });
+    setSurface(level, 14, 68, { baseHeight: 2,  shape: SHAPES.FLAT, conveyor: { x: 3.5, y: -3.5, strength: 3.5 } });
+    setSurface(level, 30, 78, { baseHeight: -2, shape: SHAPES.FLAT, conveyor: { x: -3.0, y: -3.0, strength: 3.5 } });
+    setSurface(level, 10, 84, { baseHeight: -2, shape: SHAPES.FLAT, conveyor: { x: 3.5, y: 3.5, strength: 3.5 } });
 setGoal(level, 22, 84, 0.44);
 
     addGraphNode(level, { id: 'start', type: 'entry', x: 4.5,  y: 4.5,  z: 18 });
@@ -3220,6 +3238,8 @@ setGoal(level, 22, 84, 0.44);
     });
 
     // North wing (z=12), 20×9 — sweeper + crumble tiles + ice approach
+    // Bridge x:37 (1-tile void between north wing east wall and goal approach west wall)
+    fillTrack(level, 37, 14, 1, 4, 12);
     fillTrack(level, 18, 12, 20, 9, 12);
     // Ice approach tiles before sweeper
     for (let cx = 19; cx < 27; cx++) {
@@ -3248,6 +3268,8 @@ setGoal(level, 22, 84, 0.44);
     });
 
     // East wing (z=12), 20×8 — rotating bar + crumble bridge
+    // Bridge x:55 (1-tile void between east wing east wall and ramp start)
+    fillTrack(level, 55, 27, 1, 4, 12);
     fillTrack(level, 36, 25, 20, 8, 12);
     placeRamp(level, { x: 35, y: 27, dir: 'east', length: 4, width: 4, startZ: 16, endZ: 12 });
     // Rotating bar before the crumble bridge
@@ -3269,6 +3291,8 @@ setGoal(level, 22, 84, 0.44);
     });
 
     // South wing (z=12), 20×8 — hazard strips + timed gate
+    // Bridge x:37 (1-tile void between south wing east wall and goal approach west wall)
+    fillTrack(level, 37, 40, 1, 4, 12);
     fillTrack(level, 18, 38, 20, 8, 12);
     placeRamp(level, { x: 22, y: 37, dir: 'south', length: 4, width: 4, startZ: 16, endZ: 12 });
     // Hazard strips before the timed gate
@@ -3390,6 +3414,10 @@ setGoal(level, 22, 84, 0.44);
     });
     placeRamp(level, { x: 78, y: 48, dir: 'east', length: 5, width: 12, startZ: 4, endZ: 0 });
 
+    // Bridge x:82 (1-tile void between wing ramp ends at x:82 and basin west wall at x:83)
+    fillTrack(level, 82, 12, 1, 12, 0);  // Wing A entry
+    fillTrack(level, 82, 26, 1, 10, 0);  // Wing B entry
+    fillTrack(level, 82, 48, 1, 8, 0);   // Wing C entry
     // Final goal basin (z=0), 20×46 — all three wings converge, filled with hazards
     fillTrack(level, 83, 10, 20, 46, 0);
     // Ice floor across the basin — marble slides and is hard to stop
@@ -3600,6 +3628,10 @@ setGoal(level, 93, 33, 0.44);
       ]
     });
 
+    // Bridge x:63 (1-tile void between risky lane 2 east wall x:63 and second start platform west wall x:64)
+    fillTrack(level, 63, 18, 1, 5, 4);
+    // Bridge x:63 (1-tile void between safe lane 2 east wall x:63 and second start platform west wall x:64)
+    fillTrack(level, 63, 24, 1, 8, 4);
     // Risky lane 2 (north, y=18..22, 5 wide): rotating bars + spikes
     fillTrack(level, 12, 18, 52, 5, 4);
     addActor(level, {
@@ -3702,6 +3734,8 @@ setGoal(level, 93, 33, 0.44);
     setSurface(level, 8, 52, { baseHeight: 2, shape: SHAPES.FLAT });
     setSurface(level, 9, 52, { baseHeight: 2, shape: SHAPES.FLAT });
     setSurface(level, 10, 52, { baseHeight: 2, shape: SHAPES.FLAT });
+    // Bridge x:65 (1-tile void between third corridor east wall x:65 and final goal basin west wall x:66)
+    fillTrack(level, 65, 53, 1, 5, 2);
     // Third corridor (z=2), 60×5 — ice floor, 3 sweepers, crumble sections, hazard strips
     fillTrack(level, 6, 53, 60, 5, 2);
     // Ice floor throughout
@@ -3906,6 +3940,8 @@ setGoal(level, 93, 33, 0.44);
     setSurface(level, 11, 43, { baseHeight: 2, shape: SHAPES.FLAT });
     setSurface(level, 11, 44, { baseHeight: 2, shape: SHAPES.FLAT });
 
+    // Bridge y:38 (1-tile void between Floor 3 south corridor floor end y:37 and Floor 4 start y:39)
+    fillTrack(level, 12, 38, 28, 1, 2);
     // Floor 4 fork junction (z=2), 28×5
     fillTrack(level, 12, 39, 28, 5, 2);
     addActor(level, {
