@@ -1351,16 +1351,18 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     };
 
     for (let r = 1; r <= funnelRadius; r++) {
-      const rampZ = ez + r * 0.5; // each ring is 0.5 higher
-      // North and south edges
+      const rampZ = ez + r * 0.5; // each ring is 0.5 higher than center
+      // North edge tiles: slope down toward center (south) → SLOPE_N (high at north, low at south)
+      // South edge tiles: slope down toward center (north) → SLOPE_S (high at south, low at north)
       for (let dx = -r; dx <= r; dx++) {
-        setSurface(level, entryTx + dx, entryTy - r, { baseHeight: rampZ, shape: SHAPES.SLOPE_S });
-        setSurface(level, entryTx + dx, entryTy + r, { baseHeight: rampZ, shape: SHAPES.SLOPE_N });
+        setSurface(level, entryTx + dx, entryTy - r, { baseHeight: rampZ, shape: SHAPES.SLOPE_N });
+        setSurface(level, entryTx + dx, entryTy + r, { baseHeight: rampZ, shape: SHAPES.SLOPE_S });
       }
-      // East and west edges (excluding corners already set)
+      // West edge tiles: slope down toward center (east) → SLOPE_W (high at west, low at east)
+      // East edge tiles: slope down toward center (west) → SLOPE_E (high at east, low at west)
       for (let dy = -r + 1; dy <= r - 1; dy++) {
-        setSurface(level, entryTx - r, entryTy + dy, { baseHeight: rampZ, shape: SHAPES.SLOPE_E });
-        setSurface(level, entryTx + r, entryTy + dy, { baseHeight: rampZ, shape: SHAPES.SLOPE_W });
+        setSurface(level, entryTx - r, entryTy + dy, { baseHeight: rampZ, shape: SHAPES.SLOPE_W });
+        setSurface(level, entryTx + r, entryTy + dy, { baseHeight: rampZ, shape: SHAPES.SLOPE_E });
       }
     }
 

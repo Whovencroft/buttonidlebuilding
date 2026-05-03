@@ -1145,11 +1145,23 @@
 
   let coordCanvas = null;
   let coordCtx    = null;
+  let coordFrameCounter = 0;
+  let coordLastMx = -1;
+  let coordLastMy = -1;
 
   function renderCoordOverlay(runtime, glCanvas, w, h) {
     const ML = window.MarbleLevels;
     const level = runtime.level;
     if (!level || !camera) return;
+
+    // Only redraw every 4th frame or when marble moves to a new tile
+    const mx = Math.floor(runtime.marble.x);
+    const my = Math.floor(runtime.marble.y);
+    coordFrameCounter++;
+    const marbleMoved = mx !== coordLastMx || my !== coordLastMy;
+    if (!marbleMoved && (coordFrameCounter % 4) !== 0) return;
+    coordLastMx = mx;
+    coordLastMy = my;
 
     // Ensure overlay canvas exists and is sized correctly
     if (!coordCanvas || coordCanvas.parentNode !== glCanvas.parentNode) {
@@ -1174,18 +1186,21 @@
     const halfW = cw / 2;
     const halfH = ch / 2;
 
-    // Determine visible tile range based on marble position (limit to nearby tiles for performance)
-    const mx = Math.floor(runtime.marble.x);
-    const my = Math.floor(runtime.marble.y);
-    const RANGE = 12; // tiles in each direction from marble
+    // Determine visible tile range — reduced range for performance
+    const RANGE = 10;
     const x0 = Math.max(0, mx - RANGE);
     const x1 = Math.min(level.width - 1, mx + RANGE);
     const y0 = Math.max(0, my - RANGE);
     const y1 = Math.min(level.height - 1, my + RANGE);
 
-    ctx.font = `bold ${Math.round(9 * dpr)}px monospace`;
+    const fontSize = Math.round(9 * dpr);
+    ctx.font = `bold ${fontSize}px monospace`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
+    const pad = 2 * dpr;
+    const labelH = 10 * dpr;
+    // Approximate char width for monospace to avoid measureText per label
+    const charW = fontSize * 0.6;
 
     for (let ty = y0; ty <= y1; ty++) {
       for (let tx = x0; tx <= x1; tx++) {
@@ -1207,10 +1222,9 @@
         // Draw label — round z to avoid long decimals on ramp tiles
         const zDisp = Number.isInteger(z) ? z : z.toFixed(1);
         const label = `${tx},${ty},${zDisp}`;
+        const tw = label.length * charW;
         ctx.fillStyle = 'rgba(0,0,0,0.6)';
-        const tw = ctx.measureText(label).width;
-        const pad = 2 * dpr;
-        ctx.fillRect(sx - tw/2 - pad, sy - 5*dpr, tw + pad*2, 10*dpr);
+        ctx.fillRect(sx - tw/2 - pad, sy - labelH/2, tw + pad*2, labelH);
         ctx.fillStyle = '#00ffcc';
         ctx.fillText(label, sx, sy);
       }
