@@ -5,7 +5,7 @@
   const MAX_GROUND_SPEED = 7.6;
   const MAX_AIR_SPEED = 8.4;
 
-  const MAX_STEP_UP = 0.52;
+  const MAX_STEP_UP = 1.02;
   const MAX_STEP_DOWN = 1.15;
   const GROUND_SNAP = 0.14;
   const LEDGE_FALL_HORIZONTAL_DAMPING = 0.55;

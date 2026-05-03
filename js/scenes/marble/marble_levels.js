@@ -1003,9 +1003,10 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
           actorState
         });
       } else if (actor.kind === ACTOR_KINDS.TIMED_GATE) {
-        // Only block when the marble is within the gate's vertical extent
-        const gateTop = actor.topHeight;
-        const gateBase = gateTop - 0.06; // ACTOR_THICKNESS equivalent
+        // Block when the marble is within the gate's full vertical extent
+        // Gate extends from topHeight (floor level) up by +2 (full gate slab height)
+        const gateBase = actor.topHeight;
+        const gateTop = gateBase + 2;
         if (marbleBottom > gateTop + 0.04) continue;
         if (zCheck < gateBase - radius) continue;
         const minX = actorState.x;
@@ -2663,29 +2664,63 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
         setSurface(level, cx, 27, { baseHeight: -4, shape: SHAPES.FLAT, crumble: { delay: 0.10, downtime: 1.0 } });
       }
     }
-    // Goal at 101/34/0 with pyramid staircase descending outward
-    // Each ring steps down by 0.5 (within MAX_STEP_UP=0.52 so marble can jump up)
-    // 16 rings from z=0 (center) to z=-8 (outermost)
+    // Goal at 101/34/0 with pyramid staircase descending outward (1-unit steps)
     setSurface(level, 101, 34, { baseHeight: 0, shape: SHAPES.FLAT });
-    {
-      const cx = 101, cy = 34;
-      const totalRings = 16;
-      const stepSize = 0.5;
-      for (let ring = 1; ring <= totalRings; ring++) {
-        const z = -ring * stepSize;
-        const minX = cx - ring, maxX = cx + ring;
-        const minY = cy - ring, maxY = cy + ring;
-        for (let rx = minX; rx <= maxX; rx++) {
-          for (let ry = minY; ry <= maxY; ry++) {
-            // Only place perimeter tiles (skip interior already placed by inner rings)
-            if (rx > minX && rx < maxX && ry > minY && ry < maxY) continue;
-            // Bounds check
-            if (rx > 104 || rx < 82 || ry > 47 || ry < 22) continue;
-            setSurface(level, rx, ry, { baseHeight: z, shape: SHAPES.FLAT });
-          }
-        }
+    // Ring 1: adjacent tiles at z=-1
+    for (let rx = 100; rx <= 102; rx++) {
+      for (let ry = 33; ry <= 35; ry++) {
+        if (rx === 101 && ry === 34) continue;
+        setSurface(level, rx, ry, { baseHeight: -1, shape: SHAPES.FLAT });
       }
     }
+    // Ring 2: z=-2
+    for (let rx = 99; rx <= 103; rx++) {
+      for (let ry = 32; ry <= 36; ry++) {
+        if (rx >= 100 && rx <= 102 && ry >= 33 && ry <= 35) continue;
+        setSurface(level, rx, ry, { baseHeight: -2, shape: SHAPES.FLAT });
+      }
+    }
+    // Ring 3: z=-3
+    for (let rx = 98; rx <= 104; rx++) {
+      for (let ry = 31; ry <= 37; ry++) {
+        if (rx >= 99 && rx <= 103 && ry >= 32 && ry <= 36) continue;
+        if (rx > 104 || ry > 47 || ry < 22) continue;
+        setSurface(level, rx, ry, { baseHeight: -3, shape: SHAPES.FLAT });
+      }
+    }
+    // Ring 4: z=-4
+    for (let rx = 97; rx <= 105; rx++) {
+      for (let ry = 30; ry <= 38; ry++) {
+        if (rx >= 98 && rx <= 104 && ry >= 31 && ry <= 37) continue;
+        if (rx > 104 || ry > 47 || ry < 22) continue;
+        setSurface(level, rx, ry, { baseHeight: -4, shape: SHAPES.FLAT });
+      }
+    }
+    // Ring 5: z=-5
+    for (let rx = 96; rx <= 106; rx++) {
+      for (let ry = 29; ry <= 39; ry++) {
+        if (rx >= 97 && rx <= 105 && ry >= 30 && ry <= 38) continue;
+        if (rx > 104 || ry > 47 || ry < 22) continue;
+        setSurface(level, rx, ry, { baseHeight: -5, shape: SHAPES.FLAT });
+      }
+    }
+    // Ring 6: z=-6
+    for (let rx = 95; rx <= 107; rx++) {
+      for (let ry = 28; ry <= 40; ry++) {
+        if (rx >= 96 && rx <= 106 && ry >= 29 && ry <= 39) continue;
+        if (rx > 104 || ry > 47 || ry < 22) continue;
+        setSurface(level, rx, ry, { baseHeight: -6, shape: SHAPES.FLAT });
+      }
+    }
+    // Ring 7: z=-7
+    for (let rx = 94; rx <= 108; rx++) {
+      for (let ry = 27; ry <= 41; ry++) {
+        if (rx >= 95 && rx <= 107 && ry >= 28 && ry <= 40) continue;
+        if (rx > 104 || ry > 47 || ry < 22) continue;
+        setSurface(level, rx, ry, { baseHeight: -7, shape: SHAPES.FLAT });
+      }
+    }
+    // Ring 8: z=-8 (outermost, already set by the floor drops above)
     setGoal(level, 101, 34, 0.44);
 
     addGraphNode(level, { id: 'start',    type: 'entry', x: 4.5,  y: 4.5,  z: 16 });
