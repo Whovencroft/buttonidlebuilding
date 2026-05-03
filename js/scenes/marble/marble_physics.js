@@ -642,6 +642,181 @@
     return null;
   }
 
+  // ─── Tunnel Physics ─────────────────────────────────────────────────────
+  // Catmull-Rom spline interpolation for smooth tunnel paths
+  function catmullRom(p0, p1, p2, p3, t) {
+    const t2 = t * t;
+    const t3 = t2 * t;
+    return {
+      x: 0.5 * ((2 * p1.x) + (-p0.x + p2.x) * t + (2 * p0.x - 5 * p1.x + 4 * p2.x - p3.x) * t2 + (-p0.x + 3 * p1.x - 3 * p2.x + p3.x) * t3),
+      y: 0.5 * ((2 * p1.y) + (-p0.y + p2.y) * t + (2 * p0.y - 5 * p1.y + 4 * p2.y - p3.y) * t2 + (-p0.y + 3 * p1.y - 3 * p2.y + p3.y) * t3),
+      z: 0.5 * ((2 * p1.z) + (-p0.z + p2.z) * t + (2 * p0.z - 5 * p1.z + 4 * p2.z - p3.z) * t2 + (-p0.z + 3 * p1.z - 3 * p2.z + p3.z) * t3)
+    };
+  }
+
+  function catmullRomTangent(p0, p1, p2, p3, t) {
+    const t2 = t * t;
+    return {
+      x: 0.5 * ((-p0.x + p2.x) + (4 * p0.x - 10 * p1.x + 8 * p2.x - 2 * p3.x) * t + (-3 * p0.x + 9 * p1.x - 9 * p2.x + 3 * p3.x) * t2),
+      y: 0.5 * ((-p0.y + p2.y) + (4 * p0.y - 10 * p1.y + 8 * p2.y - 2 * p3.y) * t + (-3 * p0.y + 9 * p1.y - 9 * p2.y + 3 * p3.y) * t2),
+      z: 0.5 * ((-p0.z + p2.z) + (4 * p0.z - 10 * p1.z + 8 * p2.z - 2 * p3.z) * t + (-3 * p0.z + 9 * p1.z - 9 * p2.z + 3 * p3.z) * t2)
+    };
+  }
+
+  function getTunnelSplinePoint(path, progress) {
+    const n = path.length;
+    const totalSegments = n - 1;
+    const clampedProgress = clamp(progress, 0, 1);
+    const scaledT = clampedProgress * totalSegments;
+    const segIndex = Math.min(Math.floor(scaledT), totalSegments - 1);
+    const localT = scaledT - segIndex;
+
+    const p0 = path[Math.max(0, segIndex - 1)];
+    const p1 = path[segIndex];
+    const p2 = path[Math.min(n - 1, segIndex + 1)];
+    const p3 = path[Math.min(n - 1, segIndex + 2)];
+
+    return catmullRom(p0, p1, p2, p3, localT);
+  }
+
+  function getTunnelSplineTangent(path, progress) {
+    const n = path.length;
+    const totalSegments = n - 1;
+    const clampedProgress = clamp(progress, 0, 1);
+    const scaledT = clampedProgress * totalSegments;
+    const segIndex = Math.min(Math.floor(scaledT), totalSegments - 1);
+    const localT = scaledT - segIndex;
+
+    const p0 = path[Math.max(0, segIndex - 1)];
+    const p1 = path[segIndex];
+    const p2 = path[Math.min(n - 1, segIndex + 1)];
+    const p3 = path[Math.min(n - 1, segIndex + 2)];
+
+    return catmullRomTangent(p0, p1, p2, p3, localT);
+  }
+
+  function findTunnelActorAtTile(level, tx, ty) {
+    for (const actor of level.actors) {
+      if (actor.kind !== 'tunnel') continue;
+      if (!actor.tunnelPath || actor.tunnelPath.length < 2) continue;
+      const entry = actor.tunnelPath[0];
+      // Entry tile is the tile containing the first path point
+      if (Math.floor(entry.x) === tx && Math.floor(entry.y) === ty) return actor;
+    }
+    return null;
+  }
+
+  function enterTunnel(runtime, actor) {
+    const marble = runtime.marble;
+    marble.inTunnel = {
+      actorId: actor.id,
+      progress: 0,
+      speed: actor.tunnelSpeed ?? 8.0,
+      path: actor.tunnelPath,
+      exitType: actor.exitType ?? 'emerge',
+      exitVelocity: actor.exitVelocity ?? null
+    };
+    marble.grounded = false;
+    marble.vx = 0;
+    marble.vy = 0;
+    marble.vz = 0;
+  }
+
+  function updateTunnelPhysics(runtime, dt) {
+    const marble = runtime.marble;
+    const tunnel = marble.inTunnel;
+    if (!tunnel) return false;
+
+    const path = tunnel.path;
+    if (!path || path.length < 2) {
+      marble.inTunnel = null;
+      return false;
+    }
+
+    // Compute approximate total spline length for speed normalization
+    // (cached on first call)
+    if (!tunnel._totalLength) {
+      let totalLen = 0;
+      const samples = path.length * 10;
+      let prev = getTunnelSplinePoint(path, 0);
+      for (let i = 1; i <= samples; i++) {
+        const pt = getTunnelSplinePoint(path, i / samples);
+        totalLen += Math.sqrt((pt.x - prev.x) ** 2 + (pt.y - prev.y) ** 2 + (pt.z - prev.z) ** 2);
+        prev = pt;
+      }
+      tunnel._totalLength = totalLen;
+    }
+
+    // Advance progress based on speed
+    const progressPerSecond = tunnel.speed / tunnel._totalLength;
+    tunnel.progress += progressPerSecond * dt;
+
+    if (tunnel.progress >= 1.0) {
+      // Exit tunnel
+      const exitPoint = getTunnelSplinePoint(path, 1.0);
+      const exitTangent = getTunnelSplineTangent(path, 0.98);
+      const tangentLen = Math.sqrt(exitTangent.x ** 2 + exitTangent.y ** 2 + exitTangent.z ** 2) || 1;
+
+      marble.x = exitPoint.x;
+      marble.y = exitPoint.y;
+      marble.z = exitPoint.z + marble.collisionRadius;
+
+      if (tunnel.exitVelocity) {
+        marble.vx = tunnel.exitVelocity.x ?? 0;
+        marble.vy = tunnel.exitVelocity.y ?? 0;
+        marble.vz = tunnel.exitVelocity.z ?? 0;
+      } else {
+        // Default: eject along tangent at tunnel speed
+        const exitSpeed = tunnel.speed * 0.6;
+        marble.vx = (exitTangent.x / tangentLen) * exitSpeed;
+        marble.vy = (exitTangent.y / tangentLen) * exitSpeed;
+        marble.vz = (exitTangent.z / tangentLen) * exitSpeed;
+      }
+
+      if (tunnel.exitType === 'drop') {
+        // Void drop: just let marble fall
+        marble.vz = Math.min(marble.vz, -2);
+      } else if (tunnel.exitType === 'floor') {
+        // Land on floor below
+        marble.vz = Math.min(marble.vz, 0);
+      }
+      // 'emerge' = normal exit with tangent velocity
+
+      marble.grounded = false;
+      marble.inTunnel = null;
+      return true;
+    }
+
+    // Interpolate position along spline
+    const pos = getTunnelSplinePoint(path, tunnel.progress);
+    marble.x = pos.x;
+    marble.y = pos.y;
+    marble.z = pos.z + marble.collisionRadius;
+
+    return true;
+  }
+
+  function checkTunnelEntry(runtime, groundSurface) {
+    if (!groundSurface) return false;
+    const marble = runtime.marble;
+    if (marble.inTunnel) return false;
+
+    const trigger = window.MarbleLevels.getTriggerCell(runtime.level, groundSurface.tx, groundSurface.ty);
+    if (!trigger || trigger.kind !== 'tunnel_entry') return false;
+
+    const actor = findTunnelActorAtTile(runtime.level, groundSurface.tx, groundSurface.ty);
+    if (!actor) return false;
+
+    // Check marble is close to entry center
+    const entry = actor.tunnelPath[0];
+    const dx = marble.x - entry.x;
+    const dy = marble.y - entry.y;
+    if (Math.hypot(dx, dy) > 0.7) return false;
+
+    enterTunnel(runtime, actor);
+    return true;
+  }
+
   function updateCamera(runtime, dt) {
     const marble = runtime.marble;
     const speed = Math.hypot(marble.vx, marble.vy);
@@ -820,6 +995,18 @@ function shouldFailFromVoidFall(runtime) {
     const inputAxis = inputState?.axis || { x: 0, y: 0 };
     const jumpPressed = !!inputState?.jumpPressed;
 
+    // ─── Tunnel mode: bypass all normal physics ───
+    if (marble.inTunnel) {
+      window.MarbleLevels.advanceDynamicState(runtime, dt, null);
+      updateTunnelPhysics(runtime, dt);
+      runtime.timerMs += dt * 1000;
+      const timeLimit = runtime.level.timeLimit ?? 60;
+      if (runtime.timerMs >= timeLimit * 1000) return fail(runtime, 'timeout');
+      updateCamera(runtime, dt);
+      runtime.lastResult = null;
+      return null;
+    }
+
     // Sample previous support only to inform actor movement (e.g. riding a platform);
     // skip the extra sample when already airborne to avoid a redundant sampleSupportSurface call.
     const previousSupport = marble.grounded
@@ -861,6 +1048,12 @@ function shouldFailFromVoidFall(runtime) {
     const timeLimit = runtime.level.timeLimit ?? 60;
     if (runtime.timerMs >= timeLimit * 1000) return fail(runtime, 'timeout');
     updateCamera(runtime, dt);
+
+    // Check tunnel entry before normal triggers
+    if (checkTunnelEntry(runtime, groundSurface)) {
+      runtime.lastResult = null;
+      return null;
+    }
 
     const triggerResult = evaluateTriggers(runtime, groundSurface);
     if (triggerResult) return triggerResult;

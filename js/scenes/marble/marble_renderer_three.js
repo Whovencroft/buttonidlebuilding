@@ -757,8 +757,98 @@
         actorMeshMap[actor.id] = { group: actorGroup, kind, mesh };
         group.add(actorGroup);
       }
+
+      if (kind === ML.ACTOR_KINDS.TUNNEL) {
+        actorGroup = buildTunnelMesh(actor);
+        if (actorGroup) {
+          actorMeshMap[actor.id] = { group: actorGroup, kind };
+          group.add(actorGroup);
+        }
+      }
     }
     return group;
+  }
+
+  // ─── Tunnel tube mesh generation ─────────────────────────────────────────────
+  function buildTunnelMesh(actor) {
+    const path = actor.tunnelPath;
+    if (!path || path.length < 2) return null;
+
+    const tubeRadius = actor.tunnelRadius ?? 0.45;
+    const radialSegments = 8;
+    const pathSamples = path.length * 8; // smooth sampling
+
+    // Build a THREE.Curve from the Catmull-Rom path
+    const curvePoints = [];
+    for (let i = 0; i <= pathSamples; i++) {
+      const t = i / pathSamples;
+      const pt = tunnelSplinePoint(path, t);
+      // Three.js uses Y-up: our x -> x, z -> y (height), y -> z (depth)
+      curvePoints.push(new THREE.Vector3(pt.x, pt.z, pt.y));
+    }
+
+    const curve = new THREE.CatmullRomCurve3(curvePoints, false, 'catmullrom', 0);
+    const tubeGeo = new THREE.TubeGeometry(curve, pathSamples, tubeRadius, radialSegments, false);
+
+    const tunnelMat = getMat('tunnel_tube', () => new THREE.MeshPhongMaterial({
+      color: 0x22d3ee,
+      emissive: 0x083344,
+      transparent: true,
+      opacity: 0.45,
+      side: THREE.DoubleSide,
+      shininess: 60,
+      specular: 0x67e8f9
+    }));
+
+    const tubeMesh = new THREE.Mesh(tubeGeo, tunnelMat);
+
+    // Build funnel ring at entry (a torus/ring to mark the entrance)
+    const entryPt = path[0];
+    const funnelGeo = new THREE.TorusGeometry(tubeRadius * 1.8, tubeRadius * 0.3, 8, 16);
+    const funnelMat = getMat('tunnel_funnel', () => new THREE.MeshLambertMaterial({
+      color: 0x06b6d4,
+      emissive: 0x0e7490
+    }));
+    const funnelMesh = new THREE.Mesh(funnelGeo, funnelMat);
+    funnelMesh.position.set(entryPt.x, entryPt.z, entryPt.y);
+    funnelMesh.rotation.x = Math.PI / 2; // lay flat
+
+    // Build exit ring
+    const exitPt = path[path.length - 1];
+    const exitRingMesh = new THREE.Mesh(funnelGeo, funnelMat);
+    exitRingMesh.position.set(exitPt.x, exitPt.z, exitPt.y);
+    exitRingMesh.rotation.x = Math.PI / 2;
+
+    const tunnelGroup = new THREE.Group();
+    tunnelGroup.add(tubeMesh);
+    tunnelGroup.add(funnelMesh);
+    tunnelGroup.add(exitRingMesh);
+
+    return tunnelGroup;
+  }
+
+  // Catmull-Rom spline evaluation (mirrors physics version)
+  function tunnelSplinePoint(path, progress) {
+    const n = path.length;
+    const totalSegments = n - 1;
+    const clampedProgress = Math.max(0, Math.min(1, progress));
+    const scaledT = clampedProgress * totalSegments;
+    const segIndex = Math.min(Math.floor(scaledT), totalSegments - 1);
+    const localT = scaledT - segIndex;
+
+    const p0 = path[Math.max(0, segIndex - 1)];
+    const p1 = path[segIndex];
+    const p2 = path[Math.min(n - 1, segIndex + 1)];
+    const p3 = path[Math.min(n - 1, segIndex + 2)];
+
+    const t = localT;
+    const t2 = t * t;
+    const t3 = t2 * t;
+    return {
+      x: 0.5 * ((2 * p1.x) + (-p0.x + p2.x) * t + (2 * p0.x - 5 * p1.x + 4 * p2.x - p3.x) * t2 + (-p0.x + 3 * p1.x - 3 * p2.x + p3.x) * t3),
+      y: 0.5 * ((2 * p1.y) + (-p0.y + p2.y) * t + (2 * p0.y - 5 * p1.y + 4 * p2.y - p3.y) * t2 + (-p0.y + 3 * p1.y - 3 * p2.y + p3.y) * t3),
+      z: 0.5 * ((2 * p1.z) + (-p0.z + p2.z) * t + (2 * p0.z - 5 * p1.z + 4 * p2.z - p3.z) * t2 + (-p0.z + 3 * p1.z - 3 * p2.z + p3.z) * t3)
+    };
   }
 
   // Update persistent actor mesh positions/rotations/visibility each frame.

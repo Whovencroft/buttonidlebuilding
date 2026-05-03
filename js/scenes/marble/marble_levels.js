@@ -32,7 +32,8 @@
     ELEVATOR: 'elevator',
     ROTATING_BAR: 'rotating_bar',
     SWEEPER: 'sweeper',
-    TIMED_GATE: 'timed_gate'
+    TIMED_GATE: 'timed_gate',
+    TUNNEL: 'tunnel'
   };
 
   function clamp(value, min, max) {
@@ -1312,6 +1313,97 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     });
   }
 
+  // ─── Tunnel placement helper ────────────────────────────────────────────────
+  //
+  // placeTunnel(level, opts)
+  //   Places a complete tunnel: funnel entry ramps, tunnel actor with spline
+  //   path, entry trigger, and optional exit floor tile.
+  //
+  //   opts:
+  //     id          - unique tunnel actor id (string)
+  //     path        - array of {x, y, z} control points (min 2, center of tiles)
+  //                   First point = entry, last point = exit
+  //     speed       - marble travel speed through tunnel (default 8)
+  //     radius      - tube radius (default 0.45)
+  //     exitType    - 'emerge' | 'drop' | 'floor' (default 'emerge')
+  //     exitVelocity - optional {x, y, z} exit velocity override
+  //     funnelRadius - radius of entry funnel in tiles (default 2)
+  //     entryZ      - z height of the entry floor (default: path[0].z)
+  //
+  function placeTunnel(level, { id, path, speed = 8, radius = 0.45, exitType = 'emerge', exitVelocity = null, funnelRadius = 2, entryZ = null }) {
+    if (!path || path.length < 2) {
+      console.warn(`[LevelDesign] placeTunnel '${id}': path must have at least 2 points.`);
+      return;
+    }
+
+    const entry = path[0];
+    const ez = entryZ ?? entry.z;
+    const entryTx = Math.floor(entry.x);
+    const entryTy = Math.floor(entry.y);
+
+    // Place funnel ramp ring around entry (slopes pointing inward)
+    const slopeMap = {
+      n: SHAPES.SLOPE_S,  // north of entry, slopes south (toward center)
+      s: SHAPES.SLOPE_N,
+      e: SHAPES.SLOPE_W,
+      w: SHAPES.SLOPE_E
+    };
+
+    for (let r = 1; r <= funnelRadius; r++) {
+      const rampZ = ez + r * 0.5; // each ring is 0.5 higher
+      // North and south edges
+      for (let dx = -r; dx <= r; dx++) {
+        setSurface(level, entryTx + dx, entryTy - r, { baseHeight: rampZ, shape: SHAPES.SLOPE_S });
+        setSurface(level, entryTx + dx, entryTy + r, { baseHeight: rampZ, shape: SHAPES.SLOPE_N });
+      }
+      // East and west edges (excluding corners already set)
+      for (let dy = -r + 1; dy <= r - 1; dy++) {
+        setSurface(level, entryTx - r, entryTy + dy, { baseHeight: rampZ, shape: SHAPES.SLOPE_E });
+        setSurface(level, entryTx + r, entryTy + dy, { baseHeight: rampZ, shape: SHAPES.SLOPE_W });
+      }
+    }
+
+    // Place entry center tile (flat, at entry z — this is where the trigger goes)
+    setSurface(level, entryTx, entryTy, { baseHeight: ez, shape: SHAPES.FLAT });
+
+    // Set tunnel_entry trigger on the entry tile
+    setTrigger(level, entryTx, entryTy, { kind: 'tunnel_entry', data: { tunnelId: id } });
+
+    // Place exit floor tile if exitType is 'floor' or 'emerge'
+    if (exitType === 'floor' || exitType === 'emerge') {
+      const exit = path[path.length - 1];
+      const exitTx = Math.floor(exit.x);
+      const exitTy = Math.floor(exit.y);
+      setSurface(level, exitTx, exitTy, { baseHeight: exit.z, shape: SHAPES.FLAT, landingPad: true });
+      // Also set adjacent tiles as landing pads
+      for (let dx = -1; dx <= 1; dx++) {
+        for (let dy = -1; dy <= 1; dy++) {
+          if (dx === 0 && dy === 0) continue;
+          const cell = getSurfaceCell(level, exitTx + dx, exitTy + dy);
+          if (cell && cell.kind !== 'void') {
+            setSurface(level, exitTx + dx, exitTy + dy, { ...cell, landingPad: true });
+          }
+        }
+      }
+    }
+
+    // Add tunnel actor
+    addActor(level, {
+      id,
+      kind: ACTOR_KINDS.TUNNEL,
+      x: entry.x,
+      y: entry.y,
+      z: ez,
+      width: 1,
+      height: 1,
+      tunnelPath: path,
+      tunnelSpeed: speed,
+      tunnelRadius: radius,
+      exitType,
+      exitVelocity
+    });
+  }
+
   // ─── Macro template functions ──────────────────────────────────────────────
   //
   // These high-level helpers place complex geometry in a single call,
@@ -2270,6 +2362,21 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
       gaps: [{ x: 112, y: 47 }, { x: 112, y: 48 }, { x: 112, y: 49 }, { x: 112, y: 50 }, { x: 112, y: 51 }]
     });
     setGoal(level, 117, 50, 0.55);
+
+    // === Test tunnel: shortcut from merge area through void to goal basin ===
+    placeTunnel(level, {
+      id: 'tunnel_s1_shortcut',
+      path: [
+        { x: 79.5, y: 28.5, z: 2 },    // Entry: at the void gap we created
+        { x: 79.5, y: 30.5, z: 0 },     // Dip down
+        { x: 79.5, y: 33.5, z: -2 },    // Under the floor
+        { x: 82.5, y: 37.5, z: -2 },    // Curve east into basin
+        { x: 88.5, y: 40.5, z: -2 }     // Exit in the goal basin
+      ],
+      speed: 7,
+      exitType: 'emerge',
+      funnelRadius: 1
+    });
 
     addGraphNode(level, { id: 'start',    type: 'entry', x: 4.5,   y: 4.5,  z: 14 });
     addGraphNode(level, { id: 'mid',      type: 'hub',   x: 18.5,  y: 20.5, z: 10 });
@@ -5030,6 +5137,7 @@ function registerGeneratedLevel(level) {
     getHazardContacts,
     resolveSupportInteraction,
     isCrumbleBroken,
-    setGoal
+    setGoal,
+    placeTunnel
   };
 })();
