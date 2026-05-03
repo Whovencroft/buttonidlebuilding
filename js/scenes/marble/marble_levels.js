@@ -2161,13 +2161,18 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
       ]
     });
 
+    // Bounce tile line: x=74..87, y=27, z=2
+    for (let bx = 74; bx <= 87; bx++) {
+      setSurface(level, bx, 27, { baseHeight: 2, shape: SHAPES.FLAT, bounce: 5.2 });
+    }
+
     // === SECTION 4: Moving platform bridge — teaches platform mechanic ===
     // West approach (z=2), 8×6
     fillTrack(level, 88, 16, 8, 6, 2);
     wallRing(level, 88, 16, 8, 6, 4, {
       gaps: [
         { x: 88, y: 16 }, { x: 88, y: 17 }, { x: 88, y: 18 }, { x: 88, y: 19 }, { x: 88, y: 20 }, { x: 88, y: 21 },
-        { x: 95, y: 19 }, { x: 95, y: 20 }
+        { x: 95, y: 17 }, { x: 95, y: 18 }, { x: 95, y: 19 }, { x: 95, y: 20 }
       ]
     });
     // Void gap x:96-103 — 8 tiles wide, must use the platform
@@ -2228,8 +2233,10 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
         setSurface(level, cx, cy, { baseHeight: -2, shape: SHAPES.FLAT, crumble: { delay: 0.10, downtime: 1.0 } });
       }
     }
-    // Timed gate blocking the corridor (moved to east end near final basin)
-    addTimedGate(level, 'gate_s1_ext', 103, 46, -2, 1, 4, 1.8, 1.2);
+    // Remove 3×3 void square centered at 83/39
+    clearSurfaceRect(level, 82, 38, 3, 3);
+    // Timed gate blocking the corridor (spans y:46-50)
+    addTimedGate(level, 'gate_s1_ext', 103, 46, -2, 1, 5, 1.8, 1.2);
     // Sweeper guarding the exit
     addActor(level, {
       id: 'sweeper_s1_ext', kind: ACTOR_KINDS.SWEEPER,
@@ -2301,7 +2308,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
       killZ: -20,
       voidFloor: -10,
       start: { x: 4.5, y: 4.5 },
-      timeLimit: 60,
+      timeLimit: 40,
       reward: { presses: 5000, claimKey: 'terrace_falls' },
       templates: ['fork_rejoin', 'terrace']
     });
@@ -2357,7 +2364,14 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
       setSurface(level, cx, 31, { baseHeight: 8, shape: SHAPES.FLAT, crumble: { delay: 0.10, downtime: 1.0 } });
       setSurface(level, cx, 32, { baseHeight: 8, shape: SHAPES.FLAT, crumble: { delay: 0.10, downtime: 1.0 } });
     }
-    addTimedGate(level, 'gate_l2_b', 34, 30, 6, 4, 2, 1.6, 1.2);
+    // Timed gate moved to x=36, spanning y:29-35 at z=8
+    addTimedGate(level, 'gate_l2_b', 36, 29, 8, 1, 7, 1.6, 1.2);
+    // Crumble tiles filling x:34-35, y:29-35
+    for (let cx = 34; cx <= 35; cx++) {
+      for (let cy = 29; cy <= 35; cy++) {
+        setSurface(level, cx, cy, { baseHeight: 8, shape: SHAPES.FLAT, crumble: { delay: 0.10, downtime: 1.0 } });
+      }
+    }
     wallRing(level, 24, 28, 18, 10, 10, {
       gaps: [
         { x: 28, y: 28 }, { x: 29, y: 28 }, { x: 30, y: 28 }, { x: 31, y: 28 },
@@ -2388,9 +2402,12 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
         { x: 50, y: 31 }, { x: 50, y: 32 }, { x: 50, y: 33 }, { x: 50, y: 34 },
         // North wall: include x:60 to match crumble bridge room south wall gap
         { x: 56, y: 29 }, { x: 57, y: 29 }, { x: 58, y: 29 }, { x: 59, y: 29 }, { x: 60, y: 29 },
-        { x: 56, y: 38 }, { x: 57, y: 38 }, { x: 58, y: 38 }, { x: 59, y: 38 }
+        // South wall: opened at x:55-57 (wall removed, replaced with timed gate)
+        { x: 55, y: 38 }, { x: 56, y: 38 }, { x: 57, y: 38 }, { x: 58, y: 38 }, { x: 59, y: 38 }
       ]
     });
+    // Timed gate at south wall opening (55/37 to 57/37), 2s on 1s off
+    addTimedGate(level, 'gate_tc_wall', 55, 37, 4, 3, 1, 2.0, 1.0);
 
     // Path A (north): crumble-tile bridge, narrow, fast
     fillTrack(level, 56, 24, 5, 6, 4);
@@ -2411,14 +2428,15 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
 
     // Path B (south): long detour with timed gate, safe
     fillTrack(level, 56, 39, 5, 10, 4);
-    addTimedGate(level, 'gate_tc_south', 58, 43, 6, 3, 2, 1.6, 1.4);
+    // gate_tc_south removed (replaced by gate_tc_wall at south wall opening)
     wallRing(level, 56, 39, 5, 10, 6, {
       gaps: [
         { x: 56, y: 38 }, { x: 57, y: 38 }, { x: 58, y: 38 }, { x: 59, y: 38 }, { x: 60, y: 38 },
         { x: 60, y: 39 }, { x: 60, y: 40 }, { x: 60, y: 41 }, { x: 60, y: 42 }, { x: 60, y: 43 }, { x: 60, y: 44 }, { x: 60, y: 45 }, { x: 60, y: 46 }, { x: 60, y: 47 }, { x: 60, y: 48 }
       ]
     });
-    placeRamp(level, { x: 61, y: 39, dir: 'east', length: 5, width: 10, startZ: 4, endZ: 0 });
+    // Ramp removed (61/39 to 65/48). Extend floor terrain from x:60 to x:62 at z=4
+    fillTrack(level, 60, 39, 3, 10, 4);
 
     // Lower goal basin (z=0), 12×26 — both paths converge
     fillTrack(level, 66, 22, 12, 26, 0);
@@ -2427,6 +2445,26 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
         { x: 66, y: 24 }, { x: 66, y: 25 }, { x: 66, y: 26 }, { x: 66, y: 27 }, { x: 66, y: 28 }, { x: 66, y: 29 },
         { x: 66, y: 39 }, { x: 66, y: 40 }, { x: 66, y: 41 }, { x: 66, y: 42 }, { x: 66, y: 43 }, { x: 66, y: 44 }, { x: 66, y: 45 }, { x: 66, y: 46 }, { x: 66, y: 47 }, { x: 66, y: 48 }
       ]
+    });
+    // Pillars along x=66, y:38-48 (raised to z=2)
+    for (let py = 38; py <= 48; py++) {
+      setSurface(level, 66, py, { baseHeight: 2, shape: SHAPES.FLAT });
+    }
+    // Sweepers (size 3 = armLength 3.0)
+    addActor(level, {
+      id: 'sweeper_l2_lower_a', kind: ACTOR_KINDS.SWEEPER,
+      x: 70, y: 42, z: 0, topHeight: 0,
+      width: 1, height: 1, armLength: 3.0, armWidth: 0.22, angularSpeed: 1.4, fatal: true
+    });
+    addActor(level, {
+      id: 'sweeper_l2_lower_b', kind: ACTOR_KINDS.SWEEPER,
+      x: 70, y: 27, z: 0, topHeight: 0,
+      width: 1, height: 1, armLength: 3.0, armWidth: 0.22, angularSpeed: 1.4, fatal: true
+    });
+    addActor(level, {
+      id: 'sweeper_l2_lower_c', kind: ACTOR_KINDS.SWEEPER,
+      x: 75, y: 33, z: 0, topHeight: 0,
+      width: 1, height: 1, armLength: 3.0, armWidth: 0.22, angularSpeed: 1.4, fatal: true
     });
     // Random push tiles — unpredictable direction changes (diagonal only)
     // NOTE: setSurface at (22,18) z=12 removed — was an orphaned tile floating in void
@@ -2452,27 +2490,27 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
         { x: 81, y: 40 }, { x: 81, y: 41 }, { x: 81, y: 42 }, { x: 81, y: 43 }
       ]
     });
-    // Crumble bridge north fork (z=0), 14×4
-    fillTrack(level, 82, 26, 14, 4, 0);
+    // Crumble bridge north fork (z=-4), 14×4
+    fillTrack(level, 82, 26, 14, 4, -4);
     for (let cx = 83; cx < 95; cx++) {
       for (let cy = 27; cy < 30; cy++) {
-        setSurface(level, cx, cy, { baseHeight: 0, shape: SHAPES.FLAT, crumble: { delay: 0.10, downtime: 1.0 } });
+        setSurface(level, cx, cy, { baseHeight: -4, shape: SHAPES.FLAT, crumble: { delay: 0.10, downtime: 1.0 } });
       }
     }
-    wallRing(level, 82, 26, 14, 4, 2, {
+    wallRing(level, 82, 26, 14, 4, -2, {
       gaps: [
         { x: 82, y: 28 }, { x: 82, y: 29 }, { x: 82, y: 30 }, { x: 82, y: 31 },
         { x: 95, y: 26 }, { x: 95, y: 27 }, { x: 95, y: 28 }, { x: 95, y: 29 }
       ]
     });
-    // Sweeper corridor south fork (z=0), 14×4
-    fillTrack(level, 82, 38, 14, 4, 0);
+    // Sweeper corridor south fork (z=-4), 14×4
+    fillTrack(level, 82, 38, 14, 4, -4);
     addActor(level, {
       id: 'sweeper_l2_ext', kind: ACTOR_KINDS.SWEEPER,
-      x: 89, y: 40, z: 0, topHeight: 0,
+      x: 89, y: 40, z: -4, topHeight: -4,
       width: 1, height: 1, armLength: 1.8, armWidth: 0.22, angularSpeed: 1.4, fatal: true
     });
-    wallRing(level, 82, 38, 14, 4, 2, {
+    wallRing(level, 82, 38, 14, 4, -2, {
       gaps: [
         { x: 82, y: 40 }, { x: 82, y: 41 }, { x: 82, y: 42 }, { x: 82, y: 43 },
         { x: 95, y: 38 }, { x: 95, y: 39 }, { x: 95, y: 40 }, { x: 95, y: 41 }
@@ -2481,16 +2519,76 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     // Void-edge conveyors on Terrace D — push toward east void
     setSurface(level, 79, 22, { baseHeight: 0, shape: SHAPES.FLAT, conveyor: { x: 3.0, y: -2.5, strength: 3.5 } });
     setSurface(level, 80, 47, { baseHeight: 0, shape: SHAPES.FLAT, conveyor: { x: 2.8, y: 3.2, strength: 3.5 } });
-    setSurface(level, 93, 28, { baseHeight: 0, shape: SHAPES.FLAT, conveyor: { x: 3.2, y: -2.8, strength: 3.5 } });
-    setSurface(level, 93, 40, { baseHeight: 0, shape: SHAPES.FLAT, conveyor: { x: 3.2, y: 2.8, strength: 3.5 } });
-    // Final goal basin (z=0), 10×14 — both forks converge
-    fillTrack(level, 96, 24, 10, 22, 0);
-    wallRing(level, 96, 24, 10, 22, 2, {
-      gaps: [
-        { x: 96, y: 26 }, { x: 96, y: 27 }, { x: 96, y: 28 }, { x: 96, y: 29 },
-        { x: 96, y: 38 }, { x: 96, y: 39 }, { x: 96, y: 40 }, { x: 96, y: 41 }
-      ]
-    });
+    setSurface(level, 93, 28, { baseHeight: -4, shape: SHAPES.FLAT, conveyor: { x: 3.2, y: -2.8, strength: 3.5 } });
+    setSurface(level, 93, 40, { baseHeight: -4, shape: SHAPES.FLAT, conveyor: { x: 3.2, y: 2.8, strength: 3.5 } });
+    // Drop floor x:82-95 by -4 (from z=0 to z=-4)
+    for (let dx = 82; dx <= 95; dx++) {
+      for (let dy = 22; dy <= 47; dy++) {
+        setSurface(level, dx, dy, { baseHeight: -4, shape: SHAPES.FLAT });
+      }
+    }
+    // Drop floor x:96-104 by -8 (from z=0 to z=-8)
+    for (let dx = 96; dx <= 104; dx++) {
+      for (let dy = 22; dy <= 47; dy++) {
+        setSurface(level, dx, dy, { baseHeight: -8, shape: SHAPES.FLAT });
+      }
+    }
+    // Goal at 101/34/0 with pyramid staircase descending outward
+    setSurface(level, 101, 34, { baseHeight: 0, shape: SHAPES.FLAT });
+    // Ring 1: adjacent tiles at z=-1
+    for (let rx = 100; rx <= 102; rx++) {
+      for (let ry = 33; ry <= 35; ry++) {
+        if (rx === 101 && ry === 34) continue;
+        setSurface(level, rx, ry, { baseHeight: -1, shape: SHAPES.FLAT });
+      }
+    }
+    // Ring 2: z=-2
+    for (let rx = 99; rx <= 103; rx++) {
+      for (let ry = 32; ry <= 36; ry++) {
+        if (rx >= 100 && rx <= 102 && ry >= 33 && ry <= 35) continue;
+        setSurface(level, rx, ry, { baseHeight: -2, shape: SHAPES.FLAT });
+      }
+    }
+    // Ring 3: z=-3
+    for (let rx = 98; rx <= 104; rx++) {
+      for (let ry = 31; ry <= 37; ry++) {
+        if (rx >= 99 && rx <= 103 && ry >= 32 && ry <= 36) continue;
+        setSurface(level, rx, ry, { baseHeight: -3, shape: SHAPES.FLAT });
+      }
+    }
+    // Ring 4: z=-4
+    for (let rx = 97; rx <= 105; rx++) {
+      for (let ry = 30; ry <= 38; ry++) {
+        if (rx >= 98 && rx <= 104 && ry >= 31 && ry <= 37) continue;
+        if (rx > 104 || ry > 47 || ry < 22) continue;
+        setSurface(level, rx, ry, { baseHeight: -4, shape: SHAPES.FLAT });
+      }
+    }
+    // Ring 5: z=-5
+    for (let rx = 96; rx <= 106; rx++) {
+      for (let ry = 29; ry <= 39; ry++) {
+        if (rx >= 97 && rx <= 105 && ry >= 30 && ry <= 38) continue;
+        if (rx > 104 || ry > 47 || ry < 22) continue;
+        setSurface(level, rx, ry, { baseHeight: -5, shape: SHAPES.FLAT });
+      }
+    }
+    // Ring 6: z=-6
+    for (let rx = 95; rx <= 107; rx++) {
+      for (let ry = 28; ry <= 40; ry++) {
+        if (rx >= 96 && rx <= 106 && ry >= 29 && ry <= 39) continue;
+        if (rx > 104 || ry > 47 || ry < 22) continue;
+        setSurface(level, rx, ry, { baseHeight: -6, shape: SHAPES.FLAT });
+      }
+    }
+    // Ring 7: z=-7
+    for (let rx = 94; rx <= 108; rx++) {
+      for (let ry = 27; ry <= 41; ry++) {
+        if (rx >= 95 && rx <= 107 && ry >= 28 && ry <= 40) continue;
+        if (rx > 104 || ry > 47 || ry < 22) continue;
+        setSurface(level, rx, ry, { baseHeight: -7, shape: SHAPES.FLAT });
+      }
+    }
+    // Ring 8: z=-8 (outermost, already set by the floor drops above)
     setGoal(level, 101, 34, 0.44);
 
     addGraphNode(level, { id: 'start',    type: 'entry', x: 4.5,  y: 4.5,  z: 16 });
