@@ -3638,10 +3638,10 @@ setGoal(level, 22, 84, 0.44);
         // Random push tiles — unpredictable direction changes
     setSurface(level, 22, 26, { baseHeight: 16, shape: SHAPES.FLAT, conveyor: { x: 3.5, y: -2.5, strength: 3.8 } });
     setSurface(level, 28, 16, { baseHeight: 12, shape: SHAPES.FLAT, conveyor: { x: -2.2, y: -3.2, strength: 3.5 } });
-    setSurface(level, 45, 28, { baseHeight: 12, shape: SHAPES.FLAT, conveyor: { x: -3.5, y: 3.5, strength: 3.5 } });
+    setSurface(level, 45, 28, { baseHeight: 8, shape: SHAPES.FLAT, conveyor: { x: -3.5, y: 3.5, strength: 3.5 } });  // fixed: was z=12 on z=8 floor (backtrack-only)
     setSurface(level, 24, 42, { baseHeight: 12, shape: SHAPES.FLAT, conveyor: { x: 3.2, y: 3.2, strength: 3.5 } });
     setSurface(level, 75, 18, { baseHeight: 4, shape: SHAPES.FLAT, conveyor: { x: -3.5, y: -3.5, strength: 3.5 } });
-    setSurface(level, 90, 32, { baseHeight: 4, shape: SHAPES.FLAT, conveyor: { x: 3.5, y: -3.5, strength: 3.5 } });
+    setSurface(level, 90, 32, { baseHeight: 0, shape: SHAPES.FLAT, friction: 0.22, conveyor: { x: 3.5, y: -3.5, strength: 3.5 } });  // fixed: was z=4 on z=0 ice basin (backtrack-only)
     setSurface(level, 75, 46, { baseHeight: 4, shape: SHAPES.FLAT, conveyor: { x: -3.5, y: 3.5, strength: 3.5 } });
     // Void-edge conveyors — push marble toward outer void edges of each wing
     setSurface(level, 18, 12, { baseHeight: 12, shape: SHAPES.FLAT, conveyor: { x: -3.2, y: -3.0, strength: 3.8 } });
@@ -3649,7 +3649,7 @@ setGoal(level, 22, 84, 0.44);
     setSurface(level, 36, 36, { baseHeight: 12, shape: SHAPES.FLAT, conveyor: { x: 3.2, y: 3.5, strength: 3.8 } });
     setSurface(level, 18, 44, { baseHeight: 12, shape: SHAPES.FLAT, conveyor: { x: -3.5, y: 3.2, strength: 3.8 } });
     setSurface(level, 83, 10, { baseHeight: 4, shape: SHAPES.FLAT, conveyor: { x: 2.8, y: -3.5, strength: 3.8 } });
-    setSurface(level, 83, 54, { baseHeight: 4, shape: SHAPES.FLAT, conveyor: { x: 2.8, y: 3.5, strength: 3.8 } });
+    setSurface(level, 83, 54, { baseHeight: 0, shape: SHAPES.FLAT, conveyor: { x: 2.8, y: 3.5, strength: 3.8 } });  // fixed: was z=4 on z=0 basin entry wall gap (backtrack-only)
 setGoal(level, 93, 33, 0.44);
 
     addGraphNode(level, { id: 'start',  type: 'entry', x: 4.5,  y: 28.5, z: 16 });
@@ -4314,10 +4314,11 @@ setGoal(level, 93, 33, 0.44);
     // 18-tile void — the platform is the ONLY way across
     clearSurfaceRect(level, 28, 2, 18, 3);
     // Bridge starts 2 tiles onto the west landing so the marble can board
-    // without standing right at the void edge. Ends 2 tiles onto east landing.
+    // without standing right at the void edge. Endpoint moved from (43,2) to (46,2)
+    // so it lands on the first tile of the landing pad (not in the void gap).
     addMovingBridge(level, 'bridge_fa1', [
       { x: 26, y: 2, z: 24 },
-      { x: 43, y: 2, z: 24 }
+      { x: 46, y: 2, z: 24 }
     ], 3, 3, 0.18);
     // Landing pad — 8 tiles, then ramp
     fillTrack(level, 46, 2, 10, 3, 24);
