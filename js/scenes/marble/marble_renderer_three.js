@@ -747,11 +747,20 @@
       }
 
       if (kind === ML.ACTOR_KINDS.TIMED_GATE) {
+        // Gate spans actor.width tiles on X and actor.height tiles on Y
+        // Render as a tall slab: X-size = width, Z-size (depth in 3D) = height, Y-size (vertical) = 2
         const gw = actor.width ?? 1;
-        const geo = new THREE.BoxGeometry(gw, 1.5, 0.2);
+        const gh = actor.height ?? 1;
+        const gateVertical = 2; // gate is 2 units tall visually
+        const geo = new THREE.BoxGeometry(gw, gateVertical, gh);
         const mat = getMat('gate', () => new THREE.MeshLambertMaterial({ color: 0xfbbf24 }));
         const mesh = new THREE.Mesh(geo, mat);
-        mesh.position.set((actor.x ?? 0) + gw / 2, (actor.z ?? 0) + 0.75, actor.y ?? 0);
+        // Position: center of the gate's footprint, raised by half the vertical height
+        mesh.position.set(
+          (actor.x ?? 0) + gw / 2,
+          (actor.z ?? 0) + gateVertical / 2,
+          (actor.y ?? 0) + gh / 2
+        );
         actorGroup = new THREE.Group();
         actorGroup.add(mesh);
         actorMeshMap[actor.id] = { group: actorGroup, kind, mesh };
