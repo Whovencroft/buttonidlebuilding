@@ -918,6 +918,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
       const cycle = closedDuration + openDuration;
       const phase = clock % cycle;
       state.active = phase < closedDuration;
+      state.blocking = state.active;  // renderer checks state.blocking for visibility
       state.x = actor.x;
       state.y = actor.y;
       state.z = actor.z;
@@ -1302,7 +1303,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
       kind: ACTOR_KINDS.TIMED_GATE,
       x,
       y,
-      z: 0,
+      z: topHeight,   // gate renders at floor height, not at z=0
       width,
       height,
       topHeight,
@@ -2190,7 +2191,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
       }
     }
     // Timed gate blocking the corridor
-    addTimedGate(level, 'gate_s1_ext', 84, 47, 8, 4, -2, 1.8, 1.2);
+    addTimedGate(level, 'gate_s1_ext', 84, 47, 8, 4, 2, 1.8, 1.2);
     // Sweeper guarding the exit
     addActor(level, {
       id: 'sweeper_s1_ext', kind: ACTOR_KINDS.SWEEPER,
@@ -2291,7 +2292,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     addActor(level, {
       id: 'sweeper_l2_a', kind: ACTOR_KINDS.SWEEPER,
       x: 31, y: 8, z: 12, topHeight: 12,
-      width: 1, height: 1, armLength: 2.5, armWidth: 0.22, angularSpeed: 1.1, fatal: true
+      width: 1, height: 1, armLength: 2.5, armWidth: 0.22, angularSpeed: 1.5, fatal: true
     });
     addHazardRect(level, 26, 7, 2, 3, 'l2_terrace_a_spikes');
     wallRing(level, 24, 4, 14, 10, 14, {
@@ -2557,8 +2558,14 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
         { x: 2, y: 37 }, { x: 3, y: 37 }, { x: 4, y: 37 }, { x: 5, y: 37 }, { x: 6, y: 37 }, { x: 7, y: 37 }
       ]
     });
-    // Leg C: east corridor (z=10), 14×5 — now exits from west side of Turn B
+    // Leg C: east corridor (z=10), 14×5 — ice floor introduces friction reduction before Stage 6
     fillTrack(level, 2, 38, 14, 5, 10);
+    // Ice tiles across the interior of Leg C (not the walls)
+    for (let ix = 3; ix <= 14; ix++) {
+      for (let iy = 38; iy <= 42; iy++) {
+        setSurface(level, ix, iy, { baseHeight: 10, shape: SHAPES.FLAT, friction: 0.25 });
+      }
+    }
     wallRing(level, 2, 38, 14, 5, 12, {
       gaps: [
         // West entry from Turn B: x:2-7 — 6 tiles wide
@@ -2569,6 +2576,13 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
         { x: 15, y: 42 }
       ]
     });
+    // Rotating bar on Turn B — introduces the mechanic before Stage 6
+    addActor(level, {
+      id: 'bar_turn_b', kind: ACTOR_KINDS.SWEEPER,
+      x: 8, y: 34, z: 10, topHeight: 10,
+      width: 1, height: 1, armLength: 2.8, armWidth: 0.22, angularSpeed: 0.9, fatal: true
+    });
+
     // Ramp C south (z=10→6), 6×5 — aligned with Leg C east exit at x:11-15
     placeRamp(level, { x: 11, y: 43, dir: 'south', length: 6, width: 5, startZ: 10, endZ: 6 });
 
@@ -2619,12 +2633,12 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
 
     // Path A (east): Leg E east corridor (z=2), 14×5 — with timed gate
     fillTrack(level, 11, 72, 14, 5, 2);
-    addTimedGate(level, 'gate_leg_e', 16, 73, 4, 3, 2, 1.8, 1.2);
+    addTimedGate(level, 'gate_leg_e', 16, 73, 4, 3, 2, 1.5, 1.0);
     // Sweeper on the approach to the final gate
     addActor(level, {
       id: 'sweeper_l3_final', kind: ACTOR_KINDS.SWEEPER,
       x: 18, y: 74, z: 2, topHeight: 2,
-      width: 1, height: 1, armLength: 2.0, armWidth: 0.22, angularSpeed: 1.4, fatal: true
+      width: 1, height: 1, armLength: 2.0, armWidth: 0.22, angularSpeed: 1.8, fatal: true
     });
     wallRing(level, 11, 72, 14, 5, 4, {
       gaps: [
@@ -2930,10 +2944,14 @@ setGoal(level, 12, 88, 0.44);
     // Randomizers on the final ramp approach — push diagonally to knock marble off the narrow ramp
     setSurface(level, 22, 29, { baseHeight: 5,  shape: SHAPES.FLAT, conveyor: { x: -3.0, y: 1.5,  strength: 3.5 } });
     setSurface(level, 23, 31, { baseHeight: 4,  shape: SHAPES.FLAT, conveyor: { x: 2.8,  y: -2.0, strength: 3.2 } });
+    // Bounce pad on second merge platform — first encounter with the mechanic
+    setSurface(level, 25, 22, { baseHeight: 6,  shape: SHAPES.FLAT, bounce: 5.2 });
     // Randomizers in the goal basin — push marble away from the goal
     setSurface(level, 20, 36, { baseHeight: 2,  shape: SHAPES.FLAT, conveyor: { x: 2.8,  y: -2.8, strength: 3.5 } });
     setSurface(level, 25, 38, { baseHeight: 2,  shape: SHAPES.FLAT, conveyor: { x: -3.0, y: 3.0,  strength: 3.5 } });
     setSurface(level, 18, 40, { baseHeight: 2,  shape: SHAPES.FLAT, conveyor: { x: 3.0,  y: 2.5,  strength: 3.2 } });
+    // Bounce pad in goal basin — reinforces the mechanic near the goal
+    setSurface(level, 17, 37, { baseHeight: 2,  shape: SHAPES.FLAT, bounce: 5.2 });
     // Void-edge conveyors — push marble toward outer void edges of each canal lane
     setSurface(level, 29, 4, { baseHeight: 10, shape: SHAPES.FLAT, conveyor: { x: -3.0, y: -2.8, strength: 3.5 } });
     setSurface(level, 47, 7, { baseHeight: 10, shape: SHAPES.FLAT, conveyor: { x: 3.2, y: -2.5, strength: 3.5 } });
@@ -3151,6 +3169,31 @@ setGoal(level, 22, 40, 0.44);
     });
     // Connector strip bridging east path connector (x:53) to Path B south landing (x:58)
     fillTrack(level, 54, 49, 4, 8, 4);  // x:54-57, y:49-56
+    // Void-edge conveyor on connector strip — pushes marble toward east void
+    setSurface(level, 56, 52, { baseHeight: 4, shape: SHAPES.FLAT, conveyor: { x: 3.2, y: -2.8, strength: 3.5 } });
+
+    // Crumble section on Path B south landing — must move quickly
+    for (let cx = 60; cx <= 67; cx++) {
+      setSurface(level, cx, 51, { baseHeight: 4, shape: SHAPES.FLAT, crumble: { delay: 0.10, downtime: 1.0 } });
+      setSurface(level, cx, 52, { baseHeight: 4, shape: SHAPES.FLAT, crumble: { delay: 0.10, downtime: 1.0 } });
+    }
+    // Sweeper guarding the Path B south landing exit
+    addActor(level, {
+      id: 'sweeper_l5_pathb', kind: ACTOR_KINDS.SWEEPER,
+      x: 63, y: 54, z: 4, topHeight: 4,
+      width: 1, height: 1, armLength: 2.2, armWidth: 0.22, angularSpeed: 1.6, fatal: true
+    });
+
+    // Sweeper on east path connector — guards the corridor
+    addActor(level, {
+      id: 'sweeper_l5_east', kind: ACTOR_KINDS.SWEEPER,
+      x: 44, y: 50, z: 4, topHeight: 4,
+      width: 1, height: 1, armLength: 2.5, armWidth: 0.22, angularSpeed: 1.4, fatal: true
+    });
+    // Timed gate on east path connector entry
+    addTimedGate(level, 'gate_l5_east', 42, 44, 4, 3, 2, 1.6, 1.2);
+    // Void-edge conveyor on east path connector — pushes toward east void
+    setSurface(level, 52, 47, { baseHeight: 4, shape: SHAPES.FLAT, conveyor: { x: 3.0, y: -2.5, strength: 3.5 } });
 
     // Connect east path into landing via east wall
     fillTrack(level, 34, 44, 20, 14, 4);
@@ -3290,8 +3333,9 @@ setGoal(level, 22, 40, 0.44);
     addActor(level, {
       id: 'sweeper_l6_t3', kind: ACTOR_KINDS.SWEEPER,
       x: 27, y: 41, z: 6, topHeight: 6,
-      width: 1, height: 1, armLength: 2.5, armWidth: 0.22, angularSpeed: 1.3, fatal: true
+      width: 1, height: 1, armLength: 2.5, armWidth: 0.22, angularSpeed: 1.5, fatal: true
     });
+
     // Timed gate before Tier 4 ramp
     addTimedGate(level, 'gate_l6_t3', 22, 43, 6, 3, 2, 1.6, 1.2);
     // Tier 4: final ramp south (z=6→2), 6×5
