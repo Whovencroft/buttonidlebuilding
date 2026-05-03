@@ -3022,7 +3022,11 @@ setGoal(level, 22, 40, 0.44);
     });
     wallRing(level, 34, 0, 16, 4, 12, {
       gaps: [
+        // North wall gaps (entry from east landing north side)
         { x: 34, y: 0 }, { x: 35, y: 0 }, { x: 36, y: 0 }, { x: 37, y: 0 },
+        // South wall gaps (entry from east landing, y:4 → y:3)
+        { x: 34, y: 3 }, { x: 35, y: 3 }, { x: 36, y: 3 }, { x: 37, y: 3 },
+        // East wall gaps (exit to merge platform)
         { x: 49, y: 0 }, { x: 49, y: 1 }, { x: 49, y: 2 }, { x: 49, y: 3 }
       ]
     });
@@ -3078,14 +3082,14 @@ setGoal(level, 22, 40, 0.44);
     // Bridge x:33 (1-tile void between second landing east wall x:33 and Path A west wall x:34)
     fillTrack(level, 33, 40, 1, 4, 4);
     // Path A (west): wide void gap with moving platform bridge
-    fillTrack(level, 34, 40, 16, 4, 4);
-    clearSurfaceRect(level, 40, 40, 8, 4);
+    // Floor at x:34-39 and x:47-49, void gap at x:40-46
+    fillTrack(level, 34, 40, 6, 4, 4);  // x:34-39 solid floor
+    fillTrack(level, 47, 40, 3, 4, 4);  // x:47-49 solid floor (east side of gap)
+    clearSurfaceRect(level, 40, 40, 7, 4);  // void gap x:40-46
     addMovingBridge(level, 'bridge_cross2', [
-      { x: 40, y: 40, z: 4 },
-      { x: 44, y: 40, z: 4 }
+      { x: 39, y: 40, z: 4 },
+      { x: 47, y: 40, z: 4 }
     ], 4, 4, 0.5);
-    // Bridge the gap between the platform's eastern edge (x:47) and the east landing (x:48)
-    fillTrack(level, 46, 40, 2, 4, 4);
     wallRing(level, 34, 40, 16, 4, 6, {
       gaps: [
         { x: 49, y: 40 }, { x: 49, y: 41 }, { x: 49, y: 42 }, { x: 49, y: 43 },
@@ -3109,8 +3113,22 @@ setGoal(level, 22, 40, 0.44);
     });
     wallRing(level, 55, 44, 20, 5, 6, {
       gaps: [
+        // North wall gaps (entry from approach corridor south at y:43)
         { x: 55, y: 43 }, { x: 56, y: 43 }, { x: 57, y: 43 }, { x: 58, y: 43 }, { x: 59, y: 43 }, { x: 60, y: 43 },
-        { x: 74, y: 44 }, { x: 74, y: 45 }, { x: 74, y: 46 }, { x: 74, y: 47 }, { x: 74, y: 48 }
+        // South wall gaps (exit to Path B south landing at y:49)
+        { x: 62, y: 48 }, { x: 63, y: 48 }, { x: 64, y: 48 }, { x: 65, y: 48 }, { x: 66, y: 48 }
+      ]
+    });
+
+    // Path B south landing (z=4), 12×8 — Path B exits south into this platform
+    fillTrack(level, 58, 49, 12, 8, 4);
+    wallRing(level, 58, 49, 12, 8, 6, {
+      gaps: [
+        // North wall gaps (entry from Path B south exit at y:48)
+        { x: 62, y: 49 }, { x: 63, y: 49 }, { x: 64, y: 49 }, { x: 65, y: 49 }, { x: 66, y: 49 },
+        // West wall gaps (exit to east path connector at x:53, y:49-56)
+        { x: 58, y: 49 }, { x: 58, y: 50 }, { x: 58, y: 51 }, { x: 58, y: 52 },
+        { x: 58, y: 53 }, { x: 58, y: 54 }, { x: 58, y: 55 }, { x: 58, y: 56 }
       ]
     });
 
@@ -3131,21 +3149,34 @@ setGoal(level, 22, 40, 0.44);
         { x: 25, y: 57 }, { x: 26, y: 57 }, { x: 27, y: 57 }, { x: 28, y: 57 }
       ]
     });
+    // Connector strip bridging east path connector (x:53) to Path B south landing (x:58)
+    fillTrack(level, 54, 49, 4, 8, 4);  // x:54-57, y:49-56
+
     // Connect east path into landing via east wall
     fillTrack(level, 34, 44, 20, 14, 4);
     wallRing(level, 34, 44, 20, 14, 6, {
       gaps: [
+        // North wall gaps (connect from Path A corridor at y:40-43)
         { x: 34, y: 40 }, { x: 34, y: 41 }, { x: 34, y: 42 }, { x: 34, y: 43 },
+        // West wall gaps (connect to second landing east wall at x:33, y:44-57)
+        { x: 34, y: 44 }, { x: 34, y: 45 }, { x: 34, y: 46 }, { x: 34, y: 47 },
+        { x: 34, y: 48 }, { x: 34, y: 49 }, { x: 34, y: 50 }, { x: 34, y: 51 },
+        { x: 34, y: 52 }, { x: 34, y: 53 }, { x: 34, y: 54 }, { x: 34, y: 55 },
+        { x: 34, y: 56 }, { x: 34, y: 57 },
+        // East wall gaps (connect from Path B via bridge_x54 at x:53-54, y:44-48 AND connector strip y:49-56)
         { x: 53, y: 44 }, { x: 53, y: 45 }, { x: 53, y: 46 }, { x: 53, y: 47 }, { x: 53, y: 48 },
+        { x: 53, y: 49 }, { x: 53, y: 50 }, { x: 53, y: 51 }, { x: 53, y: 52 },
+        { x: 53, y: 53 }, { x: 53, y: 54 }, { x: 53, y: 55 }, { x: 53, y: 56 },
+        // South wall gaps (exit to final ramp)
         { x: 34, y: 57 }, { x: 35, y: 57 }, { x: 36, y: 57 }, { x: 37, y: 57 }
       ]
     });
 
     // Final ramp south (z=4→0), 6×8
     placeRamp(level, { x: 22, y: 58, dir: 'south', length: 6, width: 8, startZ: 4, endZ: 0 });
-    // Goal basin (z=0), 14×10
-    fillTrack(level, 18, 64, 14, 10, 0);
-    wallRing(level, 18, 64, 14, 10, 2, {
+    // Goal basin (z=0), 14×7 — capped at y:70 to stay within map height:72
+    fillTrack(level, 18, 64, 14, 7, 0);
+    wallRing(level, 18, 64, 14, 7, 2, {
       gaps: [{ x: 22, y: 64 }, { x: 23, y: 64 }, { x: 24, y: 64 }, { x: 25, y: 64 }, { x: 26, y: 64 }, { x: 27, y: 64 }, { x: 28, y: 64 }, { x: 29, y: 64 }]
     });
     // Random push tiles — all diagonal/randomized
@@ -3168,12 +3199,12 @@ setGoal(level, 22, 40, 0.44);
     // Rotating bar mid-basin
     addActor(level, {
       id: 'bar_l5_goal', kind: ACTOR_KINDS.ROTATING_BAR,
-      x: 27, y: 66, z: 4, topHeight: 4,
+      x: 27, y: 66, z: 0, topHeight: 0,
       width: 1, height: 1, armLength: 2.2, armWidth: 0.22, angularSpeed: 2.2, fatal: true
     });
-    // Hazard strip blocking direct run to goal
-    addHazardRect(level, 20, 68, 16, 2, 'l5_goal_spikes');
-    setGoal(level, 25, 70, 0.44);
+    // Hazard strip blocking direct run to goal (inside basin, before goal)
+    addHazardRect(level, 19, 65, 12, 2, 'l5_goal_spikes');
+    setGoal(level, 25, 68, 0.44);
 
     addGraphNode(level, { id: 'start',    type: 'entry', x: 4.5,  y: 5.5,  z: 14 });
     addGraphNode(level, { id: 'bridge',   type: 'hub',   x: 23.5, y: 8.5,  z: 14 });
