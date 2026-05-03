@@ -679,13 +679,11 @@
 
     // ── Pass 1: Tile tops ────────────────────────────────────────────────────
     crumbleMeshMap = {}; // reset for this level
-    const funnelGroups = {}; // group funnel tiles by center key
     for (const { tx, ty, cell } of tiles) {
-      // Skip FUNNEL tiles from normal rendering — they get a single bowl mesh
+      // Render FUNNEL tiles as normal terrain tiles using corner heights
+      // (they get the standard ramp material — no separate bowl mesh)
       if (cell.shape === 'funnel') {
-        const key = `${cell.funnelCenterX},${cell.funnelCenterY}`;
-        if (!funnelGroups[key]) funnelGroups[key] = [];
-        funnelGroups[key].push({ tx, ty, cell });
+        group.add(buildSlopeMesh(tx, ty, cell));
         continue;
       }
       const isGoal     = ML.getTriggerCell(level, tx, ty)?.kind === 'goal';
@@ -722,17 +720,12 @@
       }
     }
 
-    // ── Pass 1b: Funnel bowl meshes (one smooth circular mesh per funnel) ────
-    for (const key of Object.keys(funnelGroups)) {
-      const mesh = buildFunnelBowlMesh(funnelGroups[key]);
-      if (mesh) group.add(mesh);
-    }
+    // (Funnel tiles rendered as normal terrain above — no separate bowl mesh)
 
     // ── Pass 2: Wall faces — all four edges ──────────────────────────────────
     const W_HL = 0.06;
     for (const { tx, ty, cell } of tiles) {
-      // Skip funnel tiles — the bowl mesh handles its own geometry
-      if (cell.shape === 'funnel') continue;
+      // Funnel tiles render walls normally (they're standard terrain now)
       const corners = ML.getSurfaceCornerHeights
         ? ML.getSurfaceCornerHeights(cell)
         : { nw: cell.baseHeight, ne: cell.baseHeight, sw: cell.baseHeight, se: cell.baseHeight };
@@ -970,28 +963,9 @@
     const tubeInnerMesh = new THREE.Mesh(tubeGeo, tunnelMatInner);
     const tubeOuterMesh = new THREE.Mesh(tubeGeo.clone(), tunnelMatOuter);
 
-    // Build funnel ring at entry (a torus/ring to mark the entrance)
-    const entryPt = path[0];
-    const funnelGeo = new THREE.TorusGeometry(tubeRadius * 1.8, tubeRadius * 0.3, 8, 16);
-    const funnelMat = getMat('tunnel_funnel', () => new THREE.MeshLambertMaterial({
-      color: 0x06b6d4,
-      emissive: 0x0e7490
-    }));
-    const funnelMesh = new THREE.Mesh(funnelGeo, funnelMat);
-    funnelMesh.position.set(entryPt.x, entryPt.z, entryPt.y);
-    funnelMesh.rotation.x = Math.PI / 2; // lay flat
-
-    // Build exit ring
-    const exitPt = path[path.length - 1];
-    const exitRingMesh = new THREE.Mesh(funnelGeo, funnelMat);
-    exitRingMesh.position.set(exitPt.x, exitPt.z, exitPt.y);
-    exitRingMesh.rotation.x = Math.PI / 2;
-
     const tunnelGroup = new THREE.Group();
     tunnelGroup.add(tubeInnerMesh);
     tunnelGroup.add(tubeOuterMesh);
-    tunnelGroup.add(funnelMesh);
-    tunnelGroup.add(exitRingMesh);
 
     return tunnelGroup;
   }
