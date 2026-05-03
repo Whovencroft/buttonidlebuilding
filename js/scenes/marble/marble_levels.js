@@ -2106,10 +2106,46 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
 
     // === SECTION 3: Merge landing — both paths rejoin ===
     fillTrack(level, 74, 12, 14, 16, 2);
-    // Void-edge conveyors in merge landing: push marble toward east void edge (toward platform)
-    setSurface(level, 75, 13, { baseHeight: 2, shape: SHAPES.FLAT, conveyor: { x: 3.2, y: -2.5, strength: 3.5 } });
-    setSurface(level, 80, 13, { baseHeight: 2, shape: SHAPES.FLAT, conveyor: { x: -2.8, y: -3.0, strength: 3.5 } });
-    setSurface(level, 85, 13, { baseHeight: 2, shape: SHAPES.FLAT, conveyor: { x: 3.0, y: -2.8, strength: 3.5 } });
+    // Diagonal conveyor line A: (74,19) → (81,26)
+    setSurface(level, 74, 19, { baseHeight: 2, shape: SHAPES.FLAT, conveyor: { x: 2.8, y: -2.5, strength: 3.0 } });
+    setSurface(level, 75, 20, { baseHeight: 2, shape: SHAPES.FLAT, conveyor: { x: -2.2, y: 3.0, strength: 3.0 } });
+    setSurface(level, 76, 21, { baseHeight: 2, shape: SHAPES.FLAT, conveyor: { x: 3.0, y: -2.8, strength: 3.0 } });
+    setSurface(level, 77, 22, { baseHeight: 2, shape: SHAPES.FLAT, conveyor: { x: -2.5, y: 2.8, strength: 3.0 } });
+    setSurface(level, 78, 23, { baseHeight: 2, shape: SHAPES.FLAT, conveyor: { x: 2.5, y: -3.0, strength: 3.0 } });
+    setSurface(level, 79, 24, { baseHeight: 2, shape: SHAPES.FLAT, conveyor: { x: -3.0, y: 2.5, strength: 3.0 } });
+    setSurface(level, 80, 25, { baseHeight: 2, shape: SHAPES.FLAT, conveyor: { x: 2.8, y: -2.2, strength: 3.0 } });
+    setSurface(level, 81, 26, { baseHeight: 2, shape: SHAPES.FLAT, conveyor: { x: -2.5, y: 3.2, strength: 3.0 } });
+    // Diagonal conveyor line B: (75,13) → (85,23)
+    setSurface(level, 75, 13, { baseHeight: 2, shape: SHAPES.FLAT, conveyor: { x: 3.2, y: -2.5, strength: 3.0 } });
+    setSurface(level, 76, 14, { baseHeight: 2, shape: SHAPES.FLAT, conveyor: { x: -2.8, y: 3.0, strength: 3.0 } });
+    setSurface(level, 77, 15, { baseHeight: 2, shape: SHAPES.FLAT, conveyor: { x: 2.5, y: -2.8, strength: 3.0 } });
+    setSurface(level, 78, 16, { baseHeight: 2, shape: SHAPES.FLAT, conveyor: { x: -3.0, y: 2.5, strength: 3.0 } });
+    setSurface(level, 79, 17, { baseHeight: 2, shape: SHAPES.FLAT, conveyor: { x: 2.8, y: -3.2, strength: 3.0 } });
+    setSurface(level, 80, 18, { baseHeight: 2, shape: SHAPES.FLAT, conveyor: { x: -2.5, y: 2.8, strength: 3.0 } });
+    setSurface(level, 81, 19, { baseHeight: 2, shape: SHAPES.FLAT, conveyor: { x: 3.0, y: -2.5, strength: 3.0 } });
+    setSurface(level, 82, 20, { baseHeight: 2, shape: SHAPES.FLAT, conveyor: { x: -2.8, y: 3.2, strength: 3.0 } });
+    setSurface(level, 83, 21, { baseHeight: 2, shape: SHAPES.FLAT, conveyor: { x: 2.5, y: -2.5, strength: 3.0 } });
+    setSurface(level, 84, 22, { baseHeight: 2, shape: SHAPES.FLAT, conveyor: { x: -3.2, y: 2.8, strength: 3.0 } });
+    setSurface(level, 85, 23, { baseHeight: 2, shape: SHAPES.FLAT, conveyor: { x: 2.8, y: -3.0, strength: 3.0 } });
+    // Diagonal conveyor line C: (80,13) → (88,21)
+    setSurface(level, 80, 13, { baseHeight: 2, shape: SHAPES.FLAT, conveyor: { x: -2.8, y: 3.0, strength: 3.0 } });
+    setSurface(level, 81, 14, { baseHeight: 2, shape: SHAPES.FLAT, conveyor: { x: 3.0, y: -2.5, strength: 3.0 } });
+    setSurface(level, 82, 15, { baseHeight: 2, shape: SHAPES.FLAT, conveyor: { x: -2.5, y: 2.8, strength: 3.0 } });
+    setSurface(level, 83, 16, { baseHeight: 2, shape: SHAPES.FLAT, conveyor: { x: 2.8, y: -3.0, strength: 3.0 } });
+    setSurface(level, 84, 17, { baseHeight: 2, shape: SHAPES.FLAT, conveyor: { x: -3.0, y: 2.5, strength: 3.0 } });
+    setSurface(level, 85, 18, { baseHeight: 2, shape: SHAPES.FLAT, conveyor: { x: 2.5, y: -2.8, strength: 3.0 } });
+    setSurface(level, 86, 19, { baseHeight: 2, shape: SHAPES.FLAT, conveyor: { x: -2.8, y: 3.2, strength: 3.0 } });
+    setSurface(level, 87, 20, { baseHeight: 2, shape: SHAPES.FLAT, conveyor: { x: 3.0, y: -2.8, strength: 3.0 } });
+    setSurface(level, 88, 21, { baseHeight: 2, shape: SHAPES.FLAT, conveyor: { x: -2.5, y: 2.5, strength: 3.0 } });
+    // Pillars: single tiles raised to z=4 (floor z=2 + 2)
+    setSurface(level, 77, 26, { baseHeight: 4, shape: SHAPES.FLAT });
+    setSurface(level, 79, 26, { baseHeight: 4, shape: SHAPES.FLAT });
+    setSurface(level, 81, 26, { baseHeight: 4, shape: SHAPES.FLAT });
+    setSurface(level, 83, 26, { baseHeight: 4, shape: SHAPES.FLAT });
+    // Bounce tile line: x=74..85, y=24, z=2
+    for (let bx = 74; bx <= 85; bx++) {
+      setSurface(level, bx, 24, { baseHeight: 2, shape: SHAPES.FLAT, bounce: 5.2 });
+    }
     wallRing(level, 74, 12, 14, 16, 4, {
       gaps: [
         // West entry from path A ramp (y:14-19)
@@ -2131,21 +2167,21 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     wallRing(level, 88, 16, 8, 6, 4, {
       gaps: [
         { x: 88, y: 16 }, { x: 88, y: 17 }, { x: 88, y: 18 }, { x: 88, y: 19 }, { x: 88, y: 20 }, { x: 88, y: 21 },
-        { x: 95, y: 17 }, { x: 95, y: 18 }, { x: 95, y: 19 }, { x: 95, y: 20 }
+        { x: 95, y: 19 }, { x: 95, y: 20 }
       ]
     });
     // Void gap x:96-103 — 8 tiles wide, must use the platform
     // Moving platform — slow and wide so easy to catch as a tutorial
     addMovingBridge(level, 'bridge_l1_tutorial', [
-      { x: 96, y: 17, z: 2 },
-      { x: 100, y: 17, z: 2 }
-    ], 6, 4, 0.22);
+      { x: 96, y: 19, z: 2 },
+      { x: 100, y: 19, z: 2 }
+    ], 6, 2, 0.22);
     // East landing (z=2), 8×6
     fillTrack(level, 104, 16, 8, 6, 2);
     wallRing(level, 104, 16, 8, 6, 4, {
       gaps: [
         // West entry from platform
-        { x: 104, y: 17 }, { x: 104, y: 18 }, { x: 104, y: 19 }, { x: 104, y: 20 },
+        { x: 104, y: 19 }, { x: 104, y: 20 },
         // East wall — open so marble can continue east if needed
         { x: 111, y: 17 }, { x: 111, y: 18 }, { x: 111, y: 19 }, { x: 111, y: 20 },
         // South exit to descent ramp (y=22 = south wall of 104,16,8,6 → y=16+6=22)
@@ -2157,6 +2193,8 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     // === SECTION 5: Final descent and goal ===
     // Ramp south from merge area (z=2→-2), 6 tiles long × 14 wide
     placeRamp(level, { x: 74, y: 28, dir: 'south', length: 6, width: 14, startZ: 2, endZ: -2 });
+    // Remove chunk: x:79-80, y:28-34 (void gap in the ramp + basin north edge)
+    clearSurfaceRect(level, 79, 28, 2, 7);
     // South corridor from east landing (x:104-111) down to goal basin
     // This fixes the dead-end: after crossing the platform, marble can go south
     placeRamp(level, { x: 104, y: 22, dir: 'south', length: 6, width: 8, startZ: 2, endZ: -2 });
@@ -2190,8 +2228,8 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
         setSurface(level, cx, cy, { baseHeight: -2, shape: SHAPES.FLAT, crumble: { delay: 0.10, downtime: 1.0 } });
       }
     }
-    // Timed gate blocking the corridor
-    addTimedGate(level, 'gate_s1_ext', 84, 47, -2, 4, 2, 1.8, 1.2);
+    // Timed gate blocking the corridor (moved to east end near final basin)
+    addTimedGate(level, 'gate_s1_ext', 103, 46, -2, 1, 4, 1.8, 1.2);
     // Sweeper guarding the exit
     addActor(level, {
       id: 'sweeper_s1_ext', kind: ACTOR_KINDS.SWEEPER,
