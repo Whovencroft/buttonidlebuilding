@@ -2199,13 +2199,18 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     setSurface(level, 106, 46, { baseHeight: -2, shape: SHAPES.FLAT, conveyor: { x: 3.0, y: -2.8, strength: 3.5 } });
     wallRing(level, 74, 46, 38, 6, 0, {
       gaps: [
+        // Full north wall open so marble from basin (y:34-45) can enter corridor
         { x: 74, y: 46 }, { x: 75, y: 46 }, { x: 76, y: 46 }, { x: 77, y: 46 },
         { x: 78, y: 46 }, { x: 79, y: 46 }, { x: 80, y: 46 }, { x: 81, y: 46 },
         { x: 82, y: 46 }, { x: 83, y: 46 }, { x: 84, y: 46 }, { x: 85, y: 46 },
         { x: 86, y: 46 }, { x: 87, y: 46 }, { x: 88, y: 46 }, { x: 89, y: 46 },
         { x: 90, y: 46 }, { x: 91, y: 46 }, { x: 92, y: 46 }, { x: 93, y: 46 },
         { x: 94, y: 46 }, { x: 95, y: 46 }, { x: 96, y: 46 }, { x: 97, y: 46 },
-        { x: 98, y: 46 }, { x: 99, y: 46 },
+        { x: 98, y: 46 }, { x: 99, y: 46 }, { x: 100, y: 46 }, { x: 101, y: 46 },
+        { x: 102, y: 46 }, { x: 103, y: 46 }, { x: 104, y: 46 }, { x: 105, y: 46 },
+        { x: 106, y: 46 }, { x: 107, y: 46 }, { x: 108, y: 46 }, { x: 109, y: 46 },
+        { x: 110, y: 46 }, { x: 111, y: 46 },
+        // East exit to final goal basin
         { x: 111, y: 47 }, { x: 111, y: 48 }, { x: 111, y: 49 }, { x: 111, y: 50 }, { x: 111, y: 51 }
       ]
     });
@@ -2248,7 +2253,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     const level = createLevelShell({
       id: 'terrace_falls',
       name: 'Terrace Falls',
-      width: 80,
+      width: 110,
       height: 60,
       killZ: -20,
       voidFloor: -10,
@@ -2647,8 +2652,11 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     fillTrack(level, 2, 82, 20, 10, -2);
     wallRing(level, 2, 82, 20, 10, 0, {
       gaps: [
+        // Path A ramp (x:11,y:77) lands at x:11-15 y:82
+        // Path B ramp (x:9,y:77) lands at x:9-13 y:82
+        // Combined: x:9-15 all open
         { x: 9, y: 82 }, { x: 10, y: 82 }, { x: 11, y: 82 }, { x: 12, y: 82 }, { x: 13, y: 82 },
-        { x: 11, y: 82 }, { x: 12, y: 82 }, { x: 13, y: 82 }, { x: 14, y: 82 }, { x: 15, y: 82 }
+        { x: 14, y: 82 }, { x: 15, y: 82 }
       ]
     });
     // Random push tiles — all diagonal/randomized
@@ -2807,18 +2815,18 @@ setGoal(level, 12, 88, 0.44);
 
        // Ramp south from merge platform (z=10→6), 5×5 — into second canal section
     placeRamp(level, { x: 55, y: 7, dir: 'south', length: 5, width: 5, startZ: 10, endZ: 6 });
-    // Connector strip (z=6), 9×3 — fills gap between ramp landing (y:12) and junction entry (y:15)
-    // Width extended to 9 (x:51-59) to cover the full ramp width (x:55-59) plus the junction entry (x:51-55).
+    // Connector strip (z=6), 11×3 — fills gap between ramp landing (y:12) and junction entry (y:15)
+    // Width extended to 11 (x:49-59) to cover the full ramp width (x:55-59) plus the junction entry (x:49-55).
     // Without this, marble arriving at x:56-59,y:11 off the ramp falls into void at y:12.
-    fillTrack(level, 51, 12, 9, 3, 6);
+    fillTrack(level, 49, 12, 11, 3, 6);
 
     // === EXTENSION: second canal section ===
-    // Second fork junction (z=6), 6×14
-    fillTrack(level, 49, 15, 10, 14, 6);
-    wallRing(level, 49, 15, 10, 14, 8, {
+    // Second fork junction (z=6), 11×14 — extended to x:49-59 to close hole at x:59,y:15
+    fillTrack(level, 49, 15, 11, 14, 6);
+    wallRing(level, 49, 15, 11, 14, 8, {
       gaps: [
         // North entry from ramp
-        { x: 51, y: 15 }, { x: 52, y: 15 }, { x: 53, y: 15 }, { x: 54, y: 15 }, { x: 55, y: 15 },
+        { x: 49, y: 15 }, { x: 50, y: 15 }, { x: 51, y: 15 }, { x: 52, y: 15 }, { x: 53, y: 15 }, { x: 54, y: 15 }, { x: 55, y: 15 }, { x: 56, y: 15 }, { x: 57, y: 15 }, { x: 58, y: 15 }, { x: 59, y: 15 },
         // West exit upper lane
         { x: 49, y: 16 }, { x: 49, y: 17 }, { x: 49, y: 18 }, { x: 49, y: 19 },
         // West exit lower lane
@@ -3105,8 +3113,16 @@ setGoal(level, 22, 40, 0.44);
     fillTrack(level, 20, 40, 14, 18, 4);
     wallRing(level, 20, 40, 14, 18, 6, {
       gaps: [
+        // Path A (west bridge) entry at y:40-43
         { x: 33, y: 40 }, { x: 33, y: 41 }, { x: 33, y: 42 }, { x: 33, y: 43 },
+        // Path B (east crumble) entry at y:44-57 — REQUIRED so east path connector can flow in
+        { x: 33, y: 44 }, { x: 33, y: 45 }, { x: 33, y: 46 }, { x: 33, y: 47 },
+        { x: 33, y: 48 }, { x: 33, y: 49 }, { x: 33, y: 50 }, { x: 33, y: 51 },
+        { x: 33, y: 52 }, { x: 33, y: 53 }, { x: 33, y: 54 }, { x: 33, y: 55 },
+        { x: 33, y: 56 }, { x: 33, y: 57 },
+        // Goal entry from Path B east wall (x:74)
         { x: 74, y: 44 }, { x: 74, y: 45 }, { x: 74, y: 46 }, { x: 74, y: 47 }, { x: 74, y: 48 },
+        // South exit to final ramp
         { x: 25, y: 57 }, { x: 26, y: 57 }, { x: 27, y: 57 }, { x: 28, y: 57 }
       ]
     });
@@ -4195,7 +4211,11 @@ setGoal(level, 93, 33, 0.44);
     addHazardRect(level, 42, 49, 2, 5, 'td_spikes_f5');
     wallRing(level, 40, 49, 28, 5, 0, {
       gaps: [
-        { x: 67, y: 44 }, { x: 67, y: 45 }, { x: 67, y: 46 }, { x: 67, y: 47 }, { x: 67, y: 48 }, { x: 67, y: 49 }, { x: 67, y: 50 }, { x: 67, y: 51 }, { x: 67, y: 52 }, { x: 67, y: 53 },
+        // North wall: ramp from Path A lands at x:64-68 y:44-48 — open north wall at x:64-67 y:49
+        { x: 64, y: 49 }, { x: 65, y: 49 }, { x: 66, y: 49 }, { x: 67, y: 49 },
+        // East wall: ramp approach from above
+        { x: 67, y: 44 }, { x: 67, y: 45 }, { x: 67, y: 46 }, { x: 67, y: 47 }, { x: 67, y: 48 }, { x: 67, y: 50 }, { x: 67, y: 51 }, { x: 67, y: 52 }, { x: 67, y: 53 },
+        // West exit to ramp going further down
         { x: 40, y: 49 }, { x: 40, y: 50 }, { x: 40, y: 51 }, { x: 40, y: 52 }, { x: 40, y: 53 }
       ]
     });
