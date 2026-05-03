@@ -2159,6 +2159,10 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     // South corridor from east landing (x:104-111) down to goal basin
     // This fixes the dead-end: after crossing the platform, marble can go south
     placeRamp(level, { x: 104, y: 22, dir: 'south', length: 6, width: 8, startZ: 2, endZ: -2 });
+    // Connector strip: bridge the 6-tile void gap (y:28-33) between the east landing ramp
+    // bottom (y:27 z=-2) and the goal basin north wall (y:34). Without this the ramp tiles
+    // at y:22-27 are unreachable islands floating above the basin.
+    fillTrack(level, 104, 28, 8, 6, -2);
     // Goal basin (z=-2), 38×12 — wide enough to catch marble from both approaches
     fillTrack(level, 74, 34, 38, 12, -2);
     wallRing(level, 74, 34, 38, 12, 0, {
@@ -2386,8 +2390,8 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
       ]
     });
     // Random push tiles — unpredictable direction changes (diagonal only)
-    setSurface(level, 22, 18, { baseHeight: 12, shape: SHAPES.FLAT, conveyor: { x: 2.2, y: 2.8, strength: 3.0 } });
-    setSurface(level, 38, 26, { baseHeight: 8, shape: SHAPES.FLAT, conveyor: { x: -2.5, y: 2.0, strength: 2.8 } });
+    // NOTE: setSurface at (22,18) z=12 removed — was an orphaned tile floating in void
+    // NOTE: setSurface at (38,26) z=8 removed — was an orphaned tile floating in void (no platform under it)
     setSurface(level, 55, 34, { baseHeight: 4, shape: SHAPES.FLAT, conveyor: { x: 2.2, y: 2.2, strength: 3.0 } });
 
     // === EXTENSION: Terrace D — crumble bridge + sweeper + new goal ===
@@ -2917,7 +2921,7 @@ setGoal(level, 12, 88, 0.44);
     setSurface(level, 32, 6,  { baseHeight: 6,  shape: SHAPES.FLAT, conveyor: { x: 2.2,  y: 3.0,  strength: 3.2 } });
     setSurface(level, 44, 10, { baseHeight: 10, shape: SHAPES.FLAT, conveyor: { x: -2.8, y: -2.0, strength: 3.0 } });
     setSurface(level, 38, 18, { baseHeight: 6,  shape: SHAPES.FLAT, conveyor: { x: 2.5,  y: 2.5,  strength: 3.2 } });
-    setSurface(level, 25, 24, { baseHeight: 6,  shape: SHAPES.FLAT, conveyor: { x: -3.0, y: 2.0,  strength: 3.5 } });
+    // NOTE: setSurface at (38,26) z=8 removed — was an orphaned tile floating in void
     // New randomizers on second merge platform — push toward the ramp or sideways
     setSurface(level, 21, 17, { baseHeight: 6,  shape: SHAPES.FLAT, conveyor: { x: -2.8, y: 2.8,  strength: 3.5 } });
     setSurface(level, 24, 20, { baseHeight: 6,  shape: SHAPES.FLAT, conveyor: { x: 3.0,  y: -1.5, strength: 3.2 } });
@@ -2989,9 +2993,10 @@ setGoal(level, 22, 40, 0.44);
     // Gap: 6 tiles void (x=22..27) — already void by default
     // Moving platform bridge — starts 2 tiles onto the west landing so the
     // marble can board it without standing right at the void edge.
+    // Endpoint moved from (26,6) to (28,6) so it lands on the east landing floor tile.
     addMovingBridge(level, 'bridge_main', [
       { x: 20, y: 6, z: 14 },
-      { x: 26, y: 6, z: 14 }
+      { x: 28, y: 6, z: 14 }
     ], 4, 4, 0.6);
 
     // East landing platform (z=14), 12×10
@@ -3148,7 +3153,7 @@ setGoal(level, 22, 40, 0.44);
     setSurface(level, 55, 18, { baseHeight: 10, shape: SHAPES.FLAT, conveyor: { x: -3.0, y: -2.2, strength: 3.2 } });
     setSurface(level, 54, 10, { baseHeight: 10, shape: SHAPES.FLAT, conveyor: { x: 3.2, y: -3.2, strength: 3.5 } });
     setSurface(level, 20, 45, { baseHeight: 4, shape: SHAPES.FLAT, conveyor: { x: -2.8, y: 2.8, strength: 3.2 } });
-    setSurface(level, 60, 55, { baseHeight: 4, shape: SHAPES.FLAT, conveyor: { x: 3.5, y: 3.5, strength: 3.5 } });
+    // NOTE: setSurface at (60,55) z=4 removed — was an orphaned tile floating in void (outside all platforms)
     // Sweepers guarding the goal basin entry
     addActor(level, {
       id: 'sweeper_l5_goal_a', kind: ACTOR_KINDS.SWEEPER,
@@ -3315,9 +3320,10 @@ setGoal(level, 22, 40, 0.44);
     });
     placeRamp(level, { x: 38, y: 73, dir: 'south', length: 5, width: 8, startZ: 2, endZ: -2 });
 
-    // Final goal basin (z=-2), 30×10 — both paths converge
-    fillTrack(level, 6, 78, 30, 10, -2);
-    wallRing(level, 6, 78, 30, 10, 0, {
+    // Final goal basin (z=-2), 40×10 — both paths converge
+    // Extended from width 30 to 40 (x:6-45) so Path B ramp (x:38-45) lands inside the basin.
+    fillTrack(level, 6, 78, 40, 10, -2);
+    wallRing(level, 6, 78, 40, 10, 0, {
       gaps: [
         { x: 8, y: 78 }, { x: 9, y: 78 }, { x: 10, y: 78 }, { x: 11, y: 78 }, { x: 12, y: 78 },
         { x: 38, y: 78 }, { x: 39, y: 78 }, { x: 40, y: 78 }, { x: 41, y: 78 }, { x: 42, y: 78 }, { x: 43, y: 78 }, { x: 44, y: 78 }, { x: 45, y: 78 }
@@ -4431,6 +4437,9 @@ setGoal(level, 93, 33, 0.44);
       { x: 74, y: 28, z: 18 }
     ], 4, 5, 0.5);
     fillTrack(level, 76, 28, 6, 6, 18);
+    // Connector strip: bridge the void row at y:27 between the fast path ramp (y:22-26)
+    // and the east landing (y:28-33). Without this the east landing is an unreachable island.
+    fillTrack(level, 76, 27, 6, 1, 18);
     placeRamp(level, { x: 58, y: 34, dir: 'south', length: 8, width: 6, startZ: 18, endZ: 6 });
 
     // Void-edge conveyors in ACT 2 citadel — push toward outer void edges
