@@ -63,6 +63,8 @@
     crumbleDark:   0x4a3520,   // dark brown grid lines
     iceTop:        0xbae6fd,   // pale cyan — ice tile base
     iceDark:       0x7dd3fc,   // slightly deeper cyan grid
+    funnelTop:     0x22d3ee,   // cyan — tunnel funnel bowl
+    funnelEmissive:0x083344,   // dark teal emissive for funnel
   };
 
   // ─── Module state ────────────────────────────────────────────────────────────
@@ -243,6 +245,7 @@
   function matWallHighlight() { return getMat('wall_hl', () => new THREE.MeshLambertMaterial({ color: COL.wallHighlight, emissive: new THREE.Color(COL.wallHighlight), emissiveIntensity: 0.25 })); }
   function matPlatformTop()   { return getMat('plat_top',  () => new THREE.MeshLambertMaterial({ color: COL.platformTop  })); }
   function matPlatformSide()  { return getMat('plat_side', () => new THREE.MeshLambertMaterial({ color: COL.platformSide })); }
+  function matFunnel()        { return getMat('funnel_bowl', () => new THREE.MeshPhongMaterial({ color: COL.funnelTop, emissive: new THREE.Color(COL.funnelEmissive), side: THREE.DoubleSide, shininess: 40 })); }
 
   // ─── Mesh builders ───────────────────────────────────────────────────────────
 
@@ -447,6 +450,81 @@
   }
 
   /**
+   * Build a smooth circular funnel bowl mesh for a group of FUNNEL tiles.
+   * Takes all funnel tiles sharing the same center and generates a single
+   * radial cone geometry with no per-tile sidewalls.
+   * @param {Array} funnelTiles - [{tx, ty, cell}] all tiles in this funnel
+   * @returns {THREE.Mesh}
+   */
+  function buildFunnelBowlMesh(funnelTiles) {
+    if (!funnelTiles || funnelTiles.length === 0) return null;
+    const ML = window.MarbleLevels;
+    const cell0 = funnelTiles[0].cell;
+    const cx = cell0.funnelCenterX;
+    const cy = cell0.funnelCenterY;
+    const maxDist = cell0.funnelMaxDist || 2;
+    const baseZ = cell0.baseHeight;
+    const rise = cell0.rise || 1;
+
+    // Generate a disc mesh with radial height variation (cone/bowl)
+    const segments = 32; // angular segments
+    const rings = 12;    // radial rings
+    const positions = [];
+    const normals = [];
+    const uvs = [];
+    const indices = [];
+
+    // Center vertex
+    positions.push(cx, baseZ, cy);
+    normals.push(0, 1, 0);
+    uvs.push(0.5, 0.5);
+
+    for (let r = 1; r <= rings; r++) {
+      const t = r / rings;
+      const radius = t * maxDist;
+      const z = baseZ + rise * t;
+      for (let s = 0; s < segments; s++) {
+        const angle = (s / segments) * Math.PI * 2;
+        const px = cx + Math.cos(angle) * radius;
+        const py = cy + Math.sin(angle) * radius;
+        positions.push(px, z, py);
+        // Normal: points upward and slightly inward (bowl surface normal)
+        const nx = -Math.cos(angle) * (rise / maxDist);
+        const nz = -Math.sin(angle) * (rise / maxDist);
+        const ny = 1;
+        const len = Math.sqrt(nx*nx + ny*ny + nz*nz);
+        normals.push(nx/len, ny/len, nz/len);
+        uvs.push(0.5 + Math.cos(angle) * t * 0.5, 0.5 + Math.sin(angle) * t * 0.5);
+      }
+    }
+
+    // Triangles: center fan
+    for (let s = 0; s < segments; s++) {
+      const next = (s + 1) % segments;
+      indices.push(0, 1 + s, 1 + next);
+    }
+    // Triangles: ring strips
+    for (let r = 1; r < rings; r++) {
+      const ringStart = 1 + (r - 1) * segments;
+      const nextRingStart = 1 + r * segments;
+      for (let s = 0; s < segments; s++) {
+        const next = (s + 1) % segments;
+        indices.push(
+          ringStart + s, nextRingStart + s, ringStart + next,
+          ringStart + next, nextRingStart + s, nextRingStart + next
+        );
+      }
+    }
+
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(positions), 3));
+    geo.setAttribute('normal', new THREE.BufferAttribute(new Float32Array(normals), 3));
+    geo.setAttribute('uv', new THREE.BufferAttribute(new Float32Array(uvs), 2));
+    geo.setIndex(indices);
+    return new THREE.Mesh(geo, matFunnel());
+  }
+
+  /**
    * Box group (top + south + east faces) — used for blockers and platforms.
    */
   function buildBoxGroup(tx, ty, zBot, w, d, h, matTop, matSide) {
@@ -547,7 +625,15 @@
 
     // ── Pass 1: Tile tops ────────────────────────────────────────────────────
     crumbleMeshMap = {}; // reset for this level
+    const funnelGroups = {}; // group funnel tiles by center key
     for (const { tx, ty, cell } of tiles) {
+      // Skip FUNNEL tiles from normal rendering — they get a single bowl mesh
+      if (cell.shape === 'funnel') {
+        const key = `${cell.funnelCenterX},${cell.funnelCenterY}`;
+        if (!funnelGroups[key]) funnelGroups[key] = [];
+        funnelGroups[key].push({ tx, ty, cell });
+        continue;
+      }
       const isGoal     = ML.getTriggerCell(level, tx, ty)?.kind === 'goal';
       const isBounce   = !!cell.bounce;
       const isConveyor = !!cell.conveyor;
@@ -582,9 +668,17 @@
       }
     }
 
+    // ── Pass 1b: Funnel bowl meshes (one smooth circular mesh per funnel) ────
+    for (const key of Object.keys(funnelGroups)) {
+      const mesh = buildFunnelBowlMesh(funnelGroups[key]);
+      if (mesh) group.add(mesh);
+    }
+
     // ── Pass 2: Wall faces — all four edges ──────────────────────────────────
     const W_HL = 0.06;
     for (const { tx, ty, cell } of tiles) {
+      // Skip funnel tiles — the bowl mesh handles its own geometry
+      if (cell.shape === 'funnel') continue;
       const corners = ML.getSurfaceCornerHeights
         ? ML.getSurfaceCornerHeights(cell)
         : { nw: cell.baseHeight, ne: cell.baseHeight, sw: cell.baseHeight, se: cell.baseHeight };

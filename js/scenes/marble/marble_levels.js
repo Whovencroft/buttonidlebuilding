@@ -24,7 +24,8 @@
     DROP_RAMP_S: 'drop_ramp_s',
     DROP_RAMP_E: 'drop_ramp_e',
     DROP_RAMP_W: 'drop_ramp_w',
-    LANDING_PAD: 'landing_pad'
+    LANDING_PAD: 'landing_pad',
+    FUNNEL: 'funnel'
   };
 
   const ACTOR_KINDS = {
@@ -121,7 +122,13 @@
       } : null,
       failType: patch.failType ?? null,
       landingPad: !!patch.landingPad || shape === SHAPES.LANDING_PAD,
-      data: patch.data ?? null
+      data: patch.data ?? null,
+      // Funnel-specific fields (only used when shape === FUNNEL)
+      funnelCenterX: patch.funnelCenterX ?? undefined,
+      funnelCenterY: patch.funnelCenterY ?? undefined,
+      funnelMaxDist: patch.funnelMaxDist ?? undefined,
+      _tx: patch._tx ?? undefined,
+      _ty: patch._ty ?? undefined
     };
   }
 
@@ -352,6 +359,11 @@
         return baseHeight + rise * smoothStep(1 - uu);
       case SHAPES.DROP_RAMP_W:
         return baseHeight + rise * smoothStep(uu);
+      case SHAPES.FUNNEL:
+        // Funnel: radial height. rise = depth of bowl (positive = slopes up from center).
+        // funnelCenterU/V stored on cell give the center offset in tile-local coords.
+        // Distance from center determines height: further = higher.
+        return baseHeight; // base case — actual funnel height computed in getSurfaceSampleForCell
       default:
         return baseHeight;
     }
@@ -420,6 +432,26 @@
   function getSurfaceSampleForCell(cell, u, v) {
     if (!cell || cell.kind === 'void') return null;
     if (!isPointInsideCurveMask(cell.shape, u, v)) return null;
+
+    // Funnel shape: radial height based on distance from funnel center (stored on cell)
+    if (cell.shape === SHAPES.FUNNEL && cell.funnelCenterX !== undefined) {
+      // World position of this sample point
+      const wx = cell._tx + u;
+      const wy = cell._ty + v;
+      // Distance from funnel center in world coords
+      const dx = wx - cell.funnelCenterX;
+      const dy = wy - cell.funnelCenterY;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      const maxDist = cell.funnelMaxDist || 2;
+      const t = clamp(dist / maxDist, 0, 1);
+      // Bowl shape: center is at baseHeight, rim is at baseHeight + rise
+      const z = cell.baseHeight + cell.rise * t;
+      // Gradient: points radially outward (uphill away from center)
+      const gradMag = (dist > 0.001) ? (cell.rise / maxDist) : 0;
+      const gx = (dist > 0.001) ? gradMag * (dx / dist) : 0;
+      const gy = (dist > 0.001) ? gradMag * (dy / dist) : 0;
+      return { z, gradient: { gx, gy } };
+    }
 
     const z = getShapeHeight(cell.shape, cell.baseHeight, cell.rise, u, v) + getCurveBank(cell.shape, u, v);
     const epsilon = 0.0025;
@@ -1331,7 +1363,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
   //     funnelRadius - radius of entry funnel in tiles (default 2)
   //     entryZ      - z height of the entry floor (default: path[0].z)
   //
-  function placeTunnel(level, { id, path, speed = 8, radius = 0.45, exitType = 'emerge', exitVelocity = null, funnelRadius = 2, entryZ = null }) {
+  function placeTunnel(level, { id, path, speed = 8, radius = 0.45, exitType = 'emerge', exitVelocity = null, funnelRadius = 2, funnelDepth = null, entryZ = null }) {
     if (!path || path.length < 2) {
       console.warn(`[LevelDesign] placeTunnel '${id}': path must have at least 2 points.`);
       return;
@@ -1341,28 +1373,33 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     const ez = entryZ ?? entry.z;
     const entryTx = Math.floor(entry.x);
     const entryTy = Math.floor(entry.y);
+    // Funnel center in world coords (center of entry tile)
+    const fCenterX = entryTx + 0.5;
+    const fCenterY = entryTy + 0.5;
+    // Depth of funnel bowl: how much the rim rises above center
+    const fDepth = funnelDepth ?? (funnelRadius * 0.5);
+    const fMaxDist = funnelRadius + 0.5; // max distance from center to outer rim edge
 
-    // Place funnel ramp ring around entry (slopes pointing inward)
-    const slopeMap = {
-      n: SHAPES.SLOPE_S,  // north of entry, slopes south (toward center)
-      s: SHAPES.SLOPE_N,
-      e: SHAPES.SLOPE_W,
-      w: SHAPES.SLOPE_E
-    };
-
-    for (let r = 1; r <= funnelRadius; r++) {
-      const rampZ = ez + r * 0.5; // each ring is 0.5 higher than center
-      // North edge tiles: slope down toward center (south) → SLOPE_N (high at north, low at south)
-      // South edge tiles: slope down toward center (north) → SLOPE_S (high at south, low at north)
-      for (let dx = -r; dx <= r; dx++) {
-        setSurface(level, entryTx + dx, entryTy - r, { baseHeight: rampZ, shape: SHAPES.SLOPE_N });
-        setSurface(level, entryTx + dx, entryTy + r, { baseHeight: rampZ, shape: SHAPES.SLOPE_S });
-      }
-      // West edge tiles: slope down toward center (east) → SLOPE_W (high at west, low at east)
-      // East edge tiles: slope down toward center (west) → SLOPE_E (high at east, low at west)
-      for (let dy = -r + 1; dy <= r - 1; dy++) {
-        setSurface(level, entryTx - r, entryTy + dy, { baseHeight: rampZ, shape: SHAPES.SLOPE_W });
-        setSurface(level, entryTx + r, entryTy + dy, { baseHeight: rampZ, shape: SHAPES.SLOPE_E });
+    // Place funnel tiles using FUNNEL shape (circular bowl, no sidewalls)
+    for (let dy = -funnelRadius; dy <= funnelRadius; dy++) {
+      for (let dx = -funnelRadius; dx <= funnelRadius; dx++) {
+        const tx = entryTx + dx;
+        const ty = entryTy + dy;
+        // Skip center tile (that gets the trigger)
+        if (dx === 0 && dy === 0) continue;
+        // Only place within circular radius (skip corners for round shape)
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist > funnelRadius + 0.5) continue;
+        setSurface(level, tx, ty, {
+          baseHeight: ez,
+          shape: SHAPES.FUNNEL,
+          rise: fDepth,
+          funnelCenterX: fCenterX,
+          funnelCenterY: fCenterY,
+          funnelMaxDist: fMaxDist,
+          _tx: tx,
+          _ty: ty
+        });
       }
     }
 
