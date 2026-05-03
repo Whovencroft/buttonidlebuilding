@@ -2191,7 +2191,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
       }
     }
     // Timed gate blocking the corridor
-    addTimedGate(level, 'gate_s1_ext', 84, 47, 8, 4, 2, 1.8, 1.2);
+    addTimedGate(level, 'gate_s1_ext', 84, 47, -2, 4, 2, 1.8, 1.2);
     // Sweeper guarding the exit
     addActor(level, {
       id: 'sweeper_s1_ext', kind: ACTOR_KINDS.SWEEPER,
@@ -2512,6 +2512,9 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
         { x: 23, y: 4 }, { x: 23, y: 5 }, { x: 23, y: 6 }, { x: 23, y: 7 }, { x: 23, y: 8 }
       ]
     });
+
+    // Void-edge conveyor on Leg A — pushes toward north void
+    setSurface(level, 22, 5, { baseHeight: 18, shape: SHAPES.FLAT, conveyor: { x: 2.5, y: -3.2, strength: 3.5 } });
 
     // Ramp A south (z=18→14), 6×5
     placeRamp(level, { x: 10, y: 9, dir: 'south', length: 6, width: 5, startZ: 18, endZ: 14 });
@@ -3635,8 +3638,8 @@ setGoal(level, 22, 84, 0.44);
         setSurface(level, cx, cy, { baseHeight: 4, shape: SHAPES.FLAT, friction: 0.22 });
       }
     }
-    addTimedGate(level, 'gate_lab2_east_a', 86, 28, 8, 3, 2, 1.8, 1.2);
-    addTimedGate(level, 'gate_lab2_east_b', 93, 28, 8, 3, 2, 1.4, 1.0);
+    addTimedGate(level, 'gate_lab2_east_a', 86, 28, 0, 3, 2, 1.8, 1.2);
+    addTimedGate(level, 'gate_lab2_east_b', 93, 28, 0, 3, 2, 1.4, 1.0);
     wallRing(level, 81, 26, 18, 12, 6, {
       gaps: [
         { x: 81, y: 28 }, { x: 81, y: 29 }, { x: 81, y: 30 }, { x: 81, y: 31 }, { x: 81, y: 32 }, { x: 81, y: 33 }, { x: 81, y: 34 }, { x: 81, y: 35 },
@@ -4255,8 +4258,8 @@ setGoal(level, 93, 33, 0.44);
       }
     }
     // Three timed gates — tight timing on ice
-    addTimedGate(level, 'gate_floor4a', 46, 40, 10, 3, 2, 1.6, 1.0);
-    addTimedGate(level, 'gate_floor4b', 54, 40, 10, 3, 2, 1.3, 0.9);
+    addTimedGate(level, 'gate_floor4a', 46, 40, 2, 3, 2, 1.6, 1.0);
+    addTimedGate(level, 'gate_floor4b', 54, 40, 2, 3, 2, 1.3, 0.9);
     addTimedGate(level, 'gate_floor4c', 62, 40, 6, 3, 2, 1.1, 0.8);
     // Hazard strip before first gate
     addHazardRect(level, 43, 39, 2, 5, 'td_spikes_f4');
@@ -4487,7 +4490,7 @@ setGoal(level, 93, 33, 0.44);
     addHazardRect(level, 60, 10, 4, 4, 'act2_spikes_a');
     addHazardRect(level, 72, 10, 4, 4, 'act2_spikes_b');
     // Timed gate blocking the south exit
-    addTimedGate(level, 'gate_fa2', 66, 20, 8, 3, 2, 1.6, 1.0);
+    addTimedGate(level, 'gate_fa2', 66, 20, 18, 3, 2, 1.6, 1.0);
     addElevator(level, 'elev_fa1', 78, 10, 6, 18, 3, 3, 1.0, 5.0);
     wallRing(level, 58, 2, 24, 20, 20, {
       gaps: [
@@ -4546,7 +4549,7 @@ setGoal(level, 93, 33, 0.44);
       }
     }
     // Timed gate blocking the ramp entry
-    addTimedGate(level, 'gate_act4', 60, 56, 12, 3, 2, 1.6, 1.0);
+    addTimedGate(level, 'gate_act4', 60, 56, 6, 3, 2, 1.6, 1.0);
     // Narrow ramp — only 6 tiles wide, not 14 (forces precise entry)
     placeRamp(level, { x: 60, y: 56, dir: 'south', length: 6, width: 8, startZ: 6, endZ: 2 });
 
@@ -4624,7 +4627,7 @@ setGoal(level, 93, 33, 0.44);
     addHazardRect(level, 84, 78, 4, 6, 'act5_spikes_east');
     addHazardRect(level, 52, 89, 8, 3, 'act5_spikes_south');
     // Timed gate blocking south path exit — tighter timing
-    addTimedGate(level, 'gate_act5', 52, 91, 6, 3, 2, 1.2, 0.7);
+    addTimedGate(level, 'gate_act5', 52, 91, -2, 3, 2, 1.2, 0.7);
     // Void-edge conveyors in ACT 5 arena — push marble toward void edges
     setSurface(level, 32, 74, { baseHeight: 2, shape: SHAPES.FLAT, friction: 0.20, conveyor: { x: -3.2, y: -3.0, strength: 3.8 } });
     setSurface(level, 88, 74, { baseHeight: 2, shape: SHAPES.FLAT, friction: 0.20, conveyor: { x: 3.2, y: -3.0, strength: 3.8 } });
