@@ -5,7 +5,8 @@
   const MAX_GROUND_SPEED = 7.6;
   const MAX_AIR_SPEED = 8.4;
 
-  const MAX_STEP_UP = 1.02;
+  const MAX_STEP_UP_GROUND = 0.52;
+  const MAX_STEP_UP_AIR = 1.02;
   const MAX_STEP_DOWN = 1.15;
   const GROUND_SNAP = 0.14;
   const LEDGE_FALL_HORIZONTAL_DAMPING = 0.55;
@@ -142,7 +143,7 @@
   function classifySurfaceTransition(currentSurface, nextSurface) {
     if (!nextSurface) return 'air';
     const stepUp = nextSurface.maxSupportZ - currentSurface.z;
-    if (stepUp > MAX_STEP_UP) return 'blocked';
+    if (stepUp > MAX_STEP_UP_GROUND) return 'blocked';
     const stepDown = currentSurface.z - nextSurface.z;
     if (stepDown > MAX_STEP_DOWN && !nextSurface.landingPad) return 'air';
     return 'ground';
@@ -253,7 +254,7 @@
         if (surface.crumble && window.MarbleLevels.isCrumbleBroken(runtime.dynamicState, tx, ty)) continue;
 
         const fz = surface.baseHeight;
-        if (fz <= marbleBottom + MAX_STEP_UP + 0.04) continue;
+        if (fz <= marbleBottom + MAX_STEP_UP_AIR + 0.04) continue;
 
         // Don't block if the marble is standing on top of this terrain tile
         // (supportZ matches the tile's surface height).
@@ -456,7 +457,7 @@
     if (
       landedSurface &&
       !landedSurface.landingPad &&
-      landedSurface.z - currentSurface.z > MAX_STEP_UP + 0.01
+      landedSurface.z - currentSurface.z > MAX_STEP_UP_GROUND + 0.01
     ) {
       marble.x = startX;
       marble.y = startY;
