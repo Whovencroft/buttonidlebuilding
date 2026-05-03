@@ -195,7 +195,13 @@
         speed: actor.travel.speed ?? 1,
         cycle: actor.travel.cycle ?? null
       } : null,
-      data: actor.data ?? null
+      data: actor.data ?? null,
+      // Tunnel-specific fields
+      tunnelPath: actor.tunnelPath ?? null,
+      tunnelSpeed: actor.tunnelSpeed ?? 8,
+      tunnelRadius: actor.tunnelRadius ?? 0.45,
+      exitType: actor.exitType ?? 'emerge',
+      exitVelocity: actor.exitVelocity ?? null
     };
   }
 
@@ -444,8 +450,9 @@
       const dist = Math.sqrt(dx * dx + dy * dy);
       const maxDist = cell.funnelMaxDist || 2;
       const t = clamp(dist / maxDist, 0, 1);
-      // Bowl shape: center is at baseHeight, rim is at baseHeight + rise
-      const z = cell.baseHeight + cell.rise * t;
+      // Bowl shape: rim is at baseHeight (flush with surrounding terrain),
+      // center dips DOWN by 'rise' amount
+      const z = cell.baseHeight - cell.rise * (1 - t);
       // Gradient: points radially outward (uphill away from center)
       const gradMag = (dist > 0.001) ? (cell.rise / maxDist) : 0;
       const gx = (dist > 0.001) ? gradMag * (dx / dist) : 0;
@@ -1403,8 +1410,9 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
       }
     }
 
-    // Place entry center tile (flat, at entry z — this is where the trigger goes)
-    setSurface(level, entryTx, entryTy, { baseHeight: ez, shape: SHAPES.FLAT });
+    // Place entry center tile (flat, at bottom of bowl — this is where the trigger goes)
+    // Center is at ez - fDepth so it's flush with the lowest point of the funnel bowl
+    setSurface(level, entryTx, entryTy, { baseHeight: ez - fDepth, shape: SHAPES.FLAT });
 
     // Set tunnel_entry trigger on the entry tile
     setTrigger(level, entryTx, entryTy, { kind: 'tunnel_entry', data: { tunnelId: id } });

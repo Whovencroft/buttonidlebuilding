@@ -518,15 +518,19 @@
     const uvs = [];
     const indices = [];
 
-    // Center vertex
-    positions.push(cx, baseZ, cy);
+    // Bowl shape: rim is at baseZ (flush with surrounding terrain),
+    // center dips DOWN by 'rise' amount
+    const centerZ = baseZ - rise;  // lowest point (center of bowl)
+
+    // Center vertex (lowest point of bowl)
+    positions.push(cx, centerZ, cy);
     normals.push(0, 1, 0);
     uvs.push(0.5, 0.5);
 
     for (let r = 1; r <= rings; r++) {
       const t = r / rings;
       const radius = t * maxDist;
-      const z = baseZ + rise * t;
+      const z = baseZ - rise * (1 - t); // matches physics: rim=baseZ, center=baseZ-rise
       for (let s = 0; s < segments; s++) {
         const angle = (s / segments) * Math.PI * 2;
         const px = cx + Math.cos(angle) * radius;
