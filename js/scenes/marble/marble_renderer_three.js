@@ -1033,6 +1033,96 @@
     camera.lookAt(camX, camZ, camY);
 
     renderer.render(scene, camera);
+
+    // ── Debug coordinate overlay ──────────────────────────────────────────────
+    if (runtime.debug?.showCoords) {
+      renderCoordOverlay(runtime, canvas, w, h);
+    } else {
+      hideCoordOverlay();
+    }
+  }
+
+  // ─── Coordinate overlay (2D canvas drawn on top of WebGL) ─────────────────
+
+  let coordCanvas = null;
+  let coordCtx    = null;
+
+  function renderCoordOverlay(runtime, glCanvas, w, h) {
+    const ML = window.MarbleLevels;
+    const level = runtime.level;
+    if (!level || !camera) return;
+
+    // Ensure overlay canvas exists and is sized correctly
+    if (!coordCanvas || coordCanvas.parentNode !== glCanvas.parentNode) {
+      coordCanvas = document.createElement('canvas');
+      coordCanvas.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:5;';
+      coordCanvas.className = 'marble-coord-overlay';
+      glCanvas.parentNode.insertBefore(coordCanvas, glCanvas.nextSibling);
+    }
+    const dpr = Math.min(window.devicePixelRatio, 2);
+    const cw = Math.round(w * dpr);
+    const ch = Math.round(h * dpr);
+    if (coordCanvas.width !== cw || coordCanvas.height !== ch) {
+      coordCanvas.width = cw;
+      coordCanvas.height = ch;
+    }
+    if (!coordCtx) coordCtx = coordCanvas.getContext('2d');
+    const ctx = coordCtx;
+    ctx.clearRect(0, 0, cw, ch);
+
+    // Project world position to screen via Three.js camera
+    const vec = new THREE.Vector3();
+    const halfW = cw / 2;
+    const halfH = ch / 2;
+
+    // Determine visible tile range based on marble position (limit to nearby tiles for performance)
+    const mx = Math.floor(runtime.marble.x);
+    const my = Math.floor(runtime.marble.y);
+    const RANGE = 12; // tiles in each direction from marble
+    const x0 = Math.max(0, mx - RANGE);
+    const x1 = Math.min(level.width - 1, mx + RANGE);
+    const y0 = Math.max(0, my - RANGE);
+    const y1 = Math.min(level.height - 1, my + RANGE);
+
+    ctx.font = `bold ${Math.round(9 * dpr)}px monospace`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+
+    for (let ty = y0; ty <= y1; ty++) {
+      for (let tx = x0; tx <= x1; tx++) {
+        const cell = ML.getSurfaceCell(level, tx, ty);
+        if (!cell || cell.kind === 'void') continue;
+        const z = cell.baseHeight;
+
+        // World position: center of tile
+        vec.set(tx + 0.5, z, ty + 0.5);
+        vec.project(camera);
+
+        // NDC to screen
+        const sx = (vec.x * halfW) + halfW;
+        const sy = (-vec.y * halfH) + halfH;
+
+        // Skip if off-screen
+        if (sx < -20 || sx > cw + 20 || sy < -20 || sy > ch + 20) continue;
+
+        // Draw label — round z to avoid long decimals on ramp tiles
+        const zDisp = Number.isInteger(z) ? z : z.toFixed(1);
+        const label = `${tx},${ty},${zDisp}`;
+        ctx.fillStyle = 'rgba(0,0,0,0.6)';
+        const tw = ctx.measureText(label).width;
+        const pad = 2 * dpr;
+        ctx.fillRect(sx - tw/2 - pad, sy - 5*dpr, tw + pad*2, 10*dpr);
+        ctx.fillStyle = '#00ffcc';
+        ctx.fillText(label, sx, sy);
+      }
+    }
+  }
+
+  function hideCoordOverlay() {
+    if (coordCanvas) {
+      coordCanvas.width = 0;
+      coordCanvas.height = 0;
+    }
   }
 
   function prepare(runtime, canvas) {

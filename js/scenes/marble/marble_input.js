@@ -39,7 +39,7 @@
     // ── Non-movement key state ────────────────────────────────────────────
     const held             = new Set();
     const bufferedPresses  = new Set();
-    const TRACKED_KEYS     = new Set(['Space', 'KeyR', 'Escape']);
+    const TRACKED_KEYS     = new Set(['Space', 'KeyR', 'Escape', 'KeyG', 'KeyC']);
     let   attached         = false;
 
     // ── Drag state ──────────────────────────────────────────────────────────

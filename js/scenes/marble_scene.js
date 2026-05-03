@@ -112,6 +112,7 @@
       lastResult: null,
       debug: {
         showRouteGraph: false,
+        showCoords: false,
         showGrid: false,
         showActorBounds: false
       }
