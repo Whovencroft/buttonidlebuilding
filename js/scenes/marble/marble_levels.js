@@ -1387,16 +1387,14 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     const fDepth = funnelDepth ?? (funnelRadius * 0.5);
     const fMaxDist = funnelRadius + 0.5; // max distance from center to outer rim edge
 
-    // Place funnel tiles using FUNNEL shape (circular bowl, no sidewalls)
+    // Place funnel tiles using FUNNEL shape — fill the entire square area
+    // (no circular cutoff, so there are no void gaps at corners)
     for (let dy = -funnelRadius; dy <= funnelRadius; dy++) {
       for (let dx = -funnelRadius; dx <= funnelRadius; dx++) {
         const tx = entryTx + dx;
         const ty = entryTy + dy;
         // Skip center tile (that gets the trigger)
         if (dx === 0 && dy === 0) continue;
-        // Only place within circular radius (skip corners for round shape)
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist > funnelRadius + 0.5) continue;
         setSurface(level, tx, ty, {
           baseHeight: ez,
           shape: SHAPES.FUNNEL,
@@ -2411,19 +2409,20 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     });
     setGoal(level, 117, 50, 0.55);
 
-    // === Test tunnel: shortcut centered at 78/20/2 for testing ===
+    // === Test tunnel: entry at 24/7/14, exit at 35/19/6, 5x5 mouth, 3 unit slope ===
     placeTunnel(level, {
       id: 'tunnel_s1_shortcut',
       path: [
-        { x: 78.5, y: 20.5, z: 2 },    // Entry: centered at 78/20 at floor level
-        { x: 78.5, y: 23.5, z: 0 },     // Dip down
-        { x: 78.5, y: 27.5, z: -2 },    // Under the floor
-        { x: 82.5, y: 33.5, z: -2 },    // Curve east
-        { x: 88.5, y: 40.5, z: -2 }     // Exit in the goal basin
+        { x: 24.5, y: 7.5, z: 14 },     // Entry: centered at 24/7 at floor level
+        { x: 27.5, y: 10.5, z: 11 },     // Dip down
+        { x: 30.5, y: 13.5, z: 8 },      // Continue descending
+        { x: 33.5, y: 16.5, z: 6 },      // Approach exit level
+        { x: 35.5, y: 19.5, z: 6 }       // Exit at 35/19/6
       ],
       speed: 7,
       exitType: 'emerge',
-      funnelRadius: 1
+      funnelRadius: 2,
+      funnelDepth: 3
     });
 
     addGraphNode(level, { id: 'start',    type: 'entry', x: 4.5,   y: 4.5,  z: 14 });
