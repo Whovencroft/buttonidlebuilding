@@ -3646,7 +3646,7 @@ setGoal(level, 22, 84, 0.44);
     // Void-edge conveyors — push marble toward outer void edges of each wing
     setSurface(level, 18, 12, { baseHeight: 12, shape: SHAPES.FLAT, conveyor: { x: -3.2, y: -3.0, strength: 3.8 } });
     setSurface(level, 36, 12, { baseHeight: 12, shape: SHAPES.FLAT, conveyor: { x: 3.5, y: -2.8, strength: 3.8 } });
-    setSurface(level, 36, 36, { baseHeight: 12, shape: SHAPES.FLAT, conveyor: { x: 3.2, y: 3.5, strength: 3.8 } });
+    setSurface(level, 36, 36, { baseHeight: 18, shape: SHAPES.FLAT, conveyor: { x: 3.2, y: 3.5, strength: 3.8 } });  // fixed: was z=12 on z=18 floor (dead-end pit — marble could fall in but not escape)
     setSurface(level, 18, 44, { baseHeight: 12, shape: SHAPES.FLAT, conveyor: { x: -3.5, y: 3.2, strength: 3.8 } });
     setSurface(level, 83, 10, { baseHeight: 4, shape: SHAPES.FLAT, conveyor: { x: 2.8, y: -3.5, strength: 3.8 } });
     setSurface(level, 83, 54, { baseHeight: 0, shape: SHAPES.FLAT, conveyor: { x: 2.8, y: 3.5, strength: 3.8 } });  // fixed: was z=4 on z=0 basin entry wall gap (backtrack-only)
