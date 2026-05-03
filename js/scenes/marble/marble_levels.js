@@ -2403,14 +2403,14 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     });
     setGoal(level, 117, 50, 0.55);
 
-    // === Test tunnel: shortcut from merge area through void to goal basin ===
+    // === Test tunnel: shortcut centered at 78/20/2 for testing ===
     placeTunnel(level, {
       id: 'tunnel_s1_shortcut',
       path: [
-        { x: 79.5, y: 28.5, z: 2 },    // Entry: at the void gap we created
-        { x: 79.5, y: 30.5, z: 0 },     // Dip down
-        { x: 79.5, y: 33.5, z: -2 },    // Under the floor
-        { x: 82.5, y: 37.5, z: -2 },    // Curve east into basin
+        { x: 78.5, y: 20.5, z: 2 },    // Entry: centered at 78/20 at floor level
+        { x: 78.5, y: 23.5, z: 0 },     // Dip down
+        { x: 78.5, y: 27.5, z: -2 },    // Under the floor
+        { x: 82.5, y: 33.5, z: -2 },    // Curve east
         { x: 88.5, y: 40.5, z: -2 }     // Exit in the goal basin
       ],
       speed: 7,

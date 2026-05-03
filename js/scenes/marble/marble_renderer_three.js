@@ -149,6 +149,7 @@
   let texHazardTop  = null;
   let texCrumbleTop = null;
   let texIceTop     = null;
+  let texTunnelInner = null;
 
   /**
    * Hazard stripe texture: diagonal red/dark-red stripes.
@@ -196,6 +197,48 @@
     return tex;
   }
 
+  /**
+   * Tunnel inner texture: repeating ring/stripe pattern to give depth cues inside the tube.
+   */
+  function makeTunnelInnerTexture(size) {
+    const cv = document.createElement('canvas');
+    cv.width = cv.height = size;
+    const ctx = cv.getContext('2d');
+    // Dark teal base
+    ctx.fillStyle = '#0a2e38';
+    ctx.fillRect(0, 0, size, size);
+    // Horizontal ring stripes (repeating along tube length)
+    const stripeCount = 8;
+    const stripeH = size / stripeCount;
+    ctx.strokeStyle = '#22d3ee';
+    ctx.lineWidth = Math.max(2, size / 48);
+    for (let i = 0; i < stripeCount; i++) {
+      const y = i * stripeH + stripeH / 2;
+      ctx.globalAlpha = (i % 2 === 0) ? 0.6 : 0.3;
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(size, y);
+      ctx.stroke();
+    }
+    // Vertical lines (around circumference)
+    ctx.globalAlpha = 0.2;
+    ctx.strokeStyle = '#67e8f9';
+    ctx.lineWidth = Math.max(1, size / 64);
+    const vCount = 6;
+    for (let i = 0; i < vCount; i++) {
+      const x = i * size / vCount + size / (vCount * 2);
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, size);
+      ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+    const tex = new THREE.CanvasTexture(cv);
+    tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+    tex.repeat.set(1, 4); // repeat along tube length for more ring density
+    return tex;
+  }
+
   function ensureTextures() {
     if (texTileTop) return;
     texTileTop    = makeTileTopTexture(256, COL.tileTop,     COL.tileGrid);
@@ -205,6 +248,7 @@
     texHazardTop  = makeHazardTexture(128);
     texCrumbleTop = makeCrumbleTexture(128);
     texIceTop     = makeTileTopTexture(128, COL.iceTop,      COL.iceDark);
+    texTunnelInner = makeTunnelInnerTexture(256);
   }
 
   // ─── Material cache ──────────────────────────────────────────────────────────
@@ -893,17 +937,28 @@
     const curve = new THREE.CatmullRomCurve3(curvePoints, false, 'catmullrom', 0);
     const tubeGeo = new THREE.TubeGeometry(curve, pathSamples, tubeRadius, radialSegments, false);
 
-    const tunnelMat = getMat('tunnel_tube', () => new THREE.MeshPhongMaterial({
+    // Inner surface: textured, opaque, BackSide so you see inside the tube
+    const tunnelMatInner = getMat('tunnel_tube_inner', () => new THREE.MeshPhongMaterial({
+      map: texTunnelInner,
+      color: 0xffffff,
+      emissive: 0x0a4050,
+      side: THREE.BackSide,
+      shininess: 40,
+      specular: 0x67e8f9
+    }));
+    // Outer surface: semi-transparent glow so you can see the tube from outside
+    const tunnelMatOuter = getMat('tunnel_tube_outer', () => new THREE.MeshPhongMaterial({
       color: 0x22d3ee,
       emissive: 0x083344,
       transparent: true,
-      opacity: 0.45,
-      side: THREE.DoubleSide,
+      opacity: 0.35,
+      side: THREE.FrontSide,
       shininess: 60,
       specular: 0x67e8f9
     }));
 
-    const tubeMesh = new THREE.Mesh(tubeGeo, tunnelMat);
+    const tubeInnerMesh = new THREE.Mesh(tubeGeo, tunnelMatInner);
+    const tubeOuterMesh = new THREE.Mesh(tubeGeo.clone(), tunnelMatOuter);
 
     // Build funnel ring at entry (a torus/ring to mark the entrance)
     const entryPt = path[0];
@@ -923,7 +978,8 @@
     exitRingMesh.rotation.x = Math.PI / 2;
 
     const tunnelGroup = new THREE.Group();
-    tunnelGroup.add(tubeMesh);
+    tunnelGroup.add(tubeInnerMesh);
+    tunnelGroup.add(tubeOuterMesh);
     tunnelGroup.add(funnelMesh);
     tunnelGroup.add(exitRingMesh);
 
