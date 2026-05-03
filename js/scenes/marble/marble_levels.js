@@ -1383,9 +1383,13 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     // Funnel center in world coords (center of entry tile)
     const fCenterX = entryTx + 0.5;
     const fCenterY = entryTy + 0.5;
-    // Depth of funnel bowl: how much the rim rises above center
+    // Depth of funnel bowl: how much the center dips below the rim
     const fDepth = funnelDepth ?? (funnelRadius * 0.5);
     const fMaxDist = funnelRadius + 0.5; // max distance from center to outer rim edge
+
+    // Adjust the first path point z to the bowl center so the tube
+    // entrance is at the bottom of the funnel mouth, not at floor level
+    const adjustedPath = path.map((p, i) => i === 0 ? { x: p.x, y: p.y, z: ez - fDepth } : p);
 
     // Place funnel tiles using FUNNEL shape — fill the entire square area
     // (no circular cutoff, so there are no void gaps at corners)
@@ -1433,16 +1437,16 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
       }
     }
 
-    // Add tunnel actor
+    // Add tunnel actor (uses adjustedPath so tube starts at bowl center)
     addActor(level, {
       id,
       kind: ACTOR_KINDS.TUNNEL,
       x: entry.x,
       y: entry.y,
-      z: ez,
+      z: ez - fDepth,
       width: 1,
       height: 1,
-      tunnelPath: path,
+      tunnelPath: adjustedPath,
       tunnelSpeed: speed,
       tunnelRadius: radius,
       exitType,

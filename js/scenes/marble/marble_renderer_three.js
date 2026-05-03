@@ -204,29 +204,35 @@
     const cv = document.createElement('canvas');
     cv.width = cv.height = size;
     const ctx = cv.getContext('2d');
-    // Dark teal base
-    ctx.fillStyle = '#0a2e38';
+    // Dark gradient base (darker at edges for depth)
+    const grad = ctx.createLinearGradient(0, 0, size, 0);
+    grad.addColorStop(0, '#061e24');
+    grad.addColorStop(0.5, '#0d3d4a');
+    grad.addColorStop(1, '#061e24');
+    ctx.fillStyle = grad;
     ctx.fillRect(0, 0, size, size);
-    // Horizontal ring stripes (repeating along tube length)
-    const stripeCount = 8;
-    const stripeH = size / stripeCount;
-    ctx.strokeStyle = '#22d3ee';
-    ctx.lineWidth = Math.max(2, size / 48);
-    for (let i = 0; i < stripeCount; i++) {
-      const y = i * stripeH + stripeH / 2;
-      ctx.globalAlpha = (i % 2 === 0) ? 0.6 : 0.3;
-      ctx.beginPath();
-      ctx.moveTo(0, y);
-      ctx.lineTo(size, y);
-      ctx.stroke();
+    // Bold ring stripes (horizontal = around circumference when mapped to tube)
+    const ringCount = 12;
+    const ringH = size / ringCount;
+    ctx.globalAlpha = 1;
+    for (let i = 0; i < ringCount; i++) {
+      const y = i * ringH;
+      // Alternating bright/dim rings
+      if (i % 3 === 0) {
+        ctx.fillStyle = '#0891b2';
+        ctx.fillRect(0, y, size, Math.max(3, ringH * 0.15));
+      } else {
+        ctx.fillStyle = '#164e63';
+        ctx.fillRect(0, y, size, Math.max(2, ringH * 0.08));
+      }
     }
-    // Vertical lines (around circumference)
-    ctx.globalAlpha = 0.2;
-    ctx.strokeStyle = '#67e8f9';
-    ctx.lineWidth = Math.max(1, size / 64);
-    const vCount = 6;
-    for (let i = 0; i < vCount; i++) {
-      const x = i * size / vCount + size / (vCount * 2);
+    // Panel seam lines (vertical = along tube length)
+    ctx.strokeStyle = '#155e75';
+    ctx.lineWidth = Math.max(1, size / 128);
+    ctx.globalAlpha = 0.5;
+    const panelCount = 8;
+    for (let i = 0; i < panelCount; i++) {
+      const x = (i + 0.5) * size / panelCount;
       ctx.beginPath();
       ctx.moveTo(x, 0);
       ctx.lineTo(x, size);
@@ -235,7 +241,7 @@
     ctx.globalAlpha = 1;
     const tex = new THREE.CanvasTexture(cv);
     tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
-    tex.repeat.set(1, 4); // repeat along tube length for more ring density
+    tex.repeat.set(1, 6); // repeat along tube length for dense ring pattern
     return tex;
   }
 
