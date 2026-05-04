@@ -3078,7 +3078,7 @@ setGoal(level, 12, 88, 0.44);
       killZ: -20,
       voidFloor: -10,
       start: { x: 4.5, y: 4.5 },
-      timeLimit: 60,
+      timeLimit: 40,
       reward: { presses: 12000, claimKey: 'canal_run' },
       templates: ['canal', 'conveyor', 'fork_rejoin']
     });
@@ -3107,7 +3107,7 @@ setGoal(level, 12, 88, 0.44);
       gaps: [
         { x: 23, y: 5 }, { x: 23, y: 6 }, { x: 23, y: 7 }, { x: 23, y: 8 },
         { x: 28, y: 4 }, { x: 28, y: 5 }, { x: 28, y: 6 }, { x: 28, y: 7 },
-        { x: 28, y: 8 }, { x: 28, y: 9 }, { x: 28, y: 10 }, { x: 28, y: 11 }, { x: 28, y: 12 }, { x: 28, y: 13 }
+        { x: 28, y: 8 }, { x: 28, y: 9 }, { x: 28, y: 10 }, { x: 28, y: 11 }, { x: 28, y: 12 }
       ]
     });
 
@@ -3121,7 +3121,7 @@ setGoal(level, 12, 88, 0.44);
     addHazardRect(level, 36, 5, 2, 2, 'canal_spikes_north');
     // Second hazard strip and timed gate — can't just fly through on conveyor
     addHazardRect(level, 42, 4, 2, 4, 'canal_spikes_north2');
-    addTimedGate(level, 'gate_canal_north', 32, 4, 10, 3, 2, 1.6, 1.2);
+    addTimedGate(level, 'gate_canal_north', 32, 5, 10, 1, 2, 1.6, 1.2);
     // Sweeper guarding the exit
     addActor(level, {
       id: 'sweeper_canal_n', kind: ACTOR_KINDS.SWEEPER,
@@ -3170,7 +3170,7 @@ setGoal(level, 12, 88, 0.44);
     setSurface(level, 44, 10, { baseHeight: 14, shape: SHAPES.FLAT });
     wallRing(level, 29, 8, 20, 6, 12, {
       gaps: [
-        { x: 29, y: 8 }, { x: 29, y: 9 }, { x: 29, y: 10 }, { x: 29, y: 11 }, { x: 29, y: 12 }, { x: 29, y: 13 },
+        { x: 29, y: 8 }, { x: 29, y: 9 }, { x: 29, y: 10 }, { x: 29, y: 11 }, { x: 29, y: 12 },
         { x: 48, y: 8 }, { x: 48, y: 9 }, { x: 48, y: 10 }, { x: 48, y: 11 }, { x: 48, y: 12 }, { x: 48, y: 13 }
       ]
     });
@@ -3237,7 +3237,7 @@ setGoal(level, 12, 88, 0.44);
 
     // Lower lane (z=6), 20×6 — timed gate + column obstacles + sweeper + crumble + hazard strip
     fillTrack(level, 29, 22, 20, 6, 6);
-    addTimedGate(level, 'gate_canal2', 35, 23, 8, 3, 2, 1.6, 1.4);
+    addTimedGate(level, 'gate_canal2', 36, 23, 8, 1, 4, 1.0, 1.0);
     // Column pair 1: north side, leaves gap on south
     setSurface(level, 40, 22, { baseHeight: 10, shape: SHAPES.FLAT });
     setSurface(level, 40, 23, { baseHeight: 10, shape: SHAPES.FLAT });
@@ -3296,13 +3296,21 @@ setGoal(level, 12, 88, 0.44);
     // New randomizers on second merge platform — push toward the ramp or sideways
     setSurface(level, 21, 17, { baseHeight: 6,  shape: SHAPES.FLAT, conveyor: { x: -2.8, y: 2.8,  strength: 3.5 } });
     setSurface(level, 24, 20, { baseHeight: 6,  shape: SHAPES.FLAT, conveyor: { x: 3.0,  y: -1.5, strength: 3.2 } });
-    setSurface(level, 20, 25, { baseHeight: 6,  shape: SHAPES.FLAT, conveyor: { x: -3.0, y: 3.0,  strength: 3.5 } });
+    setSurface(level, 28, 26, { baseHeight: 6,  shape: SHAPES.FLAT, conveyor: { x: -3.0, y: 3.0,  strength: 3.5 } });
     setSurface(level, 26, 27, { baseHeight: 6,  shape: SHAPES.FLAT, conveyor: { x: 2.5,  y: 2.0,  strength: 3.0 } });
     // Randomizers on the final ramp approach — push diagonally to knock marble off the narrow ramp
-    setSurface(level, 22, 29, { baseHeight: 5,  shape: SHAPES.FLAT, conveyor: { x: -3.0, y: 1.5,  strength: 3.5 } });
-    setSurface(level, 23, 31, { baseHeight: 4,  shape: SHAPES.FLAT, conveyor: { x: 2.8,  y: -2.0, strength: 3.2 } });
-    // Bounce pad on second merge platform — first encounter with the mechanic
-    setSurface(level, 25, 22, { baseHeight: 6,  shape: SHAPES.FLAT, bounce: 5.2 });
+    setSurface(level, 23, 28, { baseHeight: 6,  shape: SHAPES.FLAT, conveyor: { x: -3.0, y: 1.5,  strength: 3.5 } });
+    setSurface(level, 24, 28, { baseHeight: 6,  shape: SHAPES.FLAT, conveyor: { x: 2.8,  y: -2.0, strength: 3.2 } });
+    // 3x3 bounce/conveyor grid centered at 25/22 (BCB/CBC/BCB pattern)
+    setSurface(level, 24, 21, { baseHeight: 6, shape: SHAPES.FLAT, bounce: 5.2 });
+    setSurface(level, 25, 21, { baseHeight: 6, shape: SHAPES.FLAT, conveyor: { x: 2.5, y: 2.5, strength: 3.0 } });
+    setSurface(level, 26, 21, { baseHeight: 6, shape: SHAPES.FLAT, bounce: 5.2 });
+    setSurface(level, 24, 22, { baseHeight: 6, shape: SHAPES.FLAT, conveyor: { x: -2.5, y: 2.5, strength: 3.0 } });
+    setSurface(level, 25, 22, { baseHeight: 6, shape: SHAPES.FLAT, bounce: 5.2 });
+    setSurface(level, 26, 22, { baseHeight: 6, shape: SHAPES.FLAT, conveyor: { x: 2.5, y: -2.5, strength: 3.0 } });
+    setSurface(level, 24, 23, { baseHeight: 6, shape: SHAPES.FLAT, bounce: 5.2 });
+    setSurface(level, 25, 23, { baseHeight: 6, shape: SHAPES.FLAT, conveyor: { x: -2.5, y: -2.5, strength: 3.0 } });
+    setSurface(level, 26, 23, { baseHeight: 6, shape: SHAPES.FLAT, bounce: 5.2 });
     // Randomizers in the goal basin — push marble away from the goal
     setSurface(level, 20, 36, { baseHeight: 2,  shape: SHAPES.FLAT, conveyor: { x: 2.8,  y: -2.8, strength: 3.5 } });
     setSurface(level, 25, 38, { baseHeight: 2,  shape: SHAPES.FLAT, conveyor: { x: -3.0, y: 3.0,  strength: 3.5 } });
@@ -3312,7 +3320,7 @@ setGoal(level, 12, 88, 0.44);
     // Void-edge conveyors — push marble toward outer void edges of each canal lane
     setSurface(level, 29, 4, { baseHeight: 10, shape: SHAPES.FLAT, conveyor: { x: -3.0, y: -2.8, strength: 3.5 } });
     setSurface(level, 47, 7, { baseHeight: 10, shape: SHAPES.FLAT, conveyor: { x: 3.2, y: -2.5, strength: 3.5 } });
-    setSurface(level, 29, 13, { baseHeight: 10, shape: SHAPES.FLAT, conveyor: { x: -2.8, y: 3.0, strength: 3.5 } });
+    setSurface(level, 38, 9, { baseHeight: 10, shape: SHAPES.FLAT, conveyor: { x: -2.8, y: 3.0, strength: 3.5 } });
     setSurface(level, 47, 13, { baseHeight: 10, shape: SHAPES.FLAT, conveyor: { x: 3.0, y: 3.2, strength: 3.5 } });
 setGoal(level, 22, 40, 0.44);
 
