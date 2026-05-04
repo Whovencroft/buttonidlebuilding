@@ -3078,7 +3078,7 @@ setGoal(level, 12, 88, 0.44);
       killZ: -20,
       voidFloor: -10,
       start: { x: 4.5, y: 4.5 },
-      timeLimit: 40,
+      timeLimit: 25,
       reward: { presses: 12000, claimKey: 'canal_run' },
       templates: ['canal', 'conveyor', 'fork_rejoin']
     });
