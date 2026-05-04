@@ -2811,7 +2811,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
       killZ: -20,
       voidFloor: -10,
       start: { x: 4.5, y: 4.5 },
-      timeLimit: 60,
+      timeLimit: 40,
       reward: { presses: 8000, claimKey: 'the_switchback' },
       templates: ['switchback', 'crumble']
     });
@@ -2827,12 +2827,26 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     wallRing(level, 10, 4, 14, 5, 20, {
       gaps: [
         { x: 10, y: 4 }, { x: 10, y: 5 }, { x: 10, y: 6 }, { x: 10, y: 7 }, { x: 10, y: 8 },
-        { x: 23, y: 4 }, { x: 23, y: 5 }, { x: 23, y: 6 }, { x: 23, y: 7 }, { x: 23, y: 8 }
+        { x: 23, y: 4 }, { x: 23, y: 5 }, { x: 23, y: 6 }, { x: 23, y: 7 }, { x: 23, y: 8 },
+        { x: 10, y: 8 }, { x: 12, y: 8 }, { x: 13, y: 8 }
       ]
     });
 
     // Void-edge conveyor on Leg A — pushes toward north void
     setSurface(level, 22, 5, { baseHeight: 18, shape: SHAPES.FLAT, conveyor: { x: 2.5, y: -3.2, strength: 3.5 } });
+
+    // Tunnel: 3x3 centered at 22/6/18, exits at 10/17/14
+    placeTunnel(level, {
+      id: 'tunnel_leg_a',
+      path: [
+        { x: 22.5, y: 6.5, z: 18 },
+        { x: 16.5, y: 12.5, z: 16 },
+        { x: 10.5, y: 17.5, z: 14 }
+      ],
+      funnelRadius: 1,
+      funnelDepth: 2,
+      radius: 0.4
+    });
 
     // Ramp A south (z=18→14), 6×5
     placeRamp(level, { x: 10, y: 9, dir: 'south', length: 6, width: 5, startZ: 18, endZ: 14 });
@@ -2861,7 +2875,9 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
         // West entry from Turn A: full west column y:21-25
         { x: 2, y: 21 }, { x: 2, y: 22 }, { x: 2, y: 23 }, { x: 2, y: 24 }, { x: 2, y: 25 },
         // East exit to Ramp B: full east column y:21-25
-        { x: 15, y: 21 }, { x: 15, y: 22 }, { x: 15, y: 23 }, { x: 15, y: 24 }, { x: 15, y: 25 }
+        { x: 15, y: 21 }, { x: 15, y: 22 }, { x: 15, y: 23 }, { x: 15, y: 24 }, { x: 15, y: 25 },
+        // Removed walls
+        { x: 3, y: 21 }, { x: 11, y: 24 }
       ]
     });
     // Ramp B south (z=14→10), 6×5 — now on EAST side of Leg B (S-shape)
@@ -2887,6 +2903,10 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
         setSurface(level, ix, iy, { baseHeight: 10, shape: SHAPES.FLAT, friction: 0.25 });
       }
     }
+    // Remove ice at 12/40, 13/40, 14/40 — revert to normal track
+    setSurface(level, 12, 40, { baseHeight: 10, shape: SHAPES.FLAT });
+    setSurface(level, 13, 40, { baseHeight: 10, shape: SHAPES.FLAT });
+    setSurface(level, 14, 40, { baseHeight: 10, shape: SHAPES.FLAT });
     wallRing(level, 2, 38, 14, 5, 12, {
       gaps: [
         // West entry from Turn B: x:2-7 — 6 tiles wide
@@ -2894,7 +2914,9 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
         // East exit to Ramp C: full east column y:38-42 (south corner y=42 included)
         { x: 15, y: 38 }, { x: 15, y: 39 }, { x: 15, y: 40 }, { x: 15, y: 41 }, { x: 15, y: 42 },
         // South-east corner open
-        { x: 15, y: 42 }
+        { x: 15, y: 42 },
+        // Removed wall at 11/42
+        { x: 11, y: 42 }
       ]
     });
     // Rotating bar on Turn B — introduces the mechanic before Stage 6
@@ -2954,7 +2976,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
 
     // Path A (east): Leg E east corridor (z=2), 14×5 — with timed gate
     fillTrack(level, 11, 72, 14, 5, 2);
-    addTimedGate(level, 'gate_leg_e', 16, 73, 4, 3, 2, 1.5, 1.0);
+    addTimedGate(level, 'gate_leg_e', 12, 74, 4, 1, 2, 1.5, 1.0);
     // Sweeper on the approach to the final gate
     addActor(level, {
       id: 'sweeper_l3_final', kind: ACTOR_KINDS.SWEEPER,
@@ -2982,7 +3004,9 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
       gaps: [
         { x: 2, y: 68 }, { x: 3, y: 68 }, { x: 4, y: 68 }, { x: 5, y: 68 },
         { x: 2, y: 72 }, { x: 2, y: 73 }, { x: 2, y: 74 }, { x: 2, y: 75 }, { x: 2, y: 76 },
-        { x: 9, y: 72 }, { x: 9, y: 73 }, { x: 9, y: 74 }, { x: 9, y: 75 }, { x: 9, y: 76 }
+        { x: 9, y: 72 }, { x: 9, y: 73 }, { x: 9, y: 74 }, { x: 9, y: 75 }, { x: 9, y: 76 },
+        // Removed wall at 3/72
+        { x: 3, y: 72 }
       ]
     });
     placeRamp(level, { x: 9, y: 77, dir: 'south', length: 5, width: 5, startZ: 2, endZ: -2 });
@@ -3001,7 +3025,19 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     // Random push tiles — all diagonal/randomized
     setSurface(level, 8, 22, { baseHeight: 14, shape: SHAPES.FLAT, conveyor: { x: 2.8, y: -2.2, strength: 3.0 } });
     setSurface(level, 5, 38, { baseHeight: 10, shape: SHAPES.FLAT, conveyor: { x: -2.0, y: -2.5, strength: 2.8 } });
-    setSurface(level, 12, 52, { baseHeight: 6, shape: SHAPES.FLAT, conveyor: { x: -2.2, y: 2.2, strength: 3.0 } });
+    // Tunnel at 12/52/6 (3x3) — drops into void (replaces conveyor)
+    placeTunnel(level, {
+      id: 'tunnel_void_c',
+      path: [
+        { x: 12.5, y: 52.5, z: 6 },
+        { x: 12.5, y: 52.5, z: 0 },
+        { x: 12.5, y: 52.5, z: -15 }
+      ],
+      funnelRadius: 1,
+      funnelDepth: 2,
+      radius: 0.4,
+      exitType: 'drop'
+    });
     setSurface(level, 8, 68, { baseHeight: 2, shape: SHAPES.FLAT, conveyor: { x: 2.5, y: -2.5, strength: 3.2 } });
     // Void-edge conveyors — push toward outer void edges on each leg
     setSurface(level, 15, 4, { baseHeight: 18, shape: SHAPES.FLAT, conveyor: { x: 3.0, y: -2.8, strength: 3.5 } });
