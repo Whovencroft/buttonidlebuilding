@@ -302,11 +302,15 @@
     };
   }
 
+  // Reusable overlap buffer to avoid GC pressure in hot collision path
+  const _overlapBuf = [];
   function getAllBlockingOverlaps(runtime, x, y, zCheck, radius, supportZ) {
-    return [
-      ...getStaticBlockingOverlaps(runtime, x, y, zCheck, radius, supportZ),
-      ...window.MarbleLevels.getActorBlockingOverlaps(runtime.level, runtime.dynamicState, x, y, zCheck, radius, supportZ)
-    ];
+    _overlapBuf.length = 0;
+    const statics = getStaticBlockingOverlaps(runtime, x, y, zCheck, radius, supportZ);
+    for (let i = 0; i < statics.length; i++) _overlapBuf.push(statics[i]);
+    const actors = window.MarbleLevels.getActorBlockingOverlaps(runtime.level, runtime.dynamicState, x, y, zCheck, radius, supportZ);
+    for (let i = 0; i < actors.length; i++) _overlapBuf.push(actors[i]);
+    return _overlapBuf;
   }
 
   function resolveSweptBlockerMovement(runtime, startX, startY, moveX, moveY, zCheck, supportZ) {

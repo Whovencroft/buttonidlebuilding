@@ -1,7 +1,7 @@
 (() => {
-  const FIXED_DT = 1 / 120;
+  const FIXED_DT = 1 / 60;
   const MAX_PHYSICS_STEPS = 8;
-  const MAX_REPLAY_FRAMES = 21600; // 3 min at 120fps — prevents GC pressure from unbounded replay arrays
+  const MAX_REPLAY_FRAMES = 10800; // 3 min at 60fps — prevents GC pressure from unbounded replay arrays
 
   function create(api) {
     const { config, elements, getState, applyMarbleReward, switchScene, saveNow } = api;

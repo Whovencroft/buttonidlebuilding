@@ -1217,7 +1217,7 @@
     const speed = Math.hypot(marble.vx, marble.vy);
     if (speed > 0.01) {
       const r = marble.collisionRadius ?? 0.225;
-      const roll = speed * (1 / r) * (1 / 120);
+      const roll = speed * (1 / r) * (1 / 60);
       marbleMesh.rotation.x += marble.vy * roll;
       marbleMesh.rotation.z -= marble.vx * roll;
     }
