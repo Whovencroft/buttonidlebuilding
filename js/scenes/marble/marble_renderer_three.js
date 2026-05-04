@@ -996,9 +996,17 @@
 
   // Update persistent actor mesh positions/rotations/visibility each frame.
   // No geometry or material allocation — just transforms.
-  function updateActorMeshes(level, dynState) {
+  // Track which tunnels have been revealed (marble entered them)
+  let revealedTunnels = {};
+
+  function updateActorMeshes(level, dynState, marble) {
     const ML = window.MarbleLevels;
     if (!dynState?.actors) return;
+
+    // Check if marble is currently inside a tunnel — reveal that tunnel
+    if (marble && marble.inTunnel && marble.inTunnel.actorId) {
+      revealedTunnels[marble.inTunnel.actorId] = true;
+    }
 
     for (const actor of level.actors || []) {
       const entry = actorMeshMap[actor.id];
@@ -1026,6 +1034,11 @@
 
       if (kind === ML.ACTOR_KINDS.TIMED_GATE) {
         entry.group.visible = !!state.blocking;
+      }
+
+      // Tunnels are hidden until the marble enters them
+      if (kind === ML.ACTOR_KINDS.TUNNEL) {
+        entry.group.visible = !!revealedTunnels[actor.id];
       }
     }
   }
@@ -1144,6 +1157,7 @@
     dynamicGroup = null;
     actorMeshMap = {};
     crumbleMeshMap = {};
+    revealedTunnels = {};
 
     levelCamZ      = 0;
     smoothCamZ     = 0;
@@ -1201,12 +1215,13 @@
       dynamicGroup = buildActorMeshes(runtime.level);
       scene.add(dynamicGroup);
       lastLevelId = runtime.level.id;
+      revealedTunnels = {}; // Reset tunnel visibility on level change/retry
       // Seed smoothCamZ to marble's current Z so there's no pop on level load
       smoothCamZ = runtime.marble.z;
     }
 
     // Update actor positions/rotations in-place — no allocations per frame
-    updateActorMeshes(runtime.level, runtime.dynamicState);
+    updateActorMeshes(runtime.level, runtime.dynamicState, runtime.marble);
     // Show/hide crumble tiles based on dynamic crumble state
     updateCrumbleMeshes(runtime.dynamicState);
 
