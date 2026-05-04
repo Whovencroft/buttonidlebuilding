@@ -3355,7 +3355,7 @@ setGoal(level, 22, 40, 0.44);
       killZ: -20,
       voidFloor: -10,
       start: { x: 4.5, y: 5.5 },
-      timeLimit: 60,
+      timeLimit: 40,
       reward: { presses: 18000, claimKey: 'the_crossing' },
       templates: ['platform_bridge', 'fork_rejoin', 'rotating_bar']
     });
@@ -3380,8 +3380,8 @@ setGoal(level, 22, 40, 0.44);
     // marble can board it without standing right at the void edge.
     // Endpoint moved from (26,6) to (28,6) so it lands on the east landing floor tile.
     addMovingBridge(level, 'bridge_main', [
-      { x: 20, y: 6, z: 14 },
-      { x: 28, y: 6, z: 14 }
+      { x: 21, y: 8, z: 14 },
+      { x: 28, y: 8, z: 14 }
     ], 4, 4, 0.6);
 
     // East landing platform (z=14), 12×10
@@ -3455,14 +3455,16 @@ setGoal(level, 22, 40, 0.44);
     // Second approach corridor (z=4), 12×8 — hazard strips + timed gate
     fillTrack(level, 49, 36, 12, 8, 4);
     addHazardRect(level, 51, 38, 2, 4, 'l5_approach_spikes');
-    addTimedGate(level, 'gate_l5_approach', 53, 37, 6, 4, 2, 1.8, 1.2);
+    addTimedGate(level, 'gate_l5_approach', 52, 34, 4, 1, 2, 1.8, 1.2);
     wallRing(level, 49, 36, 12, 8, 6, {
       gaps: [
         { x: 53, y: 36 }, { x: 54, y: 36 }, { x: 55, y: 36 }, { x: 56, y: 36 },
         { x: 49, y: 40 }, { x: 49, y: 41 }, { x: 49, y: 42 }, { x: 49, y: 43 },
-        { x: 55, y: 43 }, { x: 56, y: 43 }, { x: 57, y: 43 }, { x: 58, y: 43 }, { x: 59, y: 43 }, { x: 60, y: 43 }
+        { x: 53, y: 43 }, { x: 54, y: 43 }, { x: 55, y: 43 }, { x: 56, y: 43 }, { x: 57, y: 43 }, { x: 58, y: 43 }, { x: 59, y: 43 }, { x: 60, y: 43 }
       ]
     });
+    // Timed gate spanning 53/44 to 54/44 at z=4
+    addTimedGate(level, 'gate_l5_pathb_entry', 53, 44, 2, 1, 2, 1.6, 1.2);
 
     // Bridge x:33 (1-tile void between second landing east wall x:33 and Path A west wall x:34)
     fillTrack(level, 33, 40, 1, 4, 4);
@@ -3590,10 +3592,23 @@ setGoal(level, 22, 40, 0.44);
       gaps: [{ x: 22, y: 64 }, { x: 23, y: 64 }, { x: 24, y: 64 }, { x: 25, y: 64 }, { x: 26, y: 64 }, { x: 27, y: 64 }, { x: 28, y: 64 }, { x: 29, y: 64 }]
     });
     // Random push tiles — all diagonal/randomized
-    setSurface(level, 30, 10, { baseHeight: 14, shape: SHAPES.FLAT, conveyor: { x: 2.5, y: 3.2, strength: 3.5 } });
+    // 3x3 conveyor section centered at 35/12/14
+    for (let cx = 34; cx <= 36; cx++) {
+      for (let cy = 11; cy <= 13; cy++) {
+        setSurface(level, cx, cy, { baseHeight: 14, shape: SHAPES.FLAT, conveyor: { x: 2.5, y: 3.2, strength: 3.5 } });
+      }
+    }
     setSurface(level, 55, 18, { baseHeight: 10, shape: SHAPES.FLAT, conveyor: { x: -3.0, y: -2.2, strength: 3.2 } });
     setSurface(level, 54, 10, { baseHeight: 10, shape: SHAPES.FLAT, conveyor: { x: 3.2, y: -3.2, strength: 3.5 } });
     setSurface(level, 20, 45, { baseHeight: 4, shape: SHAPES.FLAT, conveyor: { x: -2.8, y: 2.8, strength: 3.2 } });
+    // Failure zone 2x3 at 35/16/18
+    addHazardRect(level, 35, 16, 2, 3, 'l5_failzone');
+    // 3-wide spinner at 43/16/10
+    addActor(level, {
+      id: 'spinner_l5_lower', kind: ACTOR_KINDS.ROTATING_BAR,
+      x: 43, y: 16, z: 10, topHeight: 10,
+      width: 1, height: 1, armLength: 3.0, armWidth: 0.22, angularSpeed: 1.8, fatal: true
+    });
     // NOTE: setSurface at (60,55) z=4 removed — was an orphaned tile floating in void (outside all platforms)
     // Sweepers guarding the goal basin entry
     addActor(level, {
@@ -3615,6 +3630,45 @@ setGoal(level, 22, 40, 0.44);
     // Hazard strip blocking direct run to goal (inside basin, before goal)
     addHazardRect(level, 19, 65, 12, 2, 'l5_goal_spikes');
     setGoal(level, 25, 68, 0.44);
+
+    // === Alternating diagonal hazard lines across area 21/41 to 37/57 ===
+    // Diagonals run perpendicular (NW-SE direction: x+1, y-1)
+    // 2 full sets of Ice, Bounce, Crumble, Conveyor starting at 28/49→29/48 with Ice
+    // Each "line" is a diagonal strip where x+y = constant
+    // 28+49=77 is the first Ice diagonal
+    const diagTypes = ['ice', 'bounce', 'crumble', 'conveyor'];
+    // 2 full sets = 8 diagonals total, starting at sum=77 going outward in both directions
+    for (let setIdx = 0; setIdx < 2; setIdx++) {
+      for (let typeIdx = 0; typeIdx < 4; typeIdx++) {
+        const diagSum = 77 + (setIdx * 4 + typeIdx);  // sums 77,78,79,80,81,82,83,84
+        const dtype = diagTypes[typeIdx];
+        for (let x = 21; x <= 37; x++) {
+          const y = diagSum - x;
+          if (y >= 41 && y <= 57) {
+            if (dtype === 'ice') {
+              setSurface(level, x, y, { baseHeight: 4, shape: SHAPES.FLAT, ice: true });
+            } else if (dtype === 'bounce') {
+              setSurface(level, x, y, { baseHeight: 4, shape: SHAPES.FLAT, bounce: { strength: 6.0 } });
+            } else if (dtype === 'crumble') {
+              setSurface(level, x, y, { baseHeight: 4, shape: SHAPES.FLAT, crumble: { delay: 0.15, downtime: 1.2 } });
+            } else if (dtype === 'conveyor') {
+              setSurface(level, x, y, { baseHeight: 4, shape: SHAPES.FLAT, conveyor: { x: 2.5, y: -2.5, strength: 3.0 } });
+            }
+          }
+        }
+      }
+    }
+
+    // 2x2 tunnel at 64/50/4 → leads to goal (25/68/0)
+    placeTunnel(level, {
+      path: [{x:64, y:50, z:4}, {x:64, y:55, z:2}, {x:40, y:65, z:0}, {x:25, y:68, z:0}],
+      funnelRadius: 1, funnelDepth: 2, radius: 0.4, speed: 10
+    });
+    // 2x2 tunnel at 62/50/4 → drops into void
+    placeTunnel(level, {
+      path: [{x:62, y:50, z:4}, {x:62, y:52, z:0}, {x:62, y:54, z:-15}],
+      funnelRadius: 1, funnelDepth: 2, radius: 0.4, speed: 10, exitType: 'drop'
+    });
 
     addGraphNode(level, { id: 'start',    type: 'entry', x: 4.5,  y: 5.5,  z: 14 });
     addGraphNode(level, { id: 'bridge',   type: 'hub',   x: 23.5, y: 8.5,  z: 14 });
