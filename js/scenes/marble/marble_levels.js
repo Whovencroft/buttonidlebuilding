@@ -3455,7 +3455,7 @@ setGoal(level, 22, 40, 0.44);
     // Second approach corridor (z=4), 12×8 — hazard strips + timed gate
     fillTrack(level, 49, 36, 12, 8, 4);
     addHazardRect(level, 51, 38, 2, 4, 'l5_approach_spikes');
-    addTimedGate(level, 'gate_l5_approach', 52, 34, 4, 1, 2, 1.8, 1.2);
+    addTimedGate(level, 'gate_l5_approach', 52, 35, 4, 5, 1, 1.8, 1.2);
     wallRing(level, 49, 36, 12, 8, 6, {
       gaps: [
         { x: 53, y: 36 }, { x: 54, y: 36 }, { x: 55, y: 36 }, { x: 56, y: 36 },
@@ -3463,8 +3463,8 @@ setGoal(level, 22, 40, 0.44);
         { x: 53, y: 43 }, { x: 54, y: 43 }, { x: 55, y: 43 }, { x: 56, y: 43 }, { x: 57, y: 43 }, { x: 58, y: 43 }, { x: 59, y: 43 }, { x: 60, y: 43 }
       ]
     });
-    // Timed gate spanning 53/44 to 54/44 at z=4
-    addTimedGate(level, 'gate_l5_pathb_entry', 53, 44, 2, 1, 2, 1.6, 1.2);
+    // Timed gate spanning 53/46 to 54/46 at z=4
+    addTimedGate(level, 'gate_l5_pathb_entry', 53, 46, 4, 2, 1, 1.6, 1.2);
 
     // Bridge x:33 (1-tile void between second landing east wall x:33 and Path A west wall x:34)
     fillTrack(level, 33, 40, 1, 4, 4);
@@ -3559,8 +3559,7 @@ setGoal(level, 22, 40, 0.44);
       x: 44, y: 50, z: 4, topHeight: 4,
       width: 1, height: 1, armLength: 2.5, armWidth: 0.22, angularSpeed: 1.4, fatal: true
     });
-    // Timed gate on east path connector entry
-    addTimedGate(level, 'gate_l5_east', 42, 44, 4, 3, 2, 1.6, 1.2);
+
     // Void-edge conveyor on east path connector — pushes toward east void
     setSurface(level, 52, 47, { baseHeight: 4, shape: SHAPES.FLAT, conveyor: { x: 3.0, y: -2.5, strength: 3.5 } });
 
@@ -3653,6 +3652,34 @@ setGoal(level, 22, 40, 0.44);
               setSurface(level, x, y, { baseHeight: 4, shape: SHAPES.FLAT, crumble: { delay: 0.15, downtime: 1.2 } });
             } else if (dtype === 'conveyor') {
               setSurface(level, x, y, { baseHeight: 4, shape: SHAPES.FLAT, conveyor: { x: 2.5, y: -2.5, strength: 3.0 } });
+            }
+          }
+        }
+      }
+    }
+
+    // === Perpendicular diagonal hazard lines (NE-SW: x-y = constant) ===
+    // 2 full sets of Ice, Bounce, Crumble, Conveyor
+    // Centered around diff = -20 (center of area), spanning diffs -24 to -17
+    // Skip tiles already set by the NW-SE diagonals (x+y in 77..84)
+    const perpTypes = ['ice', 'bounce', 'crumble', 'conveyor'];
+    const existingSums = new Set();
+    for (let s = 77; s <= 84; s++) existingSums.add(s);
+    for (let setIdx2 = 0; setIdx2 < 2; setIdx2++) {
+      for (let typeIdx2 = 0; typeIdx2 < 4; typeIdx2++) {
+        const diagDiff = -24 + (setIdx2 * 4 + typeIdx2);  // diffs -24,-23,-22,-21,-20,-19,-18,-17
+        const dtype2 = perpTypes[typeIdx2];
+        for (let x = 21; x <= 37; x++) {
+          const y = x - diagDiff;
+          if (y >= 41 && y <= 57 && !existingSums.has(x + y)) {
+            if (dtype2 === 'ice') {
+              setSurface(level, x, y, { baseHeight: 4, shape: SHAPES.FLAT, ice: true });
+            } else if (dtype2 === 'bounce') {
+              setSurface(level, x, y, { baseHeight: 4, shape: SHAPES.FLAT, bounce: { strength: 6.0 } });
+            } else if (dtype2 === 'crumble') {
+              setSurface(level, x, y, { baseHeight: 4, shape: SHAPES.FLAT, crumble: { delay: 0.15, downtime: 1.2 } });
+            } else if (dtype2 === 'conveyor') {
+              setSurface(level, x, y, { baseHeight: 4, shape: SHAPES.FLAT, conveyor: { x: -2.5, y: 2.5, strength: 3.0 } });
             }
           }
         }
