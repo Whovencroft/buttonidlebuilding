@@ -108,7 +108,7 @@
       shape,
       baseHeight,
       rise,
-      friction: patch.friction ?? 1,
+      friction: patch.ice ? 0.15 : (patch.friction ?? 1),
       conveyor: patch.conveyor ? {
         x: patch.conveyor.x ?? 0,
         y: patch.conveyor.y ?? 0,
@@ -5339,6 +5339,7 @@ function registerGeneratedLevel(level) {
     getHazardContacts,
     resolveSupportInteraction,
     isCrumbleBroken,
+    sampleStaticSurfaceOnly,
     setGoal,
     placeTunnel
   };

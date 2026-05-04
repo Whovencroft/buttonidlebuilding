@@ -861,7 +861,7 @@
 
       if (kind === ML.ACTOR_KINDS.MOVING_PLATFORM || kind === ML.ACTOR_KINDS.ELEVATOR) {
         const w = actor.width ?? 2;
-        const d = actor.depth ?? 2;
+        const d = actor.height ?? 2;
         actorGroup = buildBoxGroup(0, 0, -0.3, w, d, 0.3, matPlatformTop(), matPlatformSide());
         actorMeshMap[actor.id] = { group: actorGroup, kind };
         group.add(actorGroup);
@@ -1018,9 +1018,13 @@
 
       if (kind === ML.ACTOR_KINDS.MOVING_PLATFORM || kind === ML.ACTOR_KINDS.ELEVATOR) {
         const w = actor.width ?? 2;
-        const d = actor.depth ?? 2;
+        const d = actor.height ?? 2;
         const topZ = state.z ?? actor.z ?? actor.topHeight ?? 0;
-        entry.group.position.set(state.x - w / 2, topZ - 0.3, state.y - d / 2);
+        // PLATFORM HITBOX FIX: position visual at corner-anchor (state.x, state.y)
+        // to match physics rect which spans [state.x, state.x+w] x [state.y, state.y+h].
+        // Previously used centered positioning (state.x - w/2) which offset the
+        // visual from the physics hitbox by (w/2, h/2).
+        entry.group.position.set(state.x, topZ - 0.3, state.y);
       }
 
       if (kind === ML.ACTOR_KINDS.ROTATING_BAR || kind === ML.ACTOR_KINDS.SWEEPER) {

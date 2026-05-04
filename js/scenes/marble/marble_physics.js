@@ -489,8 +489,17 @@
     }
 
     if (landedTransition === 'air') {
-      marble.vx *= LEDGE_FALL_HORIZONTAL_DAMPING;
-      marble.vy *= LEDGE_FALL_HORIZONTAL_DAMPING;
+      // CRUMBLE FREEZE FIX: only apply horizontal damping if the marble's
+      // center point is truly over void/no-surface. When a nearby crumble
+      // tile breaks, the multi-sample spread may lose support ratio, but
+      // the marble center is still on solid ground — don't halve speed.
+      const centerSurface = window.MarbleLevels.sampleStaticSurfaceOnly
+        ? window.MarbleLevels.sampleStaticSurfaceOnly(runtime.level, runtime.dynamicState, marble.x, marble.y)
+        : null;
+      if (!centerSurface) {
+        marble.vx *= LEDGE_FALL_HORIZONTAL_DAMPING;
+        marble.vy *= LEDGE_FALL_HORIZONTAL_DAMPING;
+      }
       marble.vz = Math.min(marble.vz, LEDGE_FALL_DOWNWARD_KICK);
       marble.grounded = false;
       return null;
@@ -1029,7 +1038,16 @@ function shouldFailFromVoidFall(runtime) {
       rememberSafePosition(runtime, groundSurface);
     }
 
-    if (groundSurface && marble.coyoteTime > 0 && marble.jumpBufferTime > 0 && marble.jumpCooldownTime <= 0) {
+    // AIR-JUMP FIX: only allow jump when the marble is actually grounded or
+    // within coyote time AND not falling fast. Previously, getGroundSupport
+    // could detect a surface while the marble was falling past it, and combined
+    // with coyote time still being active, spamming jump allowed mid-fall recovery.
+    // Now require either: (a) marble is grounded, or (b) coyote time active AND
+    // marble is not falling fast (vz > -3). This preserves edge-jump coyote
+    // behavior while blocking the falling exploit.
+    const canJump = groundSurface && marble.jumpBufferTime > 0 && marble.jumpCooldownTime <= 0
+      && (marble.grounded || (marble.coyoteTime > 0 && marble.vz > -3));
+    if (canJump) {
       performJump(marble, groundSurface);
       groundSurface = null;
     }
