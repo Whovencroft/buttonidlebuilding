@@ -1,16 +1,13 @@
 (() => {
   const FIXED_DT = 1 / 60;
   const MAX_PHYSICS_STEPS = 8;
-  const MAX_REPLAY_FRAMES = 10800; // 3 min at 60fps — prevents GC pressure from unbounded replay arrays
 
   function create(api) {
     const { config, elements, getState, applyMarbleReward, switchScene, saveNow } = api;
     const root = elements.marbleSceneRoot;
-    const replayStorageKey = `${config.meta.saveKey}.marble.lastReplay.v2`;
 
     let runtime = null;
     let input = null;
-    let playback = null;
     let built = false;
     let levelStripSignature = '';
 
@@ -86,27 +83,6 @@
       if (!input) input = window.MarbleInput.createInput();
     }
 
-    function saveReplayToStorage(replayData) {
-      localStorage.setItem(replayStorageKey, JSON.stringify(replayData));
-      return replayData;
-    }
-
-    function loadReplayFromStorage() {
-      try {
-        const raw = localStorage.getItem(replayStorageKey);
-        if (!raw) return null;
-        return JSON.parse(raw);
-      } catch (error) {
-        console.error(error);
-        return null;
-      }
-    }
-
-    function serializeReplay(result = null) {
-      if (!runtime?.replay) return null;
-      return { ...runtime.replay, result: result || runtime.replay.result || null };
-    }
-
     function getLevelStripSignature() {
       const slice = marbleSlice();
       const activeLevelId = runtime?.level?.id || '';
@@ -138,12 +114,6 @@
       runtime.fixedStep = FIXED_DT;
       runtime.accumulator = 0;
       window._marbleRuntime = runtime; // debug
-      playback = options.playReplayData ? { data: options.playReplayData, cursor: 0 } : null;
-      if (playback?.data?.radii) {
-        runtime.marble.renderRadius = playback.data.radii.renderRadius ?? runtime.marble.renderRadius;
-        runtime.marble.collisionRadius = playback.data.radii.collisionRadius ?? runtime.marble.collisionRadius;
-        runtime.marble.supportRadius = playback.data.radii.supportRadius ?? runtime.marble.supportRadius;
-      }
       hideOverlay();
       renderLevelStrip(true);
       render();
@@ -172,7 +142,6 @@
 
     function restartRun(options = {}) {
       ensureRuntime();
-      playback = options.playReplayData ? { data: options.playReplayData, cursor: 0 } : playback;
       window.MarbleState.restartRuntime(runtime);
       runtime.fixedStep = FIXED_DT;
       runtime.accumulator = 0;
@@ -203,12 +172,6 @@
       openLevel(nextLevelId);
     }
 
-    function persistCompletedReplay(result) {
-      if (!runtime?.replay) return null;
-      runtime.replay.result = result;
-      return saveReplayToStorage(serializeReplay(result));
-    }
-
     function applyCompletion(result) {
       const mainLevelIndex = window.MarbleLevels.getLevelIndex(result.levelId);
       const slice = marbleSlice();
@@ -234,12 +197,11 @@
       }
 
       runtime.resultApplied = true;
-      persistCompletedReplay(result);
       const nextIsUnlocked = nextLevelId ? window.MarbleLevels.isLevelUnlocked(slice.clearedLevels, nextLevelId) : false;
       renderLevelStrip(true);
 
       const rewardText = mainLevelIndex < 0
-        ? 'Generated graph course complete. Replay saved for inspection.'
+        ? 'Generated graph course complete.'
         : alreadyClaimed
           ? 'Best time updated if improved.'
           : '';
@@ -249,43 +211,19 @@
         : '';
 
       const completionBody = `${runtime.level.name} cleared in ${(result.bestTimeMs / 1000).toFixed(2)}s.${unlockText}${rewardText ? ' ' + rewardText : ''}`;
-      showOverlay(
-        playback ? 'Replay Complete' : 'Stage Cleared',
-        completionBody,
-        { showNext: !playback && !!(nextLevelId && nextIsUnlocked) }
-      );
+      showOverlay('Stage Cleared', completionBody, { showNext: !!(nextLevelId && nextIsUnlocked) });
     }
 
     function applyFailure(result) {
-      persistCompletedReplay(result);
       let reasonText = 'Run failed. Restart and try again.';
       if (result.reason === 'fall') reasonText = 'You fell off the course. Restart and try again.';
       else if (result.reason === 'timeout') reasonText = "Time's up! You didn't reach the end in time. Restart and try again.";
       else if (String(result.reason).includes('hazard') || String(result.reason).includes('bar') || String(result.reason).includes('sweeper')) reasonText = 'A hazard caught the marble. Restart and try again.';
-      showOverlay(playback ? 'Replay Failed' : 'Course Failed', reasonText);
-    }
-
-    function buildLiveStepInput() {
-      return input.buildStepInput();
-    }
-
-    function buildPlaybackStepInput() {
-      const frame = playback?.data?.frames?.[playback.cursor] || { x: 0, y: 0, j: 0 };
-      playback.cursor += 1;
-      return input.applyReplayFrame(frame);
-    }
-
-    function recordStepInput(stepInput) {
-      if (playback || !runtime?.replay) return;
-      if (runtime.replay.frames.length >= MAX_REPLAY_FRAMES) return; // cap to prevent GC pressure
-      const ax = Math.round(stepInput.axis.x * 10000) / 10000;
-      const ay = Math.round(stepInput.axis.y * 10000) / 10000;
-      runtime.replay.frames.push({ x: ax, y: ay, j: stepInput.jumpPressed ? 1 : 0 });
+      showOverlay('Course Failed', reasonText);
     }
 
     function stepSimulation(dt) {
-      const stepInput = playback ? buildPlaybackStepInput() : buildLiveStepInput();
-      recordStepInput(stepInput);
+      const stepInput = input.buildStepInput();
       const result = window.MarblePhysics.updatePhysics(runtime, stepInput, dt);
       runtime.simTick += 1;
       return result;
@@ -294,20 +232,20 @@
     function update(dt) {
       if (!runtime || !input) return;
 
-      if (!playback && input.consumeBufferedPress('Escape')) {
+      if (input.consumeBufferedPress('Escape')) {
         switchScene('button_idle', { force: true });
         input.endFrame();
         return;
       }
-      if (!playback && input.consumeBufferedPress('KeyR')) {
+      if (input.consumeBufferedPress('KeyR')) {
         restartRun();
         input.endFrame();
         return;
       }
-      if (!playback && input.consumeBufferedPress('KeyG')) {
+      if (input.consumeBufferedPress('KeyG')) {
         runtime.debug.showRouteGraph = !runtime.debug.showRouteGraph;
       }
-      if (!playback && input.consumeBufferedPress('KeyC')) {
+      if (input.consumeBufferedPress('KeyC')) {
         runtime.debug.showCoords = !runtime.debug.showCoords;
       }
 
@@ -349,13 +287,6 @@
       window.MarbleRenderer.render(runtime, refs.canvas);
     }
 
-    function startReplay(replayData) {
-      if (!replayData?.levelId) return null;
-      openLevel(replayData.levelId, { silentSave: true, playReplayData: replayData });
-      hideOverlay();
-      return replayData;
-    }
-
     function loadGeneratedSpec(spec) {
       const level = window.MarbleLevels.registerGeneratedLevel(window.MarbleLevels.generateCourseFromSpec(spec));
       openLevel(level, { silentSave: true });
@@ -377,23 +308,6 @@
           const level = loadGeneratedSpec(spec);
           switchScene('marble', { force: true, silentSave: true, startLevelId: level.id });
           return level;
-        },
-        exportLastReplay() {
-          const replay = loadReplayFromStorage();
-          return replay ? JSON.stringify(replay, null, 2) : null;
-        },
-        importReplay(replayInput) {
-          const replay = typeof replayInput === 'string' ? JSON.parse(replayInput) : replayInput;
-          switchScene('marble', { force: true, silentSave: true, startLevelId: replay.levelId, playReplayData: replay });
-          startReplay(replay);
-          return replay;
-        },
-        startSavedReplay() {
-          const replay = loadReplayFromStorage();
-          if (!replay) return null;
-          switchScene('marble', { force: true, silentSave: true, startLevelId: replay.levelId, playReplayData: replay });
-          startReplay(replay);
-          return replay;
         },
         toggleRouteGraph(value) {
           if (!runtime) return false;
@@ -426,12 +340,10 @@
         input.attach(refs.canvas);
 
         if (!runtime || (context.startLevelId && context.startLevelId !== runtime.level.id)) {
-          openLevel(context.startLevelId || currentLevelId(), { silentSave: true, playReplayData: context.playReplayData || null });
-        } else if (context.playReplayData) {
-          startReplay(context.playReplayData);
+          openLevel(context.startLevelId || currentLevelId(), { silentSave: true });
         }
 
-        if (context.restartLevel) restartRun({ silentSave: true, playReplayData: context.playReplayData || null });
+        if (context.restartLevel) restartRun({ silentSave: true });
         hideOverlay();
         renderLevelStrip(true);
         render();
@@ -444,7 +356,6 @@
       render,
       onStateLoaded,
       prepare,
-      startReplay,
       loadGeneratedSpec
     };
   }

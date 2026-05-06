@@ -115,9 +115,9 @@
 
     function onPointerCancel(e) {
       if (e.pointerId === dragPointer) {
-        // Treat cancel the same as release — fire a jump so the player
-        // isn't left hanging mid-air if the browser interrupts the gesture.
-        pendingJump = true;
+        // Cancel the drag without triggering a jump — the browser interrupted
+        // the gesture (scroll, pinch, back-swipe, notification, etc.).
+        // Firing a jump here would cause accidental jumps on mobile.
         dragActive  = false;
         dragPointer = null;
       }
@@ -237,16 +237,6 @@
       return { axis, jumpPressed };
     }
 
-    function applyReplayFrame(frame) {
-      return {
-        axis: {
-          x:          Number(frame?.x ?? 0),
-          y:          Number(frame?.y ?? 0),
-          worldSpace: false,
-        },
-        jumpPressed: !!frame?.j,
-      };
-    }
 
     /**
      * Returns drag state for the renderer to draw the drag arrow.
@@ -280,7 +270,6 @@
       isHeld,
       consumeBufferedPress,
       buildStepInput,
-      applyReplayFrame,
       getDragState,
       endFrame,
     };

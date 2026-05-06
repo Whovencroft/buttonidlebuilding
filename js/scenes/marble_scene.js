@@ -32,7 +32,7 @@
     return sample.z + getContactRadius(marble);
   }
 
-  function createReplaySeed(level) {
+  function createSeed(level) {
     if (level?.generatorSpec?.seed !== undefined) {
       return level.generatorSpec.seed >>> 0;
     }
@@ -59,30 +59,15 @@
       jumpCooldownTime: 0,
       supportSource: null,
       supportRef: null,
-      lastSafePosition: null
-    };
-  }
-
-  function buildReplaySkeleton(level, marble, seed) {
-    return {
-      version: 2,
-      levelId: level.id,
-      seed,
-      fixedStep: 1 / 120,
-      radii: {
-        renderRadius: marble.renderRadius,
-        collisionRadius: marble.collisionRadius,
-        supportRadius: marble.supportRadius
-      },
-      frames: [],
-      result: null
+      lastSafePosition: null,
+      inTunnel: null
     };
   }
 
   function createRuntime(levelOrId = 'fork_rejoin_test') {
     const level = resolveLevel(levelOrId);
     const marble = createMarbleBody();
-    const seed = createReplaySeed(level);
+    const seed = createSeed(level);
     const dynamicState = window.MarbleLevels.createDynamicState(level, seed);
 
     marble.x = level.start.x;
@@ -100,11 +85,10 @@
         lookX: 0,
         lookY: 0
       },
-      fixedStep: 1 / 120,
+      fixedStep: 1 / 60,
       accumulator: 0,
       simTick: 0,
       seed,
-      replay: buildReplaySkeleton(level, marble, seed),
       cameraSmoothing: 1,
       status: 'running',
       timerMs: 0,
@@ -137,6 +121,7 @@
     marble.supportSource = null;
     marble.supportRef = null;
     marble.lastSafePosition = null;
+    marble.inTunnel = null;
 
     runtime.camera.x = level.start.x;
     runtime.camera.y = level.start.y;
@@ -149,7 +134,6 @@
     runtime.timerMs = 0;
     runtime.resultApplied = false;
     runtime.lastResult = null;
-    runtime.replay = buildReplaySkeleton(level, marble, runtime.seed);
     return runtime;
   }
 
