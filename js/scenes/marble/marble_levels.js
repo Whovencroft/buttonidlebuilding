@@ -738,7 +738,8 @@ const _ssResult = {
   gradient: { gx: 0, gy: 0 }, trigger: null, friction: 1,
   conveyor: null, bounce: 0, failType: null, landingPad: false,
   centerSample: null, supportSamples: null, supportRatio: 0,
-  minSupportZ: 0, maxSupportZ: 0
+  minSupportZ: 0, maxSupportZ: 0,
+  actor: null, actorState: null
 };
 
 function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, options = {}) {
@@ -885,6 +886,8 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
   _ssResult.bounce = bestSample.bounce;
   _ssResult.failType = bestSample.failType;
   _ssResult.landingPad = bestSample.landingPad;
+  _ssResult.actor = bestSample.actor ?? null;
+  _ssResult.actorState = bestSample.actorState ?? null;
   _ssResult.centerSample = center;
   _ssResult.supportSamples = null; // no longer allocating array
   _ssResult.supportRatio = supportRatio;
