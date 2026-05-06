@@ -111,9 +111,11 @@
     );
 
     if (!support) return null;
+    // Deep-copy gradient to avoid mutation from reusable _ssResult.gradient
+    const g = support.gradient || { gx: 0, gy: 0 };
     return {
       ...support,
-      gradient: support.gradient || averageGradient(support.supportSamples || [])
+      gradient: { gx: g.gx, gy: g.gy }
     };
   }
 
@@ -529,7 +531,8 @@
     // thickness (near zero), causing clip-through on jump landings.
     const verticalStepSize = Math.max(0.04, marble.collisionRadius * 0.18);
     const verticalSteps = Math.ceil(Math.abs(totalDz) / verticalStepSize);
-    const steps = Math.max(1, horizontalSteps, verticalSteps);
+    // FREEZE SAFETY: cap steps to prevent runaway loops from extreme velocities
+    const steps = Math.min(Math.max(1, horizontalSteps, verticalSteps), 120);
     const stepDt = dt / steps;
 
     for (let i = 0; i < steps; i += 1) {

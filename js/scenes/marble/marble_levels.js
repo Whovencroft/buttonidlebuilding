@@ -1110,17 +1110,37 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
         if (supportZ !== null && supportZ !== undefined && supportZ >= rect.z - supportTolerance) continue;
         const closestX = clamp(x, rect.minX, rect.maxX);
         const closestY = clamp(y, rect.minY, rect.maxY);
-        const dx = x - closestX;
-        const dy = y - closestY;
+        let dx = x - closestX;
+        let dy = y - closestY;
         const distSq = dx * dx + dy * dy;
         if (distSq > radius * radius) continue;
-        const dist = Math.max(0.0001, Math.sqrt(distSq));
-        overlaps.push({
-          penetration: radius - dist,
-          normal: { x: dx / dist, y: dy / dist },
-          actor,
-          actorState
-        });
+        // FREEZE FIX: when marble center is inside the platform rect (distSq~0),
+        // compute a valid push-out normal based on shortest edge distance
+        if (distSq < 0.0001) {
+          const toLeft = x - rect.minX;
+          const toRight = rect.maxX - x;
+          const toTop = y - rect.minY;
+          const toBottom = rect.maxY - y;
+          const minEdge = Math.min(toLeft, toRight, toTop, toBottom);
+          if (minEdge === toLeft) { dx = -1; dy = 0; }
+          else if (minEdge === toRight) { dx = 1; dy = 0; }
+          else if (minEdge === toTop) { dx = 0; dy = -1; }
+          else { dx = 0; dy = 1; }
+          overlaps.push({
+            penetration: radius + minEdge,
+            normal: { x: dx, y: dy },
+            actor,
+            actorState
+          });
+        } else {
+          const dist = Math.sqrt(distSq);
+          overlaps.push({
+            penetration: radius - dist,
+            normal: { x: dx / dist, y: dy / dist },
+            actor,
+            actorState
+          });
+        }
       } else if (actor.kind === ACTOR_KINDS.TIMED_GATE) {
         // Block when the marble is within the gate's full vertical extent
         // Gate extends from topHeight (floor level) up by +2 (full gate slab height)
