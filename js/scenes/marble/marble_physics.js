@@ -896,13 +896,12 @@
     }
 
     const trigger = window.MarbleLevels.getTriggerCell(runtime.level, groundSurface.tx, groundSurface.ty);
-    if (trigger?.kind === 'hazard') {
+     if (trigger?.kind === 'hazard') {
   const cx = groundSurface.tx + 0.5;
   const cy = groundSurface.ty + 0.5;
   const dx = runtime.marble.x - cx;
   const dy = runtime.marble.y - cy;
   const radius = trigger.radius ?? HAZARD_TRIGGER_RADIUS;
-
   if (Math.hypot(dx, dy) <= radius) {
     return fail(runtime, trigger.data?.type || 'hazard');
   }

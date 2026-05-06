@@ -1190,16 +1190,18 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
         if (marbleBottom > armZTop || marbleTop < armZBase) continue;
 
         // Arm visual is centered on actor position, extends armLength in both directions.
-        // Physics must match: line segment from -armLength to +armLength through center.
+        // Three.js rotation.y around the vertical axis maps to game coords as:
+        //   endpoint = center + (cos(angle)*armLen, -sin(angle)*armLen)
+        // Physics must use the SAME sign convention so the hitbox matches the visual.
         const cx = actorState.x;
         const cy = actorState.y;
         const cosA = Math.cos(actorState.angle);
         const sinA = Math.sin(actorState.angle);
         const armLen = actor.armLength;
         const ax = cx - cosA * armLen;
-        const ay = cy - sinA * armLen;
+        const ay = cy + sinA * armLen;
         const bx = cx + cosA * armLen;
-        const by = cy + sinA * armLen;
+        const by = cy - sinA * armLen;
         const px = marble.x;
         const py = marble.y;
         const vx = bx - ax;
@@ -1214,7 +1216,8 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
         const dy = py - closestY;
         // hitRadius = marble visual edge + arm visual half-width (exact match to rendered geometry)
         const hitRadius = marble.collisionRadius + actor.armWidth * 0.5;
-        if (dx * dx + dy * dy <= hitRadius * hitRadius) {
+        const distToArm = Math.sqrt(dx * dx + dy * dy);
+        if (distToArm <= hitRadius) {
           contacts.push({ actor, actorState, dx, dy });
         }
       }
