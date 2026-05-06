@@ -9,6 +9,7 @@
   const MAX_STEP_UP_AIR = 0.52;
   const MAX_STEP_DOWN = 1.15;
   const GROUND_SNAP = 0.14;
+  const MAX_LANDING_SNAP_UP = 3.0; // max distance below surface that still counts as landing
   const LEDGE_FALL_HORIZONTAL_DAMPING = 0.55;
   const LEDGE_FALL_DOWNWARD_KICK = -0.4;
   // Air drag tuned for 90% horizontal momentum preservation over a ~0.6s jump arc.
@@ -600,8 +601,11 @@
         const landingZ = surface.z + marble.collisionRadius + (surface.landingPad ? 0.35 : GROUND_SNAP);
         const crossedLandingPlane = startZ > landingZ && marble.z <= landingZ;
         const endedBelowLandingPlane = marble.z <= landingZ;
+        // VOID TUNNEL FIX: don't snap marble up if it's too far below the surface.
+        // This prevents void-drop tunnel exits from being caught by nearby terrain.
+        const snapUpDist = (surface.z + marble.collisionRadius) - marble.z;
 
-        if (crossedLandingPlane || endedBelowLandingPlane) {
+        if ((crossedLandingPlane || endedBelowLandingPlane) && snapUpDist <= MAX_LANDING_SNAP_UP) {
           marble.grounded = true;
           marble.z = surface.z + marble.collisionRadius;
           marble.vz = 0;

@@ -725,6 +725,21 @@
     return sampleWalkableSurface(level, x, y, { runtime });
   }
 
+// Pre-allocated sample buffer to avoid per-tick GC pressure.
+// sampleSupportSurface is called 1-2x per physics tick (60/sec).
+const _ssBuf = new Array(17);    // max 17 samples
+const _ssWBuf = new Array(17);   // parallel weight buffer (stores weight for each sample)
+const _ssWeights = [2.4, 1.5, 1.5, 1.5, 1.5, 1.15, 1.15, 1.15, 1.15, 0.8, 0.8, 0.8, 0.8, 0.65, 0.65, 0.65, 0.65];
+const _ssTotalWeight = _ssWeights.reduce((a, b) => a + b, 0);
+// Reusable result object — only one caller reads it at a time
+const _ssResult = {
+  source: null, cell: null, tx: 0, ty: 0, u: 0, v: 0, z: 0,
+  gradient: { gx: 0, gy: 0 }, trigger: null, friction: 1,
+  conveyor: null, bounce: 0, failType: null, landingPad: false,
+  centerSample: null, supportSamples: null, supportRatio: 0,
+  minSupportZ: 0, maxSupportZ: 0
+};
+
 function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, options = {}) {
   const minRatio = options.minRatio ?? 0.45;
   const runtime = options.runtime ?? null;
@@ -734,111 +749,147 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
   const dOuter = outer * 0.7071;
   const dInner = inner * 0.7071;
 
-  const offsets = [
-    [0, 0, 2.4],
+  // Inline offsets to avoid array allocation
+  const ox0 = 0,        oy0 = 0;
+  const ox1 = inner,    oy1 = 0;
+  const ox2 = -inner,   oy2 = 0;
+  const ox3 = 0,        oy3 = inner;
+  const ox4 = 0,        oy4 = -inner;
+  const ox5 = dInner,   oy5 = dInner;
+  const ox6 = dInner,   oy6 = -dInner;
+  const ox7 = -dInner,  oy7 = dInner;
+  const ox8 = -dInner,  oy8 = -dInner;
+  const ox9 = outer,    oy9 = 0;
+  const ox10 = -outer,  oy10 = 0;
+  const ox11 = 0,       oy11 = outer;
+  const ox12 = 0,       oy12 = -outer;
+  const ox13 = dOuter,  oy13 = dOuter;
+  const ox14 = dOuter,  oy14 = -dOuter;
+  const ox15 = -dOuter, oy15 = dOuter;
+  const ox16 = -dOuter, oy16 = -dOuter;
 
-    [inner, 0, 1.5],
-    [-inner, 0, 1.5],
-    [0, inner, 1.5],
-    [0, -inner, 1.5],
-
-    [dInner, dInner, 1.15],
-    [dInner, -dInner, 1.15],
-    [-dInner, dInner, 1.15],
-    [-dInner, -dInner, 1.15],
-
-    [outer, 0, 0.8],
-    [-outer, 0, 0.8],
-    [0, outer, 0.8],
-    [0, -outer, 0.8],
-
-    [dOuter, dOuter, 0.65],
-    [dOuter, -dOuter, 0.65],
-    [-dOuter, dOuter, 0.65],
-    [-dOuter, -dOuter, 0.65]
-  ];
-
-  const samples = [];
+  const _opts = { runtime };
+  let sampleCount = 0;
   let center = null;
   let hitWeight = 0;
-  let totalWeight = 0;
 
-  for (const [ox, oy, weight] of offsets) {
-    totalWeight += weight;
-    const sample = sampleWalkableSurface(level, x + ox, y + oy, { runtime });
+  // Sample all 17 points — store sample and its weight in parallel buffers
+  const s0 = sampleWalkableSurface(level, x + ox0, y + oy0, _opts);
+  center = s0;
+  if (s0) { _ssBuf[sampleCount] = s0; _ssWBuf[sampleCount] = _ssWeights[0]; sampleCount++; hitWeight += _ssWeights[0]; }
 
-    if (ox === 0 && oy === 0) {
-      center = sample;
-    }
+  const s1 = sampleWalkableSurface(level, x + ox1, y + oy1, _opts);
+  if (s1) { _ssBuf[sampleCount] = s1; _ssWBuf[sampleCount] = _ssWeights[1]; sampleCount++; hitWeight += _ssWeights[1]; }
+  const s2 = sampleWalkableSurface(level, x + ox2, y + oy2, _opts);
+  if (s2) { _ssBuf[sampleCount] = s2; _ssWBuf[sampleCount] = _ssWeights[2]; sampleCount++; hitWeight += _ssWeights[2]; }
+  const s3 = sampleWalkableSurface(level, x + ox3, y + oy3, _opts);
+  if (s3) { _ssBuf[sampleCount] = s3; _ssWBuf[sampleCount] = _ssWeights[3]; sampleCount++; hitWeight += _ssWeights[3]; }
+  const s4 = sampleWalkableSurface(level, x + ox4, y + oy4, _opts);
+  if (s4) { _ssBuf[sampleCount] = s4; _ssWBuf[sampleCount] = _ssWeights[4]; sampleCount++; hitWeight += _ssWeights[4]; }
 
-    if (sample) {
-      hitWeight += weight;
-      samples.push({
-        ...sample,
-        _weight: weight
-      });
-    }
-  }
+  const s5 = sampleWalkableSurface(level, x + ox5, y + oy5, _opts);
+  if (s5) { _ssBuf[sampleCount] = s5; _ssWBuf[sampleCount] = _ssWeights[5]; sampleCount++; hitWeight += _ssWeights[5]; }
+  const s6 = sampleWalkableSurface(level, x + ox6, y + oy6, _opts);
+  if (s6) { _ssBuf[sampleCount] = s6; _ssWBuf[sampleCount] = _ssWeights[6]; sampleCount++; hitWeight += _ssWeights[6]; }
+  const s7 = sampleWalkableSurface(level, x + ox7, y + oy7, _opts);
+  if (s7) { _ssBuf[sampleCount] = s7; _ssWBuf[sampleCount] = _ssWeights[7]; sampleCount++; hitWeight += _ssWeights[7]; }
+  const s8 = sampleWalkableSurface(level, x + ox8, y + oy8, _opts);
+  if (s8) { _ssBuf[sampleCount] = s8; _ssWBuf[sampleCount] = _ssWeights[8]; sampleCount++; hitWeight += _ssWeights[8]; }
 
-  if (!samples.length) return null;
+  const s9 = sampleWalkableSurface(level, x + ox9, y + oy9, _opts);
+  if (s9) { _ssBuf[sampleCount] = s9; _ssWBuf[sampleCount] = _ssWeights[9]; sampleCount++; hitWeight += _ssWeights[9]; }
+  const s10 = sampleWalkableSurface(level, x + ox10, y + oy10, _opts);
+  if (s10) { _ssBuf[sampleCount] = s10; _ssWBuf[sampleCount] = _ssWeights[10]; sampleCount++; hitWeight += _ssWeights[10]; }
+  const s11 = sampleWalkableSurface(level, x + ox11, y + oy11, _opts);
+  if (s11) { _ssBuf[sampleCount] = s11; _ssWBuf[sampleCount] = _ssWeights[11]; sampleCount++; hitWeight += _ssWeights[11]; }
+  const s12 = sampleWalkableSurface(level, x + ox12, y + oy12, _opts);
+  if (s12) { _ssBuf[sampleCount] = s12; _ssWBuf[sampleCount] = _ssWeights[12]; sampleCount++; hitWeight += _ssWeights[12]; }
 
-  const supportRatio = hitWeight / totalWeight;
+  const s13 = sampleWalkableSurface(level, x + ox13, y + oy13, _opts);
+  if (s13) { _ssBuf[sampleCount] = s13; _ssWBuf[sampleCount] = _ssWeights[13]; sampleCount++; hitWeight += _ssWeights[13]; }
+  const s14 = sampleWalkableSurface(level, x + ox14, y + oy14, _opts);
+  if (s14) { _ssBuf[sampleCount] = s14; _ssWBuf[sampleCount] = _ssWeights[14]; sampleCount++; hitWeight += _ssWeights[14]; }
+  const s15 = sampleWalkableSurface(level, x + ox15, y + oy15, _opts);
+  if (s15) { _ssBuf[sampleCount] = s15; _ssWBuf[sampleCount] = _ssWeights[15]; sampleCount++; hitWeight += _ssWeights[15]; }
+  const s16 = sampleWalkableSurface(level, x + ox16, y + oy16, _opts);
+  if (s16) { _ssBuf[sampleCount] = s16; _ssWBuf[sampleCount] = _ssWeights[16]; sampleCount++; hitWeight += _ssWeights[16]; }
+
+  if (sampleCount === 0) return null;
+
+  const supportRatio = hitWeight / _ssTotalWeight;
   if (supportRatio < minRatio) return null;
+  if (!center && supportRatio < Math.max(minRatio, 0.62)) return null;
 
-  if (!center && supportRatio < Math.max(minRatio, 0.62)) {
-    return null;
+  // Compute anchor Z
+  let anchorZ;
+  if (center) {
+    anchorZ = center.z;
+  } else {
+    let zWeightSum = 0, zWeightTotal = 0;
+    for (let i = 0; i < sampleCount; i++) {
+      const s = _ssBuf[i];
+      const w = _ssWBuf[i];
+      zWeightSum += s.z * w;
+      zWeightTotal += w;
+    }
+    anchorZ = zWeightSum / zWeightTotal;
   }
 
-  const anchorZ = center
-    ? center.z
-    : samples.reduce((sum, sample) => sum + sample.z * sample._weight, 0) /
-      samples.reduce((sum, sample) => sum + sample._weight, 0);
+  // Filter coherent samples and compute stats in one pass
+  let coherentCount = 0;
+  let coherentBlockerWeight = 0;
+  let coherentNonBlockerWeight = 0;
+  let gx = 0, gy = 0, weightSum = 0;
+  let minZ = Infinity, maxZ = -Infinity;
+  let bestSample = center;
+  let bestWeight = center ? _ssWeights[0] : -1;
 
-  const coherentSamples = samples.filter((sample) => Math.abs(sample.z - anchorZ) <= 0.9);
-  if (!coherentSamples.length) return null;
+  for (let i = 0; i < sampleCount; i++) {
+    const s = _ssBuf[i];
+    if (Math.abs(s.z - anchorZ) > 0.9) continue;
+    coherentCount++;
+    const w = _ssWBuf[i];
+    if (s.source === 'blocker') coherentBlockerWeight += w;
+    else coherentNonBlockerWeight += w;
+    gx += (s.gradient?.gx ?? 0) * w;
+    gy += (s.gradient?.gy ?? 0) * w;
+    weightSum += w;
+    if (s.z < minZ) minZ = s.z;
+    if (s.z > maxZ) maxZ = s.z;
+    if (!bestSample || w > bestWeight) { bestSample = s; bestWeight = w; }
+  }
 
-  const coherentBlockerWeight = coherentSamples
-    .filter((sample) => sample.source === 'blocker')
-    .reduce((sum, sample) => sum + sample._weight, 0);
-
-  const coherentNonBlockerWeight = coherentSamples
-    .filter((sample) => sample.source !== 'blocker')
-    .reduce((sum, sample) => sum + sample._weight, 0);
+  if (coherentCount === 0) return null;
 
   if (coherentBlockerWeight > coherentNonBlockerWeight) {
-    if (!center || center.source !== 'blocker') {
-      return null;
-    }
+    if (!center || center.source !== 'blocker') return null;
   }
 
-  let gx = 0;
-  let gy = 0;
-  let weightSum = 0;
+  // Use center as bestSample if available
+  if (center && Math.abs(center.z - anchorZ) <= 0.9) bestSample = center;
 
-  for (const sample of coherentSamples) {
-    gx += (sample.gradient?.gx ?? 0) * sample._weight;
-    gy += (sample.gradient?.gy ?? 0) * sample._weight;
-    weightSum += sample._weight;
-  }
-
-  const bestSample = center || coherentSamples.reduce((best, sample) => {
-    if (!best) return sample;
-    return sample._weight > best._weight ? sample : best;
-  }, null);
-
-  return {
-    ...bestSample,
-    centerSample: center,
-    supportSamples: coherentSamples,
-    supportRatio,
-    minSupportZ: Math.min(...coherentSamples.map((sample) => sample.z)),
-    maxSupportZ: Math.max(...coherentSamples.map((sample) => sample.z)),
-    z: center ? center.z : anchorZ,
-    gradient: {
-      gx: weightSum > 0 ? gx / weightSum : 0,
-      gy: weightSum > 0 ? gy / weightSum : 0
-    }
-  };
+  // Populate reusable result object
+  _ssResult.source = bestSample.source;
+  _ssResult.cell = bestSample.cell;
+  _ssResult.tx = bestSample.tx;
+  _ssResult.ty = bestSample.ty;
+  _ssResult.u = bestSample.u;
+  _ssResult.v = bestSample.v;
+  _ssResult.z = center ? center.z : anchorZ;
+  _ssResult.gradient.gx = weightSum > 0 ? gx / weightSum : 0;
+  _ssResult.gradient.gy = weightSum > 0 ? gy / weightSum : 0;
+  _ssResult.trigger = bestSample.trigger;
+  _ssResult.friction = bestSample.friction;
+  _ssResult.conveyor = bestSample.conveyor;
+  _ssResult.bounce = bestSample.bounce;
+  _ssResult.failType = bestSample.failType;
+  _ssResult.landingPad = bestSample.landingPad;
+  _ssResult.centerSample = center;
+  _ssResult.supportSamples = null; // no longer allocating array
+  _ssResult.supportRatio = supportRatio;
+  _ssResult.minSupportZ = minZ;
+  _ssResult.maxSupportZ = maxZ;
+  return _ssResult;
 }
 
   function getBlockerTop(level, tx, ty) {
