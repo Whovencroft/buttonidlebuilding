@@ -33,8 +33,9 @@
   const COLLISION_RESOLVE_PASSES = 3;
 
   // Sprint: holding the action button multiplies ground acceleration
-  const SPRINT_ACCEL_MULT = 1.8;
-  const SPRINT_SPEED_MULT = 1.4;
+  const SPRINT_ACCEL_MULT_MAX = 1.8;
+  const SPRINT_SPEED_MULT_MAX = 1.4;
+  const SPRINT_RAMP_TIME = 3.0; // seconds to reach full sprint
 
   // Bounce cooldown (prevents double-bounce on same tile)
   const BOUNCE_COOLDOWN = 0.2;
@@ -367,7 +368,7 @@
     return { x: currentX, y: currentY, collided, normal: lastNormal };
   }
 
-  function applyGroundForces(runtime, inputAxis, dt, surface, sprintHeld) {
+  function applyGroundForces(runtime, inputAxis, dt, surface, sprintMults) {
     const marble = runtime.marble;
     const worldInput = mapScreenInputToWorld(inputAxis);
     const downhillX = -(surface.gradient?.gx ?? 0);
@@ -375,9 +376,9 @@
     const friction = surface.friction ?? 1;
     const conveyor = surface.conveyor ?? null;
 
-    // Sprint: holding action button boosts acceleration and speed cap
-    const accelMult = sprintHeld ? SPRINT_ACCEL_MULT : 1.0;
-    const speedCapMult = sprintHeld ? SPRINT_SPEED_MULT : 1.0;
+    // Sprint: ramp from 1.0x to 1.8x over 3 seconds of holding
+    const accelMult = sprintMults ? sprintMults.accel : 1.0;
+    const speedCapMult = sprintMults ? sprintMults.speed : 1.0;
 
     marble.vx += (worldInput.x * GROUND_STEER_ACCEL * accelMult + downhillX * SLOPE_ACCEL) * dt;
     marble.vy += (worldInput.y * GROUND_STEER_ACCEL * accelMult + downhillY * SLOPE_ACCEL) * dt;
@@ -994,6 +995,16 @@ function shouldFailFromVoidFall(runtime) {
     const inputAxis = inputState?.axis || { x: 0, y: 0 };
     const sprintHeld = !!inputState?.sprintHeld;
 
+    // Sprint ramp-up: accumulate hold time, compute current multiplier
+    if (sprintHeld) {
+      marble.sprintHoldTime = (marble.sprintHoldTime || 0) + dt;
+    } else {
+      marble.sprintHoldTime = 0;
+    }
+    const sprintT = Math.min((marble.sprintHoldTime || 0) / SPRINT_RAMP_TIME, 1.0);
+    const sprintAccelMult = 1.0 + (SPRINT_ACCEL_MULT_MAX - 1.0) * sprintT;
+    const sprintSpeedMult = 1.0 + (SPRINT_SPEED_MULT_MAX - 1.0) * sprintT;
+
     // ─── Timer pause (debug) ───
     if (runtime.timerPaused) {
       // Still run physics but don't advance timer
@@ -1032,7 +1043,7 @@ function shouldFailFromVoidFall(runtime) {
     }
 
     if (marble.grounded && groundSurface) {
-      applyGroundForces(runtime, inputAxis, dt, groundSurface, sprintHeld);
+      applyGroundForces(runtime, inputAxis, dt, groundSurface, sprintHeld ? { accel: sprintAccelMult, speed: sprintSpeedMult } : null);
       groundSurface = moveGrounded(runtime, dt);
       if (groundSurface && applyBounceSurface(runtime, groundSurface)) {
         groundSurface = null;

@@ -684,6 +684,13 @@
     );
   }
 
+  // Reusable blocker surface object — avoids allocation per sampleWalkableSurface call
+  const _blockerSample = {
+    source: 'blocker', cell: null, tx: 0, ty: 0, u: 0, v: 0, z: 0,
+    gradient: { gx: 0, gy: 0 }, trigger: null, friction: 1,
+    conveyor: null, bounce: 0, failType: null, landingPad: false
+  };
+
   function sampleWalkableSurface(level, x, y, options = {}) {
     const runtime = options.runtime ?? null;
     const tx = Math.floor(x);
@@ -697,28 +704,22 @@
       blocker?.walkableTop &&
       isPointSecurelyOnBlockerTop(tx, ty, x, y, options.blockerInset ?? BLOCKER_TOP_SUPPORT_INSET)
     ) {
-      blockerSurface = {
-        source: 'blocker',
-        cell: blocker,
-        tx,
-        ty,
-        u: x - tx,
-        v: y - ty,
-        z: blocker.top,
-        gradient: { gx: 0, gy: 0 },
-        trigger: getTriggerCell(level, tx, ty),
-        friction: 1,
-        conveyor: null,
-        bounce: 0,
-        failType: null,
-        landingPad: false
-      };
+      _blockerSample.cell = blocker;
+      _blockerSample.tx = tx;
+      _blockerSample.ty = ty;
+      _blockerSample.u = x - tx;
+      _blockerSample.v = y - ty;
+      _blockerSample.z = blocker.top;
+      _blockerSample.trigger = getTriggerCell(level, tx, ty);
+      blockerSurface = _blockerSample;
     }
 
-    const candidates = [staticSurface, blockerSurface, actorSurface].filter(Boolean);
-    if (!candidates.length) return null;
-    candidates.sort((a, b) => b.z - a.z);
-    return candidates[0];
+    // Pick highest z without allocating an array or sorting
+    let best = null;
+    if (staticSurface && (!best || staticSurface.z > best.z)) best = staticSurface;
+    if (blockerSurface && (!best || blockerSurface.z > best.z)) best = blockerSurface;
+    if (actorSurface && (!best || actorSurface.z > best.z)) best = actorSurface;
+    return best;
   }
 
   function sampleVisualSurface(level, x, y, runtime = null) {
@@ -1157,23 +1158,32 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
       if (actorState.active === false) continue;
 
       if (actor.kind === ACTOR_KINDS.ROTATING_BAR || actor.kind === ACTOR_KINDS.SWEEPER) {
-        const cx = actorState.x + actor.width * 0.5;
-        const cy = actorState.y + actor.height * 0.5;
-        const ex = cx + Math.cos(actorState.angle) * actor.armLength;
-        const ey = cy + Math.sin(actorState.angle) * actor.armLength;
+        // Arm visual is centered on actor position, extends armLength in both directions.
+        // Physics must match: line segment from -armLength to +armLength through center.
+        const cx = actorState.x; // no +0.5 offset — matches renderer positioning
+        const cy = actorState.y;
+        const cosA = Math.cos(actorState.angle);
+        const sinA = Math.sin(actorState.angle);
+        const armLen = actor.armLength;
+        // Full arm: from (cx - cos*armLen, cy - sin*armLen) to (cx + cos*armLen, cy + sin*armLen)
+        const ax = cx - cosA * armLen;
+        const ay = cy - sinA * armLen;
+        const bx = cx + cosA * armLen;
+        const by = cy + sinA * armLen;
         const px = marble.x;
         const py = marble.y;
-        const vx = ex - cx;
-        const vy = ey - cy;
-        const wx = px - cx;
-        const wy = py - cy;
+        const vx = bx - ax;
+        const vy = by - ay;
+        const wx = px - ax;
+        const wy = py - ay;
         const lenSq = vx * vx + vy * vy;
         const t = lenSq > 0 ? clamp((wx * vx + wy * vy) / lenSq, 0, 1) : 0;
-        const closestX = cx + vx * t;
-        const closestY = cy + vy * t;
+        const closestX = ax + vx * t;
+        const closestY = ay + vy * t;
         const dx = px - closestX;
         const dy = py - closestY;
-        const hitRadius = marble.collisionRadius + actor.armWidth;
+        // hitRadius = marble edge + arm half-width (armWidth is full width of the bar)
+        const hitRadius = marble.collisionRadius + actor.armWidth * 0.5;
         if (dx * dx + dy * dy <= hitRadius * hitRadius) {
           contacts.push({ actor, actorState, dx, dy });
         }
