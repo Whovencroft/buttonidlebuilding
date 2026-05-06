@@ -10,12 +10,13 @@
  *   - Force is applied as a continuous axis while dragging, then released
  *   - On release, a one-shot impulse proportional to drag length is applied
  *
- * JUMP: fires on pointer/touch RELEASE (mouse button up or finger lift).
- *   - Every release triggers a jump, regardless of drag distance.
- *   - This replaces the old tap-to-jump and spacebar-to-jump mechanics.
- *   - Spacebar still works as a fallback for keyboard-only users.
+ * SPRINT: fires while pointer/touch is HELD or spacebar is held.
+ *   - Holding the pointer (dragging) activates sprint mode.
+ *   - Holding spacebar also activates sprint.
+ *   - Sprint multiplies ground acceleration and raises speed cap.
  *   - R: restart  (consumed by marble_state.js)
  *   - Escape: return (consumed by marble_state.js)
+ *   - P: pause timer (debug)
  *
  * Isometric world projection:
  *   The isometric camera is oriented at 45° yaw, ~35.26° pitch.
@@ -39,7 +40,7 @@
     // ── Non-movement key state ────────────────────────────────────────────
     const held             = new Set();
     const bufferedPresses  = new Set();
-    const TRACKED_KEYS     = new Set(['Space', 'KeyR', 'Escape', 'KeyG', 'KeyC']);
+    const TRACKED_KEYS     = new Set(['Space', 'KeyR', 'Escape', 'KeyG', 'KeyC', 'KeyP']);
     let   attached         = false;
 
     // ── Drag state ──────────────────────────────────────────────────────────
@@ -52,7 +53,6 @@
 
     // Pending one-shot impulse from drag release
     let pendingImpulse   = null;  // { wx, wy, magnitude }
-    let pendingJump      = false;
 
     // Canvas reference (set when attached)
     let canvas = null;
@@ -97,12 +97,7 @@
       const dy   = e.clientY - dragStartY;
       const dist = Math.hypot(dx, dy);
 
-      // JUMP ON RELEASE: every pointer/touch release triggers a jump.
-      // This replaces the old tap-to-jump mechanic — the player holds to steer
-      // and releases to jump, making the controls feel more intuitive on mobile.
-      pendingJump = true;
-
-      // If the release was a meaningful drag, also apply the impulse.
+      // If the release was a meaningful drag, apply the impulse.
       if (dist >= TAP_THRESHOLD_PX) {
         const { wx, wy } = screenToWorld(dx, dy);
         const magnitude  = Math.min(dist / MAX_DRAG_PX, 1.0) * MAX_FORCE;
@@ -115,9 +110,7 @@
 
     function onPointerCancel(e) {
       if (e.pointerId === dragPointer) {
-        // Cancel the drag without triggering a jump — the browser interrupted
-        // the gesture (scroll, pinch, back-swipe, notification, etc.).
-        // Firing a jump here would cause accidental jumps on mobile.
+        // Cancel the drag cleanly — the browser interrupted the gesture.
         dragActive  = false;
         dragPointer = null;
       }
@@ -168,7 +161,6 @@
       dragActive     = false;
       dragPointer    = null;
       pendingImpulse = null;
-      pendingJump    = false;
       canvas         = null;
     }
 
@@ -211,13 +203,12 @@
 
     /**
      * Called once per physics frame to build the step input object.
-     * Consumes the pending impulse and jump flag.
+     * Consumes the pending impulse. Sprint is active while dragging or holding space.
      */
     function buildStepInput() {
       const axis = getAxis();
-      // Jump fires on pointer release OR spacebar press
-      const jumpPressed = consumeBufferedPress('Space') || pendingJump;
-      pendingJump       = false;
+      // Sprint is active while the pointer is held (dragging) or spacebar is held
+      const sprintHeld = dragActive || held.has('Space');
 
       // If there's a pending one-shot impulse from a completed drag,
       // blend it into the axis for this frame.
@@ -230,11 +221,11 @@
             y:          Number((axis.y + imp.wy * imp.magnitude).toFixed(4)),
             worldSpace: true,
           },
-          jumpPressed,
+          sprintHeld,
         };
       }
 
-      return { axis, jumpPressed };
+      return { axis, sprintHeld };
     }
 
 

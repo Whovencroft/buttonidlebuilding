@@ -5,8 +5,8 @@
   const MAX_GROUND_SPEED = 7.6;
   const MAX_AIR_SPEED = 8.4;
 
-  const MAX_STEP_UP_GROUND = 0.52;
-  const MAX_STEP_UP_AIR = 0.52;
+  const MAX_STEP_UP_GROUND = 1.1;
+  const MAX_STEP_UP_AIR = 1.1;
   const MAX_STEP_DOWN = 1.15;
   const GROUND_SNAP = 0.14;
   const MAX_LANDING_SNAP_UP = 3.0; // max distance below surface that still counts as landing
@@ -32,19 +32,18 @@
   const COLLISION_BINARY_STEPS = 10;
   const COLLISION_RESOLVE_PASSES = 3;
 
-  const JUMP_IMPULSE = 6.9;
-  const COYOTE_TIME = 0.11;
-  const JUMP_BUFFER_TIME = 0.14;
-  const JUMP_COOLDOWN = 0.12;
-  const JUMP_LIFT = 0.08;
+  // Sprint: holding the action button multiplies ground acceleration
+  const SPRINT_ACCEL_MULT = 1.8;
+  const SPRINT_SPEED_MULT = 1.4;
+
+  // Bounce cooldown (prevents double-bounce on same tile)
+  const BOUNCE_COOLDOWN = 0.2;
 
   const LOWEST_PLAYABLE_Z_CACHE = new WeakMap();
   const VOID_FAIL_BELOW_LOWEST_PLAYABLE = 4.5;
 
-  function ensureJumpState(marble) {
-    if (typeof marble.coyoteTime !== 'number') marble.coyoteTime = 0;
-    if (typeof marble.jumpBufferTime !== 'number') marble.jumpBufferTime = 0;
-    if (typeof marble.jumpCooldownTime !== 'number') marble.jumpCooldownTime = 0;
+  function ensureBounceState(marble) {
+    if (typeof marble.bounceCooldownTime !== 'number') marble.bounceCooldownTime = 0;
   }
 
   function clamp(value, min, max) {
@@ -368,7 +367,7 @@
     return { x: currentX, y: currentY, collided, normal: lastNormal };
   }
 
-  function applyGroundForces(runtime, inputAxis, dt, surface) {
+  function applyGroundForces(runtime, inputAxis, dt, surface, sprintHeld) {
     const marble = runtime.marble;
     const worldInput = mapScreenInputToWorld(inputAxis);
     const downhillX = -(surface.gradient?.gx ?? 0);
@@ -376,28 +375,30 @@
     const friction = surface.friction ?? 1;
     const conveyor = surface.conveyor ?? null;
 
-    marble.vx += (worldInput.x * GROUND_STEER_ACCEL + downhillX * SLOPE_ACCEL) * dt;
-    marble.vy += (worldInput.y * GROUND_STEER_ACCEL + downhillY * SLOPE_ACCEL) * dt;
+    // Sprint: holding action button boosts acceleration and speed cap
+    const accelMult = sprintHeld ? SPRINT_ACCEL_MULT : 1.0;
+    const speedCapMult = sprintHeld ? SPRINT_SPEED_MULT : 1.0;
+
+    marble.vx += (worldInput.x * GROUND_STEER_ACCEL * accelMult + downhillX * SLOPE_ACCEL) * dt;
+    marble.vy += (worldInput.y * GROUND_STEER_ACCEL * accelMult + downhillY * SLOPE_ACCEL) * dt;
 
     if (conveyor) {
-      // Conveyor multiplier boosted to 3.0 (was 1.1) — conveyors now push
-      // hard enough to meaningfully affect marble trajectory and force
-      // players to actively counteract them.
-      marble.vx += conveyor.x * conveyor.strength * 3.0 * dt;
-      marble.vy += conveyor.y * conveyor.strength * 3.0 * dt;
+      // Conveyor multiplier 6.0 (2x the previous 3.0) — conveyors push very hard
+      marble.vx += conveyor.x * conveyor.strength * 6.0 * dt;
+      marble.vy += conveyor.y * conveyor.strength * 6.0 * dt;
     }
 
-    // Ice tiles (friction < 0.4): very low drag, speed builds uncontrollably
+    // Ice tiles (friction 0.6): moderate drag, controllable slide
     // Normal tiles: standard drag formula
-    const isIce = friction < 0.4;
-    const dragBase = isIce ? 0.998 : 0.972;
-    const drag = Math.pow(dragBase / Math.max(0.40, friction), dt * 60);
+    const isIce = friction < 0.7;
+    const dragBase = isIce ? 0.985 : 0.972;
+    const drag = Math.pow(dragBase / Math.max(0.55, friction), dt * 60);
     marble.vx *= drag;
     marble.vy *= drag;
 
-    // Ice tiles allow much higher speed; normal tiles cap at 1.35x
-    const speedMult = isIce ? clamp(1.2 / friction, 1.0, 4.5) : clamp(1.2 / friction, 0.78, 1.35);
-    clampSpeed(marble, MAX_GROUND_SPEED * speedMult);
+    // Ice tiles allow moderately higher speed (1.5x cap); normal tiles cap at 1.35x
+    const speedMult = isIce ? 1.5 : clamp(1.2 / friction, 0.78, 1.35);
+    clampSpeed(marble, MAX_GROUND_SPEED * speedMult * speedCapMult);
   }
 
   function applyAirForces(runtime, inputAxis, dt) {
@@ -581,19 +582,6 @@
         const adjusted = removeIntoWallComponent(marble.vx, marble.vy, resolved.normal);
         marble.vx = adjusted.vx;
         marble.vy = adjusted.vy;
-        // Wall-climb prevention: if the marble is moving upward and the wall
-        // it hit extends above the marble's current z, cancel upward velocity.
-        // This prevents the marble from climbing arbitrarily tall walls by
-        // jumping against their side faces.
-        if (marble.vz > 0) {
-          const wallOverlaps = getAllBlockingOverlaps(
-            runtime, marble.x, marble.y, zCheck, marble.collisionRadius, collisionSupportZ
-          );
-          const wallTop = wallOverlaps.reduce((best, o) => Math.max(best, o.blockerTop ?? 0), 0);
-          if (wallTop > marble.z + 0.15) {
-            marble.vz = 0;
-          }
-        }
       }
 
       const surface = getLandingSupport(runtime, marble.x, marble.y, marble.supportRadius);
@@ -873,35 +861,28 @@
     return runtime.lastResult;
   }
 
-  function performJump(marble, surface) {
-    marble.grounded = false;
-    marble.vz = JUMP_IMPULSE + (surface.bounce ? surface.bounce * 0.15 : 0);
-    marble.z = Math.max(marble.z, surface.z + marble.collisionRadius + JUMP_LIFT);
-    marble.coyoteTime = 0;
-    marble.jumpBufferTime = 0;
-    marble.jumpCooldownTime = JUMP_COOLDOWN;
-  }
-
-  function updateJumpTimers(marble, jumpPressed, grounded, dt) {
-    ensureJumpState(marble);
-    if (jumpPressed) marble.jumpBufferTime = JUMP_BUFFER_TIME;
-    else marble.jumpBufferTime = Math.max(0, marble.jumpBufferTime - dt);
-
-    if (grounded) marble.coyoteTime = COYOTE_TIME;
-    else marble.coyoteTime = Math.max(0, marble.coyoteTime - dt);
-
-    marble.jumpCooldownTime = Math.max(0, marble.jumpCooldownTime - dt);
-  }
-
   function applyBounceSurface(runtime, groundSurface) {
     if (!groundSurface || !groundSurface.bounce) return false;
     const marble = runtime.marble;
-    if (marble.jumpCooldownTime > 0.05) return false;
+    ensureBounceState(marble);
+    if (marble.bounceCooldownTime > 0.05) return false;
     marble.grounded = false;
-    marble.vz = Math.max(marble.vz, groundSurface.bounce);
+    // Bounce strength: 2.5x the old jump height.
+    // Old jump impulse was 6.9 (max height ~1.06 units).
+    // New bounce target: ~2.65 units height → impulse = sqrt(2 * g * h) = sqrt(2 * 22.5 * 2.65) ≈ 10.9
+    // We scale the tile's bounce value by 1.58 to achieve this (6.9 * 1.58 ≈ 10.9)
+    const bounceStrength = (typeof groundSurface.bounce === 'object')
+      ? (groundSurface.bounce.strength ?? 5.2) * 1.58
+      : groundSurface.bounce * 1.58;
+    marble.vz = Math.max(marble.vz, bounceStrength);
     marble.z = groundSurface.z + marble.collisionRadius + 0.05;
-    marble.jumpCooldownTime = 0.2;
+    marble.bounceCooldownTime = BOUNCE_COOLDOWN;
     return true;
+  }
+
+  function updateBounceCooldown(marble, dt) {
+    ensureBounceState(marble);
+    marble.bounceCooldownTime = Math.max(0, marble.bounceCooldownTime - dt);
   }
 
   function evaluateTriggers(runtime, groundSurface) {
@@ -1011,19 +992,29 @@ function shouldFailFromVoidFall(runtime) {
     if (runtime.status !== 'running') return runtime.lastResult;
     const marble = runtime.marble;
     const inputAxis = inputState?.axis || { x: 0, y: 0 };
-    const jumpPressed = !!inputState?.jumpPressed;
+    const sprintHeld = !!inputState?.sprintHeld;
+
+    // ─── Timer pause (debug) ───
+    if (runtime.timerPaused) {
+      // Still run physics but don't advance timer
+    }
 
     // ─── Tunnel mode: bypass all normal physics ───
     if (marble.inTunnel) {
       window.MarbleLevels.advanceDynamicState(runtime, dt, null);
       updateTunnelPhysics(runtime, dt);
-      runtime.timerMs += dt * 1000;
-      const timeLimit = runtime.level.timeLimit ?? 60;
-      if (runtime.timerMs >= timeLimit * 1000) return fail(runtime, 'timeout');
+      if (!runtime.timerPaused) {
+        runtime.timerMs += dt * 1000;
+        const timeLimit = runtime.level.timeLimit ?? 60;
+        if (runtime.timerMs >= timeLimit * 1000) return fail(runtime, 'timeout');
+      }
       updateCamera(runtime, dt);
       runtime.lastResult = null;
       return null;
     }
+
+    // Update bounce cooldown
+    updateBounceCooldown(marble, dt);
 
     // Sample previous support only to inform actor movement (e.g. riding a platform);
     // skip the extra sample when already airborne to avoid a redundant sampleSupportSurface call.
@@ -1035,29 +1026,13 @@ function shouldFailFromVoidFall(runtime) {
     let groundSurface = marble.grounded
       ? (previousSupport ?? getGroundSupport(runtime, marble.x, marble.y, marble.supportRadius))
       : getGroundSupport(runtime, marble.x, marble.y, marble.supportRadius);
-    const isSupportedNow = !!(marble.grounded && groundSurface);
-    updateJumpTimers(marble, jumpPressed, isSupportedNow, dt);
 
     if (groundSurface) {
       rememberSafePosition(runtime, groundSurface);
     }
 
-    // AIR-JUMP FIX: only allow jump when the marble is actually grounded or
-    // within coyote time AND not falling fast. Previously, getGroundSupport
-    // could detect a surface while the marble was falling past it, and combined
-    // with coyote time still being active, spamming jump allowed mid-fall recovery.
-    // Now require either: (a) marble is grounded, or (b) coyote time active AND
-    // marble is not falling fast (vz > -3). This preserves edge-jump coyote
-    // behavior while blocking the falling exploit.
-    const canJump = groundSurface && marble.jumpBufferTime > 0 && marble.jumpCooldownTime <= 0
-      && (marble.grounded || (marble.coyoteTime > 0 && marble.vz > -3));
-    if (canJump) {
-      performJump(marble, groundSurface);
-      groundSurface = null;
-    }
-
     if (marble.grounded && groundSurface) {
-      applyGroundForces(runtime, inputAxis, dt, groundSurface);
+      applyGroundForces(runtime, inputAxis, dt, groundSurface, sprintHeld);
       groundSurface = moveGrounded(runtime, dt);
       if (groundSurface && applyBounceSurface(runtime, groundSurface)) {
         groundSurface = null;
@@ -1071,9 +1046,11 @@ function shouldFailFromVoidFall(runtime) {
       }
     }
 
-    runtime.timerMs += dt * 1000;
-    const timeLimit = runtime.level.timeLimit ?? 60;
-    if (runtime.timerMs >= timeLimit * 1000) return fail(runtime, 'timeout');
+    if (!runtime.timerPaused) {
+      runtime.timerMs += dt * 1000;
+      const timeLimit = runtime.level.timeLimit ?? 60;
+      if (runtime.timerMs >= timeLimit * 1000) return fail(runtime, 'timeout');
+    }
     updateCamera(runtime, dt);
 
     // Check tunnel entry before normal triggers

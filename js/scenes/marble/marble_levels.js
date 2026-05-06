@@ -108,7 +108,7 @@
       shape,
       baseHeight,
       rise,
-      friction: patch.ice ? 0.15 : (patch.friction ?? 1),
+      friction: patch.ice ? 0.6 : (patch.friction ?? 1),
       conveyor: patch.conveyor ? {
         x: patch.conveyor.x ?? 0,
         y: patch.conveyor.y ?? 0,
@@ -960,11 +960,15 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
       const points = actor.path.points;
       const totalSegments = points.length - 1;
       const speed = Math.max(0.05, actor.path.speed ?? 1);
-      const travel = (clock * speed) % (actor.path.type === 'loop' ? points.length : totalSegments * 2);
+      // Endpoint pause: platforms pause for 1 second at each endpoint.
+      // We compute a "virtual" travel that includes pause time at each end.
+      const pauseDuration = actor.path.pauseDuration ?? 1.0; // seconds at each endpoint
+      const pausePerEnd = pauseDuration * speed; // in travel-units
       let segmentIndex = 0;
       let t = 0;
 
       if (actor.path.type === 'loop') {
+        const travel = (clock * speed) % points.length;
         segmentIndex = Math.floor(travel) % points.length;
         t = travel - Math.floor(travel);
         const a = points[segmentIndex];
@@ -973,23 +977,45 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
         state.y = lerp(a.y, b.y, t);
         state.z = lerp(a.z, b.z, t);
       } else {
-        const cycle = totalSegments * 2;
-        const ping = travel;
-        const forward = ping < totalSegments;
-        if (forward) {
+        // Ping-pong with endpoint pauses:
+        // Full cycle = forward travel + pause + reverse travel + pause
+        const moveDist = totalSegments;
+        const fullCycle = moveDist * 2 + pausePerEnd * 2;
+        const raw = (clock * speed) % fullCycle;
+        let effectiveTravel;
+        if (raw < moveDist) {
+          // Forward motion
+          effectiveTravel = raw;
+        } else if (raw < moveDist + pausePerEnd) {
+          // Pause at far end
+          effectiveTravel = moveDist; // clamp at end
+        } else if (raw < moveDist * 2 + pausePerEnd) {
+          // Reverse motion
+          effectiveTravel = moveDist - (raw - moveDist - pausePerEnd);
+        } else {
+          // Pause at start end
+          effectiveTravel = 0; // clamp at start
+        }
+
+        const forward = effectiveTravel <= moveDist && effectiveTravel >= 0;
+        const ping = clamp(effectiveTravel, 0, moveDist);
+        if (ping >= moveDist - 0.0001) {
+          // At far endpoint
+          const last = points[points.length - 1];
+          state.x = last.x;
+          state.y = last.y;
+          state.z = last.z;
+        } else if (ping <= 0.0001) {
+          // At start endpoint
+          const first = points[0];
+          state.x = first.x;
+          state.y = first.y;
+          state.z = first.z;
+        } else {
           segmentIndex = Math.floor(ping);
           t = ping - segmentIndex;
           const a = points[segmentIndex];
           const b = points[Math.min(segmentIndex + 1, points.length - 1)];
-          state.x = lerp(a.x, b.x, t);
-          state.y = lerp(a.y, b.y, t);
-          state.z = lerp(a.z, b.z, t);
-        } else {
-          const reverseTravel = ping - totalSegments;
-          segmentIndex = Math.floor(reverseTravel);
-          t = reverseTravel - segmentIndex;
-          const a = points[Math.max(points.length - 1 - segmentIndex, 0)];
-          const b = points[Math.max(points.length - 2 - segmentIndex, 0)];
           state.x = lerp(a.x, b.x, t);
           state.y = lerp(a.y, b.y, t);
           state.z = lerp(a.z, b.z, t);
@@ -4336,13 +4362,13 @@ setGoal(level, 93, 33, 0.44);
     // Rotating bar (x:52) — must time with sweeper ahead
     addActor(level, {
       id: 'bar_g1', kind: ACTOR_KINDS.ROTATING_BAR,
-      x: 52, y: 14, z: 18, topHeight: 18,
+      x: 52, y: 13, z: 18, topHeight: 18,
       width: 1, height: 1, armLength: 1.4, armWidth: 0.22, angularSpeed: 2.5, fatal: true
     });
     // Sweeper at end (x:58) — final obstacle before exit
     addActor(level, {
       id: 'sweeper_g1_end', kind: ACTOR_KINDS.SWEEPER,
-      x: 58, y: 14, z: 18, topHeight: 18,
+      x: 58, y: 15, z: 18, topHeight: 18,
       width: 1, height: 1, armLength: 1.4, armWidth: 0.22, angularSpeed: -1.8, fatal: true
     });
     wallRing(level, 12, 13, 52, 3, 20, {
@@ -4899,7 +4925,7 @@ setGoal(level, 93, 33, 0.44);
     // Sweeper guards the landing — must step off platform and dodge immediately
     addActor(level, {
       id: 'sweeper_fa_path_a', kind: ACTOR_KINDS.SWEEPER,
-      x: 48, y: 3, z: 24, topHeight: 24,
+      x: 48, y: 2, z: 24, topHeight: 24,
       width: 1, height: 1, armLength: 1.8, armWidth: 0.22, angularSpeed: 2.4, fatal: true
     });
     // Timed gate just before the ramp — tight timing
@@ -5153,7 +5179,7 @@ setGoal(level, 93, 33, 0.44);
     addHazardRect(level, 26, 78, 2, 3, 'path_a_spikes_land');
     addActor(level, {
       id: 'sweeper_path_a', kind: ACTOR_KINDS.SWEEPER,
-      x: 28, y: 79, z: 2, topHeight: 2,
+      x: 28, y: 78, z: 2, topHeight: 2,
       width: 1, height: 1, armLength: 1.6, armWidth: 0.22, angularSpeed: 2.5, fatal: true
     });
     wallRing(level, 4, 78, 26, 3, 4, {
@@ -5193,17 +5219,17 @@ setGoal(level, 93, 33, 0.44);
     fillTrack(level, 90, 78, 16, 3, 2);
     addActor(level, {
       id: 'sweeper_act5a', kind: ACTOR_KINDS.SWEEPER,
-      x: 94, y: 79, z: 2, topHeight: 2,
+      x: 94, y: 78, z: 2, topHeight: 2,
       width: 1, height: 1, armLength: 1.4, armWidth: 0.22, angularSpeed: 2.2, fatal: true
     });
     addActor(level, {
       id: 'sweeper_act5b', kind: ACTOR_KINDS.SWEEPER,
-      x: 99, y: 79, z: 2, topHeight: 2,
+      x: 99, y: 80, z: 2, topHeight: 2,
       width: 1, height: 1, armLength: 1.4, armWidth: 0.22, angularSpeed: -2.6, fatal: true
     });
     addActor(level, {
       id: 'sweeper_act5c', kind: ACTOR_KINDS.SWEEPER,
-      x: 104, y: 79, z: 2, topHeight: 2,
+      x: 104, y: 78, z: 2, topHeight: 2,
       width: 1, height: 1, armLength: 1.4, armWidth: 0.22, angularSpeed: 3.0, fatal: true
     });
     wallRing(level, 90, 78, 16, 3, 4, {
