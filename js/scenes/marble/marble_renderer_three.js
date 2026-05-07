@@ -1408,5 +1408,54 @@
     };
   }
 
-  window.MarbleRenderer = { render, prepare, getDebugInfo };
+  // Full GPU resource release — call when leaving the marble scene to free VRAM
+  function dispose() {
+    if (!renderer) return;
+    // Dispose all level geometry
+    if (levelMeshGroup) {
+      scene.remove(levelMeshGroup);
+      levelMeshGroup.traverse(obj => {
+        if (obj.geometry) obj.geometry.dispose();
+      });
+      levelMeshGroup = null;
+    }
+    // Dispose actor meshes
+    if (dynamicGroup) {
+      scene.remove(dynamicGroup);
+      dynamicGroup.traverse(obj => { if (obj.geometry) obj.geometry.dispose(); });
+      dynamicGroup = null;
+    }
+    // Dispose marble mesh
+    if (marbleMesh) {
+      scene.remove(marbleMesh);
+      if (marbleMesh.geometry) marbleMesh.geometry.dispose();
+      marbleMesh = null;
+    }
+    // Dispose drag arrow
+    if (dragArrowGroup) {
+      scene.remove(dragArrowGroup);
+      dragArrowGroup.traverse(obj => { if (obj.geometry) obj.geometry.dispose(); });
+      dragArrowGroup = null;
+    }
+    // Dispose all cached materials
+    for (const key of Object.keys(matCache)) {
+      if (matCache[key] && matCache[key].dispose) matCache[key].dispose();
+      delete matCache[key];
+    }
+    // Dispose textures
+    const _texRefs = [texTileTop, texBounceTop, texGoalTop, texConvTop, texHazardTop, texCrumbleTop, texIceTop, texTunnelInner];
+    for (const tex of _texRefs) { if (tex) tex.dispose(); }
+    texTileTop = texBounceTop = texGoalTop = texConvTop = texHazardTop = texCrumbleTop = texIceTop = texTunnelInner = null;
+    // Dispose the WebGL renderer itself (frees GPU context)
+    renderer.dispose();
+    renderer = null;
+    scene = null;
+    camera = null;
+    actorMeshMap = {};
+    crumbleMeshMap = {};
+    revealedTunnels = {};
+    lastLevelId = null;
+  }
+
+  window.MarbleRenderer = { render, prepare, getDebugInfo, dispose };
 })();

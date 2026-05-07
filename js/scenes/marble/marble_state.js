@@ -270,9 +270,16 @@
             break;
           }
         }
+        render();
+      } else {
+        // Throttle rendering to ~10fps when game is paused/failed/completed
+        runtime._idleRenderAcc = (runtime._idleRenderAcc || 0) + dt;
+        if (runtime._idleRenderAcc >= 0.1) {
+          runtime._idleRenderAcc = 0;
+          render();
+        }
       }
 
-      render();
       input.endFrame();
     }
 
@@ -354,6 +361,10 @@
       },
       exit() {
         if (input) input.detach();
+        // Release GPU resources when leaving the marble scene
+        if (window.MarbleRenderer && typeof window.MarbleRenderer.dispose === 'function') {
+          window.MarbleRenderer.dispose();
+        }
       },
       update,
       render,

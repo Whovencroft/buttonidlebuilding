@@ -75,20 +75,22 @@
     return hash >>> 0;
   }
 
+  // Shared singleton for void cells — avoids allocating ~10K identical objects per level
+  const _VOID_CELL = Object.freeze({
+    kind: 'void',
+    shape: SHAPES.FLAT,
+    baseHeight: 0,
+    rise: 0,
+    friction: 1,
+    conveyor: null,
+    bounce: 0,
+    crumble: null,
+    failType: null,
+    landingPad: false,
+    data: null
+  });
   function makeVoidSurfaceCell() {
-    return {
-      kind: 'void',
-      shape: SHAPES.FLAT,
-      baseHeight: 0,
-      rise: 0,
-      friction: 1,
-      conveyor: null,
-      bounce: 0,
-      crumble: null,
-      failType: null,
-      landingPad: false,
-      data: null
-    };
+    return _VOID_CELL;
   }
 
   function inferShapeRise(shape, patchRise) {
@@ -5383,47 +5385,119 @@ function registerGeneratedLevel(level) {
   return level;
 }
 
-  const LEVELS = [
-    buildPracticeGreen(),
-    buildTerracesFalls(),
-    buildTheSwitchback(),
-    buildCanalRun(),
-    buildTheCrossing(),
-    buildStairwayHeights(),
-    buildTheLabyrinth(),
-    buildTheGauntlet(),
-    buildTowerDescent(),
-    buildTheFinalApproach()
+  // ─── Lazy level loading ─────────────────────────────────────────────────────
+  // Levels are expensive to build (~14MB total). Only build on first access and
+  // release non-current levels to free memory.
+  const LEVEL_REGISTRY = [
+    { id: 'practice_green',      name: 'Practice Green',      builder: buildPracticeGreen },
+    { id: 'terrace_falls',       name: 'Terrace Falls',       builder: buildTerracesFalls },
+    { id: 'the_switchback',      name: 'The Switchback',      builder: buildTheSwitchback },
+    { id: 'canal_run',           name: 'Canal Run',           builder: buildCanalRun },
+    { id: 'the_crossing',        name: 'The Crossing',        builder: buildTheCrossing },
+    { id: 'stairway_heights',    name: 'Stairway Heights',    builder: buildStairwayHeights },
+    { id: 'the_labyrinth',       name: 'The Labyrinth',       builder: buildTheLabyrinth },
+    { id: 'the_gauntlet',        name: 'The Gauntlet',        builder: buildTheGauntlet },
+    { id: 'tower_descent',       name: 'Tower Descent',       builder: buildTowerDescent },
+    { id: 'the_final_approach',  name: 'The Final Approach',  builder: buildTheFinalApproach }
   ];
+  const _levelCache = new Map(); // id → built level object
+  let _currentLevelId = null;    // track which level is active to release others
+
+  function _ensureLevel(index) {
+    const entry = LEVEL_REGISTRY[index];
+    if (!entry) return null;
+    if (!_levelCache.has(entry.id)) {
+      _levelCache.set(entry.id, entry.builder());
+    }
+    return _levelCache.get(entry.id);
+  }
+
+  function _releaseOtherLevels(keepId) {
+    for (const [id] of _levelCache) {
+      if (id !== keepId) _levelCache.delete(id);
+    }
+  }
+
+  // LEVELS proxy: behaves like an array but builds levels lazily
+  const LEVELS = new Proxy(LEVEL_REGISTRY, {
+    get(target, prop) {
+      if (prop === 'length') return target.length;
+      if (prop === Symbol.iterator) {
+        return function* () {
+          for (let i = 0; i < target.length; i++) yield _ensureLevel(i);
+        };
+      }
+      // Array methods that only need id/name (avoid building all levels)
+      if (prop === 'map') return function(fn) {
+        return target.map((entry, i) => {
+          // If only id/name are accessed, return lightweight stub
+          const stub = _levelCache.get(entry.id) || { id: entry.id, name: entry.name };
+          return fn(stub, i, target);
+        });
+      };
+      if (prop === 'filter') return function(fn) {
+        return target.filter((entry, i) => {
+          const stub = _levelCache.get(entry.id) || { id: entry.id, name: entry.name };
+          return fn(stub, i, target);
+        }).map((entry) => _levelCache.get(entry.id) || { id: entry.id, name: entry.name });
+      };
+      if (prop === 'findIndex') return function(fn) {
+        return target.findIndex((entry, i) => {
+          const stub = _levelCache.get(entry.id) || { id: entry.id, name: entry.name };
+          return fn(stub, i, target);
+        });
+      };
+      if (prop === 'find') return function(fn) {
+        const idx = target.findIndex((entry, i) => {
+          const stub = _levelCache.get(entry.id) || { id: entry.id, name: entry.name };
+          return fn(stub, i, target);
+        });
+        return idx >= 0 ? _ensureLevel(idx) : undefined;
+      };
+      const idx = Number(prop);
+      if (Number.isInteger(idx) && idx >= 0 && idx < target.length) {
+        return _ensureLevel(idx);
+      }
+      return target[prop];
+    }
+  });
 
   function getAllLevels() {
-    return [...LEVELS, ...GENERATED_LEVELS];
+    // Return lightweight stubs for iteration; full levels built on demand
+    return [...LEVEL_REGISTRY.map((entry) => _levelCache.get(entry.id) || { id: entry.id, name: entry.name }), ...GENERATED_LEVELS];
   }
-
   function getLevelById(id) {
-    return getAllLevels().find((level) => level.id === id) || LEVELS[0];
+    const genLevel = GENERATED_LEVELS.find((l) => l.id === id);
+    if (genLevel) return genLevel;
+    const idx = LEVEL_REGISTRY.findIndex((entry) => entry.id === id);
+    if (idx >= 0) {
+      const level = _ensureLevel(idx);
+      // Release other levels when switching to a new one
+      if (_currentLevelId !== id) {
+        _currentLevelId = id;
+        _releaseOtherLevels(id);
+      }
+      return level;
+    }
+    return _ensureLevel(0);
   }
-
   function getLevelIndex(id) {
-    return LEVELS.findIndex((level) => level.id === id);
+    return LEVEL_REGISTRY.findIndex((entry) => entry.id === id);
   }
-
   function getNextLevelId(id) {
     const index = getLevelIndex(id);
-    if (index < 0 || index >= LEVELS.length - 1) return null;
-    return LEVELS[index + 1].id;
+    if (index < 0 || index >= LEVEL_REGISTRY.length - 1) return null;
+    return LEVEL_REGISTRY[index + 1].id;
   }
-
   function isLevelUnlocked(clearedLevels = [], levelId) {
     const index = getLevelIndex(levelId);
     if (index < 0) return true;
     if (index === 0) return true;
     if (clearedLevels.includes(levelId)) return true;
-    return clearedLevels.includes(LEVELS[index - 1].id);
+    return clearedLevels.includes(LEVEL_REGISTRY[index - 1].id);
   }
-
   function getUnlockedLevelIds(clearedLevels = []) {
-    return LEVELS.filter((level) => isLevelUnlocked(clearedLevels, level.id)).map((level) => level.id);
+    return LEVEL_REGISTRY.filter((entry) => isLevelUnlocked(clearedLevels, entry.id)).map((entry) => entry.id);
   }
 
   window.MarbleLevels = {
