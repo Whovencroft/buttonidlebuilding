@@ -382,25 +382,28 @@
     const accelMult = sprintMults ? sprintMults.accel : 1.0;
     const speedCapMult = sprintMults ? sprintMults.speed : 1.0;
 
-    marble.vx += (worldInput.x * GROUND_STEER_ACCEL * accelMult + downhillX * SLOPE_ACCEL) * dt;
-    marble.vy += (worldInput.y * GROUND_STEER_ACCEL * accelMult + downhillY * SLOPE_ACCEL) * dt;
+    // Ice tiles: marble slides with greatly reduced traction.
+    // Player input barely steers; momentum is preserved; no speed boost.
+    const isIce = friction < 0.7;
+    const steerFactor = isIce ? 0.15 : 1.0;  // 15% steering on ice
+    const slopeFactor = isIce ? 0.6 : 1.0;   // slopes still push but less abruptly
+
+    marble.vx += (worldInput.x * GROUND_STEER_ACCEL * accelMult * steerFactor + downhillX * SLOPE_ACCEL * slopeFactor) * dt;
+    marble.vy += (worldInput.y * GROUND_STEER_ACCEL * accelMult * steerFactor + downhillY * SLOPE_ACCEL * slopeFactor) * dt;
 
     if (conveyor) {
-      // Conveyor multiplier 6.0 (2x the previous 3.0) — conveyors push very hard
       marble.vx += conveyor.x * conveyor.strength * 6.0 * dt;
       marble.vy += conveyor.y * conveyor.strength * 6.0 * dt;
     }
 
-    // Ice tiles (friction 0.6): moderate drag, controllable slide
-    // Normal tiles: standard drag formula
-    const isIce = friction < 0.7;
-    const dragBase = isIce ? 0.985 : 0.972;
-    const drag = Math.pow(dragBase / Math.max(0.55, friction), dt * 60);
+    // Ice: very low drag (marble keeps sliding); Normal: standard drag
+    const dragBase = isIce ? 0.997 : 0.972;
+    const drag = Math.pow(isIce ? dragBase : (dragBase / Math.max(0.55, friction)), dt * 60);
     marble.vx *= drag;
     marble.vy *= drag;
 
-    // Ice tiles allow moderately higher speed (1.5x cap); normal tiles cap at 1.35x
-    const speedMult = isIce ? 1.5 : clamp(1.2 / friction, 0.78, 1.35);
+    // Ice does NOT boost speed cap — same cap as normal tiles
+    const speedMult = isIce ? 1.0 : clamp(1.2 / friction, 0.78, 1.35);
     clampSpeed(marble, MAX_GROUND_SPEED * speedMult * speedCapMult);
   }
 
