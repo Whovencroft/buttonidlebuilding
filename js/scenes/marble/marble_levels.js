@@ -1734,7 +1734,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
       name: 'Gentle Slopes',
       width: 100,
       height: 80,
-      timeLimit: 120,
+      timeLimit: 60,
       start: { x: 10, y: 40 },
       reward: { presses: 500, unlocks: ['marble_gentle_slopes_complete'], claimKey: 'gentle_slopes' }
     });
@@ -1787,7 +1787,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
       name: 'Forked Path',
       width: 120,
       height: 100,
-      timeLimit: 120,
+      timeLimit: 60,
       start: { x: 10, y: 50 },
       reward: { presses: 1000, unlocks: ['marble_forked_path_complete'], claimKey: 'forked_path' }
     });
@@ -1846,7 +1846,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
       name: 'Crumble Bridge',
       width: 110,
       height: 90,
-      timeLimit: 120,
+      timeLimit: 60,
       start: { x: 10, y: 44 },
       reward: { presses: 1500, unlocks: ['marble_crumble_bridge_complete'], claimKey: 'crumble_bridge' }
     });
@@ -1907,7 +1907,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
       name: 'Conveyor Lane',
       width: 120,
       height: 100,
-      timeLimit: 120,
+      timeLimit: 60,
       start: { x: 10, y: 50 },
       reward: { presses: 2000, unlocks: ['marble_conveyor_lane_complete'], claimKey: 'conveyor_lane' }
     });
@@ -1962,7 +1962,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
       name: 'Bounce Garden',
       width: 100,
       height: 100,
-      timeLimit: 120,
+      timeLimit: 60,
       start: { x: 10, y: 50 },
       reward: { presses: 2500, unlocks: ['marble_bounce_garden_complete'], claimKey: 'bounce_garden' }
     });
@@ -2025,7 +2025,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
       name: 'Ice Rink',
       width: 120,
       height: 110,
-      timeLimit: 100,
+      timeLimit: 50,
       start: { x: 10, y: 54 },
       reward: { presses: 3000, unlocks: ['marble_ice_rink_complete'], claimKey: 'ice_rink' }
     });
@@ -2075,7 +2075,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
       name: 'Gate Runner',
       width: 110,
       height: 120,
-      timeLimit: 100,
+      timeLimit: 50,
       start: { x: 10, y: 60 },
       reward: { presses: 3500, unlocks: ['marble_gate_runner_complete'], claimKey: 'gate_runner' }
     });
@@ -2145,7 +2145,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
       name: 'Sweeper Alley',
       width: 120,
       height: 100,
-      timeLimit: 100,
+      timeLimit: 50,
       start: { x: 10, y: 50 },
       reward: { presses: 4000, unlocks: ['marble_sweeper_alley_complete'], claimKey: 'sweeper_alley' }
     });
@@ -2204,7 +2204,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
       name: 'Platform Hop',
       width: 130,
       height: 110,
-      timeLimit: 100,
+      timeLimit: 50,
       start: { x: 10, y: 54 },
       reward: { presses: 4500, unlocks: ['marble_platform_hop_complete'], claimKey: 'platform_hop' }
     });
@@ -2266,7 +2266,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
       name: 'Tunnel Network',
       width: 140,
       height: 120,
-      timeLimit: 100,
+      timeLimit: 50,
       start: { x: 10, y: 60 },
       reward: { presses: 5000, unlocks: ['marble_tunnel_network_complete'], claimKey: 'tunnel_network' }
     });
@@ -2338,7 +2338,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
       name: 'Switchback Descent',
       width: 100,
       height: 140,
-      timeLimit: 80,
+      timeLimit: 40,
       start: { x: 10, y: 20 },
       reward: { presses: 5500, unlocks: ['marble_switchback_descent_complete'], claimKey: 'switchback_descent' }
     });
@@ -2402,7 +2402,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
       name: 'Hazard Gauntlet',
       width: 130,
       height: 100,
-      timeLimit: 80,
+      timeLimit: 40,
       start: { x: 10, y: 50 },
       reward: { presses: 6000, unlocks: ['marble_hazard_gauntlet_complete'], claimKey: 'hazard_gauntlet' }
     });
@@ -2464,7 +2464,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
       name: 'Elevator Shaft',
       width: 100,
       height: 100,
-      timeLimit: 80,
+      timeLimit: 40,
       start: { x: 50, y: 10 },
       reward: { presses: 6500, unlocks: ['marble_elevator_shaft_complete'], claimKey: 'elevator_shaft' }
     });
@@ -2516,7 +2516,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
       name: 'The Mountain',
       width: 200,
       height: 200,
-      timeLimit: 120,
+      timeLimit: 40,
       start: { x: 10, y: 100 },
       reward: { presses: 7000, unlocks: ['marble_the_mountain_complete'], claimKey: 'the_mountain' }
     });
@@ -2636,7 +2636,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
       name: 'Ice Crossing',
       width: 120,
       height: 110,
-      timeLimit: 80,
+      timeLimit: 40,
       start: { x: 10, y: 54 },
       reward: { presses: 7500, unlocks: ['marble_ice_crossing_complete'], claimKey: 'ice_crossing' }
     });
@@ -2701,7 +2701,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
       name: 'Crumble Cascade',
       width: 110,
       height: 120,
-      timeLimit: 60,
+      timeLimit: 30,
       start: { x: 10, y: 20 },
       reward: { presses: 8000, unlocks: ['marble_crumble_cascade_complete'], claimKey: 'crumble_cascade' }
     });
@@ -2768,7 +2768,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
       name: 'The Gauntlet',
       width: 160,
       height: 100,
-      timeLimit: 60,
+      timeLimit: 30,
       start: { x: 10, y: 50 },
       reward: { presses: 8500, unlocks: ['marble_the_gauntlet_v2_complete'], claimKey: 'the_gauntlet_v2' }
     });
@@ -2829,7 +2829,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
       name: 'Conveyor Maze',
       width: 120,
       height: 120,
-      timeLimit: 60,
+      timeLimit: 30,
       start: { x: 10, y: 60 },
       reward: { presses: 9000, unlocks: ['marble_conveyor_maze_complete'], claimKey: 'conveyor_maze' }
     });
@@ -2896,7 +2896,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
       name: 'Tunnel Express',
       width: 140,
       height: 120,
-      timeLimit: 60,
+      timeLimit: 30,
       start: { x: 10, y: 60 },
       reward: { presses: 9500, unlocks: ['marble_tunnel_express_complete'], claimKey: 'tunnel_express' }
     });
@@ -2987,7 +2987,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
       name: 'The Final Ascent',
       width: 160,
       height: 140,
-      timeLimit: 60,
+      timeLimit: 30,
       start: { x: 10, y: 70 },
       reward: { presses: 10000, unlocks: ['marble_the_final_ascent_complete'], claimKey: 'the_final_ascent' }
     });
