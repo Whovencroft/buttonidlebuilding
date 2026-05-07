@@ -293,9 +293,18 @@
         text-shadow: 0 0 32px rgba(255, 50, 50, 1.0), 0 3px 10px rgba(0,0,0,0.95) !important;
         animation: countdown-pulse 0.22s ease-in-out infinite alternate;
       }
+      .marble-countdown--penalty {
+        color: #ff3333 !important;
+        text-shadow: 0 0 40px rgba(255, 50, 50, 1.0), 0 3px 10px rgba(0,0,0,0.95) !important;
+        animation: penalty-flash 0.15s ease-in-out 3 alternate;
+      }
       @keyframes countdown-pulse {
         from { transform: scale(1.0); }
         to   { transform: scale(1.1); }
+      }
+      @keyframes penalty-flash {
+        from { transform: scale(1.0); opacity: 1; }
+        to   { transform: scale(1.3); opacity: 0.6; }
       }
       .marble-stage-label {
         font-size: 0.8rem;

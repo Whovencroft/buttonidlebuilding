@@ -856,15 +856,65 @@
     runtime.camera.y += (targetY - runtime.camera.y) * follow;
   }
 
+  const DEATH_PENALTY_MS = 4000; // 4 seconds lost per death
+
   function fail(runtime, reason) {
     runtime.status = 'failed';
     runtime.lastResult = { type: 'failed', reason, levelId: runtime.level.id };
     return runtime.lastResult;
   }
 
+  function penalize(runtime, reason) {
+    runtime.penaltyCount = (runtime.penaltyCount || 0) + 1;
+
+    // Deduct time penalty (skip for training levels with no timer)
+    if (runtime.level.timeLimit !== 0) {
+      runtime.timerMs += DEATH_PENALTY_MS;
+      // Check if time has run out after penalty
+      const timeLimit = (runtime.level.timeLimit ?? 60) + (runtime.bonusTimeMs || 0) / 1000;
+      if (runtime.timerMs >= timeLimit * 1000) {
+        return fail(runtime, 'timeout');
+      }
+    }
+
+    // Respawn at last safe position or level start
+    const marble = runtime.marble;
+    const safe = marble.lastSafePosition;
+    if (safe && safe.levelId === runtime.level.id) {
+      marble.x = safe.x;
+      marble.y = safe.y;
+      marble.z = safe.z;
+    } else {
+      marble.x = runtime.level.start.x;
+      marble.y = runtime.level.start.y;
+      marble.z = window.MarbleState.getStartZ(runtime.level, marble, runtime.dynamicState);
+    }
+    marble.vx = 0;
+    marble.vy = 0;
+    marble.vz = 0;
+    marble.grounded = true;
+    marble.inTunnel = null;
+    marble.sprintHoldTime = 0;
+
+    // Brief invulnerability after respawn
+    runtime.invulnerableUntilTick = (runtime.simTick || 0) + 30; // 0.5s at 60fps
+
+    runtime.lastResult = { type: 'penalized', reason, levelId: runtime.level.id };
+    return runtime.lastResult;
+  }
+
   function complete(runtime, bestTimeMs) {
+    // Calculate remaining time for carry-forward
+    const timeLimit = (runtime.level.timeLimit ?? 60) + (runtime.bonusTimeMs || 0) / 1000;
+    const remainingMs = Math.max(0, Math.round(timeLimit * 1000 - runtime.timerMs));
     runtime.status = 'completed';
-    runtime.lastResult = { type: 'completed', levelId: runtime.level.id, bestTimeMs, reward: runtime.level.reward };
+    runtime.lastResult = {
+      type: 'completed',
+      levelId: runtime.level.id,
+      bestTimeMs,
+      reward: runtime.level.reward,
+      remainingMs
+    };
     return runtime.lastResult;
   }
 
@@ -894,21 +944,24 @@
 
   function evaluateTriggers(runtime, groundSurface) {
     if (!groundSurface) return null;
-    if (groundSurface.failType) {
-      return fail(runtime, groundSurface.failType);
+    // Skip hazard checks during invulnerability window after respawn
+    const invulnerable = runtime.invulnerableUntilTick && runtime.simTick < runtime.invulnerableUntilTick;
+
+    if (groundSurface.failType && !invulnerable) {
+      return penalize(runtime, groundSurface.failType);
     }
 
     const trigger = window.MarbleLevels.getTriggerCell(runtime.level, groundSurface.tx, groundSurface.ty);
-     if (trigger?.kind === 'hazard') {
-  const cx = groundSurface.tx + 0.5;
-  const cy = groundSurface.ty + 0.5;
-  const dx = runtime.marble.x - cx;
-  const dy = runtime.marble.y - cy;
-  const radius = trigger.radius ?? HAZARD_TRIGGER_RADIUS;
-  if (Math.hypot(dx, dy) <= radius) {
-    return fail(runtime, trigger.data?.type || 'hazard');
-  }
-}
+    if (trigger?.kind === 'hazard' && !invulnerable) {
+      const cx = groundSurface.tx + 0.5;
+      const cy = groundSurface.ty + 0.5;
+      const dx = runtime.marble.x - cx;
+      const dy = runtime.marble.y - cy;
+      const radius = trigger.radius ?? HAZARD_TRIGGER_RADIUS;
+      if (Math.hypot(dx, dy) <= radius) {
+        return penalize(runtime, trigger.data?.type || 'hazard');
+      }
+    }
 
     if (trigger?.kind === 'goal') {
       const cx = groundSurface.tx + 0.5;
@@ -919,9 +972,11 @@
       if (Math.hypot(dx, dy) <= radius) return complete(runtime, Math.round(runtime.timerMs));
     }
 
-    const hazardContacts = window.MarbleLevels.getHazardContacts(runtime.level, runtime.dynamicState, runtime.marble);
-    if (hazardContacts.length) {
-      return fail(runtime, hazardContacts[0].actor.kind);
+    if (!invulnerable) {
+      const hazardContacts = window.MarbleLevels.getHazardContacts(runtime.level, runtime.dynamicState, runtime.marble);
+      if (hazardContacts.length) {
+        return penalize(runtime, hazardContacts[0].actor.kind);
+      }
     }
 
     return null;
@@ -929,6 +984,15 @@
 
   function rememberSafePosition(runtime, groundSurface) {
     if (!groundSurface) return;
+    // Only remember flat, safe floor tiles (not ramps, tunnels, bounce pads, or hazards)
+    const shape = groundSurface.shape || 'flat';
+    if (shape !== 'flat' && shape !== 'landing_pad') return;
+    if (groundSurface.failType) return;
+    if (groundSurface.bounce) return;
+    if (groundSurface.crumble) return;
+    // Check if there's a hazard trigger on this tile
+    const trigger = window.MarbleLevels.getTriggerCell(runtime.level, groundSurface.tx, groundSurface.ty);
+    if (trigger?.kind === 'hazard') return;
     runtime.marble.lastSafePosition = {
       x: runtime.marble.x,
       y: runtime.marble.y,
@@ -1019,9 +1083,9 @@ function shouldFailFromVoidFall(runtime) {
     if (marble.inTunnel) {
       window.MarbleLevels.advanceDynamicState(runtime, dt, null);
       updateTunnelPhysics(runtime, dt);
-      if (!runtime.timerPaused) {
+      if (!runtime.timerPaused && runtime.level.timeLimit !== 0) {
         runtime.timerMs += dt * 1000;
-        const timeLimit = runtime.level.timeLimit ?? 60;
+        const timeLimit = (runtime.level.timeLimit ?? 60) + (runtime.bonusTimeMs || 0) / 1000;
         if (runtime.timerMs >= timeLimit * 1000) return fail(runtime, 'timeout');
       }
       updateCamera(runtime, dt);
@@ -1062,9 +1126,9 @@ function shouldFailFromVoidFall(runtime) {
       }
     }
 
-    if (!runtime.timerPaused) {
+    if (!runtime.timerPaused && runtime.level.timeLimit !== 0) {
       runtime.timerMs += dt * 1000;
-      const timeLimit = runtime.level.timeLimit ?? 60;
+      const timeLimit = (runtime.level.timeLimit ?? 60) + (runtime.bonusTimeMs || 0) / 1000;
       if (runtime.timerMs >= timeLimit * 1000) return fail(runtime, 'timeout');
     }
     updateCamera(runtime, dt);
@@ -1077,7 +1141,7 @@ function shouldFailFromVoidFall(runtime) {
 
     const triggerResult = evaluateTriggers(runtime, groundSurface);
     if (triggerResult) return triggerResult;
-    if (shouldFailFromVoidFall(runtime)) return fail(runtime, 'fall');
+    if (shouldFailFromVoidFall(runtime)) return penalize(runtime, 'fall');
 
     runtime.lastResult = null;
     return null;

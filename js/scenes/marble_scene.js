@@ -4,7 +4,7 @@
   const DEFAULT_SUPPORT_RADIUS = 0.12;
   const DEFAULT_SEED = 0x5f3759df;
 
-  function resolveLevel(levelOrId = 'fork_rejoin_test') {
+  function resolveLevel(levelOrId = 'training_ground') {
     if (levelOrId && typeof levelOrId === 'object' && typeof levelOrId.id === 'string') {
       return levelOrId;
     }
@@ -37,7 +37,7 @@
       return level.generatorSpec.seed >>> 0;
     }
     if (typeof window.MarbleLevels?.hashSeed === 'function') {
-      return window.MarbleLevels.hashSeed(level?.id || 'fork_rejoin_test');
+      return window.MarbleLevels.hashSeed(level?.id || 'training_ground');
     }
     return DEFAULT_SEED;
   }
@@ -64,7 +64,7 @@
     };
   }
 
-  function createRuntime(levelOrId = 'fork_rejoin_test') {
+  function createRuntime(levelOrId = 'training_ground') {
     const level = resolveLevel(levelOrId);
     const marble = createMarbleBody();
     const seed = createSeed(level);
@@ -92,6 +92,9 @@
       cameraSmoothing: 1,
       status: 'running',
       timerMs: 0,
+      bonusTimeMs: 0,
+      penaltyCount: 0,
+      invulnerableUntilTick: 0,
       resultApplied: false,
       lastResult: null,
       debug: {
@@ -132,6 +135,9 @@
     runtime.simTick = 0;
     runtime.status = 'running';
     runtime.timerMs = 0;
+    runtime.penaltyCount = 0;
+    runtime.invulnerableUntilTick = 0;
+    // bonusTimeMs is preserved across restarts (carry-forward from previous levels)
     runtime.resultApplied = false;
     runtime.lastResult = null;
     return runtime;

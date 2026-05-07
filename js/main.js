@@ -65,7 +65,7 @@
         button_idle: {},
         marble: {
           unlocked: false,
-          currentLevelId: 'fork_rejoin_test',
+          currentLevelId: 'training_ground',
           bestTimes: {},
           clearedLevels: [],
           rewardClaims: {},
@@ -115,7 +115,7 @@
     }
 
     if (typeof data.scenes.marble.currentLevelId !== 'string' || !data.scenes.marble.currentLevelId) {
-      data.scenes.marble.currentLevelId = 'fork_rejoin_test';
+      data.scenes.marble.currentLevelId = 'training_ground';
     }
 
     data.scenes.marble.bestTimes = data.scenes.marble.bestTimes || {};
@@ -499,7 +499,7 @@
     endingTransitionActive = true;
 
     state.scenes.marble.unlocked = true;
-    state.scenes.marble.currentLevelId = state.scenes.marble.currentLevelId || 'fork_rejoin_test';
+    state.scenes.marble.currentLevelId = state.scenes.marble.currentLevelId || 'training_ground';
     state.ui.activeTab = 'play';
     saveGame();
 

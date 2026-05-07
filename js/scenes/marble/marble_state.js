@@ -29,7 +29,7 @@
     }
 
     function currentLevelId() {
-      return marbleSlice().currentLevelId || 'fork_rejoin_test';
+      return marbleSlice().currentLevelId || 'training_ground';
     }
 
     function buildDom() {
@@ -169,7 +169,12 @@
       const nextLevelId = window.MarbleLevels.getNextLevelId(currentLevelId());
       if (!nextLevelId) return;
       if (!window.MarbleLevels.isLevelUnlocked(marbleSlice().clearedLevels, nextLevelId)) return;
+      // Pass carry-forward time to next level
+      const carryMs = runtime?._carryForwardMs || 0;
       openLevel(nextLevelId);
+      if (runtime && carryMs > 0) {
+        runtime.bonusTimeMs = carryMs;
+      }
     }
 
     function applyCompletion(result) {
@@ -210,16 +215,27 @@
         ? ` Level ${window.MarbleLevels.getLevelIndex(nextLevelId) + 1} unlocked.`
         : '';
 
-      const completionBody = `${runtime.level.name} cleared in ${(result.bestTimeMs / 1000).toFixed(2)}s.${unlockText}${rewardText ? ' ' + rewardText : ''}`;
+      const remainingSec = (result.remainingMs || 0) / 1000;
+      const carryText = remainingSec > 0 ? ` +${remainingSec.toFixed(1)}s banked for next level.` : '';
+      const completionBody = `${runtime.level.name} cleared in ${(result.bestTimeMs / 1000).toFixed(2)}s.${carryText}${unlockText}${rewardText ? ' ' + rewardText : ''}`;
+      // Store carry-forward time for next level
+      runtime._carryForwardMs = result.remainingMs || 0;
       showOverlay('Stage Cleared', completionBody, { showNext: !!(nextLevelId && nextIsUnlocked) });
     }
 
+    function applyPenalty(result) {
+      // Brief visual feedback - flash the countdown red
+      if (refs.countdown) {
+        refs.countdown.classList.add('marble-countdown--penalty');
+        setTimeout(() => refs.countdown.classList.remove('marble-countdown--penalty'), 600);
+      }
+      // No overlay - game continues
+    }
+
     function applyFailure(result) {
-      let reasonText = 'Run failed. Restart and try again.';
-      if (result.reason === 'fall') reasonText = 'You fell off the course. Restart and try again.';
-      else if (result.reason === 'timeout') reasonText = "Time's up! You didn't reach the end in time. Restart and try again.";
-      else if (String(result.reason).includes('hazard') || String(result.reason).includes('bar') || String(result.reason).includes('sweeper')) reasonText = 'A hazard caught the marble. Restart and try again.';
-      showOverlay('Course Failed', reasonText);
+      let reasonText = "Time's up! You ran out of time.";
+      if (result.reason === 'timeout') reasonText = "Time's up! You ran out of time. Restart to try again.";
+      showOverlay('Time Expired', reasonText);
     }
 
     function stepSimulation(dt) {
@@ -260,6 +276,11 @@
           runtime.accumulator -= runtime.fixedStep;
           steps += 1;
 
+          if (result?.type === 'penalized') {
+            applyPenalty(result);
+            break;
+          }
+
           if (result?.type === 'failed') {
             applyFailure(result);
             break;
@@ -286,12 +307,19 @@
     function render() {
       if (!runtime || !refs.canvas) return;
       refs.stageName.textContent = runtime.level.name;
-      const timeLimit = runtime.level.timeLimit ?? 60;
-      const remaining = Math.max(0, timeLimit - runtime.timerMs / 1000);
-      const remainingCeil = Math.ceil(remaining);
-      refs.countdown.textContent = remainingCeil;
-      refs.countdown.classList.toggle('marble-countdown--urgent', remainingCeil <= 10);
-      refs.countdown.classList.toggle('marble-countdown--critical', remainingCeil <= 5);
+      const baseTimeLimit = runtime.level.timeLimit ?? 60;
+      if (baseTimeLimit === 0) {
+        // Training level - no timer
+        refs.countdown.textContent = '\u221E'; // infinity symbol
+        refs.countdown.classList.remove('marble-countdown--urgent', 'marble-countdown--critical');
+      } else {
+        const totalTimeLimit = baseTimeLimit + (runtime.bonusTimeMs || 0) / 1000;
+        const remaining = Math.max(0, totalTimeLimit - runtime.timerMs / 1000);
+        const remainingCeil = Math.ceil(remaining);
+        refs.countdown.textContent = remainingCeil;
+        refs.countdown.classList.toggle('marble-countdown--urgent', remainingCeil <= 10);
+        refs.countdown.classList.toggle('marble-countdown--critical', remainingCeil <= 5);
+      }
       // Expose drag state to renderer for arrow overlay
       if (input) runtime.dragInput = input.getDragState();
       window.MarbleRenderer.render(runtime, refs.canvas);
@@ -334,7 +362,7 @@
 
     function onStateLoaded() {
       const slice = marbleSlice();
-      if (!slice.currentLevelId) slice.currentLevelId = 'fork_rejoin_test';
+      if (!slice.currentLevelId) slice.currentLevelId = 'training_ground';
       prepare();
       renderLevelStrip(true);
       render();
