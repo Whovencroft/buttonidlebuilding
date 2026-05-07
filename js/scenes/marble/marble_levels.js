@@ -132,7 +132,9 @@
       _tx: patch._tx ?? undefined,
       _ty: patch._ty ?? undefined,
       // Hidden flag — tile is invisible and non-collidable until secret is revealed
-      hidden: !!patch.hidden
+      hidden: !!patch.hidden,
+      // When hidden and not revealed, render/collide as flat tile at this height (null = void)
+      hiddenFallback: patch.hiddenFallback ?? null
     };
   }
 
@@ -532,8 +534,26 @@
       return null;
     }
 
-    // Hidden tiles are non-collidable until the secret is revealed
+    // Hidden tiles: when secret is not revealed, use fallback behavior
     if (cell.hidden && !(runtime && runtime.secretRevealed)) {
+      // Tiles with hiddenFallback appear as flat tiles at the fallback height
+      if (cell.hiddenFallback) {
+        return {
+          source: 'surface',
+          cell: cell,
+          tx,
+          ty,
+          u: x - tx,
+          v: y - ty,
+          z: cell.hiddenFallback,
+          gradient: { gx: 0, gy: 0 },
+          trigger: null,
+          friction: 1,
+          conveyor: null,
+          bounce: 0
+        };
+      }
+      // Tiles without fallback (secret platform) are void
       return null;
     }
 
@@ -1504,7 +1524,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
   //     funnelRadius - radius of entry funnel in tiles (default 2)
   //     entryZ      - z height of the entry floor (default: path[0].z)
   //
-  function placeTunnel(level, { id, path, speed = 8, radius = 0.45, exitType = 'emerge', exitVelocity = null, funnelRadius = 2, funnelDepth = null, entryZ = null, hidden = false }) {
+  function placeTunnel(level, { id, path, speed = 8, radius = 0.45, exitType = 'emerge', exitVelocity = null, funnelRadius = 2, funnelDepth = null, entryZ = null, hidden = false, hiddenFallback = null }) {
     if (!path || path.length < 2) {
       console.warn(`[LevelDesign] placeTunnel '${id}': path must have at least 2 points.`);
       return;
@@ -1542,14 +1562,15 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
           funnelMaxDist: fMaxDist,
           _tx: tx,
           _ty: ty,
-          hidden: hidden
+          hidden: hidden,
+          hiddenFallback: hiddenFallback
         });
       }
     }
 
     // Place entry center tile (flat, at bottom of bowl — this is where the trigger goes)
     // Center is at ez - fDepth so it's flush with the lowest point of the funnel bowl
-    setSurface(level, entryTx, entryTy, { baseHeight: ez - fDepth, shape: SHAPES.FLAT, hidden: hidden });
+    setSurface(level, entryTx, entryTy, { baseHeight: ez - fDepth, shape: SHAPES.FLAT, hidden: hidden, hiddenFallback: hiddenFallback });
 
     // Set tunnel_entry trigger on the entry tile
     setTrigger(level, entryTx, entryTy, { kind: 'tunnel_entry', data: { tunnelId: id }, hidden: hidden });
@@ -2548,12 +2569,13 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
       exitType: 'emerge',
       funnelRadius: 1,
       entryZ: 4,
-      hidden: true
+      hidden: true,
+      hiddenFallback: 4  // Ring 2 height — funnel appears as flat z=4 when not revealed
     });
     // Secret platform (3x3 at z=2, far east side — only reachable via tunnel)
     for (let dx = -1; dx <= 1; dx++) {
       for (let dy = -1; dy <= 1; dy++) {
-        setSurface(level, 48 + dx, 30 + dy, { baseHeight: 2, shape: SHAPES.FLAT, hidden: true });
+        setSurface(level, 48 + dx, 30 + dy, { baseHeight: 2, shape: SHAPES.FLAT, hidden: true, landingPad: true });
       }
     }
     // Secret goal on the hidden platform

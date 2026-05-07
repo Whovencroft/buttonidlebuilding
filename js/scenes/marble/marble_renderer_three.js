@@ -647,13 +647,20 @@
     const IDX_S   = [0,1,2, 1,3,2]; // south/north wall faces — verified: normal +Z
     const IDX_E   = [0,2,1, 1,2,3]; // east/west wall faces   — verified: normal +X
 
-    // Collect non-void tiles (skip hidden tiles when secret not revealed)
+    // Collect non-void tiles (handle hidden tiles based on reveal state)
     const tiles = [];
     for (let ty = 0; ty < level.height; ty++) {
       for (let tx = 0; tx < level.width; tx++) {
         const cell = ML.getSurfaceCell(level, tx, ty);
         if (!cell || cell.kind === 'void') continue;
-        if (cell.hidden && !_secretRevealed) continue;
+        if (cell.hidden && !_secretRevealed) {
+          // Tiles with hiddenFallback render as flat tiles at the fallback height
+          if (cell.hiddenFallback != null) {
+            tiles.push({ tx, ty, cell: { kind: 'track', shape: 'flat', baseHeight: cell.hiddenFallback, rise: 0, friction: 1, conveyor: null, bounce: 0, crumble: null, failType: null, landingPad: false } });
+          }
+          // Tiles without fallback (secret platform) are skipped
+          continue;
+        }
         tiles.push({ tx, ty, cell });
       }
     }

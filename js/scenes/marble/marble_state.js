@@ -115,6 +115,8 @@
       runtime.accumulator = 0;
       // Set secret tunnel reveal state based on cleared levels
       runtime.secretRevealed = window.MarbleLevels.isSecretRevealed(marbleSlice().clearedLevels);
+      // Also set on dynamicState since physics passes dynamicState as the 'runtime' arg
+      runtime.dynamicState.secretRevealed = runtime.secretRevealed;
       if (window.MarbleRenderer && window.MarbleRenderer.setSecretRevealed) {
         window.MarbleRenderer.setSecretRevealed(runtime.secretRevealed);
       }
@@ -245,10 +247,9 @@
 
     function applySecretUnlock(result) {
       runtime.resultApplied = true;
-      // Apply the secret unlock reward
+      // Apply the secret unlock reward (no levelId — don't update clearedLevels/bestTimes)
       applyMarbleReward({
         type: 'secret_unlocked',
-        levelId: result.levelId,
         reward: { presses: 0, unlocks: ['next_game_unlocked'], claimKey: 'secret_tunnel' }
       });
       showOverlay('\u2728 Secret Discovered \u2728', 'You found the secret passage through the mountain! A new world awaits...');

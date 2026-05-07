@@ -489,8 +489,8 @@
       marbleSlice.rewardClaims[reward.claimKey] = true;
     }
 
-    // Check if all 20 levels are now beaten — show secret tunnel hint
-    if (result.levelId === 'the_final_ascent' && window.MarbleLevels && window.MarbleLevels.isSecretRevealed) {
+    // Check if all 20 levels are now beaten — show secret tunnel hint (only once)
+    if (result.levelId === 'the_final_ascent' && !marbleSlice.rewardClaims['secret_tunnel'] && window.MarbleLevels && window.MarbleLevels.isSecretRevealed) {
       if (window.MarbleLevels.isSecretRevealed(marbleSlice.clearedLevels)) {
         // Show the secret tunnel notification after a brief delay
         setTimeout(function() {
