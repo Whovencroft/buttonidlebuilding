@@ -130,7 +130,9 @@
       funnelCenterY: patch.funnelCenterY ?? undefined,
       funnelMaxDist: patch.funnelMaxDist ?? undefined,
       _tx: patch._tx ?? undefined,
-      _ty: patch._ty ?? undefined
+      _ty: patch._ty ?? undefined,
+      // Hidden flag — tile is invisible and non-collidable until secret is revealed
+      hidden: !!patch.hidden
     };
   }
 
@@ -150,7 +152,8 @@
     return {
       kind: patch.kind ?? 'goal',
       radius: patch.radius ?? null,
-      data: patch.data ?? null
+      data: patch.data ?? null,
+      hidden: !!patch.hidden
     };
   }
 
@@ -203,7 +206,9 @@
       tunnelSpeed: actor.tunnelSpeed ?? 8,
       tunnelRadius: actor.tunnelRadius ?? 0.45,
       exitType: actor.exitType ?? 'emerge',
-      exitVelocity: actor.exitVelocity ?? null
+      exitVelocity: actor.exitVelocity ?? null,
+      // Secret/hidden flag — actor is invisible and non-interactive until revealed
+      hidden: !!actor.hidden
     };
   }
 
@@ -524,6 +529,11 @@
     const cell = getSurfaceCell(level, tx, ty);
 
     if (!cell || cell.kind === 'void') {
+      return null;
+    }
+
+    // Hidden tiles are non-collidable until the secret is revealed
+    if (cell.hidden && !(runtime && runtime.secretRevealed)) {
       return null;
     }
 
@@ -1494,7 +1504,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
   //     funnelRadius - radius of entry funnel in tiles (default 2)
   //     entryZ      - z height of the entry floor (default: path[0].z)
   //
-  function placeTunnel(level, { id, path, speed = 8, radius = 0.45, exitType = 'emerge', exitVelocity = null, funnelRadius = 2, funnelDepth = null, entryZ = null }) {
+  function placeTunnel(level, { id, path, speed = 8, radius = 0.45, exitType = 'emerge', exitVelocity = null, funnelRadius = 2, funnelDepth = null, entryZ = null, hidden = false }) {
     if (!path || path.length < 2) {
       console.warn(`[LevelDesign] placeTunnel '${id}': path must have at least 2 points.`);
       return;
@@ -1531,31 +1541,32 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
           funnelCenterY: fCenterY,
           funnelMaxDist: fMaxDist,
           _tx: tx,
-          _ty: ty
+          _ty: ty,
+          hidden: hidden
         });
       }
     }
 
     // Place entry center tile (flat, at bottom of bowl — this is where the trigger goes)
     // Center is at ez - fDepth so it's flush with the lowest point of the funnel bowl
-    setSurface(level, entryTx, entryTy, { baseHeight: ez - fDepth, shape: SHAPES.FLAT });
+    setSurface(level, entryTx, entryTy, { baseHeight: ez - fDepth, shape: SHAPES.FLAT, hidden: hidden });
 
     // Set tunnel_entry trigger on the entry tile
-    setTrigger(level, entryTx, entryTy, { kind: 'tunnel_entry', data: { tunnelId: id } });
+    setTrigger(level, entryTx, entryTy, { kind: 'tunnel_entry', data: { tunnelId: id }, hidden: hidden });
 
     // Place exit floor tile if exitType is 'floor' or 'emerge'
     if (exitType === 'floor' || exitType === 'emerge') {
       const exit = path[path.length - 1];
       const exitTx = Math.floor(exit.x);
       const exitTy = Math.floor(exit.y);
-      setSurface(level, exitTx, exitTy, { baseHeight: exit.z, shape: SHAPES.FLAT, landingPad: true });
+      setSurface(level, exitTx, exitTy, { baseHeight: exit.z, shape: SHAPES.FLAT, landingPad: true, hidden: hidden });
       // Also set adjacent tiles as landing pads
       for (let dx = -1; dx <= 1; dx++) {
         for (let dy = -1; dy <= 1; dy++) {
           if (dx === 0 && dy === 0) continue;
           const cell = getSurfaceCell(level, exitTx + dx, exitTy + dy);
           if (cell && cell.kind !== 'void') {
-            setSurface(level, exitTx + dx, exitTy + dy, { ...cell, landingPad: true });
+            setSurface(level, exitTx + dx, exitTy + dy, { ...cell, landingPad: true, hidden: hidden });
           }
         }
       }
@@ -1574,7 +1585,8 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
       tunnelSpeed: speed,
       tunnelRadius: radius,
       exitType,
-      exitVelocity
+      exitVelocity,
+      hidden: hidden
     });
   }
 
@@ -2517,6 +2529,36 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     setSurface(level, 26, 33, { baseHeight: 8, shape: SHAPES.FLAT, bounce: 5 });
     // Goal at the peak!
     setGoal(level, 26, 30, 0.55);
+
+    // === SECRET TUNNEL (hidden until all 20 levels beaten) ===
+    // Entrance: Ring 2, north side (tile 18, 22) at z=4
+    // Path: goes through the mountain interior, exits far east side
+    // Exit: tile 48, 30 at z=2 — a hidden platform with the secret goal
+    placeTunnel(level, {
+      id: 'secret_tunnel',
+      path: [
+        { x: 18.5, y: 22.5, z: 4 },   // entry on Ring 2 north edge
+        { x: 26.5, y: 22.5, z: 3 },   // through the mountain interior
+        { x: 35.5, y: 25.5, z: 2 },   // curving east and down
+        { x: 42.5, y: 28.5, z: 2 },   // emerging east of Ring 1
+        { x: 48.5, y: 30.5, z: 2 }    // exit at secret platform
+      ],
+      speed: 6,
+      radius: 0.4,
+      exitType: 'emerge',
+      funnelRadius: 1,
+      entryZ: 4,
+      hidden: true
+    });
+    // Secret platform (3x3 at z=2, far east side — only reachable via tunnel)
+    for (let dx = -1; dx <= 1; dx++) {
+      for (let dy = -1; dy <= 1; dy++) {
+        setSurface(level, 48 + dx, 30 + dy, { baseHeight: 2, shape: SHAPES.FLAT, hidden: true });
+      }
+    }
+    // Secret goal on the hidden platform
+    setTrigger(level, 49, 30, { kind: 'secret_goal', radius: 0.5, hidden: true });
+
     // Route graph
     addGraphNode(level, { id: 'start', type: 'entry', x: 5.5, y: 30.5, z: 2 });
     addGraphNode(level, { id: 'ring1', type: 'hub', x: 26.5, y: 30.5, z: 2 });
@@ -3139,6 +3181,21 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     return LEVEL_REGISTRY.filter((entry) => isLevelUnlocked(clearedLevels, entry.id)).map((entry) => entry.id);
   }
 
+  // ─── Secret tunnel reveal check ────────────────────────────────────────────
+  // All 20 non-training level IDs that must be cleared to reveal the secret tunnel
+  var SECRET_LEVEL_IDS = [
+    'gentle_slopes', 'forked_path', 'crumble_bridge', 'conveyor_lane', 'bounce_garden',
+    'ice_rink', 'gate_runner', 'sweeper_alley', 'platform_hop', 'tunnel_network',
+    'switchback_descent', 'hazard_gauntlet', 'elevator_shaft', 'the_mountain',
+    'ice_crossing', 'crumble_cascade', 'the_gauntlet_v2', 'conveyor_maze',
+    'tunnel_express', 'the_final_ascent'
+  ];
+
+  function isSecretRevealed(clearedLevels) {
+    if (!clearedLevels || !Array.isArray(clearedLevels)) return false;
+    return SECRET_LEVEL_IDS.every(function(id) { return clearedLevels.indexOf(id) >= 0; });
+  }
+
   window.MarbleLevels = {
     SHAPES,
     ACTOR_KINDS,
@@ -3174,6 +3231,8 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     isCrumbleBroken,
     sampleStaticSurfaceOnly,
     setGoal,
-    placeTunnel
+    placeTunnel,
+    SECRET_LEVEL_IDS,
+    isSecretRevealed
   };
 })();

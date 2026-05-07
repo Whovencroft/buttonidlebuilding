@@ -489,7 +489,42 @@
       marbleSlice.rewardClaims[reward.claimKey] = true;
     }
 
+    // Check if all 20 levels are now beaten — show secret tunnel hint
+    if (result.levelId === 'the_final_ascent' && window.MarbleLevels && window.MarbleLevels.isSecretRevealed) {
+      if (window.MarbleLevels.isSecretRevealed(marbleSlice.clearedLevels)) {
+        // Show the secret tunnel notification after a brief delay
+        setTimeout(function() {
+          showSecretTunnelNotification();
+        }, 2500);
+      }
+    }
+
     saveGame();
+  }
+
+  function showSecretTunnelNotification() {
+    // Create a floating notification that hints at the secret
+    var notif = document.createElement('div');
+    notif.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);' +
+      'background:rgba(20,10,40,0.95);color:#e8d44d;padding:32px 48px;border-radius:12px;' +
+      'font-size:22px;font-family:serif;font-style:italic;z-index:99999;text-align:center;' +
+      'border:2px solid #e8d44d;box-shadow:0 0 30px rgba(232,212,77,0.4);' +
+      'animation:secretFadeIn 1s ease-out;max-width:400px;line-height:1.5;';
+    notif.textContent = 'Secret tunnel\u2026 Secret tunnelll...';
+    // Add fade-in animation
+    var style = document.createElement('style');
+    style.textContent = '@keyframes secretFadeIn{from{opacity:0;transform:translate(-50%,-50%) scale(0.8)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}';
+    document.head.appendChild(style);
+    document.body.appendChild(notif);
+    // Auto-dismiss after 5 seconds
+    setTimeout(function() {
+      notif.style.transition = 'opacity 1.5s ease-out';
+      notif.style.opacity = '0';
+      setTimeout(function() {
+        if (notif.parentNode) notif.parentNode.removeChild(notif);
+        if (style.parentNode) style.parentNode.removeChild(style);
+      }, 1600);
+    }, 5000);
   }
 
   function beginEndingTransitionToMarble() {

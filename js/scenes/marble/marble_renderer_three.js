@@ -91,6 +91,8 @@
   // Smoothed camera Z — follows marble height changes gradually to avoid jitter
   let smoothCamZ     = 0;
   let lastRenderTime = 0;  // performance.now() at last render call, for dt computation
+  // Secret tunnel reveal state — set by marble_state before entering a level
+  let _secretRevealed = false;
 
   // ─── Texture helpers ─────────────────────────────────────────────────────────
 
@@ -645,12 +647,13 @@
     const IDX_S   = [0,1,2, 1,3,2]; // south/north wall faces — verified: normal +Z
     const IDX_E   = [0,2,1, 1,2,3]; // east/west wall faces   — verified: normal +X
 
-    // Collect non-void tiles
+    // Collect non-void tiles (skip hidden tiles when secret not revealed)
     const tiles = [];
     for (let ty = 0; ty < level.height; ty++) {
       for (let tx = 0; tx < level.width; tx++) {
         const cell = ML.getSurfaceCell(level, tx, ty);
         if (!cell || cell.kind === 'void') continue;
+        if (cell.hidden && !_secretRevealed) continue;
         tiles.push({ tx, ty, cell });
       }
     }
@@ -686,7 +689,8 @@
         group.add(buildSlopeMesh(tx, ty, cell));
         continue;
       }
-      const isGoal     = ML.getTriggerCell(level, tx, ty)?.kind === 'goal';
+      const triggerKind = ML.getTriggerCell(level, tx, ty)?.kind;
+      const isGoal     = triggerKind === 'goal' || triggerKind === 'secret_goal';
       const isBounce   = !!cell.bounce;
       const isConveyor = !!cell.conveyor;
       const isCrumble  = !!cell.crumble;
@@ -1041,8 +1045,13 @@
       }
 
       // Tunnels are hidden until the marble enters them
+      // Secret (hidden) tunnels stay invisible unless the secret is revealed
       if (kind === ML.ACTOR_KINDS.TUNNEL) {
-        entry.group.visible = !!revealedTunnels[actor.id];
+        if (actor.hidden && !_secretRevealed) {
+          entry.group.visible = false;
+        } else {
+          entry.group.visible = !!revealedTunnels[actor.id];
+        }
       }
     }
   }
@@ -1457,5 +1466,9 @@
     lastLevelId = null;
   }
 
-  window.MarbleRenderer = { render, prepare, getDebugInfo, dispose };
+  function setSecretRevealed(revealed) {
+    _secretRevealed = !!revealed;
+  }
+
+  window.MarbleRenderer = { render, prepare, getDebugInfo, dispose, setSecretRevealed };
 })();

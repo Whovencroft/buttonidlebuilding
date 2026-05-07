@@ -820,6 +820,9 @@
     const actor = findTunnelActorAtTile(runtime.level, groundSurface.tx, groundSurface.ty);
     if (!actor) return false;
 
+    // Block entry to hidden tunnels unless the secret has been revealed
+    if (actor.hidden && !runtime.secretRevealed) return false;
+
     // Check marble is close to entry center
     const entry = actor.tunnelPath[0];
     const dx = marble.x - entry.x;
@@ -970,6 +973,23 @@
       const dx = runtime.marble.x - cx;
       const dy = runtime.marble.y - cy;
       if (Math.hypot(dx, dy) <= radius) return complete(runtime, Math.round(runtime.timerMs));
+    }
+
+    // Secret goal — only active when secret is revealed
+    if (trigger?.kind === 'secret_goal' && runtime.secretRevealed) {
+      const cx = groundSurface.tx + 0.5;
+      const cy = groundSurface.ty + 0.5;
+      const radius = trigger.radius ?? 0.5;
+      const dx = runtime.marble.x - cx;
+      const dy = runtime.marble.y - cy;
+      if (Math.hypot(dx, dy) <= radius) {
+        runtime.status = 'completed';
+        runtime.lastResult = {
+          type: 'secret_unlocked',
+          levelId: runtime.level.id
+        };
+        return runtime.lastResult;
+      }
     }
 
     if (!invulnerable) {

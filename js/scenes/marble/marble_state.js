@@ -113,6 +113,11 @@
       runtime = window.MarbleState.createRuntime(level);
       runtime.fixedStep = FIXED_DT;
       runtime.accumulator = 0;
+      // Set secret tunnel reveal state based on cleared levels
+      runtime.secretRevealed = window.MarbleLevels.isSecretRevealed(marbleSlice().clearedLevels);
+      if (window.MarbleRenderer && window.MarbleRenderer.setSecretRevealed) {
+        window.MarbleRenderer.setSecretRevealed(runtime.secretRevealed);
+      }
       window._marbleRuntime = runtime; // debug
       hideOverlay();
       renderLevelStrip(true);
@@ -238,6 +243,18 @@
       showOverlay('Time Expired', reasonText);
     }
 
+    function applySecretUnlock(result) {
+      runtime.resultApplied = true;
+      // Apply the secret unlock reward
+      applyMarbleReward({
+        type: 'secret_unlocked',
+        levelId: result.levelId,
+        reward: { presses: 0, unlocks: ['next_game_unlocked'], claimKey: 'secret_tunnel' }
+      });
+      showOverlay('\u2728 Secret Discovered \u2728', 'You found the secret passage through the mountain! A new world awaits...');
+      saveNow();
+    }
+
     function stepSimulation(dt) {
       const stepInput = input.buildStepInput();
       const result = window.MarblePhysics.updatePhysics(runtime, stepInput, dt);
@@ -288,6 +305,11 @@
 
           if (result?.type === 'completed' && !runtime.resultApplied) {
             applyCompletion(result);
+            break;
+          }
+
+          if (result?.type === 'secret_unlocked' && !runtime.resultApplied) {
+            applySecretUnlock(result);
             break;
           }
         }
