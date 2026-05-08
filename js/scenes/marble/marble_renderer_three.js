@@ -1488,6 +1488,77 @@
         ctx.font = `bold ${fontSize}px monospace`;
       }
     }
+
+    // ── Compass rose (N/E/S/W directional) ──────────────────────────────────
+    // World: X+ = east, Z+ = south (Three.js), level Y+ = south
+    // Project unit vectors from marble position to determine screen directions
+    const compassSize = 40 * dpr;
+    const compassX = cw - compassSize - 16 * dpr;
+    const compassY = compassSize + 16 * dpr;
+    const mWorldX = runtime.marble.x;
+    const mWorldZ = runtime.marble.y; // level y -> Three.js z
+    const mWorldY = runtime.marble.z; // level z -> Three.js y (height)
+    const arrowLen = 24 * dpr;
+
+    // Project marble center
+    vec.set(mWorldX, mWorldY, mWorldZ);
+    vec.project(camera);
+    const csx = (vec.x * halfW) + halfW;
+    const csy = (-vec.y * halfH) + halfH;
+
+    // Project a point 1 unit north (Z-1 in Three.js)
+    vec.set(mWorldX, mWorldY, mWorldZ - 1);
+    vec.project(camera);
+    const nsx = (vec.x * halfW) + halfW;
+    const nsy = (-vec.y * halfH) + halfH;
+    // North direction on screen
+    let ndx = nsx - csx;
+    let ndy = nsy - csy;
+    let nLen = Math.sqrt(ndx*ndx + ndy*ndy) || 1;
+    ndx /= nLen; ndy /= nLen;
+
+    // East is perpendicular: project X+1
+    vec.set(mWorldX + 1, mWorldY, mWorldZ);
+    vec.project(camera);
+    const esx = (vec.x * halfW) + halfW;
+    const esy = (-vec.y * halfH) + halfH;
+    let edx = esx - csx;
+    let edy = esy - csy;
+    let eLen = Math.sqrt(edx*edx + edy*edy) || 1;
+    edx /= eLen; edy /= eLen;
+
+    // Draw compass background
+    ctx.fillStyle = 'rgba(0,0,0,0.7)';
+    ctx.beginPath();
+    ctx.arc(compassX, compassY, compassSize, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,0.4)';
+    ctx.lineWidth = 1 * dpr;
+    ctx.stroke();
+
+    // Draw direction arrows and labels
+    const dirs = [
+      { label: 'N', dx: ndx, dy: ndy, color: '#ff4444' },
+      { label: 'S', dx: -ndx, dy: -ndy, color: '#ffffff' },
+      { label: 'E', dx: edx, dy: edy, color: '#ffffff' },
+      { label: 'W', dx: -edx, dy: -edy, color: '#ffffff' }
+    ];
+    const compassFontSize = Math.round(11 * dpr);
+    ctx.font = `bold ${compassFontSize}px monospace`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    for (const dir of dirs) {
+      // Arrow line
+      ctx.strokeStyle = dir.color;
+      ctx.lineWidth = 2 * dpr;
+      ctx.beginPath();
+      ctx.moveTo(compassX, compassY);
+      ctx.lineTo(compassX + dir.dx * arrowLen, compassY + dir.dy * arrowLen);
+      ctx.stroke();
+      // Label
+      ctx.fillStyle = dir.color;
+      ctx.fillText(dir.label, compassX + dir.dx * (arrowLen + 10 * dpr), compassY + dir.dy * (arrowLen + 10 * dpr));
+    }
   }
 
   function hideCoordOverlay() {
