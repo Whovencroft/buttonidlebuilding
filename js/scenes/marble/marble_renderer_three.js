@@ -1398,6 +1398,96 @@
         ctx.fillText(label, sx, sy);
       }
     }
+
+    // ── Platform labels and path visualization ──────────────────────────────
+    const ML2 = window.MarbleLevels;
+    const actors = level.actors || [];
+    let platIndex = 0;
+    for (const actor of actors) {
+      if (actor.kind !== ML2.ACTOR_KINDS.MOVING_PLATFORM && actor.kind !== ML2.ACTOR_KINDS.ELEVATOR) continue;
+      platIndex++;
+      const platName = actor.id || `platform_${platIndex}`;
+
+      // Collect waypoints for this platform
+      const waypoints = [];
+      if (actor.kind === ML2.ACTOR_KINDS.MOVING_PLATFORM && actor.path?.points?.length >= 2) {
+        for (const pt of actor.path.points) {
+          waypoints.push({ x: pt.x, y: pt.z ?? actor.z ?? 0, z: pt.y });
+        }
+      } else if (actor.kind === ML2.ACTOR_KINDS.ELEVATOR && actor.travel) {
+        // Elevator: two stops (min and max on the travel axis)
+        const ax = actor.x;
+        const ay = actor.y;
+        const minZ = actor.travel.min ?? actor.z ?? 0;
+        const maxZ = actor.travel.max ?? minZ + 2;
+        waypoints.push({ x: ax, y: minZ, z: ay });
+        waypoints.push({ x: ax, y: maxZ, z: ay });
+      }
+
+      if (waypoints.length < 2) continue;
+
+      // Project all waypoints to screen
+      const screenPts = [];
+      for (const wp of waypoints) {
+        vec.set(wp.x, wp.y, wp.z);
+        vec.project(camera);
+        screenPts.push({
+          sx: (vec.x * halfW) + halfW,
+          sy: (-vec.y * halfH) + halfH,
+          wp
+        });
+      }
+
+      // Draw path lines between waypoints
+      ctx.strokeStyle = '#ff44ff';
+      ctx.lineWidth = 2 * dpr;
+      ctx.setLineDash([4 * dpr, 4 * dpr]);
+      ctx.beginPath();
+      ctx.moveTo(screenPts[0].sx, screenPts[0].sy);
+      for (let i = 1; i < screenPts.length; i++) {
+        ctx.lineTo(screenPts[i].sx, screenPts[i].sy);
+      }
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Draw waypoint markers and coordinate labels
+      for (let i = 0; i < screenPts.length; i++) {
+        const sp = screenPts[i];
+        // Skip if off-screen
+        if (sp.sx < -50 || sp.sx > cw + 50 || sp.sy < -50 || sp.sy > ch + 50) continue;
+
+        // Draw waypoint dot
+        ctx.fillStyle = '#ff44ff';
+        ctx.beginPath();
+        ctx.arc(sp.sx, sp.sy, 4 * dpr, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Draw waypoint coordinate label
+        const wpLabel = `(${sp.wp.x.toFixed(1)},${sp.wp.z.toFixed(1)},z${sp.wp.y.toFixed(1)})`;
+        const wpTw = wpLabel.length * charW;
+        const wpLabelY = sp.sy + labelH + 4 * dpr;
+        ctx.fillStyle = 'rgba(80,0,80,0.75)';
+        ctx.fillRect(sp.sx - wpTw/2 - pad, wpLabelY - labelH/2, wpTw + pad*2, labelH);
+        ctx.fillStyle = '#ff88ff';
+        ctx.fillText(wpLabel, sp.sx, wpLabelY);
+      }
+
+      // Draw platform name label at the midpoint of the path
+      const midIdx = Math.floor(screenPts.length / 2);
+      const midPt = screenPts[midIdx];
+      if (midPt.sx > -50 && midPt.sx < cw + 50 && midPt.sy > -50 && midPt.sy < ch + 50) {
+        const nameFontSize = Math.round(11 * dpr);
+        ctx.font = `bold ${nameFontSize}px monospace`;
+        const nameTw = platName.length * (nameFontSize * 0.6);
+        const nameY = midPt.sy - labelH - 6 * dpr;
+        ctx.fillStyle = 'rgba(120,0,120,0.85)';
+        ctx.fillRect(midPt.sx - nameTw/2 - pad*2, nameY - nameFontSize/2 - pad, nameTw + pad*4, nameFontSize + pad*2);
+        ctx.fillStyle = '#ffffff';
+        ctx.fillText(platName, midPt.sx, nameY);
+        // Restore font
+        ctx.font = `bold ${fontSize}px monospace`;
+      }
+    }
   }
 
   function hideCoordOverlay() {
