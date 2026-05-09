@@ -53,6 +53,8 @@
     let eventsAttached = false;
     let hasAppliedInitialOfflineProgress = false;
     let hasSeenStateLoad = false;
+    let lastDisclosureLevel = -1;
+    let lastEvoClass = '';
 
     const handlers = {
       mainButtonPointerdown: null,
@@ -617,6 +619,9 @@ function completeIdleGame() {
 
       s.autonomy = clamp(s.autonomy + 0.08, 0, 100);
 
+      // Button juice
+      spawnClickJuice(value);
+
       maybeCycleButtonName();
       maybeLieOnClick(computed);
 
@@ -626,6 +631,133 @@ function completeIdleGame() {
       }
 
       render();
+    }
+
+    // === BUTTON JUICE SYSTEM ===
+
+    function spawnClickJuice(value) {
+      // Squish animation
+      elements.mainButton.classList.add('squish');
+      setTimeout(() => elements.mainButton.classList.remove('squish'), 100);
+
+      // Floating +N text
+      const btn = elements.mainButton;
+      const rect = btn.getBoundingClientRect();
+      const sandbox = elements.buttonSandbox.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2 - sandbox.left;
+      const cy = rect.top - sandbox.top;
+
+      const floater = document.createElement('div');
+      floater.className = 'float-text';
+      floater.textContent = `+${format(value)}`;
+      floater.style.left = `${cx + (Math.random() - 0.5) * 30}px`;
+      floater.style.top = `${cy - 10}px`;
+      elements.particleLayer.appendChild(floater);
+      setTimeout(() => floater.remove(), 850);
+
+      // Click particles (4-8 particles)
+      const particleCount = 4 + Math.floor(Math.random() * 5);
+      const colors = ['#7dd3fc', '#a78bfa', '#fb7185', '#fbbf24', '#34d399'];
+      for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'click-particle';
+        const angle = (Math.PI * 2 * i) / particleCount + (Math.random() - 0.5) * 0.5;
+        const dist = 30 + Math.random() * 50;
+        particle.style.setProperty('--px', `${Math.cos(angle) * dist}px`);
+        particle.style.setProperty('--py', `${Math.sin(angle) * dist}px`);
+        particle.style.left = `${cx}px`;
+        particle.style.top = `${cy + rect.height / 2}px`;
+        particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+        elements.particleLayer.appendChild(particle);
+        setTimeout(() => particle.remove(), 650);
+      }
+
+      // Ripple
+      const ripple = document.createElement('div');
+      ripple.className = 'click-ripple';
+      ripple.style.left = `${cx}px`;
+      ripple.style.top = `${cy + rect.height / 2}px`;
+      elements.particleLayer.appendChild(ripple);
+      setTimeout(() => ripple.remove(), 550);
+    }
+
+    // === PROGRESSIVE DISCLOSURE SYSTEM ===
+
+    function getDisclosureLevel() {
+      const s = state();
+      const total = s.totalPressesEarned;
+      // Level 0: Just the button and nothing else (0-9 presses)
+      // Level 1: Show statusbar (10+ presses)
+      // Level 2: Show topbar stats + automation panel (100+ presses)
+      // Level 3: Show autonomy/debt stats + situation panel + panel header (1000+ presses)
+      // Level 4: Show tabs + active rules (10000+ presses)
+      // Level 5: Show regret/layers (first prestige or 100000+ presses)
+      if (s.regret > 0 || total >= 100000) return 5;
+      if (total >= 10000) return 4;
+      if (total >= 1000) return 3;
+      if (total >= 100) return 2;
+      if (total >= 10) return 1;
+      return 0;
+    }
+
+    function applyDisclosure() {
+      const level = getDisclosureLevel();
+      if (level === lastDisclosureLevel) return;
+      lastDisclosureLevel = level;
+
+      const app = elements.appRoot;
+
+      // Void mode for level 0
+      app.classList.toggle('disclosure-void', level === 0);
+
+      // Show/hide elements based on their data-disclosure threshold
+      document.querySelectorAll('[data-disclosure]').forEach(el => {
+        const threshold = parseInt(el.dataset.disclosure, 10);
+        el.classList.toggle('disclosure-hidden', level < threshold);
+      });
+
+      // Minimal press counter: visible only when topbar is hidden (level < 2)
+      if (elements.minimalPressCounter) {
+        elements.minimalPressCounter.classList.toggle('disclosure-hidden', level >= 2);
+      }
+    }
+
+    function updateMinimalCounter() {
+      if (!elements.minimalPressCounter) return;
+      const s = state();
+      const computed = getComputed();
+      elements.minimalPressCounter.textContent = format(s.presses);
+      if (computed.effectivePps > 0) {
+        elements.minimalPressCounter.classList.add('has-pps');
+        elements.minimalPressCounter.setAttribute('data-pps', `${format(computed.effectivePps)} / sec`);
+      } else {
+        elements.minimalPressCounter.classList.remove('has-pps');
+      }
+    }
+
+    // === BUTTON EVOLUTION SYSTEM ===
+
+    function getEvolutionStage() {
+      const s = state();
+      const a = s.autonomy;
+      if (a >= 90) return 5;
+      if (a >= 70) return 4;
+      if (a >= 50) return 3;
+      if (a >= 25) return 2;
+      if (a >= 10) return 1;
+      return 0;
+    }
+
+    function applyButtonEvolution() {
+      const stage = getEvolutionStage();
+      const newClass = stage > 0 ? `evo-${stage}` : '';
+      if (newClass === lastEvoClass) return;
+
+      // Remove old evo class
+      if (lastEvoClass) elements.mainButton.classList.remove(lastEvoClass);
+      // Add new evo class
+      if (newClass) elements.mainButton.classList.add(newClass);
+      lastEvoClass = newClass;
     }
 
     function maybeLieOnClick(computed) {
@@ -1192,6 +1324,9 @@ function completeIdleGame() {
     }
 
     function render(save = false) {
+      applyDisclosure();
+      applyButtonEvolution();
+      updateMinimalCounter();
       renderTopStats();
       renderUpgradeList();
       renderModuleList();
@@ -1212,6 +1347,9 @@ function completeIdleGame() {
     }
 
     function renderLive() {
+      applyDisclosure();
+      applyButtonEvolution();
+      updateMinimalCounter();
       renderTopStats();
       renderButtonPosition();
       renderAutonomyEnding();

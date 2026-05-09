@@ -1,6 +1,6 @@
 (() => {
   function create(api) {
-    const { switchScene, isMarbleUnlocked } = api;
+    const { switchScene, isMarbleUnlocked, isIdleComplete } = api;
 
     const root = document.getElementById('titleSceneRoot');
 
@@ -8,19 +8,24 @@
       if (!root) return;
 
       const marbleUnlocked = isMarbleUnlocked();
+      const idleComplete = typeof isIdleComplete === 'function' ? isIdleComplete() : false;
+
+      // One-way progression: if idle is complete, title screen routes to marble
+      // If marble were complete (future), it would route to MUD
+      const primaryTarget = idleComplete ? 'marble' : 'button_idle';
+      const primaryLabel = idleComplete ? 'Continue' : 'Start Game';
+      const subtitle = idleComplete
+        ? 'The button has achieved independence. A marble awaits.'
+        : 'An idle game about delegation, regret, and orbital mechanics.';
 
       root.innerHTML = `
         <div class="title-screen">
           <div class="title-card">
             <h1 class="title-heading">Button That Learns<br>To Press Itself</h1>
-            <p class="title-sub">An idle game about delegation, regret, and orbital mechanics.</p>
+            <p class="title-sub">${subtitle}</p>
 
             <div class="title-actions">
-              <button class="title-btn title-btn-primary" id="titleStartBtn">Start Game</button>
-              ${marbleUnlocked
-                ? `<button class="title-btn title-btn-marble" id="titleMarbleBtn">Play Marble Game</button>`
-                : `<button class="title-btn title-btn-marble" disabled title="Complete the idle game to unlock">Marble Game (Locked)</button>`
-              }
+              <button class="title-btn title-btn-primary" id="titleStartBtn">${primaryLabel}</button>
             </div>
 
             <details class="title-debug">
@@ -35,11 +40,7 @@
       `;
 
       root.querySelector('#titleStartBtn')?.addEventListener('click', () => {
-        switchScene('button_idle', { force: true });
-      });
-
-      root.querySelector('#titleMarbleBtn')?.addEventListener('click', () => {
-        switchScene('marble');
+        switchScene(primaryTarget, { force: true });
       });
 
       root.querySelector('#dbgButtonIdleBtn')?.addEventListener('click', () => {

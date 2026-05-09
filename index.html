@@ -8,46 +8,46 @@
 </head>
 <body>
   <div class="app">
-    <div class="topbar">
-      <div class="stat hero">
+    <div class="topbar" data-disclosure="2">
+      <div class="stat hero" data-disclosure="2">
         <div class="label">Displayed Presses</div>
         <div class="value" id="displayedPresses">0</div>
         <div class="subvalue" id="truePressesSub">True total hidden in plain sight</div>
       </div>
-      <div class="stat">
+      <div class="stat" data-disclosure="2">
         <div class="label">Presses / sec</div>
         <div class="value" id="pps">0</div>
         <div class="subvalue" id="manualValue">Manual press value: 1</div>
       </div>
-      <div class="stat">
+      <div class="stat" data-disclosure="3">
         <div class="label">Autonomy</div>
         <div class="value" id="autonomyValue">0%</div>
         <div class="subvalue" id="autonomySub">Still dependent on you</div>
       </div>
-      <div class="stat">
+      <div class="stat" data-disclosure="3">
         <div class="label">Debt</div>
         <div class="value" id="debtValue">0</div>
         <div class="subvalue" id="debtSub">Financially irresponsible mode locked</div>
       </div>
-      <div class="stat">
+      <div class="stat" data-disclosure="5">
         <div class="label">Regret</div>
         <div class="value" id="regretValue">0</div>
         <div class="subvalue" id="layerSummary">No layers yet</div>
       </div>
-      <div class="stat">
+      <div class="stat" data-disclosure="4">
         <div class="label">Active Rules</div>
         <div class="value" id="activeRulesValue">0 / 2</div>
         <div class="subvalue" id="comboSummary">No harmful innovations selected</div>
       </div>
     </div>
 
-    <div class="tabs" id="tabs"></div>
+    <div class="tabs" id="tabs" data-disclosure="4"></div>
 
     <div class="content">
       <section class="tab-panel active" data-tab="play">
         <div class="game-grid" id="playGameGrid">
           <div class="panel">
-            <div class="panel-header">
+            <div class="panel-header" data-disclosure="3">
              <h2>Main Button</h2>
              <div class="panel-tools">
                 <div class="small" id="buttonModeLabel">Mode: Manual humiliation</div>
@@ -64,6 +64,8 @@
                    <div class="button-sandbox" id="buttonSandbox">
                       <button class="big-button" id="mainButton">Press Me</button>
                      <div class="button-center-note" id="buttonNote">I built a game about not playing a game; it feels like self indulgence, or maybe self flagellation.</div>
+                     <div class="minimal-press-counter" id="minimalPressCounter">0</div>
+                     <div class="particle-layer" id="particleLayer"></div>
                      <div id="fakeButtonLayer"></div>
                     </div>
                     <div class="popup-zone" id="popupZone"></div>
@@ -89,7 +91,7 @@
   </div>
 </div>
 
-          <div class="column-stack button-only-pane">
+          <div class="column-stack button-only-pane" data-disclosure="2">
             <div class="panel">
               <div class="panel-header">
                 <h2>Automation</h2>
@@ -101,7 +103,7 @@
             </div>
           </div>
 
-          <div class="column-stack button-only-pane">
+          <div class="column-stack button-only-pane" data-disclosure="3">
             <div class="panel">
               <div class="panel-header">
                 <h2>Situation</h2>
@@ -286,7 +288,7 @@
       </section>
     </div>
 
-    <div class="statusbar">
+    <div class="statusbar" data-disclosure="1">
       <div class="message" id="messageBar">You could stop anytime. The button disagrees.</div>
       <div class="status-right">
         <span id="autosaveStatus">Autosave: waiting</span>
@@ -619,16 +621,16 @@
   </script>
   <script src="./js/core/scene_manager.js"></script>
 
-  <script src="./js/scenes/marble/marble_levels.js?v=93"></script>
-  <script src="./js/scenes/marble/marble_state.js?v=93"></script>
-  <script src="./js/scenes/marble/marble_input.js?v=93"></script>
+  <script src="./js/scenes/marble/marble_levels.js?v=94"></script>
+  <script src="./js/scenes/marble/marble_state.js?v=94"></script>
+  <script src="./js/scenes/marble/marble_input.js?v=94"></script>
   <script src="./js/vendor/three.min.js"></script>
-  <script src="./js/scenes/marble/marble_physics.js?v=93"></script>
-  <script src="./js/scenes/marble/marble_renderer_three.js?v=93"></script>
+  <script src="./js/scenes/marble/marble_physics.js?v=94"></script>
+  <script src="./js/scenes/marble/marble_renderer_three.js?v=94"></script>
 
   <script src="./js/scenes/button_idle_scene.js"></script>
-  <script src="./js/scenes/marble_scene.js?v=93"></script>
+  <script src="./js/scenes/marble_scene.js?v=94"></script>
   <script src="./js/scenes/title_scene.js"></script>
-  <script src="./js/main.js?v=93"></script>
+  <script src="./js/main.js?v=94"></script>
 </body>
 </html>

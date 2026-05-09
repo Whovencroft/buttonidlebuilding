@@ -230,7 +230,9 @@
     buttonIdleSceneRoot: $('buttonIdleSceneRoot'),
     marbleSceneRoot: $('marbleSceneRoot'),
     switchButtonSceneBtn: $('switchButtonSceneBtn'),
-    switchMarbleSceneBtn: $('switchMarbleSceneBtn')
+    switchMarbleSceneBtn: $('switchMarbleSceneBtn'),
+    particleLayer: $('particleLayer'),
+    minimalPressCounter: $('minimalPressCounter')
   };
 
   let sceneManager = null;
@@ -676,6 +678,9 @@ function switchScene(sceneId, options = {}) {
     },
     isMarbleUnlocked() {
       return !!state.scenes.marble.unlocked;
+    },
+    isIdleComplete() {
+      return !!state.flags.idleGameComplete;
     },
     setSaveStatus(text) {
       elements.saveStatus.textContent = text;
