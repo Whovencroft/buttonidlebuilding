@@ -496,6 +496,11 @@ function completeIdleGame() {
         basePps += (s.upgrades[upgrade.id] || 0) * upgrade.pps;
       }
 
+      // Prestige PPS floor: ensures all builds can bootstrap after prestige resets
+      // This gives passive/idle builds a non-zero starting point proportional to progress
+      const prestigePpsFloor = s.regret * 0.5 + s.metaPresses * 2 + s.hyperPresses * 50 + s.pressDerivatives * 500;
+      basePps += prestigePpsFloor;
+
       const idleSeconds = Math.max(0, (now() - s.session.lastClick) / 1000);
       const idleBonus = idleEnabled
         ? (1 + Math.log2(1 + idleSeconds) * 0.2 * Math.max(1, idleScale))
@@ -560,7 +565,8 @@ function completeIdleGame() {
         maxModuleSlots,
         synergyBonus,
         antiSynergyPenalty,
-        overclockProtocolActive
+        overclockProtocolActive,
+        prestigePpsFloor
       };
     }
 
