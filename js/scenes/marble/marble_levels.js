@@ -4649,7 +4649,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     setSurface(level, 90, 143, { baseHeight: 2, kind: 'bounce', bounce: 6 });
 
     // --- Goal ---
-    setGoal(level, 2.5, 194.5);
+    setGoal(level, 52.5, 106.5);
     setTrigger(level, 133, 99, 'secret_goal');
 
     return registerLevel(level);
@@ -6574,9 +6574,6 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
 
     return registerLevel(level);
   }
-
-
-
   function generateCourseFromSpec(spec = {}) {
     const width = Math.max(28, Math.floor(spec.width ?? 36));
     const height = Math.max(20, Math.floor(spec.height ?? 24));
