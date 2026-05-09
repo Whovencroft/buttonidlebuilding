@@ -189,6 +189,8 @@
       path: actor.path ? {
         type: actor.path.type ?? 'ping_pong',
         speed: actor.path.speed ?? 1,
+        pauseDuration: actor.path.pauseDuration ?? 1.0,
+        midpointPause: actor.path.midpointPause ?? 0,
         points: (actor.path.points ?? []).map((point) => ({
           x: point.x ?? 0,
           y: point.y ?? 0,
@@ -989,6 +991,28 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     };
   }
 
+  // Convert raw travel distance to path position, accounting for midpoint pauses
+  function rawToPathPos(raw, totalSegments, midPauseTime) {
+    if (midPauseTime <= 0) return raw;
+    let pos = 0;
+    let remaining = raw;
+    for (let i = 0; i < totalSegments; i++) {
+      if (remaining <= 1) {
+        pos += remaining;
+        return pos;
+      }
+      pos += 1;
+      remaining -= 1;
+      if (i < totalSegments - 1) {
+        if (remaining <= midPauseTime) {
+          return pos; // pausing at midpoint
+        }
+        remaining -= midPauseTime;
+      }
+    }
+    return totalSegments;
+  }
+
   function updateActorState(actor, state, clock, dt) {
     const prev = { x: state.x, y: state.y, z: state.z, topHeight: state.topHeight };
 
@@ -1013,43 +1037,40 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
         state.y = lerp(a.y, b.y, t);
         state.z = lerp(a.z, b.z, t);
       } else {
-        // Ping-pong with endpoint pauses:
-        // Full cycle = forward travel + pause + reverse travel + pause
+        // Ping-pong with endpoint + midpoint pauses:
+        const midPause = actor.path.midpointPause ?? 0;
+        const midPauseTime = midPause * speed; // in travel-units
+        const numMidpoints = Math.max(0, totalSegments - 1);
         const moveDist = totalSegments;
-        const fullCycle = moveDist * 2 + pausePerEnd * 2;
+        const oneWayDist = moveDist + numMidpoints * midPauseTime;
+        const fullCycle = oneWayDist * 2 + pausePerEnd * 2;
         const raw = (clock * speed) % fullCycle;
-        let effectiveTravel;
-        if (raw < moveDist) {
-          // Forward motion
-          effectiveTravel = raw;
-        } else if (raw < moveDist + pausePerEnd) {
-          // Pause at far end
-          effectiveTravel = moveDist; // clamp at end
-        } else if (raw < moveDist * 2 + pausePerEnd) {
-          // Reverse motion
-          effectiveTravel = moveDist - (raw - moveDist - pausePerEnd);
+        let pathPos;
+        if (raw < oneWayDist) {
+          pathPos = rawToPathPos(raw, totalSegments, midPauseTime);
+        } else if (raw < oneWayDist + pausePerEnd) {
+          pathPos = totalSegments;
+        } else if (raw < oneWayDist * 2 + pausePerEnd) {
+          const reverseRaw = raw - oneWayDist - pausePerEnd;
+          pathPos = totalSegments - rawToPathPos(reverseRaw, totalSegments, midPauseTime);
         } else {
-          // Pause at start end
-          effectiveTravel = 0; // clamp at start
+          pathPos = 0;
         }
 
-        const forward = effectiveTravel <= moveDist && effectiveTravel >= 0;
-        const ping = clamp(effectiveTravel, 0, moveDist);
-        if (ping >= moveDist - 0.0001) {
-          // At far endpoint
+        pathPos = clamp(pathPos, 0, totalSegments);
+        if (pathPos >= totalSegments - 0.0001) {
           const last = points[points.length - 1];
           state.x = last.x;
           state.y = last.y;
           state.z = last.z;
-        } else if (ping <= 0.0001) {
-          // At start endpoint
+        } else if (pathPos <= 0.0001) {
           const first = points[0];
           state.x = first.x;
           state.y = first.y;
           state.z = first.z;
         } else {
-          segmentIndex = Math.floor(ping);
-          t = ping - segmentIndex;
+          segmentIndex = Math.floor(pathPos);
+          t = pathPos - segmentIndex;
           const a = points[segmentIndex];
           const b = points[Math.min(segmentIndex + 1, points.length - 1)];
           state.x = lerp(a.x, b.x, t);
@@ -1465,6 +1486,8 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
       path: {
         type: extra.loop ? 'loop' : 'ping_pong',
         speed,
+        pauseDuration: extra.pauseDuration ?? 1.0,
+        midpointPause: extra.midpointPause ?? 0,
         points
       },
       conveyor: extra.conveyor ?? null,
@@ -1688,1470 +1711,4825 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
   // LEVEL 0 — Training Ground
   // Safe sandbox with no timer. Teaches movement, ramps, and goal.
   // ═══════════════════════════════════════════════════════════════════════════
+  // ─── Level 0: Training Ground ───
   function buildTrainingGround() {
     const level = createLevelShell({
       id: 'training_ground',
       name: 'Training Ground',
       width: 50,
       height: 50,
-      timeLimit: 0,
-      start: { x: 5, y: 5 },
-      reward: { presses: 0, unlocks: [], claimKey: 'training_ground' }
+      start: { x: 5.5, y: 5.5, z: 6 },
+      timeLimit: 0
     });
-    // Start platform at z=6
-    fillTrack(level, 3, 3, 8, 8, 6);
-    // Ramp down east to z=4
-    placeRamp(level, { x: 11, y: 5, dir: 'east', length: 4, width: 4, startZ: 6, endZ: 4 });
-    // Mid corridor at z=4 — zigzag shape
+
+    // --- Surface tiles ---
+    fillTrack(level, 3, 2, 8, 11, 6);
     fillTrack(level, 15, 5, 8, 4, 4);
-    fillTrack(level, 19, 9, 4, 10, 4);
-    fillTrack(level, 19, 19, 12, 4, 4);
-    // Ramp down south to z=2
-    placeRamp(level, { x: 27, y: 23, dir: 'south', length: 4, width: 4, startZ: 4, endZ: 2 });
-    // Lower section at z=2
-    fillTrack(level, 25, 27, 8, 8, 2);
-    // Short corridor to goal
-    fillTrack(level, 25, 35, 4, 8, 2);
-    // Goal platform
-    fillTrack(level, 23, 40, 8, 6, 2);
-    setGoal(level, 27, 43, 0.55);
-    // Route graph
-    addGraphNode(level, { id: 'start', type: 'entry', x: 6, y: 6, z: 6 });
-    addGraphNode(level, { id: 'mid', type: 'hub', x: 23, y: 15, z: 4 });
-    addGraphNode(level, { id: 'goal', type: 'goal', x: 28, y: 44, z: 2 });
-    addGraphEdge(level, { from: 'start', to: 'mid', kind: 'descent' });
-    addGraphEdge(level, { from: 'mid', to: 'goal', kind: 'descent' });
+    fillTrack(level, 19, 9, 4, 14, 4);
+    fillTrack(level, 6, 17, 13, 2, 4);
+    fillTrack(level, 6, 19, 4, 8, 4);
+    fillTrack(level, 15, 19, 1, 20, 4);
+    fillTrack(level, 23, 19, 8, 4, 4);
+    fillTrack(level, 10, 22, 2, 17, 4);
+    fillTrack(level, 20, 23, 2, 10, 4);
+    fillTrack(level, 8, 27, 2, 6, 4);
+    fillTrack(level, 12, 31, 3, 8, 4);
+    fillTrack(level, 16, 31, 4, 2, 4);
+    fillTrack(level, 26, 27, 7, 8, 2);
+    fillTrack(level, 26, 35, 3, 13, 2);
+    fillTrack(level, 19, 40, 7, 6, 2);
+    fillTrack(level, 29, 40, 1, 8, 2);
+    fillTrack(level, 18, 41, 1, 7, 2);
+    fillTrack(level, 17, 42, 1, 7, 2);
+    fillTrack(level, 14, 43, 3, 6, 2);
+    fillTrack(level, 19, 46, 3, 1, 2);
+    fillTrack(level, 25, 46, 1, 2, 2);
+    fillTrack(level, 19, 47, 2, 1, 2);
+    // Ramps
+    setSurface(level, 11, 5, { baseHeight: 6, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 12, 5, { baseHeight: 5.5, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 13, 5, { baseHeight: 5, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 14, 5, { baseHeight: 4.5, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 11, 6, { baseHeight: 6, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 12, 6, { baseHeight: 5.5, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 13, 6, { baseHeight: 5, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 14, 6, { baseHeight: 4.5, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 11, 7, { baseHeight: 6, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 12, 7, { baseHeight: 5.5, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 13, 7, { baseHeight: 5, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 14, 7, { baseHeight: 4.5, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 11, 8, { baseHeight: 6, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 12, 8, { baseHeight: 5.5, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 13, 8, { baseHeight: 5, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 14, 8, { baseHeight: 4.5, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 7, 13, { baseHeight: 6, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 8, 13, { baseHeight: 6, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 7, 14, { baseHeight: 5.5, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 8, 14, { baseHeight: 5.5, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 7, 15, { baseHeight: 5, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 8, 15, { baseHeight: 5, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 7, 16, { baseHeight: 4.5, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 8, 16, { baseHeight: 4.5, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 27, 23, { baseHeight: 4, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 28, 23, { baseHeight: 4, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 29, 23, { baseHeight: 4, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 30, 23, { baseHeight: 4, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 27, 24, { baseHeight: 3.5, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 28, 24, { baseHeight: 3.5, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 29, 24, { baseHeight: 3.5, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 30, 24, { baseHeight: 3.5, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 27, 25, { baseHeight: 3, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 28, 25, { baseHeight: 3, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 29, 25, { baseHeight: 3, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 30, 25, { baseHeight: 3, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 27, 26, { baseHeight: 2.5, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 28, 26, { baseHeight: 2.5, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 29, 26, { baseHeight: 2.5, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 30, 26, { baseHeight: 2.5, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 22, 31, { baseHeight: 4, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 23, 31, { baseHeight: 3.5, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 24, 31, { baseHeight: 3, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 25, 31, { baseHeight: 2.5, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 22, 32, { baseHeight: 4, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 23, 32, { baseHeight: 3.5, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 24, 32, { baseHeight: 3, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 25, 32, { baseHeight: 2.5, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 14, 39, { baseHeight: 4, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 15, 39, { baseHeight: 4, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 14, 40, { baseHeight: 3.5, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 15, 40, { baseHeight: 3.5, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 14, 41, { baseHeight: 3, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 15, 41, { baseHeight: 3, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 14, 42, { baseHeight: 2.5, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 15, 42, { baseHeight: 2.5, shape: 'slope_s', kind: 'track' });
+
+    // --- Goal ---
+    setGoal(level, 27.5, 43.5);
+
     return registerLevel(level);
   }
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  // LEVEL 1 — Gentle Slopes
-  // Introduction to ramps and gentle descent. Winding path with multiple turns.
-  // ═══════════════════════════════════════════════════════════════════════════
+  // ─── Level 1: Gentle Slopes ───
   function buildGentleSlopes() {
     const level = createLevelShell({
       id: 'gentle_slopes',
       name: 'Gentle Slopes',
       width: 60,
       height: 70,
-      timeLimit: 60,
-      start: { x: 5, y: 5 },
-      reward: { presses: 500, unlocks: ['marble_gentle_slopes_complete'], claimKey: 'gentle_slopes' }
+      start: { x: 5.5, y: 5.5, z: 14 },
+      timeLimit: 60
     });
-    // Start at z=12 — long winding descent to z=2
-    fillTrack(level, 3, 3, 8, 6, 12);
-    // Ramp east down to z=10
-    placeRamp(level, { x: 11, y: 4, dir: 'east', length: 5, width: 4, startZ: 12, endZ: 10 });
-    // Platform at z=10
-    fillTrack(level, 16, 3, 8, 6, 10);
-    // Ramp south down to z=8
-    placeRamp(level, { x: 18, y: 9, dir: 'south', length: 5, width: 4, startZ: 10, endZ: 8 });
-    // Platform at z=8 — wider area
-    fillTrack(level, 16, 14, 10, 8, 8);
-    // Ramp west down to z=6 (switchback)
-    placeRamp(level, { x: 15, y: 16, dir: 'west', length: 5, width: 4, startZ: 8, endZ: 6 });
-    // Corridor west at z=6
-    fillTrack(level, 5, 15, 6, 6, 6);
-    // Ramp south down to z=4
-    placeRamp(level, { x: 6, y: 21, dir: 'south', length: 5, width: 4, startZ: 6, endZ: 4 });
-    // Platform at z=4
-    fillTrack(level, 4, 26, 10, 8, 4);
-    // Ramp east down to z=2 (another switchback)
-    placeRamp(level, { x: 14, y: 28, dir: 'east', length: 6, width: 4, startZ: 4, endZ: 2 });
-    // Long corridor east at z=2
-    fillTrack(level, 20, 27, 16, 5, 2);
-    // S-curve section at z=2
-    fillTrack(level, 36, 27, 5, 12, 2);
-    fillTrack(level, 28, 39, 13, 5, 2);
-    fillTrack(level, 28, 44, 5, 10, 2);
-    fillTrack(level, 28, 54, 14, 5, 2);
-    // Goal area
-    fillTrack(level, 42, 52, 8, 8, 2);
-    setGoal(level, 46, 56, 0.55);
-    // Route graph
-    addGraphNode(level, { id: 'start', type: 'entry', x: 6, y: 6, z: 12 });
-    addGraphNode(level, { id: 'r1', type: 'route', x: 20, y: 6, z: 10 });
-    addGraphNode(level, { id: 'r2', type: 'route', x: 21, y: 18, z: 8 });
-    addGraphNode(level, { id: 'r3', type: 'route', x: 8, y: 18, z: 6 });
-    addGraphNode(level, { id: 'r4', type: 'route', x: 9, y: 30, z: 4 });
-    addGraphNode(level, { id: 'goal', type: 'goal', x: 47, y: 57, z: 2 });
-    addGraphEdge(level, { from: 'start', to: 'r1', kind: 'descent' });
-    addGraphEdge(level, { from: 'r1', to: 'r2', kind: 'descent' });
-    addGraphEdge(level, { from: 'r2', to: 'r3', kind: 'descent' });
-    addGraphEdge(level, { from: 'r3', to: 'r4', kind: 'descent' });
-    addGraphEdge(level, { from: 'r4', to: 'goal', kind: 'descent' });
+
+    // --- Surface tiles ---
+    fillTrack(level, 3, 3, 8, 6, 14);
+    fillTrack(level, 16, 3, 8, 6, 12);
+    fillTrack(level, 16, 14, 10, 8, 10);
+    fillTrack(level, 5, 15, 6, 6, 8);
+    fillTrack(level, 4, 26, 10, 8, 6);
+    fillTrack(level, 20, 27, 20, 5, 4);
+    fillTrack(level, 47, 56, 3, 1, 4);
+    fillTrack(level, 28, 39, 12, 5, 2);
+    fillTrack(level, 28, 51, 15, 4, 0);
+    fillTrack(level, 43, 52, 7, 4, 0);
+    fillTrack(level, 41, 55, 2, 1, 0);
+    fillTrack(level, 42, 56, 5, 4, 0);
+    fillTrack(level, 47, 57, 3, 3, 0);
+    // Ramps
+    setSurface(level, 11, 4, { baseHeight: 14, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 12, 4, { baseHeight: 13.6, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 13, 4, { baseHeight: 13.2, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 14, 4, { baseHeight: 12.8, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 15, 4, { baseHeight: 12.4, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 11, 5, { baseHeight: 14, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 12, 5, { baseHeight: 13.6, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 13, 5, { baseHeight: 13.2, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 14, 5, { baseHeight: 12.8, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 15, 5, { baseHeight: 12.4, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 11, 6, { baseHeight: 14, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 12, 6, { baseHeight: 13.6, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 13, 6, { baseHeight: 13.2, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 14, 6, { baseHeight: 12.8, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 15, 6, { baseHeight: 12.4, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 11, 7, { baseHeight: 14, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 12, 7, { baseHeight: 13.6, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 13, 7, { baseHeight: 13.2, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 14, 7, { baseHeight: 12.8, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 15, 7, { baseHeight: 12.4, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 18, 9, { baseHeight: 12, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 19, 9, { baseHeight: 12, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 20, 9, { baseHeight: 12, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 21, 9, { baseHeight: 12, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 18, 10, { baseHeight: 11.6, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 19, 10, { baseHeight: 11.6, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 20, 10, { baseHeight: 11.6, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 21, 10, { baseHeight: 11.6, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 18, 11, { baseHeight: 11.2, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 19, 11, { baseHeight: 11.2, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 20, 11, { baseHeight: 11.2, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 21, 11, { baseHeight: 11.2, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 18, 12, { baseHeight: 10.8, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 19, 12, { baseHeight: 10.8, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 20, 12, { baseHeight: 10.8, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 21, 12, { baseHeight: 10.8, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 18, 13, { baseHeight: 10.4, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 19, 13, { baseHeight: 10.4, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 20, 13, { baseHeight: 10.4, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 21, 13, { baseHeight: 10.4, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 11, 16, { baseHeight: 8.4, shape: 'slope_w', kind: 'track' });
+    setSurface(level, 12, 16, { baseHeight: 8.8, shape: 'slope_w', kind: 'track' });
+    setSurface(level, 13, 16, { baseHeight: 9.2, shape: 'slope_w', kind: 'track' });
+    setSurface(level, 14, 16, { baseHeight: 9.6, shape: 'slope_w', kind: 'track' });
+    setSurface(level, 15, 16, { baseHeight: 10, shape: 'slope_w', kind: 'track' });
+    setSurface(level, 11, 17, { baseHeight: 8.4, shape: 'slope_w', kind: 'track' });
+    setSurface(level, 12, 17, { baseHeight: 8.8, shape: 'slope_w', kind: 'track' });
+    setSurface(level, 13, 17, { baseHeight: 9.2, shape: 'slope_w', kind: 'track' });
+    setSurface(level, 14, 17, { baseHeight: 9.6, shape: 'slope_w', kind: 'track' });
+    setSurface(level, 15, 17, { baseHeight: 10, shape: 'slope_w', kind: 'track' });
+    setSurface(level, 11, 18, { baseHeight: 8.4, shape: 'slope_w', kind: 'track' });
+    setSurface(level, 12, 18, { baseHeight: 8.8, shape: 'slope_w', kind: 'track' });
+    setSurface(level, 13, 18, { baseHeight: 9.2, shape: 'slope_w', kind: 'track' });
+    setSurface(level, 14, 18, { baseHeight: 9.6, shape: 'slope_w', kind: 'track' });
+    setSurface(level, 15, 18, { baseHeight: 10, shape: 'slope_w', kind: 'track' });
+    setSurface(level, 11, 19, { baseHeight: 8.4, shape: 'slope_w', kind: 'track' });
+    setSurface(level, 12, 19, { baseHeight: 8.8, shape: 'slope_w', kind: 'track' });
+    setSurface(level, 13, 19, { baseHeight: 9.2, shape: 'slope_w', kind: 'track' });
+    setSurface(level, 14, 19, { baseHeight: 9.6, shape: 'slope_w', kind: 'track' });
+    setSurface(level, 15, 19, { baseHeight: 10, shape: 'slope_w', kind: 'track' });
+    setSurface(level, 6, 21, { baseHeight: 8, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 7, 21, { baseHeight: 8, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 8, 21, { baseHeight: 8, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 9, 21, { baseHeight: 8, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 6, 22, { baseHeight: 7.6, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 7, 22, { baseHeight: 7.6, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 8, 22, { baseHeight: 7.6, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 9, 22, { baseHeight: 7.6, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 6, 23, { baseHeight: 7.2, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 7, 23, { baseHeight: 7.2, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 8, 23, { baseHeight: 7.2, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 9, 23, { baseHeight: 7.2, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 6, 24, { baseHeight: 6.8, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 7, 24, { baseHeight: 6.8, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 8, 24, { baseHeight: 6.8, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 9, 24, { baseHeight: 6.8, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 6, 25, { baseHeight: 6.4, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 7, 25, { baseHeight: 6.4, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 8, 25, { baseHeight: 6.4, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 9, 25, { baseHeight: 6.4, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 14, 28, { baseHeight: 6, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 15, 28, { baseHeight: 5.7, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 16, 28, { baseHeight: 5.3, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 17, 28, { baseHeight: 5, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 18, 28, { baseHeight: 4.7, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 19, 28, { baseHeight: 4.3, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 14, 29, { baseHeight: 6, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 15, 29, { baseHeight: 5.7, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 16, 29, { baseHeight: 5.3, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 17, 29, { baseHeight: 5, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 18, 29, { baseHeight: 4.7, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 19, 29, { baseHeight: 4.3, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 14, 30, { baseHeight: 6, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 15, 30, { baseHeight: 5.7, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 16, 30, { baseHeight: 5.3, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 17, 30, { baseHeight: 5, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 18, 30, { baseHeight: 4.7, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 19, 30, { baseHeight: 4.3, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 14, 31, { baseHeight: 6, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 15, 31, { baseHeight: 5.7, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 16, 31, { baseHeight: 5.3, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 17, 31, { baseHeight: 5, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 18, 31, { baseHeight: 4.7, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 19, 31, { baseHeight: 4.3, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 36, 32, { baseHeight: 4, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 37, 32, { baseHeight: 4, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 38, 32, { baseHeight: 4, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 39, 32, { baseHeight: 4, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 36, 33, { baseHeight: 4.7, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 37, 33, { baseHeight: 4.7, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 38, 33, { baseHeight: 4.7, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 39, 33, { baseHeight: 4.7, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 36, 34, { baseHeight: 4.3, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 37, 34, { baseHeight: 4.3, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 38, 34, { baseHeight: 4.3, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 39, 34, { baseHeight: 4.3, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 36, 35, { baseHeight: 3, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 37, 35, { baseHeight: 3, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 38, 35, { baseHeight: 3, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 39, 35, { baseHeight: 3, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 36, 36, { baseHeight: 2.7, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 37, 36, { baseHeight: 2.7, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 38, 36, { baseHeight: 2.7, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 39, 36, { baseHeight: 2.7, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 36, 37, { baseHeight: 2.3, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 37, 37, { baseHeight: 2.3, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 38, 37, { baseHeight: 2.3, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 39, 37, { baseHeight: 2.3, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 36, 38, { baseHeight: 2, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 37, 38, { baseHeight: 2, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 38, 38, { baseHeight: 2, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 39, 38, { baseHeight: 2, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 28, 44, { baseHeight: 2, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 29, 44, { baseHeight: 2, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 30, 44, { baseHeight: 2, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 31, 44, { baseHeight: 2, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 28, 45, { baseHeight: 1.7, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 29, 45, { baseHeight: 1.7, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 30, 45, { baseHeight: 1.7, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 31, 45, { baseHeight: 1.7, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 28, 46, { baseHeight: 1.3, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 29, 46, { baseHeight: 1.3, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 30, 46, { baseHeight: 1.3, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 31, 46, { baseHeight: 1.3, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 28, 47, { baseHeight: 1, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 29, 47, { baseHeight: 1, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 30, 47, { baseHeight: 1, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 31, 47, { baseHeight: 1, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 28, 48, { baseHeight: 0.7, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 29, 48, { baseHeight: 0.7, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 30, 48, { baseHeight: 0.7, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 31, 48, { baseHeight: 0.7, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 28, 49, { baseHeight: 0.30000000000000004, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 29, 49, { baseHeight: 0.30000000000000004, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 30, 49, { baseHeight: 0.30000000000000004, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 31, 49, { baseHeight: 0.30000000000000004, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 28, 50, { baseHeight: 0, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 29, 50, { baseHeight: 0, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 30, 50, { baseHeight: 0, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 31, 50, { baseHeight: 0, shape: 'slope_s', kind: 'track' });
+
+    // --- Goal ---
+    setGoal(level, 46.5, 56.5);
+
     return registerLevel(level);
   }
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  // LEVEL 2 — Forked Path
-  // Two routes diverge and rejoin. Multiple forks with risk/reward choices.
-  // ═══════════════════════════════════════════════════════════════════════════
+  // ─── Level 2: Forked Path ───
   function buildForkedPath() {
     const level = createLevelShell({
       id: 'forked_path',
       name: 'Forked Path',
       width: 65,
       height: 60,
-      timeLimit: 60,
-      start: { x: 5, y: 28 },
-      reward: { presses: 1000, unlocks: ['marble_forked_path_complete'], claimKey: 'forked_path' }
+      start: { x: 5.5, y: 28.5, z: 10 },
+      timeLimit: 60
     });
-    // Start at z=10
-    fillTrack(level, 3, 26, 6, 6, 10);
-    // Short corridor east
-    fillTrack(level, 9, 27, 6, 4, 10);
-    // Fork 1 platform
-    fillTrack(level, 15, 24, 6, 10, 10);
-    // === Upper path (risky — narrow, steep) ===
-    placeRamp(level, { x: 17, y: 20, dir: 'north', length: 4, width: 3, startZ: 10, endZ: 8 });
+
+    // --- Surface tiles ---
+    fillTrack(level, 45, 9, 14, 3, 2);
+    fillTrack(level, 59, 10, 2, 7, 2);
+    fillTrack(level, 45, 12, 2, 3, 2);
+    fillTrack(level, 53, 12, 6, 6, 2);
+    fillTrack(level, 53, 18, 4, 16, 2);
+    fillTrack(level, 45, 33, 3, 4, 2);
+    fillTrack(level, 53, 34, 3, 6, 2);
+    fillTrack(level, 48, 36, 5, 4, 2);
+    fillTrack(level, 47, 37, 1, 3, 2);
     fillTrack(level, 17, 13, 3, 7, 8);
-    placeRamp(level, { x: 20, y: 14, dir: 'east', length: 5, width: 3, startZ: 8, endZ: 6 });
-    fillTrack(level, 25, 14, 6, 3, 6);
-    placeRamp(level, { x: 31, y: 14, dir: 'east', length: 4, width: 3, startZ: 6, endZ: 4 });
-    fillTrack(level, 35, 13, 5, 4, 4);
-    // === Lower path (safe — wider, gentler) ===
-    placeRamp(level, { x: 17, y: 34, dir: 'south', length: 3, width: 4, startZ: 10, endZ: 9 });
-    fillTrack(level, 16, 37, 5, 6, 9);
-    placeRamp(level, { x: 21, y: 38, dir: 'east', length: 4, width: 5, startZ: 9, endZ: 7 });
-    fillTrack(level, 25, 37, 8, 6, 7);
-    placeRamp(level, { x: 33, y: 38, dir: 'east', length: 5, width: 5, startZ: 7, endZ: 5 });
-    fillTrack(level, 38, 37, 6, 6, 5);
-    placeRamp(level, { x: 38, y: 33, dir: 'north', length: 4, width: 5, startZ: 5, endZ: 4 });
-    fillTrack(level, 37, 27, 6, 6, 4);
-    // Merge area at z=4
     fillTrack(level, 35, 13, 8, 20, 4);
-    // Fork 2 — after merge
-    fillTrack(level, 43, 18, 6, 10, 4);
-    // Upper shortcut — 2 tiles wide, drops to z=2
-    placeRamp(level, { x: 45, y: 15, dir: 'north', length: 3, width: 2, startZ: 4, endZ: 2 });
-    fillTrack(level, 45, 9, 2, 6, 2);
-    fillTrack(level, 47, 9, 8, 3, 2);
-    // Lower safe path — wider
-    placeRamp(level, { x: 44, y: 28, dir: 'south', length: 4, width: 4, startZ: 4, endZ: 2 });
-    fillTrack(level, 43, 32, 5, 8, 2);
-    fillTrack(level, 48, 36, 8, 4, 2);
-    fillTrack(level, 53, 20, 4, 16, 2);
-    // Final merge and goal at z=2
-    fillTrack(level, 53, 9, 6, 11, 2);
-    fillTrack(level, 55, 10, 6, 6, 2);
-    setGoal(level, 58, 13, 0.55);
-    // Route graph
-    addGraphNode(level, { id: 'start', type: 'entry', x: 6, y: 29, z: 10 });
-    addGraphNode(level, { id: 'fork1', type: 'fork', x: 18, y: 29, z: 10 });
-    addGraphNode(level, { id: 'upper1', type: 'route', x: 30, y: 16, z: 6 });
-    addGraphNode(level, { id: 'lower1', type: 'route', x: 35, y: 40, z: 5 });
-    addGraphNode(level, { id: 'merge', type: 'hub', x: 40, y: 23, z: 4 });
-    addGraphNode(level, { id: 'goal', type: 'goal', x: 59, y: 14, z: 2 });
-    addGraphEdge(level, { from: 'start', to: 'fork1', kind: 'roll' });
-    addGraphEdge(level, { from: 'fork1', to: 'upper1', kind: 'descent' });
-    addGraphEdge(level, { from: 'fork1', to: 'lower1', kind: 'descent' });
-    addGraphEdge(level, { from: 'upper1', to: 'merge', kind: 'descent' });
-    addGraphEdge(level, { from: 'lower1', to: 'merge', kind: 'descent' });
-    addGraphEdge(level, { from: 'merge', to: 'goal', kind: 'descent' });
+    fillTrack(level, 43, 18, 5, 10, 4);
+    fillTrack(level, 48, 19, 1, 3, 4);
+    fillTrack(level, 48, 24, 1, 3, 4);
+    fillTrack(level, 25, 14, 6, 3, 6);
+    fillTrack(level, 15, 24, 6, 10, 10);
+    fillTrack(level, 3, 26, 6, 6, 10);
+    fillTrack(level, 9, 27, 6, 4, 10);
+    fillTrack(level, 16, 37, 5, 6, 9);
+    fillTrack(level, 25, 37, 8, 6, 7);
+    fillTrack(level, 38, 37, 5, 6, 5);
+    // Ramps
+    setSurface(level, 20, 14, { baseHeight: 8, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 21, 14, { baseHeight: 7.6, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 22, 14, { baseHeight: 7.2, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 23, 14, { baseHeight: 6.8, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 24, 14, { baseHeight: 6.4, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 31, 14, { baseHeight: 6, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 32, 14, { baseHeight: 5.5, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 33, 14, { baseHeight: 5, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 34, 14, { baseHeight: 4.5, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 20, 15, { baseHeight: 8, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 21, 15, { baseHeight: 7.6, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 22, 15, { baseHeight: 7.2, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 23, 15, { baseHeight: 6.8, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 24, 15, { baseHeight: 6.4, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 31, 15, { baseHeight: 6, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 32, 15, { baseHeight: 5.5, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 33, 15, { baseHeight: 5, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 34, 15, { baseHeight: 4.5, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 45, 15, { baseHeight: 2, shape: 'slope_n', kind: 'track' });
+    setSurface(level, 46, 15, { baseHeight: 2, shape: 'slope_n', kind: 'track' });
+    setSurface(level, 20, 16, { baseHeight: 8, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 21, 16, { baseHeight: 7.6, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 22, 16, { baseHeight: 7.2, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 23, 16, { baseHeight: 6.8, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 24, 16, { baseHeight: 6.4, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 31, 16, { baseHeight: 6, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 32, 16, { baseHeight: 5.5, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 33, 16, { baseHeight: 5, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 34, 16, { baseHeight: 4.5, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 45, 16, { baseHeight: 3, shape: 'slope_n', kind: 'track' });
+    setSurface(level, 46, 16, { baseHeight: 3, shape: 'slope_n', kind: 'track' });
+    setSurface(level, 45, 17, { baseHeight: 4, shape: 'slope_n', kind: 'track' });
+    setSurface(level, 46, 17, { baseHeight: 4, shape: 'slope_n', kind: 'track' });
+    setSurface(level, 48, 18, { baseHeight: 4, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 49, 18, { baseHeight: 3.5, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 50, 18, { baseHeight: 3, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 51, 18, { baseHeight: 2.5, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 52, 18, { baseHeight: 2, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 17, 20, { baseHeight: 8, shape: 'slope_n', kind: 'track' });
+    setSurface(level, 18, 20, { baseHeight: 8, shape: 'slope_n', kind: 'track' });
+    setSurface(level, 19, 20, { baseHeight: 8, shape: 'slope_n', kind: 'track' });
+    setSurface(level, 17, 21, { baseHeight: 8.7, shape: 'slope_n', kind: 'track' });
+    setSurface(level, 18, 21, { baseHeight: 8.7, shape: 'slope_n', kind: 'track' });
+    setSurface(level, 19, 21, { baseHeight: 8.7, shape: 'slope_n', kind: 'track' });
+    setSurface(level, 17, 22, { baseHeight: 9.4, shape: 'slope_n', kind: 'track' });
+    setSurface(level, 18, 22, { baseHeight: 9.4, shape: 'slope_n', kind: 'track' });
+    setSurface(level, 19, 22, { baseHeight: 9.4, shape: 'slope_n', kind: 'track' });
+    setSurface(level, 48, 22, { baseHeight: 4, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 49, 22, { baseHeight: 3.5, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 50, 22, { baseHeight: 3, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 51, 22, { baseHeight: 2.5, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 52, 22, { baseHeight: 2, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 17, 23, { baseHeight: 10, shape: 'slope_n', kind: 'track' });
+    setSurface(level, 18, 23, { baseHeight: 10, shape: 'slope_n', kind: 'track' });
+    setSurface(level, 19, 23, { baseHeight: 10, shape: 'slope_n', kind: 'track' });
+    setSurface(level, 48, 23, { baseHeight: 4, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 49, 23, { baseHeight: 3.5, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 50, 23, { baseHeight: 3, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 51, 23, { baseHeight: 2.5, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 52, 23, { baseHeight: 2, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 48, 27, { baseHeight: 4, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 49, 27, { baseHeight: 3.5, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 50, 27, { baseHeight: 3, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 51, 27, { baseHeight: 2.5, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 52, 27, { baseHeight: 2, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 45, 28, { baseHeight: 4, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 46, 28, { baseHeight: 4, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 47, 28, { baseHeight: 4, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 45, 29, { baseHeight: 3.5, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 46, 29, { baseHeight: 3.5, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 47, 29, { baseHeight: 3.5, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 45, 30, { baseHeight: 3, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 46, 30, { baseHeight: 3, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 47, 30, { baseHeight: 3, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 45, 31, { baseHeight: 2.5, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 46, 31, { baseHeight: 2.5, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 47, 31, { baseHeight: 2.5, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 45, 32, { baseHeight: 2, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 46, 32, { baseHeight: 2, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 47, 32, { baseHeight: 2, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 38, 33, { baseHeight: 4, shape: 'slope_n', kind: 'track' });
+    setSurface(level, 39, 33, { baseHeight: 4, shape: 'slope_n', kind: 'track' });
+    setSurface(level, 40, 33, { baseHeight: 4, shape: 'slope_n', kind: 'track' });
+    setSurface(level, 41, 33, { baseHeight: 4, shape: 'slope_n', kind: 'track' });
+    setSurface(level, 17, 34, { baseHeight: 10, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 18, 34, { baseHeight: 10, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 19, 34, { baseHeight: 10, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 20, 34, { baseHeight: 10, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 38, 34, { baseHeight: 4.3, shape: 'slope_n', kind: 'track' });
+    setSurface(level, 39, 34, { baseHeight: 4.3, shape: 'slope_n', kind: 'track' });
+    setSurface(level, 40, 34, { baseHeight: 4.3, shape: 'slope_n', kind: 'track' });
+    setSurface(level, 41, 34, { baseHeight: 4.3, shape: 'slope_n', kind: 'track' });
+    setSurface(level, 17, 35, { baseHeight: 9.7, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 18, 35, { baseHeight: 9.7, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 19, 35, { baseHeight: 9.7, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 20, 35, { baseHeight: 9.7, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 38, 35, { baseHeight: 4.7, shape: 'slope_n', kind: 'track' });
+    setSurface(level, 39, 35, { baseHeight: 4.7, shape: 'slope_n', kind: 'track' });
+    setSurface(level, 40, 35, { baseHeight: 4.7, shape: 'slope_n', kind: 'track' });
+    setSurface(level, 41, 35, { baseHeight: 4.7, shape: 'slope_n', kind: 'track' });
+    setSurface(level, 17, 36, { baseHeight: 9.3, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 18, 36, { baseHeight: 9.3, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 19, 36, { baseHeight: 9.3, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 20, 36, { baseHeight: 9.3, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 38, 36, { baseHeight: 5, shape: 'slope_n', kind: 'track' });
+    setSurface(level, 39, 36, { baseHeight: 5, shape: 'slope_n', kind: 'track' });
+    setSurface(level, 40, 36, { baseHeight: 5, shape: 'slope_n', kind: 'track' });
+    setSurface(level, 41, 36, { baseHeight: 5, shape: 'slope_n', kind: 'track' });
+    setSurface(level, 43, 37, { baseHeight: 5, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 44, 37, { baseHeight: 4, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 45, 37, { baseHeight: 3, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 46, 37, { baseHeight: 2, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 21, 38, { baseHeight: 9, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 22, 38, { baseHeight: 8.5, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 23, 38, { baseHeight: 8, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 24, 38, { baseHeight: 7.5, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 33, 38, { baseHeight: 7, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 34, 38, { baseHeight: 6.6, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 35, 38, { baseHeight: 6.2, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 36, 38, { baseHeight: 5.8, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 37, 38, { baseHeight: 5.4, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 43, 38, { baseHeight: 5, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 44, 38, { baseHeight: 4, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 45, 38, { baseHeight: 3, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 46, 38, { baseHeight: 2, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 21, 39, { baseHeight: 9, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 22, 39, { baseHeight: 8.5, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 23, 39, { baseHeight: 8, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 24, 39, { baseHeight: 7.5, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 33, 39, { baseHeight: 7, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 34, 39, { baseHeight: 6.6, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 35, 39, { baseHeight: 6.2, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 36, 39, { baseHeight: 5.8, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 37, 39, { baseHeight: 5.4, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 43, 39, { baseHeight: 5, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 44, 39, { baseHeight: 4, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 45, 39, { baseHeight: 3, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 46, 39, { baseHeight: 2, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 21, 40, { baseHeight: 9, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 22, 40, { baseHeight: 8.5, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 23, 40, { baseHeight: 8, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 24, 40, { baseHeight: 7.5, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 33, 40, { baseHeight: 7, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 34, 40, { baseHeight: 6.6, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 35, 40, { baseHeight: 6.2, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 36, 40, { baseHeight: 5.8, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 37, 40, { baseHeight: 5.4, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 21, 41, { baseHeight: 9, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 22, 41, { baseHeight: 8.5, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 23, 41, { baseHeight: 8, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 24, 41, { baseHeight: 7.5, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 33, 41, { baseHeight: 7, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 34, 41, { baseHeight: 6.6, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 35, 41, { baseHeight: 6.2, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 36, 41, { baseHeight: 5.8, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 37, 41, { baseHeight: 5.4, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 21, 42, { baseHeight: 9, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 22, 42, { baseHeight: 8.5, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 23, 42, { baseHeight: 8, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 24, 42, { baseHeight: 7.5, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 33, 42, { baseHeight: 7, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 34, 42, { baseHeight: 6.6, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 35, 42, { baseHeight: 6.2, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 36, 42, { baseHeight: 5.8, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 37, 42, { baseHeight: 5.4, shape: 'slope_e', kind: 'track' });
+
+    // --- Goal ---
+    setGoal(level, 58.5, 13.5);
+
     return registerLevel(level);
   }
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  // LEVEL 3 — Crumble Bridge
-  // Introduces crumble tiles. Multiple crumble sections with increasing difficulty.
-  // ═══════════════════════════════════════════════════════════════════════════
+  // ─── Level 3: Crumble Bridge ───
   function buildCrumbleBridge() {
     const level = createLevelShell({
       id: 'crumble_bridge',
       name: 'Crumble Bridge',
       width: 55,
       height: 55,
-      timeLimit: 60,
-      start: { x: 5, y: 5 },
-      reward: { presses: 1500, unlocks: ['marble_crumble_bridge_complete'], claimKey: 'crumble_bridge' }
+      start: { x: 5.5, y: 5.5, z: 8 },
+      timeLimit: 60
     });
-    // Start at z=8
+
+    // --- Surface tiles ---
     fillTrack(level, 3, 3, 6, 6, 8);
-    // Section 1: Short crumble bridge east (4 tiles, wide)
     fillTrack(level, 9, 4, 3, 4, 8);
-    fillTrack(level, 12, 4, 6, 4, 8, { crumble: { delay: 0.3, respawn: 3.5 } });
-    fillTrack(level, 18, 4, 4, 4, 8);
-    // Turn south
-    fillTrack(level, 18, 8, 4, 6, 8);
-    // Section 2: Crumble bridge south (6 tiles, 3 wide — narrower)
-    fillTrack(level, 19, 14, 3, 8, 8, { crumble: { delay: 0.25, respawn: 3.0 } });
+    fillTrack(level, 18, 4, 4, 10, 8);
     fillTrack(level, 18, 22, 5, 5, 8);
-    // Ramp down to z=6
-    placeRamp(level, { x: 19, y: 27, dir: 'south', length: 4, width: 3, startZ: 8, endZ: 6 });
-    // Section 3: Zigzag crumble at z=6 (2 tiles wide)
     fillTrack(level, 18, 31, 4, 4, 6);
-    fillTrack(level, 22, 31, 8, 2, 6, { crumble: { delay: 0.2, respawn: 2.5 } });
     fillTrack(level, 30, 31, 4, 4, 6);
-    fillTrack(level, 30, 35, 2, 6, 6, { crumble: { delay: 0.2, respawn: 2.5 } });
-    fillTrack(level, 28, 41, 6, 4, 6);
-    fillTrack(level, 22, 42, 6, 2, 6, { crumble: { delay: 0.2, respawn: 2.5 } });
     fillTrack(level, 18, 40, 4, 5, 6);
-    // Ramp down to z=4
-    placeRamp(level, { x: 19, y: 45, dir: 'south', length: 3, width: 3, startZ: 6, endZ: 4 });
-    // Section 4: Final crumble gauntlet (1 tile wide, very fast)
-    fillTrack(level, 18, 48, 4, 3, 4);
-    fillTrack(level, 22, 49, 10, 1, 4, { crumble: { delay: 0.15, respawn: 2.0 } });
-    // Goal platform
+    fillTrack(level, 28, 41, 6, 4, 6);
     fillTrack(level, 32, 47, 6, 5, 4);
-    setGoal(level, 35, 49, 0.55);
-    // Route graph
-    addGraphNode(level, { id: 'start', type: 'entry', x: 6, y: 6, z: 8 });
-    addGraphNode(level, { id: 'c1', type: 'route', x: 15, y: 6, z: 8 });
-    addGraphNode(level, { id: 'c2', type: 'route', x: 20, y: 18, z: 8 });
-    addGraphNode(level, { id: 'c3', type: 'route', x: 25, y: 36, z: 6 });
-    addGraphNode(level, { id: 'goal', type: 'goal', x: 36, y: 50, z: 4 });
-    addGraphEdge(level, { from: 'start', to: 'c1', kind: 'roll', tag: 'crumble' });
-    addGraphEdge(level, { from: 'c1', to: 'c2', kind: 'roll', tag: 'crumble' });
-    addGraphEdge(level, { from: 'c2', to: 'c3', kind: 'descent', tag: 'crumble' });
-    addGraphEdge(level, { from: 'c3', to: 'goal', kind: 'descent', tag: 'crumble' });
+    fillTrack(level, 18, 48, 4, 3, 4);
+    // Ramps
+    setSurface(level, 19, 27, { baseHeight: 8, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 20, 27, { baseHeight: 8, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 21, 27, { baseHeight: 8, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 19, 28, { baseHeight: 7.5, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 20, 28, { baseHeight: 7.5, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 21, 28, { baseHeight: 7.5, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 19, 29, { baseHeight: 7, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 20, 29, { baseHeight: 7, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 21, 29, { baseHeight: 7, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 19, 30, { baseHeight: 6.5, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 20, 30, { baseHeight: 6.5, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 21, 30, { baseHeight: 6.5, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 19, 45, { baseHeight: 6, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 20, 45, { baseHeight: 6, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 21, 45, { baseHeight: 6, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 19, 46, { baseHeight: 5.3, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 20, 46, { baseHeight: 5.3, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 21, 46, { baseHeight: 5.3, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 19, 47, { baseHeight: 4.7, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 20, 47, { baseHeight: 4.7, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 21, 47, { baseHeight: 4.7, shape: 'slope_s', kind: 'track' });
+    // Crumble tiles
+    fillSurfaceRect(level, 12, 4, 6, 4, { baseHeight: 8, kind: 'crumble', delay: 0.15, downtime: 4.0 });
+    fillSurfaceRect(level, 19, 14, 3, 8, { baseHeight: 8, kind: 'crumble', delay: 0.15, downtime: 4.0 });
+    fillSurfaceRect(level, 22, 31, 8, 2, { baseHeight: 6, kind: 'crumble', delay: 0.15, downtime: 4.0 });
+    fillSurfaceRect(level, 30, 35, 2, 6, { baseHeight: 6, kind: 'crumble', delay: 0.15, downtime: 4.0 });
+    fillSurfaceRect(level, 22, 42, 6, 2, { baseHeight: 6, kind: 'crumble', delay: 0.15, downtime: 4.0 });
+    fillSurfaceRect(level, 22, 49, 10, 1, { baseHeight: 4, kind: 'crumble', delay: 0.15, downtime: 4.0 });
+
+    // --- Goal ---
+    setGoal(level, 35.5, 49.5);
+
     return registerLevel(level);
   }
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  // LEVEL 4 — Conveyor Lane
-  // Introduces conveyors. Must fight against and use conveyor currents.
-  // ═══════════════════════════════════════════════════════════════════════════
+  // ─── Level 4: Conveyor Lane ───
   function buildConveyorLane() {
     const level = createLevelShell({
       id: 'conveyor_lane',
       name: 'Conveyor Lane',
       width: 60,
       height: 55,
-      timeLimit: 60,
-      start: { x: 5, y: 5 },
-      reward: { presses: 2000, unlocks: ['marble_conveyor_lane_complete'], claimKey: 'conveyor_lane' }
+      start: { x: 5.5, y: 5.5, z: 4 },
+      timeLimit: 60
     });
-    // Start at z=4
+
+    // --- Surface tiles ---
     fillTrack(level, 3, 3, 6, 5, 4);
-    // Section 1: Helpful conveyor pushes east
-    fillTrack(level, 9, 4, 12, 3, 4, { conveyor: { x: 3.0, y: 0, strength: 2.5 } });
     fillTrack(level, 21, 3, 5, 5, 4);
-    // Section 2: Must cross a conveyor pushing south — navigate east while being pushed down
-    fillTrack(level, 26, 3, 3, 14, 4, { conveyor: { x: 0, y: 3.5, strength: 3.0 } });
-    fillTrack(level, 29, 3, 5, 5, 4);
-    // Section 3: Alternating conveyors — zigzag through opposing currents
-    fillTrack(level, 29, 8, 5, 3, 4);
-    fillTrack(level, 29, 11, 14, 3, 4, { conveyor: { x: -3.0, y: 0, strength: 2.5 } });
-    fillTrack(level, 29, 14, 5, 3, 4);
-    fillTrack(level, 29, 17, 14, 3, 4, { conveyor: { x: 3.0, y: 0, strength: 2.5 } });
-    fillTrack(level, 40, 14, 3, 3, 4);
-    fillTrack(level, 40, 20, 5, 4, 4);
-    // Section 4: Strong conveyor pushing west — must sprint east against it
-    fillTrack(level, 20, 24, 25, 3, 4, { conveyor: { x: -4.0, y: 0, strength: 3.5 } });
-    fillTrack(level, 20, 24, 4, 3, 4); // safe start area (no conveyor override)
-    fillTrack(level, 42, 23, 5, 5, 4);
-    // Section 5: Conveyor maze — 3 lanes pushing different directions
-    fillTrack(level, 42, 28, 5, 3, 4);
-    fillTrack(level, 35, 31, 12, 3, 4, { conveyor: { x: -3.0, y: 0, strength: 2.5 } });
-    fillTrack(level, 35, 34, 3, 3, 4);
-    fillTrack(level, 35, 37, 12, 3, 4, { conveyor: { x: 3.0, y: 0, strength: 2.5 } });
-    fillTrack(level, 44, 34, 3, 3, 4);
-    fillTrack(level, 44, 37, 5, 5, 4);
-    // Section 6: Final gauntlet — narrow with strong cross-conveyor
-    fillTrack(level, 44, 42, 3, 8, 4, { conveyor: { x: 3.0, y: 0, strength: 3.0 } });
-    fillTrack(level, 42, 47, 8, 4, 4);
-    // Goal
-    fillTrack(level, 48, 46, 6, 5, 4);
-    setGoal(level, 51, 48, 0.55);
-    // Route graph
-    addGraphNode(level, { id: 'start', type: 'entry', x: 6, y: 6, z: 4 });
-    addGraphNode(level, { id: 's1', type: 'route', x: 15, y: 6, z: 4 });
-    addGraphNode(level, { id: 's2', type: 'route', x: 28, y: 6, z: 4 });
-    addGraphNode(level, { id: 's3', type: 'route', x: 35, y: 15, z: 4 });
-    addGraphNode(level, { id: 's4', type: 'route', x: 35, y: 26, z: 4 });
-    addGraphNode(level, { id: 'goal', type: 'goal', x: 52, y: 49, z: 4 });
-    addGraphEdge(level, { from: 'start', to: 's1', kind: 'roll', tag: 'conveyor' });
-    addGraphEdge(level, { from: 's1', to: 's2', kind: 'roll', tag: 'conveyor' });
-    addGraphEdge(level, { from: 's2', to: 's3', kind: 'roll', tag: 'conveyor' });
-    addGraphEdge(level, { from: 's3', to: 's4', kind: 'roll', tag: 'conveyor' });
-    addGraphEdge(level, { from: 's4', to: 'goal', kind: 'roll', tag: 'conveyor' });
+    fillTrack(level, 29, 3, 3, 14, 4);
+    fillTrack(level, 32, 8, 2, 9, 4);
+    fillTrack(level, 40, 11, 3, 16, 4);
+    fillTrack(level, 35, 14, 3, 3, 4);
+    fillTrack(level, 26, 20, 3, 4, 4);
+    fillTrack(level, 35, 20, 3, 4, 4);
+    fillTrack(level, 43, 20, 2, 11, 4);
+    fillTrack(level, 45, 23, 2, 8, 4);
+    fillTrack(level, 6, 24, 3, 3, 4);
+    fillTrack(level, 20, 24, 4, 3, 4);
+    fillTrack(level, 35, 27, 3, 4, 4);
+    fillTrack(level, 42, 27, 1, 7, 4);
+    fillTrack(level, 35, 31, 1, 9, 4);
+    fillTrack(level, 43, 31, 1, 3, 4);
+    fillTrack(level, 36, 34, 2, 3, 4);
+    fillTrack(level, 44, 35, 3, 7, 4);
+    fillTrack(level, 44, 46, 10, 2, 4);
+    fillTrack(level, 42, 47, 2, 4, 4);
+    fillTrack(level, 51, 48, 3, 3, 4);
+    fillTrack(level, 44, 49, 7, 2, 4);
+    // Conveyor tiles
+    setSurface(level, 26, 3, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 27, 3, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 28, 3, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 9, 4, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 10, 4, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 11, 4, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 12, 4, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 13, 4, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 14, 4, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 15, 4, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 16, 4, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 17, 4, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 18, 4, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 19, 4, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 20, 4, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 26, 4, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 27, 4, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 28, 4, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 9, 5, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 10, 5, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 11, 5, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 12, 5, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 13, 5, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 14, 5, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 15, 5, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 16, 5, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 17, 5, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 18, 5, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 19, 5, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 20, 5, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 26, 5, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 27, 5, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 28, 5, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 9, 6, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 10, 6, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 11, 6, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 12, 6, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 13, 6, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 14, 6, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 15, 6, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 16, 6, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 17, 6, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 18, 6, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 19, 6, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 20, 6, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 26, 6, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 27, 6, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 28, 6, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 26, 7, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 27, 7, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 28, 7, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 6, 8, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 7, 8, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 8, 8, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 26, 8, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 27, 8, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 28, 8, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 6, 9, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 7, 9, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 8, 9, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 26, 9, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 27, 9, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 28, 9, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 6, 10, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 7, 10, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 8, 10, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 26, 10, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 27, 10, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 28, 10, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 6, 11, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 7, 11, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 8, 11, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 26, 11, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 27, 11, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 28, 11, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 34, 11, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 35, 11, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 36, 11, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 37, 11, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 38, 11, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 39, 11, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 6, 12, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 7, 12, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 8, 12, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 26, 12, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 27, 12, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 28, 12, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 34, 12, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 35, 12, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 36, 12, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 37, 12, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 38, 12, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 39, 12, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 6, 13, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 7, 13, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 8, 13, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 26, 13, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 27, 13, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 28, 13, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 34, 13, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 35, 13, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 36, 13, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 37, 13, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 38, 13, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 39, 13, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 6, 14, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 7, 14, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 8, 14, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 26, 14, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 27, 14, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 28, 14, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 6, 15, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 7, 15, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 8, 15, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 26, 15, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 27, 15, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 28, 15, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 6, 16, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 7, 16, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 8, 16, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 26, 16, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 27, 16, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 28, 16, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 6, 17, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 7, 17, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 8, 17, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 26, 17, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 27, 17, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 28, 17, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 29, 17, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 30, 17, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 31, 17, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 32, 17, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 33, 17, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 34, 17, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 35, 17, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 36, 17, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 37, 17, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 38, 17, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 39, 17, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 6, 18, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 7, 18, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 8, 18, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 26, 18, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 27, 18, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 28, 18, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 29, 18, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 30, 18, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 31, 18, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 32, 18, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 33, 18, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 34, 18, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 35, 18, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 36, 18, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 37, 18, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 38, 18, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 39, 18, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 6, 19, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 7, 19, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 8, 19, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 26, 19, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 27, 19, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 28, 19, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 29, 19, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 30, 19, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 31, 19, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 32, 19, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 33, 19, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 34, 19, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 35, 19, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 36, 19, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 37, 19, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 38, 19, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 39, 19, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 6, 20, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 7, 20, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 8, 20, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 6, 21, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 7, 21, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 8, 21, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 6, 22, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 7, 22, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 8, 22, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 6, 23, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 7, 23, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 8, 23, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 9, 24, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 10, 24, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 11, 24, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 12, 24, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 13, 24, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 14, 24, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 15, 24, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 16, 24, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 17, 24, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 18, 24, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 19, 24, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 24, 24, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 25, 24, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 26, 24, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 27, 24, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 28, 24, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 29, 24, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 30, 24, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 31, 24, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 32, 24, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 33, 24, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 34, 24, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 35, 24, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 36, 24, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 37, 24, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 38, 24, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 39, 24, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 9, 25, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 10, 25, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 11, 25, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 12, 25, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 13, 25, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 14, 25, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 15, 25, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 16, 25, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 17, 25, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 18, 25, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 19, 25, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 24, 25, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 25, 25, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 26, 25, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 27, 25, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 28, 25, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 29, 25, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 30, 25, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 31, 25, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 32, 25, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 33, 25, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 34, 25, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 35, 25, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 36, 25, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 37, 25, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 38, 25, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 39, 25, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 9, 26, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 10, 26, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 11, 26, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 12, 26, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 13, 26, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 14, 26, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 15, 26, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 16, 26, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 17, 26, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 18, 26, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 19, 26, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 24, 26, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 25, 26, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 26, 26, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 27, 26, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 28, 26, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 29, 26, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 30, 26, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 31, 26, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 32, 26, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 33, 26, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 34, 26, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 35, 26, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 36, 26, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 37, 26, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 38, 26, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 39, 26, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 36, 31, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 37, 31, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 38, 31, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 39, 31, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 40, 31, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 41, 31, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 44, 31, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 45, 31, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 46, 31, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 36, 32, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 37, 32, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 38, 32, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 39, 32, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 40, 32, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 41, 32, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 44, 32, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 45, 32, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 46, 32, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 36, 33, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 37, 33, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 38, 33, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 39, 33, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 40, 33, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 41, 33, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 44, 33, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 45, 33, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 46, 33, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 44, 34, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 45, 34, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 46, 34, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 36, 37, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 37, 37, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 38, 37, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 39, 37, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 40, 37, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 41, 37, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 42, 37, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 43, 37, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 36, 38, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 37, 38, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 38, 38, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 39, 38, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 40, 38, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 41, 38, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 42, 38, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 43, 38, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 36, 39, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 37, 39, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 38, 39, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 39, 39, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 40, 39, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 41, 39, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 42, 39, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 43, 39, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 44, 42, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 45, 42, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 46, 42, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 44, 43, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 45, 43, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 46, 43, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 44, 44, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 45, 44, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 46, 44, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 44, 45, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 45, 45, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 46, 45, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 44, 48, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 45, 48, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 46, 48, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 47, 48, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 48, 48, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 49, 48, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 50, 48, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+
+    // --- Goal ---
+    setGoal(level, 51.5, 48.5);
+
     return registerLevel(level);
   }
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  // LEVEL 5 — Bounce Garden
-  // Introduces bounce tiles. Must use bounces to reach higher tiers.
-  // ═══════════════════════════════════════════════════════════════════════════
+  // ─── Level 5: Bounce Garden ───
   function buildBounceGarden() {
     const level = createLevelShell({
       id: 'bounce_garden',
       name: 'Bounce Garden',
       width: 55,
       height: 60,
-      timeLimit: 60,
-      start: { x: 5, y: 5 },
-      reward: { presses: 2500, unlocks: ['marble_bounce_garden_complete'], claimKey: 'bounce_garden' }
+      start: { x: 5.5, y: 5.5, z: 2 },
+      timeLimit: 60
     });
-    // Start at z=2
+
+    // --- Surface tiles ---
     fillTrack(level, 3, 3, 6, 6, 2);
-    // Corridor east to first bounce
+    fillTrack(level, 15, 3, 5, 2, 2);
     fillTrack(level, 9, 4, 6, 4, 2);
-    // Bounce pad area — bounce up to z=6
-    fillTrack(level, 15, 3, 5, 5, 2);
-    setSurface(level, 17, 5, { baseHeight: 2, shape: SHAPES.FLAT, bounce: 8 });
-    setSurface(level, 18, 5, { baseHeight: 2, shape: SHAPES.FLAT, bounce: 8 });
-    // Tier 1 at z=6 — small platform
-    fillTrack(level, 15, 10, 8, 6, 6);
-    // Corridor south at z=6
-    fillTrack(level, 17, 16, 4, 8, 6);
-    // Bounce to z=10
-    fillTrack(level, 16, 24, 6, 5, 6);
-    setSurface(level, 18, 26, { baseHeight: 6, shape: SHAPES.FLAT, bounce: 8 });
-    setSurface(level, 19, 26, { baseHeight: 6, shape: SHAPES.FLAT, bounce: 8 });
-    // Tier 2 at z=10 — zigzag path
-    fillTrack(level, 22, 24, 8, 4, 10);
-    fillTrack(level, 26, 28, 4, 8, 10);
-    fillTrack(level, 22, 36, 8, 4, 10);
-    // Bounce to z=14
-    fillTrack(level, 22, 40, 5, 4, 10);
-    setSurface(level, 24, 42, { baseHeight: 10, shape: SHAPES.FLAT, bounce: 8 });
-    // Tier 3 at z=14 — narrow bridge
-    fillTrack(level, 28, 40, 6, 4, 14);
-    fillTrack(level, 34, 38, 4, 8, 14);
-    // Bounce to z=18 (final tier)
-    setSurface(level, 35, 44, { baseHeight: 14, shape: SHAPES.FLAT, bounce: 8 });
-    setSurface(level, 36, 44, { baseHeight: 14, shape: SHAPES.FLAT, bounce: 8 });
-    // Tier 4 at z=18 — descent to goal
-    fillTrack(level, 34, 48, 6, 5, 18);
-    // Ramp down to goal at z=14
-    placeRamp(level, { x: 40, y: 49, dir: 'east', length: 4, width: 4, startZ: 18, endZ: 14 });
-    fillTrack(level, 44, 48, 6, 5, 14);
-    setGoal(level, 47, 50, 0.55);
-    // Route graph
-    addGraphNode(level, { id: 'start', type: 'entry', x: 6, y: 6, z: 2 });
-    addGraphNode(level, { id: 't1', type: 'hub', x: 19, y: 13, z: 6 });
-    addGraphNode(level, { id: 't2', type: 'hub', x: 26, y: 30, z: 10 });
-    addGraphNode(level, { id: 't3', type: 'hub', x: 36, y: 42, z: 14 });
-    addGraphNode(level, { id: 'goal', type: 'goal', x: 48, y: 51, z: 14 });
-    addGraphEdge(level, { from: 'start', to: 't1', kind: 'roll', tag: 'bounce' });
-    addGraphEdge(level, { from: 't1', to: 't2', kind: 'roll', tag: 'bounce' });
-    addGraphEdge(level, { from: 't2', to: 't3', kind: 'roll', tag: 'bounce' });
-    addGraphEdge(level, { from: 't3', to: 'goal', kind: 'descent' });
+    fillTrack(level, 15, 5, 2, 5, 2);
+    fillTrack(level, 19, 5, 1, 5, 2);
+    fillTrack(level, 17, 7, 2, 3, 2);
+    fillTrack(level, 15, 10, 8, 2, 6);
+    fillTrack(level, 15, 12, 3, 4, 6);
+    fillTrack(level, 19, 12, 4, 4, 6);
+    fillTrack(level, 18, 13, 1, 13, 6);
+    fillTrack(level, 17, 16, 1, 13, 6);
+    fillTrack(level, 19, 16, 2, 3, 6);
+    fillTrack(level, 20, 19, 1, 6, 6);
+    fillTrack(level, 19, 20, 1, 6, 6);
+    fillTrack(level, 16, 24, 1, 5, 6);
+    fillTrack(level, 21, 24, 1, 9, 6);
+    setSurface(level, 20, 26, { baseHeight: 6, kind: 'track' });
+    fillTrack(level, 18, 27, 2, 2, 6);
+    fillTrack(level, 20, 28, 1, 6, 6);
+    fillTrack(level, 19, 29, 1, 5, 6);
+    fillTrack(level, 22, 24, 8, 2, 10);
+    fillTrack(level, 22, 26, 2, 2, 10);
+    fillTrack(level, 25, 26, 5, 2, 10);
+    setSurface(level, 24, 27, { baseHeight: 10, kind: 'track' });
+    fillTrack(level, 26, 28, 4, 2, 10);
+    fillTrack(level, 26, 30, 1, 11, 10);
+    fillTrack(level, 28, 30, 2, 7, 10);
+    fillTrack(level, 27, 31, 1, 9, 10);
+    fillTrack(level, 22, 36, 4, 6, 10);
+    fillTrack(level, 28, 38, 2, 2, 10);
+    fillTrack(level, 22, 42, 2, 2, 10);
+    fillTrack(level, 25, 42, 2, 2, 10);
+    setSurface(level, 24, 43, { baseHeight: 10, kind: 'track' });
+    fillTrack(level, 34, 38, 4, 2, 14);
+    fillTrack(level, 28, 40, 7, 4, 14);
+    fillTrack(level, 37, 40, 1, 7, 14);
+    fillTrack(level, 35, 41, 2, 4, 14);
+    fillTrack(level, 34, 44, 1, 3, 14);
+    fillTrack(level, 35, 46, 2, 1, 14);
+    fillTrack(level, 45, 48, 5, 1, 14);
+    fillTrack(level, 45, 49, 3, 4, 14);
+    fillTrack(level, 49, 49, 1, 4, 14);
+    setSurface(level, 48, 50, { baseHeight: 14, kind: 'track' });
+    setSurface(level, 48, 52, { baseHeight: 14, kind: 'track' });
+    fillTrack(level, 34, 48, 10, 2, 18);
+    fillTrack(level, 34, 50, 9, 3, 18);
+    fillTrack(level, 43, 51, 1, 2, 18);
+    // Bounce tiles
+    setSurface(level, 17, 5, { baseHeight: 2, kind: 'bounce' });
+    setSurface(level, 18, 5, { baseHeight: 2, kind: 'bounce' });
+    setSurface(level, 17, 6, { baseHeight: 2, kind: 'bounce' });
+    setSurface(level, 18, 6, { baseHeight: 2, kind: 'bounce' });
+    setSurface(level, 18, 12, { baseHeight: 6, kind: 'bounce' });
+    setSurface(level, 19, 19, { baseHeight: 6, kind: 'bounce' });
+    setSurface(level, 20, 25, { baseHeight: 6, kind: 'bounce' });
+    setSurface(level, 18, 26, { baseHeight: 6, kind: 'bounce' });
+    setSurface(level, 19, 26, { baseHeight: 6, kind: 'bounce' });
+    setSurface(level, 24, 26, { baseHeight: 10, kind: 'bounce' });
+    setSurface(level, 20, 27, { baseHeight: 6, kind: 'bounce' });
+    setSurface(level, 27, 30, { baseHeight: 10, kind: 'bounce' });
+    setSurface(level, 21, 33, { baseHeight: 6, kind: 'bounce' });
+    setSurface(level, 28, 37, { baseHeight: 10, kind: 'bounce' });
+    setSurface(level, 29, 37, { baseHeight: 10, kind: 'bounce' });
+    setSurface(level, 35, 40, { baseHeight: 14, kind: 'bounce' });
+    setSurface(level, 36, 40, { baseHeight: 14, kind: 'bounce' });
+    setSurface(level, 26, 41, { baseHeight: 10, kind: 'bounce' });
+    setSurface(level, 24, 42, { baseHeight: 10, kind: 'bounce' });
+    setSurface(level, 35, 45, { baseHeight: 14, kind: 'bounce' });
+    setSurface(level, 36, 45, { baseHeight: 14, kind: 'bounce' });
+    setSurface(level, 44, 48, { baseHeight: 14, kind: 'bounce' });
+    setSurface(level, 44, 49, { baseHeight: 14, kind: 'bounce' });
+    setSurface(level, 48, 49, { baseHeight: 14, kind: 'bounce' });
+    setSurface(level, 43, 50, { baseHeight: 18, kind: 'bounce' });
+    setSurface(level, 44, 50, { baseHeight: 14, kind: 'bounce' });
+    setSurface(level, 44, 51, { baseHeight: 14, kind: 'bounce' });
+    setSurface(level, 48, 51, { baseHeight: 14, kind: 'bounce' });
+    setSurface(level, 44, 52, { baseHeight: 14, kind: 'bounce' });
+
+    // --- Goal ---
+    setGoal(level, 47.5, 50.5);
+
     return registerLevel(level);
   }
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  // LEVEL 6 — Ice Rink
-  // Introduces ice physics. Slippery surfaces with precision navigation.
-  // ═══════════════════════════════════════════════════════════════════════════
+  // ─── Level 6: Ice Rink ───
   function buildIceRink() {
     const level = createLevelShell({
       id: 'ice_rink',
       name: 'Ice Rink',
       width: 55,
       height: 55,
-      timeLimit: 50,
-      start: { x: 5, y: 5 },
-      reward: { presses: 3000, unlocks: ['marble_ice_rink_complete'], claimKey: 'ice_rink' }
+      start: { x: 5.5, y: 5.5, z: 4 },
+      timeLimit: 50
     });
-    // Start (normal friction)
-    fillTrack(level, 3, 3, 6, 5, 4);
-    // Section 1: Wide ice patch — must cross diagonally to exit on south side
-    fillTrack(level, 9, 3, 20, 16, 4, { friction: 0.5 });
-    // Normal-friction stepping stones within the ice
-    fillTrack(level, 14, 7, 3, 3, 4);
-    fillTrack(level, 20, 12, 3, 3, 4);
-    // Exit south
-    fillTrack(level, 22, 19, 4, 4, 4);
-    // Section 2: Narrow ice corridor with walls — must control momentum
-    fillTrack(level, 22, 23, 4, 12, 4, { friction: 0.5 });
-    blockerRing(level, 21, 22, 6, 14, 6);
-    clearBlocker(level, 23, 22);
-    clearBlocker(level, 24, 22);
-    clearBlocker(level, 23, 35);
-    clearBlocker(level, 24, 35);
-    // Safe platform
-    fillTrack(level, 21, 35, 6, 5, 4);
-    // Section 3: Ice zigzag — alternating direction with tight turns
-    fillTrack(level, 15, 37, 6, 3, 4, { friction: 0.5 });
-    fillTrack(level, 15, 40, 3, 6, 4, { friction: 0.5 });
-    fillTrack(level, 15, 46, 10, 3, 4, { friction: 0.5 });
-    fillTrack(level, 22, 43, 3, 3, 4, { friction: 0.5 });
-    // Safe island mid-zigzag
-    fillTrack(level, 12, 37, 3, 3, 4);
-    fillTrack(level, 25, 46, 4, 3, 4);
-    // Section 4: Final ice slide to goal — long straight with goal at end
-    fillTrack(level, 29, 44, 14, 4, 4, { friction: 0.5 });
-    // Walls to keep marble on track
-    blockerRing(level, 28, 43, 16, 6, 6);
-    clearBlocker(level, 29, 45);
-    clearBlocker(level, 29, 46);
-    clearBlocker(level, 43, 45);
-    clearBlocker(level, 43, 46);
-    // Goal
-    fillTrack(level, 43, 44, 6, 4, 4);
-    setGoal(level, 46, 46, 0.55);
-    // Route graph
-    addGraphNode(level, { id: 'start', type: 'entry', x: 6, y: 6, z: 4 });
-    addGraphNode(level, { id: 'rink', type: 'hub', x: 19, y: 11, z: 4 });
-    addGraphNode(level, { id: 'corridor', type: 'route', x: 24, y: 29, z: 4 });
-    addGraphNode(level, { id: 'zigzag', type: 'route', x: 18, y: 43, z: 4 });
-    addGraphNode(level, { id: 'goal', type: 'goal', x: 47, y: 47, z: 4 });
-    addGraphEdge(level, { from: 'start', to: 'rink', kind: 'roll', tag: 'ice' });
-    addGraphEdge(level, { from: 'rink', to: 'corridor', kind: 'roll', tag: 'ice' });
-    addGraphEdge(level, { from: 'corridor', to: 'zigzag', kind: 'roll', tag: 'ice' });
-    addGraphEdge(level, { from: 'zigzag', to: 'goal', kind: 'roll', tag: 'ice' });
+
+    // --- Surface tiles ---
+    fillTrack(level, 3, 3, 26, 1, 4);
+    fillTrack(level, 3, 4, 7, 4, 4);
+    fillTrack(level, 28, 4, 1, 34, 4);
+    fillTrack(level, 9, 8, 1, 41, 4);
+    fillTrack(level, 14, 18, 9, 1, 4);
+    fillTrack(level, 14, 19, 1, 16, 4);
+    fillTrack(level, 22, 19, 1, 16, 4);
+    fillTrack(level, 15, 34, 7, 1, 4);
+    fillTrack(level, 29, 37, 4, 1, 4);
+    fillTrack(level, 32, 38, 1, 4, 4);
+    setSurface(level, 30, 39, { baseHeight: 4, kind: 'track' });
+    fillTrack(level, 28, 41, 4, 1, 4);
+    fillTrack(level, 28, 42, 1, 7, 4);
+    fillTrack(level, 10, 48, 18, 1, 4);
+    // Ice tiles
+    fillSurfaceRect(level, 10, 4, 18, 14, { baseHeight: 4, kind: 'ice' });
+    fillSurfaceRect(level, 10, 18, 4, 30, { baseHeight: 4, kind: 'ice' });
+    fillSurfaceRect(level, 23, 18, 5, 30, { baseHeight: 4, kind: 'ice' });
+    fillSurfaceRect(level, 14, 35, 9, 13, { baseHeight: 4, kind: 'ice' });
+    fillSurfaceRect(level, 28, 38, 4, 1, { baseHeight: 4, kind: 'ice' });
+    fillSurfaceRect(level, 28, 39, 2, 2, { baseHeight: 4, kind: 'ice' });
+    fillSurfaceRect(level, 31, 39, 1, 2, { baseHeight: 4, kind: 'ice' });
+    setSurface(level, 30, 40, { baseHeight: 4, kind: 'ice' });
+
+    // --- Goal ---
+    setGoal(level, 30.5, 39.5);
+
     return registerLevel(level);
   }
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  // LEVEL 7 — Gate Runner
-  // Introduces timed gates. Must time passage through multiple gates.
-  // ═══════════════════════════════════════════════════════════════════════════
+  // ─── Level 7: Gate Runner ───
   function buildGateRunner() {
     const level = createLevelShell({
       id: 'gate_runner',
       name: 'Gate Runner',
       width: 55,
       height: 60,
-      timeLimit: 50,
-      start: { x: 5, y: 5 },
-      reward: { presses: 3500, unlocks: ['marble_gate_runner_complete'], claimKey: 'gate_runner' }
+      start: { x: 5.5, y: 5.5, z: 8 },
+      timeLimit: 50
     });
-    // Start at z=8
+
+    // --- Surface tiles ---
     fillTrack(level, 3, 3, 6, 5, 8);
-    // Corridor east to gate 1
-    fillTrack(level, 9, 4, 8, 3, 8);
-    // Gate 1 — slow, easy timing
-    addTimedGate(level, 'gate1', 13, 4, 8, 1, 3, 2.0, 1.5);
-    fillTrack(level, 17, 4, 6, 3, 8);
-    // Turn south
-    fillTrack(level, 20, 7, 3, 6, 8);
-    // Gate 2 — faster
-    addTimedGate(level, 'gate2', 20, 10, 8, 3, 1, 1.6, 1.2);
-    fillTrack(level, 20, 13, 3, 6, 8);
-    // Platform and descent
-    fillTrack(level, 18, 19, 7, 5, 8);
-    placeRamp(level, { x: 19, y: 24, dir: 'south', length: 4, width: 5, startZ: 8, endZ: 6 });
-    // Section 2: Double gates at z=6
-    fillTrack(level, 18, 28, 7, 4, 6);
-    fillTrack(level, 18, 32, 14, 3, 6);
-    // Two gates in sequence — must time both
-    addTimedGate(level, 'gate3a', 23, 32, 6, 1, 3, 1.4, 1.0);
-    addTimedGate(level, 'gate3b', 28, 32, 6, 1, 3, 1.4, 1.0);
-    fillTrack(level, 32, 31, 5, 5, 6);
-    // Turn south
-    fillTrack(level, 33, 36, 3, 8, 6);
-    // Gate 4 — fast, narrow corridor
-    addTimedGate(level, 'gate4', 33, 40, 6, 3, 1, 1.2, 0.9);
-    fillTrack(level, 33, 44, 3, 5, 6);
-    // Descent to z=4
-    placeRamp(level, { x: 33, y: 49, dir: 'south', length: 3, width: 3, startZ: 6, endZ: 4 });
-    // Section 3: Gate gauntlet — 3 gates in quick succession
-    fillTrack(level, 30, 52, 16, 3, 4);
-    addTimedGate(level, 'gate5a', 33, 52, 4, 1, 3, 1.0, 0.8);
-    addTimedGate(level, 'gate5b', 37, 52, 4, 1, 3, 1.0, 0.8);
-    addTimedGate(level, 'gate5c', 41, 52, 4, 1, 3, 1.0, 0.8);
-    // Goal
+    fillTrack(level, 9, 4, 14, 3, 8);
+    fillTrack(level, 20, 7, 3, 17, 8);
+    fillTrack(level, 18, 19, 2, 5, 8);
+    fillTrack(level, 23, 19, 2, 5, 8);
+    fillTrack(level, 18, 28, 7, 7, 6);
+    fillTrack(level, 32, 31, 4, 5, 6);
+    fillTrack(level, 25, 32, 7, 3, 6);
+    fillTrack(level, 19, 35, 5, 1, 6);
+    fillTrack(level, 33, 36, 3, 13, 6);
     fillTrack(level, 46, 51, 5, 5, 4);
-    setGoal(level, 48, 53, 0.55);
-    // Route graph
-    addGraphNode(level, { id: 'start', type: 'entry', x: 6, y: 6, z: 8 });
-    addGraphNode(level, { id: 'g1', type: 'route', x: 15, y: 6, z: 8 });
-    addGraphNode(level, { id: 'g2', type: 'route', x: 22, y: 16, z: 8 });
-    addGraphNode(level, { id: 'g3', type: 'route', x: 25, y: 34, z: 6 });
-    addGraphNode(level, { id: 'g4', type: 'route', x: 35, y: 42, z: 6 });
-    addGraphNode(level, { id: 'goal', type: 'goal', x: 49, y: 54, z: 4 });
-    addGraphEdge(level, { from: 'start', to: 'g1', kind: 'timed_cross' });
-    addGraphEdge(level, { from: 'g1', to: 'g2', kind: 'timed_cross' });
-    addGraphEdge(level, { from: 'g2', to: 'g3', kind: 'timed_cross' });
-    addGraphEdge(level, { from: 'g3', to: 'g4', kind: 'timed_cross' });
-    addGraphEdge(level, { from: 'g4', to: 'goal', kind: 'timed_cross' });
+    fillTrack(level, 33, 52, 13, 3, 4);
+    // Ramps
+    setSurface(level, 19, 24, { baseHeight: 8, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 20, 24, { baseHeight: 8, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 21, 24, { baseHeight: 8, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 22, 24, { baseHeight: 8, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 23, 24, { baseHeight: 8, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 19, 25, { baseHeight: 7.5, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 20, 25, { baseHeight: 7.5, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 21, 25, { baseHeight: 7.5, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 22, 25, { baseHeight: 7.5, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 23, 25, { baseHeight: 7.5, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 19, 26, { baseHeight: 7, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 20, 26, { baseHeight: 7, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 21, 26, { baseHeight: 7, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 22, 26, { baseHeight: 7, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 23, 26, { baseHeight: 7, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 19, 27, { baseHeight: 6.5, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 20, 27, { baseHeight: 6.5, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 21, 27, { baseHeight: 6.5, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 22, 27, { baseHeight: 6.5, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 23, 27, { baseHeight: 6.5, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 33, 49, { baseHeight: 6, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 34, 49, { baseHeight: 6, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 35, 49, { baseHeight: 6, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 33, 50, { baseHeight: 5.3, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 34, 50, { baseHeight: 5.3, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 35, 50, { baseHeight: 5.3, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 33, 51, { baseHeight: 4.7, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 34, 51, { baseHeight: 4.7, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 35, 51, { baseHeight: 4.7, shape: 'slope_s', kind: 'track' });
+
+    // --- Timed Gates ---
+    addTimedGate(level, 'gate_1', 13.5, 5.5, 10, 1, 3);
+    addTimedGate(level, 'gate_2', 21.5, 10.5, 10, 3, 1);
+    addActor(level, {
+      id: 'gate_3a', kind: ACTOR_KINDS.TIMED_GATE,
+      x: 31.5, y: 33.5, z: 6,
+      width: 1, height: 3, topHeight: 8,
+      closedDuration: 1.4, openDuration: 1.1, startOffset: 0
+    });
+    addActor(level, {
+      id: 'gate_3b', kind: ACTOR_KINDS.TIMED_GATE,
+      x: 34.5, y: 35.5, z: 6,
+      width: 3, height: 1, topHeight: 8,
+      closedDuration: 1.4, openDuration: 1.1, startOffset: 0.5
+    });
+    addActor(level, {
+      id: 'gate_4a', kind: ACTOR_KINDS.TIMED_GATE,
+      x: 40.5, y: 53.5, z: 4,
+      width: 1, height: 3, topHeight: 6,
+      closedDuration: 1.4, openDuration: 1.1, startOffset: 0
+    });
+    addActor(level, {
+      id: 'gate_4b', kind: ACTOR_KINDS.TIMED_GATE,
+      x: 42.5, y: 53.5, z: 4,
+      width: 1, height: 3, topHeight: 6,
+      closedDuration: 1.4, openDuration: 1.1, startOffset: 0.5
+    });
+    addActor(level, {
+      id: 'gate_4c', kind: ACTOR_KINDS.TIMED_GATE,
+      x: 44.5, y: 53.5, z: 4,
+      width: 1, height: 3, topHeight: 6,
+      closedDuration: 1.4, openDuration: 1.1, startOffset: 1
+    });
+
+    // --- Goal ---
+    setGoal(level, 48.5, 53.5);
+
     return registerLevel(level);
   }
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  // LEVEL 8 — Sweeper Alley
-  // Introduces sweepers. Must time movement through rotating arms.
-  // ═══════════════════════════════════════════════════════════════════════════
+  // ─── Level 8: Sweeper Alley ───
   function buildSweeperAlley() {
     const level = createLevelShell({
       id: 'sweeper_alley',
       name: 'Sweeper Alley',
       width: 55,
       height: 55,
-      timeLimit: 50,
-      start: { x: 5, y: 5 },
-      reward: { presses: 4000, unlocks: ['marble_sweeper_alley_complete'], claimKey: 'sweeper_alley' }
+      start: { x: 5.5, y: 5.5, z: 4 },
+      timeLimit: 50
     });
-    // Start at z=4
-    fillTrack(level, 3, 3, 6, 5, 4);
-    // Section 1: Wide arena with slow sweeper
+
+    // --- Surface tiles ---
     fillTrack(level, 9, 2, 14, 14, 4);
+    fillTrack(level, 3, 3, 6, 5, 4);
+    fillTrack(level, 27, 5, 10, 6, 4);
+    fillTrack(level, 23, 6, 4, 4, 4);
+    fillTrack(level, 34, 11, 4, 18, 4);
+    fillTrack(level, 28, 19, 6, 10, 4);
+    fillTrack(level, 28, 29, 4, 8, 4);
+    fillTrack(level, 10, 30, 8, 16, 4);
+    fillTrack(level, 18, 33, 10, 4, 4);
+    fillTrack(level, 10, 46, 6, 5, 4);
+
+    // --- Sweepers ---
     addActor(level, {
       id: 'sweep1', kind: ACTOR_KINDS.SWEEPER,
-      x: 8, y: 4.5, z: 4, topHeight: 4,
-      width: 2, height: 1, armLength: 3.5, armWidth: 0.22, angularSpeed: 1.0, fatal: true
+      x: 36.5, y: 5.5, z: 4, topHeight: 4,
+      width: 1, height: 1, armLength: 2.5, armWidth: 0.22, angularSpeed: 1.2, fatal: true
     });
-    // Exit east
-    fillTrack(level, 23, 6, 4, 4, 4);
-    // Section 2: Narrow corridor with faster sweeper
-    fillTrack(level, 27, 5, 10, 6, 4);
     addActor(level, {
       id: 'sweep2', kind: ACTOR_KINDS.SWEEPER,
-      x: 16, y: 4, z: 4, topHeight: 4,
-      width: 2, height: 1, armLength: 2.5, armWidth: 0.22, angularSpeed: 1.5, fatal: true
+      x: 13.5, y: 7.5, z: 4, topHeight: 4,
+      width: 1, height: 1, armLength: 2.5, armWidth: 0.22, angularSpeed: 1.5, fatal: true
     });
-    // Turn south
-    fillTrack(level, 34, 11, 4, 8, 4);
-    // Section 3: Two sweepers in sequence — tight passage
-    fillTrack(level, 28, 19, 14, 10, 4);
     addActor(level, {
       id: 'sweep3', kind: ACTOR_KINDS.SWEEPER,
-      x: 16, y: 12, z: 4, topHeight: 4,
-      width: 2, height: 1, armLength: 2.5, armWidth: 0.22, angularSpeed: 1.4, fatal: true
+      x: 19.5, y: 7.5, z: 4, topHeight: 4,
+      width: 1, height: 1, armLength: 2.5, armWidth: 0.22, angularSpeed: 1.7999999999999998, fatal: true
     });
     addActor(level, {
       id: 'sweep4', kind: ACTOR_KINDS.SWEEPER,
-      x: 19, y: 12, z: 4, topHeight: 4,
-      width: 2, height: 1, armLength: 2.5, armWidth: 0.22, angularSpeed: -1.6, fatal: true
+      x: 28.5, y: 23.5, z: 4, topHeight: 4,
+      width: 1, height: 1, armLength: 2.5, armWidth: 0.22, angularSpeed: 1.2, fatal: true
     });
-    // Turn south and west
-    fillTrack(level, 28, 29, 4, 6, 4);
-    fillTrack(level, 18, 33, 14, 4, 4);
-    // Section 4: Sweeper gauntlet — 3 sweepers in a row
-    fillTrack(level, 10, 30, 8, 16, 4);
     addActor(level, {
       id: 'sweep5', kind: ACTOR_KINDS.SWEEPER,
-      x: 7, y: 17, z: 4, topHeight: 4,
-      width: 2, height: 1, armLength: 2.0, armWidth: 0.22, angularSpeed: 1.8, fatal: true
+      x: 35.5, y: 26.5, z: 4, topHeight: 4,
+      width: 1, height: 1, armLength: 2.5, armWidth: 0.22, angularSpeed: 1.5, fatal: true
     });
     addActor(level, {
       id: 'sweep6', kind: ACTOR_KINDS.SWEEPER,
-      x: 7, y: 20, z: 4, topHeight: 4,
-      width: 2, height: 1, armLength: 2.0, armWidth: 0.22, angularSpeed: -1.6, fatal: true
+      x: 16.5, y: 39.5, z: 4, topHeight: 4,
+      width: 1, height: 1, armLength: 2.5, armWidth: 0.22, angularSpeed: 1.7999999999999998, fatal: true
     });
     addActor(level, {
       id: 'sweep7', kind: ACTOR_KINDS.SWEEPER,
-      x: 7, y: 23, z: 4, topHeight: 4,
-      width: 2, height: 1, armLength: 2.0, armWidth: 0.22, angularSpeed: 2.0, fatal: true
+      x: 10.5, y: 42.5, z: 4, topHeight: 4,
+      width: 1, height: 1, armLength: 2.5, armWidth: 0.22, angularSpeed: 1.2, fatal: true
     });
-    // Goal
-    fillTrack(level, 10, 46, 6, 5, 4);
-    setGoal(level, 13, 48, 0.55);
-    // Route graph
-    addGraphNode(level, { id: 'start', type: 'entry', x: 6, y: 6, z: 4 });
-    addGraphNode(level, { id: 's1', type: 'route', x: 16, y: 9, z: 4 });
-    addGraphNode(level, { id: 's2', type: 'route', x: 32, y: 8, z: 4 });
-    addGraphNode(level, { id: 's3', type: 'route', x: 35, y: 24, z: 4 });
-    addGraphNode(level, { id: 's4', type: 'route', x: 14, y: 38, z: 4 });
-    addGraphNode(level, { id: 'goal', type: 'goal', x: 14, y: 49, z: 4 });
-    addGraphEdge(level, { from: 'start', to: 's1', kind: 'roll' });
-    addGraphEdge(level, { from: 's1', to: 's2', kind: 'roll' });
-    addGraphEdge(level, { from: 's2', to: 's3', kind: 'roll' });
-    addGraphEdge(level, { from: 's3', to: 's4', kind: 'roll' });
-    addGraphEdge(level, { from: 's4', to: 'goal', kind: 'roll' });
+
+    // --- Goal ---
+    setGoal(level, 13.5, 48.5);
+
     return registerLevel(level);
   }
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  // LEVEL 9 — Platform Hop
-  // Moving platforms carry the marble across void gaps.
-  // ═══════════════════════════════════════════════════════════════════════════
+  // ─── Level 9: Platform Hop ───
   function buildPlatformHop() {
     const level = createLevelShell({
       id: 'platform_hop',
       name: 'Platform Hop',
       width: 55,
       height: 55,
-      timeLimit: 50,
-      start: { x: 5, y: 5 },
-      reward: { presses: 4500, unlocks: ['marble_platform_hop_complete'], claimKey: 'platform_hop' }
+      start: { x: 5.5, y: 5.5, z: 6 },
+      timeLimit: 50
     });
-    // Start at z=6
+
+    // --- Surface tiles ---
     fillTrack(level, 3, 3, 6, 5, 6);
-    // Platform 1: Moves east across a void gap
-    fillTrack(level, 9, 4, 3, 3, 6);
-    // Void gap (tiles 12-17)
-    addMovingBridge(level, 'plat1', [
-      { x: 6, y: 2.5, z: 6 },
-      { x: 10, y: 2.5, z: 6 }
-    ], 3, 3, 0.5);
     fillTrack(level, 18, 3, 5, 5, 6);
-    // Turn south
+    fillTrack(level, 9, 4, 3, 3, 6);
     fillTrack(level, 19, 8, 3, 4, 6);
-    // Platform 2: Moves south across larger gap
-    addMovingBridge(level, 'plat2', [
-      { x: 10, y: 6, z: 6 },
-      { x: 10, y: 12, z: 6 }
-    ], 3, 3, 0.45);
     fillTrack(level, 19, 22, 5, 4, 6);
-    // Platform 3: Diagonal movement
     fillTrack(level, 19, 26, 3, 3, 6);
-    addMovingBridge(level, 'plat3', [
-      { x: 10, y: 14.5, z: 6 },
-      { x: 16, y: 18.5, z: 6 }
-    ], 3, 3, 0.4);
     fillTrack(level, 32, 36, 5, 4, 6);
-    // Section 2: Multiple platforms in sequence (no safe ground between)
     fillTrack(level, 34, 40, 3, 3, 6);
-    addMovingBridge(level, 'plat4', [
-      { x: 18.5, y: 21.5, z: 6 },
-      { x: 22.5, y: 21.5, z: 6 }
-    ], 2, 2, 0.55);
-    addMovingBridge(level, 'plat5', [
-      { x: 23.5, y: 21.5, z: 6 },
-      { x: 23.5, y: 25.5, z: 6 }
-    ], 2, 2, 0.5);
     fillTrack(level, 44, 46, 5, 5, 6);
-    // Goal
-    setGoal(level, 46, 48, 0.55);
-    // Route graph
-    addGraphNode(level, { id: 'start', type: 'entry', x: 6, y: 6, z: 6 });
-    addGraphNode(level, { id: 'p1', type: 'route', x: 20, y: 6, z: 6 });
-    addGraphNode(level, { id: 'p2', type: 'route', x: 21, y: 24, z: 6 });
-    addGraphNode(level, { id: 'p3', type: 'route', x: 34, y: 38, z: 6 });
-    addGraphNode(level, { id: 'goal', type: 'goal', x: 47, y: 49, z: 6 });
-    addGraphEdge(level, { from: 'start', to: 'p1', kind: 'roll' });
-    addGraphEdge(level, { from: 'p1', to: 'p2', kind: 'roll' });
-    addGraphEdge(level, { from: 'p2', to: 'p3', kind: 'roll' });
-    addGraphEdge(level, { from: 'p3', to: 'goal', kind: 'roll' });
+
+    // --- Moving Platforms ---
+    addMovingBridge(level, 'plat1', [
+      { x: 12.5, y: 5.5, z: 6 },
+      { x: 17.5, y: 5.5, z: 6 },
+    ], 2, 2, 0.5500, { pauseDuration: 1.5 });
+    addMovingBridge(level, 'plat2', [
+      { x: 20.5, y: 12.5, z: 6 },
+      { x: 20.5, y: 21.5, z: 6 },
+    ], 2, 2, 0.5500, { pauseDuration: 1.5 });
+    addMovingBridge(level, 'plat3', [
+      { x: 23.5, y: 26.5, z: 6 },
+      { x: 23.5, y: 35.5, z: 6 },
+    ], 2, 2, 0.5500, { pauseDuration: 1.5 });
+    addMovingBridge(level, 'plat4', [
+      { x: 31.5, y: 36.5, z: 6 },
+      { x: 23.5, y: 36.5, z: 6 },
+    ], 2, 2, 0.5500, { pauseDuration: 1.5 });
+    addMovingBridge(level, 'plat5', [
+      { x: 37.5, y: 38.5, z: 6 },
+      { x: 45.5, y: 38.5, z: 6 },
+    ], 2, 2, 0.5500, { pauseDuration: 1.5 });
+    addMovingBridge(level, 'plat6', [
+      { x: 45.5, y: 45.5, z: 6 },
+      { x: 45.5, y: 39.5, z: 6 },
+    ], 2, 2, 0.5500, { pauseDuration: 1.5 });
+
+    // --- Goal ---
+    setGoal(level, 46.5, 48.5);
+
     return registerLevel(level);
   }
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  // LEVEL 10 — Tunnel Network
-  // Introduces tunnels. Multiple tunnel paths, some misleading.
-  // ═══════════════════════════════════════════════════════════════════════════
+  // ─── Level 10: Tunnel Network ───
   function buildTunnelNetwork() {
     const level = createLevelShell({
       id: 'tunnel_network',
       name: 'Tunnel Network',
       width: 60,
       height: 55,
-      timeLimit: 50,
-      start: { x: 5, y: 27 },
-      reward: { presses: 5000, unlocks: ['marble_tunnel_network_complete'], claimKey: 'tunnel_network' }
+      start: { x: 5.5, y: 27.5, z: 6 },
+      timeLimit: 50
     });
-    // Start at z=6
+
+    // --- Surface tiles ---
+    fillTrack(level, 5, 5, 6, 2, 8);
+    fillTrack(level, 5, 7, 1, 10, 8);
+    fillTrack(level, 7, 7, 4, 2, 8);
+    setSurface(level, 6, 8, { baseHeight: 8, kind: 'track' });
+    fillTrack(level, 6, 14, 5, 2, 8);
+    fillTrack(level, 6, 16, 3, 1, 8);
+    fillTrack(level, 41, 19, 6, 1, 4);
+    fillTrack(level, 33, 20, 12, 2, 4);
+    fillTrack(level, 46, 20, 1, 7, 4);
+    setSurface(level, 45, 21, { baseHeight: 4, kind: 'track' });
+    fillTrack(level, 33, 22, 4, 4, 4);
+    fillTrack(level, 38, 22, 5, 4, 4);
+    fillTrack(level, 37, 23, 1, 3, 4);
+    fillTrack(level, 43, 25, 3, 2, 4);
+    fillTrack(level, 41, 26, 2, 1, 4);
+    fillTrack(level, 9, 43, 7, 1, 4);
+    fillTrack(level, 9, 44, 3, 5, 4);
+    fillTrack(level, 13, 44, 3, 2, 4);
+    fillTrack(level, 12, 45, 1, 4, 4);
+    fillTrack(level, 14, 46, 2, 3, 4);
+    fillTrack(level, 13, 47, 1, 2, 4);
+    fillTrack(level, 9, 22, 3, 12, 6);
+    fillTrack(level, 15, 22, 4, 2, 6);
+    fillTrack(level, 17, 24, 2, 6, 6);
     fillTrack(level, 3, 25, 6, 6, 6);
-    // Hub area with 3 tunnel entrances
-    fillTrack(level, 9, 22, 10, 12, 6);
-    // Tunnel A — goes east, exits at mid-level (correct path)
+    fillTrack(level, 12, 25, 2, 5, 6);
+    fillTrack(level, 14, 27, 3, 3, 6);
+    fillTrack(level, 12, 30, 1, 4, 6);
+    fillTrack(level, 13, 33, 6, 1, 6);
+    fillTrack(level, 9, 36, 1, 7, 6);
+    fillTrack(level, 11, 36, 3, 7, 6);
+    fillTrack(level, 10, 37, 1, 6, 6);
+    fillTrack(level, 49, 38, 7, 3, 2);
+    fillTrack(level, 49, 41, 2, 4, 2);
+    fillTrack(level, 52, 41, 4, 4, 2);
+    fillTrack(level, 51, 42, 1, 3, 2);
+    // Bounce tiles
+    setSurface(level, 9, 16, { baseHeight: 8, kind: 'bounce' });
+    setSurface(level, 10, 16, { baseHeight: 8, kind: 'bounce' });
+    setSurface(level, 10, 36, { baseHeight: 6, kind: 'bounce' });
+    setSurface(level, 12, 44, { baseHeight: 4, kind: 'bounce' });
+
+    // --- Funnel tiles (track at funnel height, tunnels handle funnel shape) ---
+    setSurface(level, 6, 9, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 7, 9, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 8, 9, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 9, 9, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 10, 9, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 6, 10, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 7, 10, { baseHeight: 7, kind: 'track' });
+    setSurface(level, 8, 10, { baseHeight: 7, kind: 'track' });
+    setSurface(level, 9, 10, { baseHeight: 7, kind: 'track' });
+    setSurface(level, 10, 10, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 6, 11, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 7, 11, { baseHeight: 7, kind: 'track' });
+    setSurface(level, 9, 11, { baseHeight: 7, kind: 'track' });
+    setSurface(level, 10, 11, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 6, 12, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 7, 12, { baseHeight: 7, kind: 'track' });
+    setSurface(level, 8, 12, { baseHeight: 7, kind: 'track' });
+    setSurface(level, 9, 12, { baseHeight: 7, kind: 'track' });
+    setSurface(level, 10, 12, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 6, 13, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 7, 13, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 8, 13, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 9, 13, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 10, 13, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 12, 22, { baseHeight: 6, kind: 'track' });
+    setSurface(level, 13, 22, { baseHeight: 6, kind: 'track' });
+    setSurface(level, 14, 22, { baseHeight: 6, kind: 'track' });
+    setSurface(level, 43, 22, { baseHeight: 4, kind: 'track' });
+    setSurface(level, 44, 22, { baseHeight: 4, kind: 'track' });
+    setSurface(level, 45, 22, { baseHeight: 4, kind: 'track' });
+    setSurface(level, 12, 23, { baseHeight: 6, kind: 'track' });
+    setSurface(level, 14, 23, { baseHeight: 6, kind: 'track' });
+    setSurface(level, 43, 23, { baseHeight: 4, kind: 'track' });
+    setSurface(level, 45, 23, { baseHeight: 4, kind: 'track' });
+    setSurface(level, 12, 24, { baseHeight: 6, kind: 'track' });
+    setSurface(level, 13, 24, { baseHeight: 6, kind: 'track' });
+    setSurface(level, 14, 24, { baseHeight: 6, kind: 'track' });
+    setSurface(level, 15, 24, { baseHeight: 6, kind: 'track' });
+    setSurface(level, 16, 24, { baseHeight: 6, kind: 'track' });
+    setSurface(level, 43, 24, { baseHeight: 4, kind: 'track' });
+    setSurface(level, 44, 24, { baseHeight: 4, kind: 'track' });
+    setSurface(level, 45, 24, { baseHeight: 4, kind: 'track' });
+    setSurface(level, 14, 25, { baseHeight: 6, kind: 'track' });
+    setSurface(level, 16, 25, { baseHeight: 6, kind: 'track' });
+    setSurface(level, 14, 26, { baseHeight: 6, kind: 'track' });
+    setSurface(level, 15, 26, { baseHeight: 6, kind: 'track' });
+    setSurface(level, 16, 26, { baseHeight: 6, kind: 'track' });
+    setSurface(level, 13, 30, { baseHeight: 6, kind: 'track' });
+    setSurface(level, 14, 30, { baseHeight: 6, kind: 'track' });
+    setSurface(level, 15, 30, { baseHeight: 6, kind: 'track' });
+    setSurface(level, 16, 30, { baseHeight: 6, kind: 'track' });
+    setSurface(level, 17, 30, { baseHeight: 6, kind: 'track' });
+    setSurface(level, 18, 30, { baseHeight: 6, kind: 'track' });
+    setSurface(level, 13, 31, { baseHeight: 6, kind: 'track' });
+    setSurface(level, 15, 31, { baseHeight: 6, kind: 'track' });
+    setSurface(level, 16, 31, { baseHeight: 6, kind: 'track' });
+    setSurface(level, 18, 31, { baseHeight: 6, kind: 'track' });
+    setSurface(level, 13, 32, { baseHeight: 6, kind: 'track' });
+    setSurface(level, 14, 32, { baseHeight: 6, kind: 'track' });
+    setSurface(level, 15, 32, { baseHeight: 6, kind: 'track' });
+    setSurface(level, 16, 32, { baseHeight: 6, kind: 'track' });
+    setSurface(level, 17, 32, { baseHeight: 6, kind: 'track' });
+    setSurface(level, 18, 32, { baseHeight: 6, kind: 'track' });
+
+    // --- Tunnels ---
     placeTunnel(level, {
-      id: 'tunnel_a',
+      id: 'tunnel_1',
       path: [
-        { x: 15.5, y: 25.5, z: 6 },
-        { x: 25, y: 20, z: 4 },
-        { x: 35, y: 22, z: 4 }
+        { x: 13.5, y: 23.5, z: 4 },
+        { x: 37.5, y: 22.5, z: 4 }
       ],
-      speed: 8,
-      exitType: 'emerge',
-      funnelRadius: 1,
-      funnelDepth: 2
+      speed: 8, funnelRadius: 1
     });
-    // Tunnel B — goes north, loops back near start (wrong path)
     placeTunnel(level, {
-      id: 'tunnel_b',
+      id: 'tunnel_2',
       path: [
-        { x: 13.5, y: 23.5, z: 6 },
-        { x: 13, y: 12, z: 5 },
-        { x: 8, y: 8, z: 6 }
+        { x: 15.5, y: 25.5, z: 4 },
+        { x: 13.5, y: 46.5, z: 4 }
       ],
-      speed: 7,
-      exitType: 'emerge',
-      funnelRadius: 1,
-      funnelDepth: 2
+      speed: 8, funnelRadius: 1
     });
-    // Tunnel B exit platform
-    fillTrack(level, 5, 5, 7, 7, 6);
-    // Path back from B exit to hub
-    fillTrack(level, 5, 12, 4, 10, 6);
-    // Tunnel C — goes south, exits at a dead end with a bounce back
     placeTunnel(level, {
-      id: 'tunnel_c',
+      id: 'tunnel_3',
       path: [
-        { x: 15.5, y: 31.5, z: 6 },
-        { x: 18, y: 40, z: 4 },
-        { x: 12, y: 45, z: 4 }
+        { x: 17.5, y: 31.5, z: 4 },
+        { x: 45.5, y: 20.5, z: 4 }
       ],
-      speed: 7,
-      exitType: 'emerge',
-      funnelRadius: 1,
-      funnelDepth: 2
+      speed: 8, funnelRadius: 1
     });
-    // Tunnel C exit — dead end with bounce pad back
-    fillTrack(level, 9, 43, 7, 6, 4);
-    setSurface(level, 12, 44, { baseHeight: 4, shape: SHAPES.FLAT, bounce: 6 });
-    // Landing from bounce — connects back to hub area
-    fillTrack(level, 9, 36, 5, 7, 6);
-    // Tunnel A exit area — mid section
-    fillTrack(level, 33, 20, 8, 6, 4);
-    // Second hub with tunnel D
-    fillTrack(level, 41, 19, 6, 8, 4);
-    // Tunnel D — final tunnel to goal area
     placeTunnel(level, {
-      id: 'tunnel_d',
+      id: 'tunnel_4',
       path: [
-        { x: 44.5, y: 23.5, z: 4 },
-        { x: 50, y: 30, z: 3 },
-        { x: 52, y: 40, z: 2 }
+        { x: 8.5, y: 11.5, z: 6 },
+        { x: 51.5, y: 41.5, z: 2 }
       ],
-      speed: 9,
-      exitType: 'emerge',
-      funnelRadius: 1,
-      funnelDepth: 2
+      speed: 8, funnelRadius: 1
     });
-    // Goal area
-    fillTrack(level, 49, 38, 7, 7, 2);
-    setGoal(level, 52, 41, 0.55);
-    // Route graph
-    addGraphNode(level, { id: 'start', type: 'entry', x: 6, y: 28, z: 6 });
-    addGraphNode(level, { id: 'hub', type: 'fork', x: 14, y: 28, z: 6 });
-    addGraphNode(level, { id: 'ta_exit', type: 'hub', x: 37, y: 23, z: 4 });
-    addGraphNode(level, { id: 'goal', type: 'goal', x: 53, y: 42, z: 2 });
-    addGraphEdge(level, { from: 'start', to: 'hub', kind: 'roll' });
-    addGraphEdge(level, { from: 'hub', to: 'ta_exit', kind: 'roll', tag: 'tunnel' });
-    addGraphEdge(level, { from: 'ta_exit', to: 'goal', kind: 'roll', tag: 'tunnel' });
+    placeTunnel(level, {
+      id: 'tunnel_5',
+      path: [
+        { x: 44.5, y: 23.5, z: 2 },
+        { x: 6.5, y: 7.5, z: 8 }
+      ],
+      speed: 8, funnelRadius: 1
+    });
+    placeTunnel(level, {
+      id: 'tunnel_void_1',
+      path: [
+        { x: 14.5, y: 31.5, z: 4 },
+        { x: 14.5, y: 31.5, z: -16 }
+      ],
+      speed: 12, funnelRadius: 1, exitType: 'drop'
+    });
+
+    // --- Goal ---
+    setGoal(level, 52.5, 41.5);
+
     return registerLevel(level);
   }
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  // LEVEL 11 — Switchback Descent
-  // Long winding descent with tight switchbacks and increasing speed.
-  // ═══════════════════════════════════════════════════════════════════════════
+  // ─── Level 11: Switchback Descent ───
   function buildSwitchbackDescentV2() {
     const level = createLevelShell({
       id: 'switchback_descent',
       name: 'Switchback Descent',
       width: 50,
       height: 65,
-      timeLimit: 40,
-      start: { x: 5, y: 5 },
-      reward: { presses: 5500, unlocks: ['marble_switchback_descent_complete'], claimKey: 'switchback_descent' }
+      start: { x: 5.5, y: 5.5, z: 16 },
+      timeLimit: 40
     });
-    // Start at z=16 — long descent to z=2
-    fillTrack(level, 3, 3, 6, 4, 16);
-    // Switchback 1: East
-    placeRamp(level, { x: 9, y: 4, dir: 'east', length: 6, width: 3, startZ: 16, endZ: 14 });
-    fillTrack(level, 15, 3, 8, 4, 14);
-    // Switchback 2: South + West
-    placeRamp(level, { x: 18, y: 7, dir: 'south', length: 4, width: 3, startZ: 14, endZ: 12 });
-    fillTrack(level, 17, 11, 5, 4, 12);
-    placeRamp(level, { x: 16, y: 12, dir: 'west', length: 6, width: 3, startZ: 12, endZ: 10 });
-    fillTrack(level, 5, 11, 6, 4, 10);
-    // Switchback 3: South + East
-    placeRamp(level, { x: 6, y: 15, dir: 'south', length: 4, width: 3, startZ: 10, endZ: 8 });
-    fillTrack(level, 5, 19, 5, 4, 8);
-    placeRamp(level, { x: 10, y: 20, dir: 'east', length: 6, width: 3, startZ: 8, endZ: 6 });
-    fillTrack(level, 16, 19, 8, 4, 6);
-    // Switchback 4: South + West (narrower — 2 wide)
-    placeRamp(level, { x: 20, y: 23, dir: 'south', length: 4, width: 2, startZ: 6, endZ: 5 });
-    fillTrack(level, 19, 27, 4, 3, 5);
-    placeRamp(level, { x: 18, y: 28, dir: 'west', length: 6, width: 2, startZ: 5, endZ: 4 });
-    fillTrack(level, 7, 27, 6, 3, 4);
-    // Switchback 5: South + East (2 wide, steeper)
-    placeRamp(level, { x: 8, y: 30, dir: 'south', length: 4, width: 2, startZ: 4, endZ: 3 });
-    fillTrack(level, 7, 34, 4, 3, 3);
-    placeRamp(level, { x: 11, y: 35, dir: 'east', length: 8, width: 2, startZ: 3, endZ: 2 });
-    // Final straight
-    fillTrack(level, 19, 34, 12, 3, 2);
-    // Narrow finish corridor
-    fillTrack(level, 31, 34, 3, 12, 2);
-    fillTrack(level, 24, 46, 10, 3, 2);
-    fillTrack(level, 24, 49, 3, 8, 2);
-    fillTrack(level, 24, 57, 10, 3, 2);
-    // Goal
-    fillTrack(level, 34, 55, 5, 5, 2);
-    setGoal(level, 36, 57, 0.55);
-    // Route graph
-    addGraphNode(level, { id: 'start', type: 'entry', x: 6, y: 5, z: 16 });
-    addGraphNode(level, { id: 'sb1', type: 'route', x: 19, y: 5, z: 14 });
-    addGraphNode(level, { id: 'sb2', type: 'route', x: 8, y: 13, z: 10 });
-    addGraphNode(level, { id: 'sb3', type: 'route', x: 20, y: 21, z: 6 });
-    addGraphNode(level, { id: 'sb4', type: 'route', x: 9, y: 29, z: 4 });
-    addGraphNode(level, { id: 'goal', type: 'goal', x: 37, y: 58, z: 2 });
-    addGraphEdge(level, { from: 'start', to: 'sb1', kind: 'descent' });
-    addGraphEdge(level, { from: 'sb1', to: 'sb2', kind: 'descent' });
-    addGraphEdge(level, { from: 'sb2', to: 'sb3', kind: 'descent' });
-    addGraphEdge(level, { from: 'sb3', to: 'sb4', kind: 'descent' });
-    addGraphEdge(level, { from: 'sb4', to: 'goal', kind: 'descent' });
+
+    // --- Surface tiles ---
+    fillTrack(level, 2, 3, 7, 5, 16);
+    fillTrack(level, 13, 8, 1, 2, 14);
+    fillTrack(level, 10, 9, 1, 3, 13);
+    fillTrack(level, 18, 11, 1, 3, 10);
+    fillTrack(level, 7, 13, 1, 3, 8);
+    fillTrack(level, 1, 15, 1, 3, 6);
+    fillTrack(level, 5, 17, 1, 3, 4);
+    fillTrack(level, 18, 19, 2, 4, 0);
+    fillTrack(level, 15, 22, 3, 3, 0);
+    setSurface(level, 18, 23, { baseHeight: 0, kind: 'track' });
+    // Ramps
+    setSurface(level, 2, 8, { baseHeight: 16, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 3, 8, { baseHeight: 15.8, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 4, 8, { baseHeight: 15.6, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 5, 8, { baseHeight: 15.4, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 6, 8, { baseHeight: 15.2, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 7, 8, { baseHeight: 15, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 8, 8, { baseHeight: 14.8, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 9, 8, { baseHeight: 14.6, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 10, 8, { baseHeight: 14.4, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 11, 8, { baseHeight: 14.2, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 12, 8, { baseHeight: 14, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 11, 9, { baseHeight: 13, shape: 'slope_w', kind: 'track' });
+    setSurface(level, 12, 9, { baseHeight: 14, shape: 'slope_w', kind: 'track' });
+    setSurface(level, 11, 11, { baseHeight: 13, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 12, 11, { baseHeight: 12.5, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 13, 11, { baseHeight: 12, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 14, 11, { baseHeight: 11.5, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 15, 11, { baseHeight: 11, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 16, 11, { baseHeight: 10.5, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 17, 11, { baseHeight: 10, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 8, 13, { baseHeight: 8, shape: 'slope_w', kind: 'track' });
+    setSurface(level, 9, 13, { baseHeight: 8.2, shape: 'slope_w', kind: 'track' });
+    setSurface(level, 10, 13, { baseHeight: 8.4, shape: 'slope_w', kind: 'track' });
+    setSurface(level, 11, 13, { baseHeight: 8.6, shape: 'slope_w', kind: 'track' });
+    setSurface(level, 12, 13, { baseHeight: 8.8, shape: 'slope_w', kind: 'track' });
+    setSurface(level, 13, 13, { baseHeight: 9, shape: 'slope_w', kind: 'track' });
+    setSurface(level, 14, 13, { baseHeight: 9.2, shape: 'slope_w', kind: 'track' });
+    setSurface(level, 15, 13, { baseHeight: 9.4, shape: 'slope_w', kind: 'track' });
+    setSurface(level, 16, 13, { baseHeight: 9.6, shape: 'slope_w', kind: 'track' });
+    setSurface(level, 17, 13, { baseHeight: 9.8, shape: 'slope_w', kind: 'track' });
+    setSurface(level, 2, 15, { baseHeight: 6, shape: 'slope_w', kind: 'track' });
+    setSurface(level, 3, 15, { baseHeight: 6.5, shape: 'slope_w', kind: 'track' });
+    setSurface(level, 4, 15, { baseHeight: 7, shape: 'slope_w', kind: 'track' });
+    setSurface(level, 5, 15, { baseHeight: 7.5, shape: 'slope_w', kind: 'track' });
+    setSurface(level, 6, 15, { baseHeight: 8, shape: 'slope_w', kind: 'track' });
+    setSurface(level, 2, 17, { baseHeight: 6, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 3, 17, { baseHeight: 5, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 4, 17, { baseHeight: 4, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 6, 19, { baseHeight: 4, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 7, 19, { baseHeight: 3.9, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 8, 19, { baseHeight: 3.8, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 9, 19, { baseHeight: 3.7, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 10, 19, { baseHeight: 3.6, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 11, 19, { baseHeight: 3.5, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 12, 19, { baseHeight: 3.4, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 13, 19, { baseHeight: 3.3, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 14, 19, { baseHeight: 3.2, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 15, 19, { baseHeight: 3.1, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 16, 19, { baseHeight: 3, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 17, 19, { baseHeight: 0, shape: 'slope_e', kind: 'track' });
+
+    // --- Goal ---
+    setGoal(level, 16.5, 23.5);
+
     return registerLevel(level);
   }
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  // LEVEL 12 — Hazard Gauntlet
-  // Combines sweepers, gates, and hazard strips in a gauntlet run.
-  // ═══════════════════════════════════════════════════════════════════════════
+  // ─── Level 12: Hazard Gauntlet ───
   function buildHazardGauntlet() {
     const level = createLevelShell({
       id: 'hazard_gauntlet',
       name: 'Hazard Gauntlet',
       width: 60,
       height: 50,
-      timeLimit: 40,
-      start: { x: 5, y: 24 },
-      reward: { presses: 6000, unlocks: ['marble_hazard_gauntlet_complete'], claimKey: 'hazard_gauntlet' }
+      start: { x: 5.5, y: 24.5, z: 6 },
+      timeLimit: 40
     });
-    // Start at z=6
-    fillTrack(level, 3, 22, 5, 5, 6);
-    // Section 1: Sweeper corridor
-    fillTrack(level, 8, 21, 10, 7, 6);
+
+    // --- Surface tiles ---
+    fillTrack(level, 26, 21, 18, 7, 6);
+    fillTrack(level, 46, 21, 2, 2, 6);
+    fillTrack(level, 3, 22, 12, 1, 6);
+    fillTrack(level, 17, 22, 1, 5, 6);
+    fillTrack(level, 3, 23, 11, 1, 6);
+    fillTrack(level, 16, 23, 1, 4, 6);
+    fillTrack(level, 48, 23, 7, 1, 6);
+    fillTrack(level, 56, 23, 1, 3, 6);
+    fillTrack(level, 3, 24, 10, 1, 6);
+    fillTrack(level, 15, 24, 1, 3, 6);
+    setSurface(level, 55, 24, { baseHeight: 6, kind: 'track' });
+    fillTrack(level, 3, 25, 9, 1, 6);
+    fillTrack(level, 48, 25, 7, 1, 6);
+    fillTrack(level, 3, 26, 8, 1, 6);
+    fillTrack(level, 13, 26, 2, 1, 6);
+    fillTrack(level, 46, 26, 2, 2, 6);
+    // Crumble tiles
+    fillSurfaceRect(level, 18, 23, 8, 1, { baseHeight: 6, kind: 'crumble', delay: 0.15, downtime: 4.0 });
+    fillSurfaceRect(level, 46, 23, 2, 3, { baseHeight: 6, kind: 'crumble', delay: 0.15, downtime: 4.0 });
+    fillSurfaceRect(level, 18, 24, 1, 2, { baseHeight: 6, kind: 'crumble', delay: 0.15, downtime: 4.0 });
+    fillSurfaceRect(level, 20, 24, 1, 2, { baseHeight: 6, kind: 'crumble', delay: 0.15, downtime: 4.0 });
+    fillSurfaceRect(level, 22, 24, 1, 2, { baseHeight: 6, kind: 'crumble', delay: 0.15, downtime: 4.0 });
+    fillSurfaceRect(level, 24, 24, 2, 2, { baseHeight: 6, kind: 'crumble', delay: 0.15, downtime: 4.0 });
+    fillSurfaceRect(level, 48, 24, 7, 1, { baseHeight: 6, kind: 'crumble', delay: 0.15, downtime: 4.0 });
+    setSurface(level, 19, 25, { baseHeight: 6, kind: 'crumble', delay: 0.15, downtime: 4.0 });
+    setSurface(level, 21, 25, { baseHeight: 6, kind: 'crumble', delay: 0.15, downtime: 4.0 });
+    setSurface(level, 23, 25, { baseHeight: 6, kind: 'crumble', delay: 0.15, downtime: 4.0 });
+    // Bounce tiles
+    setSurface(level, 55, 23, { baseHeight: 6, kind: 'bounce' });
+    setSurface(level, 19, 24, { baseHeight: 6, kind: 'bounce' });
+    setSurface(level, 21, 24, { baseHeight: 6, kind: 'bounce' });
+    setSurface(level, 23, 24, { baseHeight: 6, kind: 'bounce' });
+    setSurface(level, 14, 25, { baseHeight: 6, kind: 'bounce' });
+    setSurface(level, 55, 25, { baseHeight: 6, kind: 'bounce' });
+    // Ice tiles
+    fillSurfaceRect(level, 44, 21, 2, 7, { baseHeight: 6, kind: 'ice' });
+    fillSurfaceRect(level, 15, 22, 2, 1, { baseHeight: 6, kind: 'ice' });
+    fillSurfaceRect(level, 14, 23, 2, 1, { baseHeight: 6, kind: 'ice' });
+    fillSurfaceRect(level, 13, 24, 2, 1, { baseHeight: 6, kind: 'ice' });
+    fillSurfaceRect(level, 12, 25, 2, 1, { baseHeight: 6, kind: 'ice' });
+    fillSurfaceRect(level, 11, 26, 2, 1, { baseHeight: 6, kind: 'ice' });
+    // Hazard tiles
+    setSurface(level, 26, 20, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 27, 20, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 28, 20, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 29, 20, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 30, 20, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 31, 20, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 32, 20, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 33, 20, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 34, 20, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 35, 20, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 36, 20, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 37, 20, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 38, 20, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 39, 20, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 40, 20, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 41, 20, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 42, 20, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 43, 20, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 44, 20, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 45, 20, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 46, 20, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 47, 20, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 8, 21, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 9, 21, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 10, 21, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 11, 21, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 12, 21, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 13, 21, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 14, 21, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 15, 21, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 16, 21, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 17, 21, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 18, 22, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 19, 22, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 20, 22, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 21, 22, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 22, 22, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 23, 22, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 24, 22, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 25, 22, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 48, 22, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 49, 22, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 50, 22, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 51, 22, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 52, 22, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 53, 22, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 54, 22, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 55, 22, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 56, 22, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 57, 22, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 57, 23, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 57, 24, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 57, 25, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 18, 26, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 19, 26, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 20, 26, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 21, 26, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 22, 26, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 23, 26, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 24, 26, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 25, 26, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 48, 26, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 49, 26, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 50, 26, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 51, 26, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 52, 26, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 53, 26, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 54, 26, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 55, 26, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 56, 26, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 57, 26, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 8, 27, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 9, 27, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 10, 27, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 11, 27, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 12, 27, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 13, 27, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 14, 27, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 15, 27, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 16, 27, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 17, 27, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 26, 28, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 27, 28, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 28, 28, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 29, 28, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 30, 28, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 31, 28, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 32, 28, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 33, 28, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 34, 28, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 35, 28, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 36, 28, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 37, 28, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 38, 28, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 39, 28, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 40, 28, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 41, 28, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 42, 28, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 43, 28, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 44, 28, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 45, 28, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 46, 28, { baseHeight: 6, kind: 'hazard' });
+    setSurface(level, 47, 28, { baseHeight: 6, kind: 'hazard' });
+
+    // --- Timed Gates ---
+    addTimedGate(level, 'gate_2', 37.5, 24.5, 8, 13, 7);
+    addTimedGate(level, 'gate_1', 7.5, 24.5, 8, 1, 5);
+
+    // --- Sweepers ---
     addActor(level, {
       id: 'sweep1', kind: ACTOR_KINDS.SWEEPER,
-      x: 6.5, y: 12.25, z: 6, topHeight: 6,
-      width: 2, height: 1, armLength: 2.5, armWidth: 0.22, angularSpeed: 1.4, fatal: true
+      x: 9.5, y: 24.5, z: 6, topHeight: 6,
+      width: 1, height: 1, armLength: 2.5, armWidth: 0.22, angularSpeed: 1.2, fatal: true
     });
-    // Section 2: Gate after sweeper
-    fillTrack(level, 18, 22, 8, 5, 6);
-    addTimedGate(level, 'gate1', 22, 22, 6, 1, 5, 1.5, 1.2);
-    // Section 3: Hazard strip corridor — must weave between strips
-    fillTrack(level, 26, 20, 12, 9, 6);
-    addHazardRect(level, 28, 20, 2, 3);
-    addHazardRect(level, 32, 26, 2, 3);
-    addHazardRect(level, 35, 20, 2, 3);
-    // Section 4: Double sweeper + gate combo
-    fillTrack(level, 38, 20, 10, 9, 6);
     addActor(level, {
       id: 'sweep2', kind: ACTOR_KINDS.SWEEPER,
-      x: 21, y: 12.25, z: 6, topHeight: 6,
-      width: 2, height: 1, armLength: 2.0, armWidth: 0.22, angularSpeed: 1.6, fatal: true
+      x: 29.5, y: 24.5, z: 6, topHeight: 6,
+      width: 1, height: 1, armLength: 2.5, armWidth: 0.22, angularSpeed: 1.5, fatal: true
     });
     addActor(level, {
       id: 'sweep3', kind: ACTOR_KINDS.SWEEPER,
-      x: 23.5, y: 12.25, z: 6, topHeight: 6,
-      width: 2, height: 1, armLength: 2.0, armWidth: 0.22, angularSpeed: -1.8, fatal: true
+      x: 34.5, y: 24.5, z: 6, topHeight: 6,
+      width: 1, height: 1, armLength: 2.5, armWidth: 0.22, angularSpeed: 1.7999999999999998, fatal: true
     });
-    addTimedGate(level, 'gate2', 45, 22, 6, 1, 5, 1.2, 0.9);
-    // Section 5: Final sprint with hazards on both sides
-    fillTrack(level, 48, 22, 8, 5, 6);
-    addHazardRect(level, 49, 22, 6, 1);
-    addHazardRect(level, 49, 26, 6, 1);
-    // Goal
-    fillTrack(level, 53, 22, 5, 5, 6);
-    setGoal(level, 55, 24, 0.55);
-    // Route graph
-    addGraphNode(level, { id: 'start', type: 'entry', x: 6, y: 25, z: 6 });
-    addGraphNode(level, { id: 's1', type: 'route', x: 13, y: 25, z: 6 });
-    addGraphNode(level, { id: 's2', type: 'route', x: 25, y: 25, z: 6 });
-    addGraphNode(level, { id: 's3', type: 'route', x: 35, y: 25, z: 6 });
-    addGraphNode(level, { id: 's4', type: 'route', x: 45, y: 25, z: 6 });
-    addGraphNode(level, { id: 'goal', type: 'goal', x: 56, y: 25, z: 6 });
-    addGraphEdge(level, { from: 'start', to: 's1', kind: 'roll' });
-    addGraphEdge(level, { from: 's1', to: 's2', kind: 'timed_cross' });
-    addGraphEdge(level, { from: 's2', to: 's3', kind: 'roll' });
-    addGraphEdge(level, { from: 's3', to: 's4', kind: 'roll' });
-    addGraphEdge(level, { from: 's4', to: 'goal', kind: 'roll' });
+    addActor(level, {
+      id: 'sweep4', kind: ACTOR_KINDS.SWEEPER,
+      x: 40.5, y: 24.5, z: 6, topHeight: 6,
+      width: 1, height: 1, armLength: 2.5, armWidth: 0.22, angularSpeed: 1.2, fatal: true
+    });
+
+    // --- Goal ---
+    setGoal(level, 55.5, 24.5);
+
     return registerLevel(level);
   }
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  // LEVEL 13 — Elevator Shaft
-  // Introduces elevators. Must ride platforms up through vertical shafts.
-  // ═══════════════════════════════════════════════════════════════════════════
+  // ─── Level 13: Elevator Shaft ───
   function buildElevatorShaft() {
     const level = createLevelShell({
       id: 'elevator_shaft',
       name: 'Elevator Shaft',
       width: 45,
       height: 50,
-      timeLimit: 40,
-      start: { x: 5, y: 5 },
-      reward: { presses: 6500, unlocks: ['marble_elevator_shaft_complete'], claimKey: 'elevator_shaft' }
+      start: { x: 5.5, y: 5.5, z: 2 },
+      timeLimit: 40
     });
-    // Start at z=2
+
+    // --- Surface tiles ---
     fillTrack(level, 3, 3, 6, 5, 2);
-    // Corridor to elevator 1
     fillTrack(level, 9, 4, 6, 3, 2);
-    // Elevator 1: z=2 to z=6
-    fillTrack(level, 15, 3, 5, 5, 2);
-    addElevator(level, 'elev1', 8.5, 2.5, 2, 6, 3, 3, 0.8, 5.0);
-    // Platform at z=6
     fillTrack(level, 15, 3, 5, 5, 6);
-    // Corridor east at z=6
-    fillTrack(level, 20, 4, 8, 3, 6);
-    // Elevator 2: z=6 to z=10
-    fillTrack(level, 28, 3, 5, 5, 6);
-    addElevator(level, 'elev2', 15, 2.5, 6, 10, 3, 3, 0.7, 5.5);
-    // Platform at z=10
-    fillTrack(level, 28, 3, 5, 5, 10);
-    // Turn south at z=10
-    fillTrack(level, 29, 8, 3, 8, 10);
-    // Elevator 3: z=10 to z=14 (faster)
-    fillTrack(level, 28, 16, 5, 5, 10);
-    addElevator(level, 'elev3', 15, 9, 10, 14, 3, 3, 1.0, 4.5);
-    // Platform at z=14
-    fillTrack(level, 28, 16, 5, 5, 14);
-    // Corridor west at z=14
-    fillTrack(level, 18, 17, 10, 3, 14);
-    // Elevator 4: z=14 to z=18 (fast, small)
-    fillTrack(level, 14, 16, 4, 4, 14);
-    addElevator(level, 'elev4', 8, 9, 14, 18, 2, 2, 1.2, 4.0);
-    // Platform at z=18
+    fillTrack(level, 20, 3, 5, 5, 10);
+    fillTrack(level, 21, 8, 3, 8, 10);
     fillTrack(level, 14, 16, 4, 4, 18);
-    // Descent from z=18 to goal
-    placeRamp(level, { x: 15, y: 20, dir: 'south', length: 6, width: 3, startZ: 18, endZ: 14 });
-    fillTrack(level, 14, 26, 4, 4, 14);
-    placeRamp(level, { x: 15, y: 30, dir: 'south', length: 6, width: 3, startZ: 14, endZ: 10 });
-    fillTrack(level, 14, 36, 4, 4, 10);
-    placeRamp(level, { x: 15, y: 40, dir: 'south', length: 4, width: 3, startZ: 10, endZ: 8 });
-    // Goal
+    fillTrack(level, 20, 16, 5, 5, 14);
+    fillTrack(level, 18, 17, 2, 3, 14);
     fillTrack(level, 13, 44, 6, 4, 8);
-    setGoal(level, 16, 46, 0.55);
-    // Route graph
-    addGraphNode(level, { id: 'start', type: 'entry', x: 6, y: 6, z: 2 });
-    addGraphNode(level, { id: 'e1', type: 'route', x: 17, y: 5, z: 6 });
-    addGraphNode(level, { id: 'e2', type: 'route', x: 30, y: 5, z: 10 });
-    addGraphNode(level, { id: 'e3', type: 'route', x: 30, y: 18, z: 14 });
-    addGraphNode(level, { id: 'e4', type: 'route', x: 16, y: 18, z: 18 });
-    addGraphNode(level, { id: 'goal', type: 'goal', x: 17, y: 47, z: 8 });
-    addGraphEdge(level, { from: 'start', to: 'e1', kind: 'roll' });
-    addGraphEdge(level, { from: 'e1', to: 'e2', kind: 'roll' });
-    addGraphEdge(level, { from: 'e2', to: 'e3', kind: 'roll' });
-    addGraphEdge(level, { from: 'e3', to: 'e4', kind: 'roll' });
-    addGraphEdge(level, { from: 'e4', to: 'goal', kind: 'descent' });
+
+    // --- Elevators ---
+    addElevator(level, 'elev1', 14.5, 5.5, 2, 7, 2, 2, 0.8, 4.8);
+    addElevator(level, 'elev2', 19.5, 5.5, 6, 11, 2, 2, 0.8, 4.8);
+    addElevator(level, 'elev3', 22.5, 15.5, 10, 15, 2, 2, 0.8, 4.8);
+    addElevator(level, 'elev4', 18.5, 18.5, 14, 19, 2, 2, 0.8, 4.8);
+
+    // --- Moving Platforms ---
+    addMovingBridge(level, 'plat1', [
+      { x: 15.5, y: 20.5, z: 18 },
+      { x: 15.5, y: 43.5, z: 8 },
+    ], 2, 2, 0.5500, { pauseDuration: 1.5 });
+
+    // --- Goal ---
+    setGoal(level, 16.5, 46.5);
+
     return registerLevel(level);
   }
 
-
-  // ═══════════════════════════════════════════════════════════════════════════
-  // LEVEL 14 — The Mountain
-  // Climb to the peak! Goal is at the top. Ascending terrain.
-  // Each ring has a 1-unit ramp up and 1 bounce tile to jump up.
-  // ═══════════════════════════════════════════════════════════════════════════
+  // ─── Level 14: The Mountain ───
   function buildTheMountain() {
     const level = createLevelShell({
       id: 'the_mountain',
       name: 'The Mountain',
       width: 200,
       height: 200,
-      timeLimit: 40,
-      start: { x: 10, y: 100 },
-      reward: { presses: 7000, unlocks: ['marble_the_mountain_complete'], claimKey: 'the_mountain' }
+      start: { x: 10.5, y: 100.5, z: 2 },
+      timeLimit: 40
     });
-    // Center of the mountain at (100, 100)
-    const cx = 100, cy = 100;
 
-    // === Base approach at z=2 ===
-    fillTrack(level, 6, 94, 20, 12, 2);
+    // --- Surface tiles ---
+    fillTrack(level, 13, 68, 77, 1, 2);
+    fillTrack(level, 91, 68, 1, 76, 2);
+    fillTrack(level, 13, 69, 3, 1, 2);
+    fillTrack(level, 17, 69, 5, 1, 2);
+    fillTrack(level, 23, 69, 5, 1, 2);
+    fillTrack(level, 29, 69, 5, 1, 2);
+    fillTrack(level, 35, 69, 4, 1, 2);
+    fillTrack(level, 40, 69, 4, 1, 2);
+    fillTrack(level, 45, 69, 4, 1, 2);
+    fillTrack(level, 50, 69, 5, 1, 2);
+    fillTrack(level, 56, 69, 4, 1, 2);
+    fillTrack(level, 61, 69, 5, 1, 2);
+    fillTrack(level, 67, 69, 5, 1, 2);
+    fillTrack(level, 73, 69, 5, 1, 2);
+    fillTrack(level, 79, 69, 2, 1, 2);
+    fillTrack(level, 82, 69, 2, 1, 2);
+    fillTrack(level, 85, 69, 2, 1, 2);
+    fillTrack(level, 88, 69, 2, 1, 2);
+    fillTrack(level, 13, 70, 2, 4, 2);
+    fillTrack(level, 90, 70, 1, 5, 2);
+    fillTrack(level, 13, 74, 1, 68, 2);
+    fillTrack(level, 14, 75, 1, 5, 2);
+    fillTrack(level, 90, 80, 1, 3, 2);
+    fillTrack(level, 14, 81, 1, 4, 2);
+    fillTrack(level, 14, 86, 1, 4, 2);
+    fillTrack(level, 90, 87, 1, 5, 2);
+    fillTrack(level, 14, 91, 1, 5, 2);
+    fillTrack(level, 7, 94, 6, 12, 2);
+    fillTrack(level, 90, 94, 1, 4, 2);
+    fillTrack(level, 14, 98, 1, 5, 2);
+    fillTrack(level, 90, 99, 1, 3, 2);
+    fillTrack(level, 90, 103, 1, 3, 2);
+    fillTrack(level, 14, 105, 1, 6, 2);
+    fillTrack(level, 90, 107, 1, 3, 2);
+    fillTrack(level, 90, 111, 1, 2, 2);
+    fillTrack(level, 14, 112, 1, 4, 2);
+    fillTrack(level, 90, 114, 1, 2, 2);
+    fillTrack(level, 14, 117, 1, 3, 2);
+    fillTrack(level, 90, 117, 1, 3, 2);
+    fillTrack(level, 14, 121, 1, 4, 2);
+    fillTrack(level, 90, 121, 1, 3, 2);
+    fillTrack(level, 90, 125, 1, 2, 2);
+    fillTrack(level, 14, 126, 1, 5, 2);
+    fillTrack(level, 90, 128, 1, 2, 2);
+    fillTrack(level, 90, 131, 1, 2, 2);
+    fillTrack(level, 14, 132, 1, 4, 2);
+    fillTrack(level, 90, 134, 1, 4, 2);
+    fillTrack(level, 14, 137, 1, 6, 2);
+    fillTrack(level, 90, 141, 1, 2, 2);
+    fillTrack(level, 15, 142, 12, 2, 2);
+    fillTrack(level, 28, 142, 5, 2, 2);
+    fillTrack(level, 34, 142, 5, 2, 2);
+    fillTrack(level, 40, 142, 5, 2, 2);
+    fillTrack(level, 46, 142, 5, 2, 2);
+    fillTrack(level, 52, 142, 4, 2, 2);
+    fillTrack(level, 57, 142, 4, 2, 2);
+    fillTrack(level, 62, 142, 4, 2, 2);
+    fillTrack(level, 67, 142, 4, 2, 2);
+    fillTrack(level, 72, 142, 4, 2, 2);
+    fillTrack(level, 77, 142, 4, 2, 2);
+    fillTrack(level, 82, 142, 3, 2, 2);
+    fillTrack(level, 86, 142, 2, 2, 2);
+    fillTrack(level, 89, 142, 1, 2, 2);
+    setSurface(level, 13, 143, { baseHeight: 2, kind: 'track' });
+    setSurface(level, 27, 143, { baseHeight: 2, kind: 'track' });
+    setSurface(level, 33, 143, { baseHeight: 2, kind: 'track' });
+    setSurface(level, 39, 143, { baseHeight: 2, kind: 'track' });
+    setSurface(level, 45, 143, { baseHeight: 2, kind: 'track' });
+    setSurface(level, 51, 143, { baseHeight: 2, kind: 'track' });
+    setSurface(level, 56, 143, { baseHeight: 2, kind: 'track' });
+    setSurface(level, 61, 143, { baseHeight: 2, kind: 'track' });
+    setSurface(level, 66, 143, { baseHeight: 2, kind: 'track' });
+    setSurface(level, 71, 143, { baseHeight: 2, kind: 'track' });
+    setSurface(level, 76, 143, { baseHeight: 2, kind: 'track' });
+    setSurface(level, 81, 143, { baseHeight: 2, kind: 'track' });
+    setSurface(level, 85, 143, { baseHeight: 2, kind: 'track' });
+    setSurface(level, 88, 143, { baseHeight: 2, kind: 'track' });
+    fillTrack(level, 15, 70, 75, 2, 3);
+    fillTrack(level, 15, 72, 5, 1, 3);
+    fillTrack(level, 21, 72, 3, 1, 3);
+    fillTrack(level, 25, 72, 4, 1, 3);
+    fillTrack(level, 30, 72, 5, 1, 3);
+    fillTrack(level, 36, 72, 7, 1, 3);
+    fillTrack(level, 44, 72, 13, 1, 3);
+    fillTrack(level, 58, 72, 6, 1, 3);
+    fillTrack(level, 65, 72, 6, 1, 3);
+    fillTrack(level, 72, 72, 5, 1, 3);
+    fillTrack(level, 78, 72, 5, 1, 3);
+    fillTrack(level, 84, 72, 6, 1, 3);
+    fillTrack(level, 15, 73, 3, 10, 3);
+    fillTrack(level, 87, 73, 3, 2, 3);
+    fillTrack(level, 88, 75, 2, 67, 3);
+    fillTrack(level, 87, 76, 1, 8, 3);
+    fillTrack(level, 15, 83, 2, 15, 3);
+    fillTrack(level, 17, 84, 1, 7, 3);
+    fillTrack(level, 87, 85, 1, 3, 3);
+    fillTrack(level, 87, 89, 1, 3, 3);
+    fillTrack(level, 17, 92, 1, 15, 3);
+    fillTrack(level, 87, 93, 1, 4, 3);
+    fillTrack(level, 16, 98, 1, 44, 3);
+    fillTrack(level, 87, 98, 1, 5, 3);
+    fillTrack(level, 15, 103, 1, 39, 3);
+    fillTrack(level, 87, 104, 1, 5, 3);
+    fillTrack(level, 17, 108, 1, 24, 3);
+    fillTrack(level, 87, 110, 1, 8, 3);
+    fillTrack(level, 87, 119, 1, 7, 3);
+    fillTrack(level, 87, 127, 1, 7, 3);
+    fillTrack(level, 17, 133, 1, 9, 3);
+    fillTrack(level, 87, 135, 1, 7, 3);
+    fillTrack(level, 18, 139, 1, 3, 3);
+    fillTrack(level, 20, 139, 3, 3, 3);
+    fillTrack(level, 24, 139, 4, 3, 3);
+    fillTrack(level, 29, 139, 1, 3, 3);
+    fillTrack(level, 31, 139, 5, 3, 3);
+    fillTrack(level, 37, 139, 5, 3, 3);
+    fillTrack(level, 43, 139, 6, 3, 3);
+    fillTrack(level, 50, 139, 11, 3, 3);
+    fillTrack(level, 62, 139, 7, 3, 3);
+    fillTrack(level, 70, 139, 7, 3, 3);
+    fillTrack(level, 78, 139, 6, 3, 3);
+    fillTrack(level, 85, 139, 2, 3, 3);
+    fillTrack(level, 19, 140, 1, 2, 3);
+    fillTrack(level, 23, 140, 1, 2, 3);
+    fillTrack(level, 28, 140, 1, 2, 3);
+    fillTrack(level, 30, 140, 1, 2, 3);
+    fillTrack(level, 36, 140, 1, 2, 3);
+    fillTrack(level, 42, 140, 1, 2, 3);
+    fillTrack(level, 49, 140, 1, 2, 3);
+    fillTrack(level, 61, 140, 1, 2, 3);
+    fillTrack(level, 69, 140, 1, 2, 3);
+    fillTrack(level, 77, 140, 1, 2, 3);
+    fillTrack(level, 84, 140, 1, 2, 3);
+    fillTrack(level, 18, 73, 69, 2, 4);
+    fillTrack(level, 18, 75, 3, 4, 4);
+    fillTrack(level, 22, 75, 3, 1, 4);
+    fillTrack(level, 26, 75, 3, 1, 4);
+    fillTrack(level, 30, 75, 3, 1, 4);
+    fillTrack(level, 34, 75, 4, 1, 4);
+    fillTrack(level, 39, 75, 4, 1, 4);
+    fillTrack(level, 44, 75, 8, 1, 4);
+    fillTrack(level, 53, 75, 8, 1, 4);
+    fillTrack(level, 62, 75, 5, 1, 4);
+    fillTrack(level, 68, 75, 7, 1, 4);
+    fillTrack(level, 76, 75, 7, 1, 4);
+    fillTrack(level, 84, 75, 3, 9, 4);
+    fillTrack(level, 18, 79, 2, 17, 4);
+    fillTrack(level, 20, 80, 1, 5, 4);
+    fillTrack(level, 85, 84, 2, 55, 4);
+    fillTrack(level, 84, 85, 1, 5, 4);
+    fillTrack(level, 20, 86, 1, 5, 4);
+    fillTrack(level, 84, 91, 1, 6, 4);
+    fillTrack(level, 20, 92, 1, 13, 4);
+    fillTrack(level, 18, 96, 1, 43, 4);
+    fillTrack(level, 19, 97, 1, 42, 4);
+    fillTrack(level, 84, 98, 1, 12, 4);
+    fillTrack(level, 20, 106, 1, 13, 4);
+    fillTrack(level, 84, 111, 1, 5, 4);
+    fillTrack(level, 84, 117, 1, 6, 4);
+    fillTrack(level, 20, 120, 1, 9, 4);
+    fillTrack(level, 84, 124, 1, 10, 4);
+    fillTrack(level, 20, 130, 1, 9, 4);
+    fillTrack(level, 84, 135, 1, 4, 4);
+    fillTrack(level, 21, 136, 3, 3, 4);
+    fillTrack(level, 25, 136, 2, 3, 4);
+    fillTrack(level, 29, 136, 5, 3, 4);
+    fillTrack(level, 35, 136, 11, 3, 4);
+    fillTrack(level, 47, 136, 5, 3, 4);
+    fillTrack(level, 53, 136, 5, 3, 4);
+    fillTrack(level, 59, 136, 5, 3, 4);
+    fillTrack(level, 65, 136, 6, 3, 4);
+    fillTrack(level, 72, 136, 5, 3, 4);
+    fillTrack(level, 78, 136, 2, 3, 4);
+    fillTrack(level, 81, 136, 3, 3, 4);
+    fillTrack(level, 24, 137, 1, 2, 4);
+    fillTrack(level, 27, 137, 2, 2, 4);
+    fillTrack(level, 34, 137, 1, 2, 4);
+    fillTrack(level, 46, 137, 1, 2, 4);
+    fillTrack(level, 52, 137, 1, 2, 4);
+    fillTrack(level, 58, 137, 1, 2, 4);
+    fillTrack(level, 64, 137, 1, 2, 4);
+    fillTrack(level, 71, 137, 1, 2, 4);
+    fillTrack(level, 77, 137, 1, 2, 4);
+    fillTrack(level, 80, 137, 1, 2, 4);
+    fillTrack(level, 21, 76, 63, 1, 5);
+    fillTrack(level, 21, 77, 27, 1, 5);
+    fillTrack(level, 49, 77, 35, 1, 5);
+    fillTrack(level, 21, 78, 3, 4, 5);
+    setSurface(level, 25, 78, { baseHeight: 5, kind: 'track' });
+    fillTrack(level, 27, 78, 3, 1, 5);
+    fillTrack(level, 31, 78, 3, 1, 5);
+    fillTrack(level, 35, 78, 5, 1, 5);
+    fillTrack(level, 41, 78, 5, 1, 5);
+    fillTrack(level, 47, 78, 9, 1, 5);
+    fillTrack(level, 57, 78, 7, 1, 5);
+    fillTrack(level, 65, 78, 8, 1, 5);
+    fillTrack(level, 74, 78, 7, 1, 5);
+    fillTrack(level, 82, 78, 2, 37, 5);
+    fillTrack(level, 81, 79, 1, 2, 5);
+    fillTrack(level, 21, 82, 2, 27, 5);
+    fillTrack(level, 81, 82, 1, 15, 5);
+    fillTrack(level, 23, 83, 1, 7, 5);
+    fillTrack(level, 23, 91, 1, 10, 5);
+    fillTrack(level, 81, 98, 1, 12, 5);
+    fillTrack(level, 23, 102, 1, 7, 5);
+    fillTrack(level, 22, 109, 1, 27, 5);
+    fillTrack(level, 21, 110, 1, 26, 5);
+    fillTrack(level, 23, 110, 1, 4, 5);
+    fillTrack(level, 81, 111, 1, 2, 5);
+    fillTrack(level, 81, 114, 1, 14, 5);
+    fillTrack(level, 23, 115, 1, 6, 5);
+    fillTrack(level, 82, 115, 1, 21, 5);
+    fillTrack(level, 83, 116, 1, 20, 5);
+    fillTrack(level, 23, 122, 1, 6, 5);
+    fillTrack(level, 23, 129, 1, 4, 5);
+    fillTrack(level, 81, 129, 1, 7, 5);
+    fillTrack(level, 24, 133, 3, 3, 5);
+    fillTrack(level, 28, 133, 3, 3, 5);
+    fillTrack(level, 32, 133, 1, 3, 5);
+    fillTrack(level, 34, 133, 4, 3, 5);
+    fillTrack(level, 39, 133, 4, 2, 5);
+    fillTrack(level, 44, 133, 3, 3, 5);
+    fillTrack(level, 48, 133, 6, 3, 5);
+    fillTrack(level, 55, 133, 6, 3, 5);
+    fillTrack(level, 62, 133, 7, 3, 5);
+    fillTrack(level, 70, 133, 9, 3, 5);
+    fillTrack(level, 80, 133, 1, 3, 5);
+    fillTrack(level, 23, 134, 1, 2, 5);
+    fillTrack(level, 27, 134, 1, 2, 5);
+    fillTrack(level, 31, 134, 1, 2, 5);
+    fillTrack(level, 33, 134, 1, 2, 5);
+    fillTrack(level, 38, 134, 1, 2, 5);
+    fillTrack(level, 43, 134, 1, 2, 5);
+    fillTrack(level, 47, 134, 1, 2, 5);
+    fillTrack(level, 54, 134, 1, 2, 5);
+    fillTrack(level, 61, 134, 1, 2, 5);
+    fillTrack(level, 69, 134, 1, 2, 5);
+    fillTrack(level, 79, 134, 1, 2, 5);
+    fillTrack(level, 39, 135, 3, 1, 5);
+    fillTrack(level, 24, 79, 57, 2, 6);
+    fillTrack(level, 24, 81, 4, 1, 6);
+    fillTrack(level, 29, 81, 4, 1, 6);
+    fillTrack(level, 34, 81, 3, 1, 6);
+    fillTrack(level, 38, 81, 4, 1, 6);
+    fillTrack(level, 43, 81, 5, 1, 6);
+    fillTrack(level, 49, 81, 7, 1, 6);
+    fillTrack(level, 57, 81, 5, 1, 6);
+    fillTrack(level, 63, 81, 7, 1, 6);
+    fillTrack(level, 71, 81, 2, 1, 6);
+    fillTrack(level, 74, 81, 7, 1, 6);
+    fillTrack(level, 24, 82, 3, 3, 6);
+    fillTrack(level, 79, 82, 2, 21, 6);
+    fillTrack(level, 78, 83, 1, 7, 6);
+    fillTrack(level, 24, 85, 2, 48, 6);
+    fillTrack(level, 26, 86, 1, 5, 6);
+    fillTrack(level, 78, 91, 1, 9, 6);
+    fillTrack(level, 26, 92, 1, 9, 6);
+    fillTrack(level, 78, 101, 1, 8, 6);
+    fillTrack(level, 26, 102, 1, 8, 6);
+    fillTrack(level, 79, 103, 1, 30, 6);
+    fillTrack(level, 80, 104, 1, 29, 6);
+    fillTrack(level, 78, 110, 1, 8, 6);
+    fillTrack(level, 26, 111, 1, 6, 6);
+    fillTrack(level, 26, 118, 1, 10, 6);
+    fillTrack(level, 78, 119, 1, 7, 6);
+    fillTrack(level, 78, 127, 1, 6, 6);
+    fillTrack(level, 26, 129, 1, 4, 6);
+    fillTrack(level, 27, 130, 1, 3, 6);
+    fillTrack(level, 29, 130, 2, 3, 6);
+    fillTrack(level, 32, 130, 7, 1, 6);
+    fillTrack(level, 40, 130, 4, 3, 6);
+    fillTrack(level, 45, 130, 5, 3, 6);
+    fillTrack(level, 51, 130, 4, 3, 6);
+    fillTrack(level, 56, 130, 4, 3, 6);
+    fillTrack(level, 61, 130, 5, 2, 6);
+    fillTrack(level, 67, 130, 5, 3, 6);
+    fillTrack(level, 73, 130, 2, 3, 6);
+    fillTrack(level, 76, 130, 2, 3, 6);
+    fillTrack(level, 31, 131, 5, 2, 6);
+    fillTrack(level, 37, 131, 2, 2, 6);
+    fillTrack(level, 44, 131, 1, 2, 6);
+    fillTrack(level, 50, 131, 1, 2, 6);
+    fillTrack(level, 55, 131, 1, 2, 6);
+    fillTrack(level, 60, 131, 1, 2, 6);
+    fillTrack(level, 66, 131, 1, 2, 6);
+    fillTrack(level, 72, 131, 1, 2, 6);
+    fillTrack(level, 75, 131, 1, 2, 6);
+    setSurface(level, 28, 132, { baseHeight: 6, kind: 'track' });
+    setSurface(level, 36, 132, { baseHeight: 6, kind: 'track' });
+    setSurface(level, 39, 132, { baseHeight: 6, kind: 'track' });
+    setSurface(level, 61, 132, { baseHeight: 6, kind: 'track' });
+    fillTrack(level, 63, 132, 3, 1, 6);
+    fillTrack(level, 27, 82, 24, 2, 7);
+    fillTrack(level, 52, 82, 26, 2, 7);
+    fillTrack(level, 51, 83, 1, 2, 7);
+    fillTrack(level, 27, 84, 2, 46, 7);
+    setSurface(level, 30, 84, { baseHeight: 7, kind: 'track' });
+    fillTrack(level, 32, 84, 4, 1, 7);
+    fillTrack(level, 37, 84, 2, 1, 7);
+    fillTrack(level, 40, 84, 4, 1, 7);
+    fillTrack(level, 45, 84, 3, 1, 7);
+    fillTrack(level, 49, 84, 2, 1, 7);
+    fillTrack(level, 52, 84, 2, 1, 7);
+    fillTrack(level, 55, 84, 2, 1, 7);
+    fillTrack(level, 59, 84, 7, 1, 7);
+    fillTrack(level, 67, 84, 4, 1, 7);
+    fillTrack(level, 72, 84, 6, 1, 7);
+    fillTrack(level, 29, 85, 1, 2, 7);
+    fillTrack(level, 76, 85, 2, 13, 7);
+    fillTrack(level, 75, 86, 1, 6, 7);
+    fillTrack(level, 29, 88, 1, 2, 7);
+    fillTrack(level, 29, 91, 1, 6, 7);
+    fillTrack(level, 75, 93, 1, 8, 7);
+    fillTrack(level, 29, 98, 1, 7, 7);
+    fillTrack(level, 76, 98, 1, 32, 7);
+    fillTrack(level, 77, 99, 1, 31, 7);
+    fillTrack(level, 75, 102, 1, 8, 7);
+    fillTrack(level, 29, 106, 1, 6, 7);
+    fillTrack(level, 75, 111, 1, 8, 7);
+    fillTrack(level, 29, 113, 1, 6, 7);
+    fillTrack(level, 29, 120, 1, 6, 7);
+    fillTrack(level, 75, 120, 1, 4, 7);
+    fillTrack(level, 75, 125, 1, 5, 7);
+    fillTrack(level, 29, 127, 1, 3, 7);
+    fillTrack(level, 32, 127, 2, 3, 7);
+    fillTrack(level, 35, 127, 1, 3, 7);
+    fillTrack(level, 37, 127, 3, 3, 7);
+    fillTrack(level, 41, 127, 3, 3, 7);
+    fillTrack(level, 45, 127, 3, 3, 7);
+    fillTrack(level, 49, 127, 3, 3, 7);
+    fillTrack(level, 53, 127, 4, 3, 7);
+    fillTrack(level, 58, 127, 3, 3, 7);
+    fillTrack(level, 62, 127, 4, 3, 7);
+    fillTrack(level, 67, 127, 4, 3, 7);
+    fillTrack(level, 72, 127, 3, 3, 7);
+    fillTrack(level, 30, 128, 2, 2, 7);
+    fillTrack(level, 34, 128, 1, 2, 7);
+    fillTrack(level, 36, 128, 1, 2, 7);
+    fillTrack(level, 40, 128, 1, 2, 7);
+    fillTrack(level, 44, 128, 1, 2, 7);
+    fillTrack(level, 48, 128, 1, 2, 7);
+    fillTrack(level, 52, 128, 1, 2, 7);
+    fillTrack(level, 57, 128, 1, 2, 7);
+    fillTrack(level, 61, 128, 1, 2, 7);
+    fillTrack(level, 66, 128, 1, 2, 7);
+    fillTrack(level, 71, 128, 1, 2, 7);
+    fillTrack(level, 30, 85, 45, 2, 8);
+    fillTrack(level, 30, 87, 2, 40, 8);
+    setSurface(level, 33, 87, { baseHeight: 8, kind: 'track' });
+    fillTrack(level, 35, 87, 3, 1, 8);
+    fillTrack(level, 39, 87, 5, 1, 8);
+    fillTrack(level, 45, 87, 5, 1, 8);
+    fillTrack(level, 51, 87, 8, 1, 8);
+    fillTrack(level, 60, 87, 4, 1, 8);
+    fillTrack(level, 65, 87, 3, 1, 8);
+    fillTrack(level, 69, 87, 3, 1, 8);
+    fillTrack(level, 73, 87, 2, 27, 8);
+    fillTrack(level, 32, 88, 1, 4, 8);
+    fillTrack(level, 72, 88, 1, 3, 8);
+    fillTrack(level, 72, 92, 1, 5, 8);
+    fillTrack(level, 32, 93, 1, 5, 8);
+    fillTrack(level, 72, 98, 1, 6, 8);
+    fillTrack(level, 32, 99, 1, 4, 8);
+    fillTrack(level, 32, 104, 1, 7, 8);
+    fillTrack(level, 72, 105, 1, 6, 8);
+    fillTrack(level, 32, 112, 1, 8, 8);
+    fillTrack(level, 72, 112, 1, 6, 8);
+    fillTrack(level, 73, 114, 1, 13, 8);
+    fillTrack(level, 74, 115, 1, 12, 8);
+    fillTrack(level, 72, 119, 1, 5, 8);
+    fillTrack(level, 32, 121, 1, 6, 8);
+    fillTrack(level, 34, 124, 4, 1, 8);
+    fillTrack(level, 39, 124, 4, 3, 8);
+    fillTrack(level, 44, 124, 4, 3, 8);
+    fillTrack(level, 49, 124, 4, 3, 8);
+    fillTrack(level, 54, 124, 4, 3, 8);
+    fillTrack(level, 60, 124, 3, 3, 8);
+    fillTrack(level, 64, 124, 4, 3, 8);
+    fillTrack(level, 69, 124, 3, 3, 8);
+    fillTrack(level, 33, 125, 2, 2, 8);
+    fillTrack(level, 36, 125, 3, 2, 8);
+    fillTrack(level, 43, 125, 1, 2, 8);
+    fillTrack(level, 48, 125, 1, 2, 8);
+    fillTrack(level, 53, 125, 1, 2, 8);
+    fillTrack(level, 58, 125, 2, 2, 8);
+    fillTrack(level, 63, 125, 1, 2, 8);
+    fillTrack(level, 68, 125, 1, 2, 8);
+    fillTrack(level, 72, 125, 1, 2, 8);
+    setSurface(level, 35, 126, { baseHeight: 8, kind: 'track' });
+    fillTrack(level, 33, 88, 39, 2, 9);
+    fillTrack(level, 33, 90, 3, 4, 9);
+    fillTrack(level, 37, 90, 2, 1, 9);
+    setSurface(level, 40, 90, { baseHeight: 9, kind: 'track' });
+    fillTrack(level, 42, 90, 2, 1, 9);
+    fillTrack(level, 45, 90, 3, 1, 9);
+    fillTrack(level, 49, 90, 3, 1, 9);
+    setSurface(level, 53, 90, { baseHeight: 9, kind: 'track' });
+    fillTrack(level, 55, 90, 4, 1, 9);
+    fillTrack(level, 60, 90, 4, 1, 9);
+    fillTrack(level, 65, 90, 3, 1, 9);
+    fillTrack(level, 69, 90, 3, 3, 9);
+    fillTrack(level, 70, 93, 1, 31, 9);
+    fillTrack(level, 33, 94, 2, 30, 9);
+    fillTrack(level, 69, 94, 1, 5, 9);
+    fillTrack(level, 71, 94, 1, 30, 9);
+    fillTrack(level, 35, 95, 1, 4, 9);
+    fillTrack(level, 35, 100, 1, 4, 9);
+    fillTrack(level, 69, 100, 1, 5, 9);
+    fillTrack(level, 35, 105, 1, 4, 9);
+    fillTrack(level, 69, 106, 1, 5, 9);
+    fillTrack(level, 35, 110, 1, 4, 9);
+    fillTrack(level, 69, 112, 1, 5, 9);
+    fillTrack(level, 35, 115, 1, 5, 9);
+    fillTrack(level, 69, 118, 1, 3, 9);
+    fillTrack(level, 35, 121, 2, 3, 9);
+    fillTrack(level, 38, 121, 3, 3, 9);
+    fillTrack(level, 42, 121, 2, 3, 9);
+    fillTrack(level, 45, 121, 2, 3, 9);
+    fillTrack(level, 48, 121, 4, 3, 9);
+    fillTrack(level, 53, 121, 1, 3, 9);
+    fillTrack(level, 55, 121, 3, 3, 9);
+    fillTrack(level, 59, 121, 3, 3, 9);
+    fillTrack(level, 63, 121, 3, 3, 9);
+    fillTrack(level, 67, 121, 2, 3, 9);
+    fillTrack(level, 37, 122, 1, 2, 9);
+    fillTrack(level, 41, 122, 1, 2, 9);
+    fillTrack(level, 44, 122, 1, 2, 9);
+    fillTrack(level, 47, 122, 1, 2, 9);
+    fillTrack(level, 52, 122, 1, 2, 9);
+    fillTrack(level, 54, 122, 1, 2, 9);
+    fillTrack(level, 58, 122, 1, 2, 9);
+    fillTrack(level, 62, 122, 1, 2, 9);
+    fillTrack(level, 66, 122, 1, 2, 9);
+    fillTrack(level, 69, 122, 1, 2, 9);
+    setSurface(level, 2, 194, { baseHeight: 9, kind: 'track' });
+    fillTrack(level, 36, 91, 11, 2, 10);
+    fillTrack(level, 48, 91, 10, 2, 10);
+    fillTrack(level, 59, 91, 10, 2, 10);
+    fillTrack(level, 47, 92, 1, 2, 10);
+    fillTrack(level, 58, 92, 1, 2, 10);
+    fillTrack(level, 36, 93, 5, 1, 10);
+    fillTrack(level, 42, 93, 2, 1, 10);
+    fillTrack(level, 45, 93, 2, 1, 10);
+    fillTrack(level, 49, 93, 4, 1, 10);
+    fillTrack(level, 54, 93, 3, 1, 10);
+    fillTrack(level, 59, 93, 3, 1, 10);
+    fillTrack(level, 63, 93, 3, 1, 10);
+    fillTrack(level, 67, 93, 2, 28, 10);
+    fillTrack(level, 36, 94, 2, 27, 10);
+    fillTrack(level, 66, 94, 1, 7, 10);
+    fillTrack(level, 38, 95, 1, 6, 10);
+    fillTrack(level, 38, 102, 1, 3, 10);
+    fillTrack(level, 66, 102, 1, 5, 10);
+    fillTrack(level, 38, 106, 1, 5, 10);
+    fillTrack(level, 66, 108, 1, 5, 10);
+    fillTrack(level, 38, 112, 1, 4, 10);
+    fillTrack(level, 66, 114, 1, 4, 10);
+    fillTrack(level, 38, 117, 1, 4, 10);
+    fillTrack(level, 39, 118, 1, 3, 10);
+    fillTrack(level, 41, 118, 3, 3, 10);
+    fillTrack(level, 46, 118, 3, 3, 10);
+    fillTrack(level, 50, 118, 3, 2, 10);
+    fillTrack(level, 54, 118, 4, 3, 10);
+    fillTrack(level, 59, 118, 3, 3, 10);
+    fillTrack(level, 63, 118, 3, 3, 10);
+    fillTrack(level, 40, 119, 1, 2, 10);
+    fillTrack(level, 44, 119, 2, 2, 10);
+    fillTrack(level, 49, 119, 1, 2, 10);
+    fillTrack(level, 53, 119, 1, 2, 10);
+    fillTrack(level, 58, 119, 1, 2, 10);
+    fillTrack(level, 62, 119, 1, 2, 10);
+    fillTrack(level, 66, 119, 1, 2, 10);
+    fillTrack(level, 51, 120, 2, 1, 10);
+    fillTrack(level, 39, 94, 27, 1, 11);
+    fillTrack(level, 39, 95, 3, 1, 11);
+    fillTrack(level, 43, 95, 2, 1, 11);
+    fillTrack(level, 46, 95, 2, 1, 11);
+    fillTrack(level, 49, 95, 2, 1, 11);
+    fillTrack(level, 52, 95, 2, 1, 11);
+    fillTrack(level, 55, 95, 2, 1, 11);
+    fillTrack(level, 58, 95, 2, 1, 11);
+    fillTrack(level, 61, 95, 2, 1, 11);
+    fillTrack(level, 64, 95, 2, 1, 11);
+    fillTrack(level, 39, 96, 1, 22, 11);
+    setSurface(level, 64, 96, { baseHeight: 11, kind: 'track' });
+    fillTrack(level, 40, 97, 1, 2, 11);
+    fillTrack(level, 65, 97, 1, 20, 11);
+    fillTrack(level, 64, 98, 1, 2, 11);
+    fillTrack(level, 40, 100, 1, 11, 11);
+    fillTrack(level, 64, 101, 1, 2, 11);
+    fillTrack(level, 64, 104, 1, 2, 11);
+    fillTrack(level, 64, 107, 1, 2, 11);
+    fillTrack(level, 64, 110, 1, 2, 11);
+    fillTrack(level, 40, 112, 1, 6, 11);
+    fillTrack(level, 64, 113, 1, 2, 11);
+    fillTrack(level, 42, 116, 1, 2, 11);
+    fillTrack(level, 44, 116, 1, 2, 11);
+    fillTrack(level, 46, 116, 3, 2, 11);
+    fillTrack(level, 50, 116, 3, 2, 11);
+    fillTrack(level, 54, 116, 2, 2, 11);
+    fillTrack(level, 57, 116, 2, 2, 11);
+    fillTrack(level, 60, 116, 2, 2, 11);
+    fillTrack(level, 63, 116, 2, 2, 11);
+    setSurface(level, 41, 117, { baseHeight: 11, kind: 'track' });
+    setSurface(level, 43, 117, { baseHeight: 11, kind: 'track' });
+    setSurface(level, 45, 117, { baseHeight: 11, kind: 'track' });
+    setSurface(level, 49, 117, { baseHeight: 11, kind: 'track' });
+    setSurface(level, 53, 117, { baseHeight: 11, kind: 'track' });
+    setSurface(level, 56, 117, { baseHeight: 11, kind: 'track' });
+    setSurface(level, 59, 117, { baseHeight: 11, kind: 'track' });
+    setSurface(level, 62, 117, { baseHeight: 11, kind: 'track' });
+    fillTrack(level, 129, 94, 9, 4, 0);
+    fillTrack(level, 128, 95, 1, 9, 0);
+    fillTrack(level, 138, 95, 1, 9, 0);
+    fillTrack(level, 129, 98, 4, 1, 0);
+    fillTrack(level, 134, 98, 4, 1, 0);
+    fillTrack(level, 129, 99, 3, 6, 0);
+    fillTrack(level, 135, 99, 3, 6, 0);
+    fillTrack(level, 132, 100, 1, 5, 0);
+    fillTrack(level, 134, 100, 1, 5, 0);
+    fillTrack(level, 133, 101, 1, 4, 0);
+    fillTrack(level, 41, 96, 18, 1, 12);
+    fillTrack(level, 60, 96, 4, 1, 12);
+    fillTrack(level, 41, 97, 4, 1, 12);
+    fillTrack(level, 46, 97, 2, 1, 12);
+    setSurface(level, 49, 97, { baseHeight: 12, kind: 'track' });
+    fillTrack(level, 51, 97, 3, 1, 12);
+    fillTrack(level, 55, 97, 2, 1, 12);
+    fillTrack(level, 58, 97, 3, 1, 12);
+    fillTrack(level, 62, 97, 2, 2, 12);
+    fillTrack(level, 41, 98, 1, 18, 12);
+    fillTrack(level, 42, 99, 1, 2, 12);
+    fillTrack(level, 63, 99, 1, 17, 12);
+    fillTrack(level, 62, 100, 1, 3, 12);
+    fillTrack(level, 42, 102, 1, 4, 12);
+    fillTrack(level, 62, 104, 1, 3, 12);
+    fillTrack(level, 42, 107, 1, 3, 12);
+    fillTrack(level, 62, 108, 1, 3, 12);
+    setSurface(level, 42, 111, { baseHeight: 12, kind: 'track' });
+    fillTrack(level, 62, 112, 1, 4, 12);
+    fillTrack(level, 42, 113, 1, 3, 12);
+    fillTrack(level, 44, 114, 1, 2, 12);
+    fillTrack(level, 46, 114, 2, 2, 12);
+    fillTrack(level, 49, 114, 2, 2, 12);
+    fillTrack(level, 52, 114, 1, 2, 12);
+    fillTrack(level, 54, 114, 3, 2, 12);
+    fillTrack(level, 58, 114, 3, 2, 12);
+    setSurface(level, 43, 115, { baseHeight: 12, kind: 'track' });
+    setSurface(level, 45, 115, { baseHeight: 12, kind: 'track' });
+    setSurface(level, 48, 115, { baseHeight: 12, kind: 'track' });
+    setSurface(level, 51, 115, { baseHeight: 12, kind: 'track' });
+    setSurface(level, 53, 115, { baseHeight: 12, kind: 'track' });
+    setSurface(level, 57, 115, { baseHeight: 12, kind: 'track' });
+    setSurface(level, 61, 115, { baseHeight: 12, kind: 'track' });
+    fillTrack(level, 43, 98, 19, 1, 13);
+    fillTrack(level, 43, 99, 1, 15, 13);
+    setSurface(level, 45, 99, { baseHeight: 13, kind: 'track' });
+    setSurface(level, 47, 99, { baseHeight: 13, kind: 'track' });
+    setSurface(level, 49, 99, { baseHeight: 13, kind: 'track' });
+    fillTrack(level, 51, 99, 2, 1, 13);
+    setSurface(level, 54, 99, { baseHeight: 13, kind: 'track' });
+    setSurface(level, 56, 99, { baseHeight: 13, kind: 'track' });
+    setSurface(level, 58, 99, { baseHeight: 13, kind: 'track' });
+    fillTrack(level, 60, 99, 2, 3, 13);
+    fillTrack(level, 44, 100, 1, 2, 13);
+    fillTrack(level, 61, 102, 1, 12, 13);
+    setSurface(level, 44, 103, { baseHeight: 13, kind: 'track' });
+    fillTrack(level, 60, 103, 1, 2, 13);
+    fillTrack(level, 44, 105, 1, 2, 13);
+    fillTrack(level, 60, 106, 1, 2, 13);
+    fillTrack(level, 44, 108, 1, 2, 13);
+    fillTrack(level, 60, 109, 1, 2, 13);
+    fillTrack(level, 44, 111, 1, 3, 13);
+    fillTrack(level, 46, 112, 2, 2, 13);
+    fillTrack(level, 49, 112, 2, 2, 13);
+    fillTrack(level, 52, 112, 3, 2, 13);
+    fillTrack(level, 56, 112, 2, 2, 13);
+    fillTrack(level, 60, 112, 1, 2, 13);
+    setSurface(level, 45, 113, { baseHeight: 13, kind: 'track' });
+    setSurface(level, 48, 113, { baseHeight: 13, kind: 'track' });
+    setSurface(level, 51, 113, { baseHeight: 13, kind: 'track' });
+    setSurface(level, 55, 113, { baseHeight: 13, kind: 'track' });
+    fillTrack(level, 58, 113, 2, 1, 13);
+    setSurface(level, 133, 99, { baseHeight: 1, kind: 'track' });
+    fillTrack(level, 45, 100, 1, 3, 15);
+    fillTrack(level, 48, 100, 12, 1, 15);
+    setSurface(level, 46, 101, { baseHeight: 15, kind: 'track' });
+    fillTrack(level, 48, 101, 2, 1, 15);
+    setSurface(level, 51, 101, { baseHeight: 15, kind: 'track' });
+    fillTrack(level, 53, 101, 2, 1, 15);
+    setSurface(level, 57, 101, { baseHeight: 15, kind: 'track' });
+    fillTrack(level, 59, 101, 1, 11, 15);
+    setSurface(level, 52, 102, { baseHeight: 15, kind: 'track' });
+    setSurface(level, 58, 102, { baseHeight: 15, kind: 'track' });
+    fillTrack(level, 46, 103, 1, 5, 15);
+    fillTrack(level, 45, 104, 1, 2, 15);
+    setSurface(level, 58, 104, { baseHeight: 15, kind: 'track' });
+    setSurface(level, 57, 105, { baseHeight: 15, kind: 'track' });
+    fillTrack(level, 58, 106, 1, 3, 15);
+    fillTrack(level, 45, 107, 1, 5, 15);
+    fillTrack(level, 46, 109, 1, 3, 15);
+    fillTrack(level, 47, 110, 2, 1, 15);
+    fillTrack(level, 52, 110, 2, 1, 15);
+    fillTrack(level, 55, 110, 2, 1, 15);
+    fillTrack(level, 58, 110, 1, 2, 15);
+    setSurface(level, 47, 111, { baseHeight: 15, kind: 'track' });
+    fillTrack(level, 49, 111, 3, 1, 15);
+    fillTrack(level, 53, 111, 2, 1, 15);
+    setSurface(level, 56, 111, { baseHeight: 15, kind: 'track' });
+    setSurface(level, 49, 104, { baseHeight: 18, kind: 'track' });
+    setSurface(level, 55, 104, { baseHeight: 18, kind: 'track' });
+    setSurface(level, 53, 105, { baseHeight: 18, kind: 'track' });
+    setSurface(level, 56, 105, { baseHeight: 18, kind: 'track' });
+    setSurface(level, 50, 106, { baseHeight: 18, kind: 'track' });
+    setSurface(level, 49, 107, { baseHeight: 18, kind: 'track' });
+    fillTrack(level, 55, 107, 2, 1, 18);
+    fillTrack(level, 51, 104, 3, 1, 19);
+    fillTrack(level, 51, 105, 2, 3, 19);
+    fillTrack(level, 53, 106, 1, 2, 19);
+    // Ramps
+    setSurface(level, 51, 82, { baseHeight: 7, shape: 'slope_n', kind: 'track' });
+    setSurface(level, 29, 87, { baseHeight: 8, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 47, 91, { baseHeight: 10, shape: 'slope_n', kind: 'track' });
+    setSurface(level, 58, 91, { baseHeight: 10, shape: 'slope_n', kind: 'track' });
+    setSurface(level, 71, 93, { baseHeight: 9, shape: 'slope_w', kind: 'track' });
+    setSurface(level, 59, 96, { baseHeight: 12, shape: 'slope_n', kind: 'track' });
+    setSurface(level, 65, 96, { baseHeight: 11, shape: 'slope_w', kind: 'track' });
+    setSurface(level, 15, 98, { baseHeight: 3, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 77, 98, { baseHeight: 7, shape: 'slope_w', kind: 'track' });
+    setSurface(level, 133, 98, { baseHeight: 1, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 15, 99, { baseHeight: 3, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 132, 99, { baseHeight: 1, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 134, 99, { baseHeight: 1, shape: 'slope_w', kind: 'track' });
+    setSurface(level, 15, 100, { baseHeight: 3, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 133, 100, { baseHeight: 1, shape: 'slope_n', kind: 'track' });
+    setSurface(level, 15, 101, { baseHeight: 3, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 42, 101, { baseHeight: 13, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 15, 102, { baseHeight: 3, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 80, 103, { baseHeight: 6, shape: 'slope_w', kind: 'track' });
+    setSurface(level, 23, 109, { baseHeight: 6, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 74, 114, { baseHeight: 8, shape: 'slope_w', kind: 'track' });
+    setSurface(level, 83, 115, { baseHeight: 5, shape: 'slope_w', kind: 'track' });
+    setSurface(level, 65, 117, { baseHeight: 11, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 35, 120, { baseHeight: 10, shape: 'slope_e', kind: 'track' });
+    setSurface(level, 50, 120, { baseHeight: 10, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 33, 124, { baseHeight: 9, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 59, 124, { baseHeight: 8, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 28, 130, { baseHeight: 7, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 62, 132, { baseHeight: 6, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 42, 135, { baseHeight: 5, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 30, 139, { baseHeight: 4, shape: 'slope_s', kind: 'track' });
+    // Bounce tiles
+    setSurface(level, 90, 68, { baseHeight: 2, kind: 'bounce' });
+    setSurface(level, 16, 69, { baseHeight: 2, kind: 'bounce' });
+    setSurface(level, 22, 69, { baseHeight: 2, kind: 'bounce' });
+    setSurface(level, 28, 69, { baseHeight: 2, kind: 'bounce' });
+    setSurface(level, 34, 69, { baseHeight: 2, kind: 'bounce' });
+    setSurface(level, 39, 69, { baseHeight: 2, kind: 'bounce' });
+    setSurface(level, 44, 69, { baseHeight: 2, kind: 'bounce' });
+    setSurface(level, 49, 69, { baseHeight: 2, kind: 'bounce' });
+    setSurface(level, 55, 69, { baseHeight: 2, kind: 'bounce' });
+    setSurface(level, 60, 69, { baseHeight: 2, kind: 'bounce' });
+    setSurface(level, 66, 69, { baseHeight: 2, kind: 'bounce' });
+    setSurface(level, 72, 69, { baseHeight: 2, kind: 'bounce' });
+    setSurface(level, 78, 69, { baseHeight: 2, kind: 'bounce' });
+    setSurface(level, 81, 69, { baseHeight: 2, kind: 'bounce' });
+    setSurface(level, 84, 69, { baseHeight: 2, kind: 'bounce' });
+    setSurface(level, 87, 69, { baseHeight: 2, kind: 'bounce' });
+    setSurface(level, 90, 69, { baseHeight: 2, kind: 'bounce' });
+    setSurface(level, 20, 72, { baseHeight: 3, kind: 'bounce' });
+    setSurface(level, 24, 72, { baseHeight: 3, kind: 'bounce' });
+    setSurface(level, 29, 72, { baseHeight: 3, kind: 'bounce' });
+    setSurface(level, 35, 72, { baseHeight: 3, kind: 'bounce' });
+    setSurface(level, 43, 72, { baseHeight: 3, kind: 'bounce' });
+    setSurface(level, 57, 72, { baseHeight: 3, kind: 'bounce' });
+    setSurface(level, 64, 72, { baseHeight: 3, kind: 'bounce' });
+    setSurface(level, 71, 72, { baseHeight: 3, kind: 'bounce' });
+    setSurface(level, 77, 72, { baseHeight: 3, kind: 'bounce' });
+    setSurface(level, 83, 72, { baseHeight: 3, kind: 'bounce' });
+    setSurface(level, 14, 74, { baseHeight: 2, kind: 'bounce' });
+    setSurface(level, 21, 75, { baseHeight: 4, kind: 'bounce' });
+    setSurface(level, 25, 75, { baseHeight: 4, kind: 'bounce' });
+    setSurface(level, 29, 75, { baseHeight: 4, kind: 'bounce' });
+    setSurface(level, 33, 75, { baseHeight: 4, kind: 'bounce' });
+    setSurface(level, 38, 75, { baseHeight: 4, kind: 'bounce' });
+    setSurface(level, 43, 75, { baseHeight: 4, kind: 'bounce' });
+    setSurface(level, 52, 75, { baseHeight: 4, kind: 'bounce' });
+    setSurface(level, 61, 75, { baseHeight: 4, kind: 'bounce' });
+    setSurface(level, 67, 75, { baseHeight: 4, kind: 'bounce' });
+    setSurface(level, 75, 75, { baseHeight: 4, kind: 'bounce' });
+    setSurface(level, 83, 75, { baseHeight: 4, kind: 'bounce' });
+    setSurface(level, 87, 75, { baseHeight: 3, kind: 'bounce' });
+    setSurface(level, 90, 75, { baseHeight: 2, kind: 'bounce' });
+    setSurface(level, 90, 76, { baseHeight: 2, kind: 'bounce' });
+    setSurface(level, 48, 77, { baseHeight: 5, kind: 'bounce' });
+    setSurface(level, 90, 77, { baseHeight: 2, kind: 'bounce' });
+    setSurface(level, 24, 78, { baseHeight: 5, kind: 'bounce' });
+    setSurface(level, 26, 78, { baseHeight: 5, kind: 'bounce' });
+    setSurface(level, 30, 78, { baseHeight: 5, kind: 'bounce' });
+    setSurface(level, 34, 78, { baseHeight: 5, kind: 'bounce' });
+    setSurface(level, 40, 78, { baseHeight: 5, kind: 'bounce' });
+    setSurface(level, 46, 78, { baseHeight: 5, kind: 'bounce' });
+    setSurface(level, 56, 78, { baseHeight: 5, kind: 'bounce' });
+    setSurface(level, 64, 78, { baseHeight: 5, kind: 'bounce' });
+    setSurface(level, 73, 78, { baseHeight: 5, kind: 'bounce' });
+    setSurface(level, 81, 78, { baseHeight: 5, kind: 'bounce' });
+    setSurface(level, 90, 78, { baseHeight: 2, kind: 'bounce' });
+    setSurface(level, 20, 79, { baseHeight: 4, kind: 'bounce' });
+    setSurface(level, 90, 79, { baseHeight: 2, kind: 'bounce' });
+    setSurface(level, 14, 80, { baseHeight: 2, kind: 'bounce' });
+    setSurface(level, 28, 81, { baseHeight: 6, kind: 'bounce' });
+    setSurface(level, 33, 81, { baseHeight: 6, kind: 'bounce' });
+    setSurface(level, 37, 81, { baseHeight: 6, kind: 'bounce' });
+    setSurface(level, 42, 81, { baseHeight: 6, kind: 'bounce' });
+    setSurface(level, 48, 81, { baseHeight: 6, kind: 'bounce' });
+    setSurface(level, 56, 81, { baseHeight: 6, kind: 'bounce' });
+    setSurface(level, 62, 81, { baseHeight: 6, kind: 'bounce' });
+    setSurface(level, 70, 81, { baseHeight: 6, kind: 'bounce' });
+    setSurface(level, 73, 81, { baseHeight: 6, kind: 'bounce' });
+    setSurface(level, 81, 81, { baseHeight: 5, kind: 'bounce' });
+    setSurface(level, 23, 82, { baseHeight: 5, kind: 'bounce' });
+    setSurface(level, 78, 82, { baseHeight: 6, kind: 'bounce' });
+    setSurface(level, 17, 83, { baseHeight: 3, kind: 'bounce' });
+    setSurface(level, 90, 83, { baseHeight: 2, kind: 'bounce' });
+    setSurface(level, 29, 84, { baseHeight: 7, kind: 'bounce' });
+    setSurface(level, 31, 84, { baseHeight: 7, kind: 'bounce' });
+    setSurface(level, 36, 84, { baseHeight: 7, kind: 'bounce' });
+    setSurface(level, 39, 84, { baseHeight: 7, kind: 'bounce' });
+    setSurface(level, 44, 84, { baseHeight: 7, kind: 'bounce' });
+    setSurface(level, 48, 84, { baseHeight: 7, kind: 'bounce' });
+    setSurface(level, 54, 84, { baseHeight: 7, kind: 'bounce' });
+    setSurface(level, 57, 84, { baseHeight: 7, kind: 'bounce' });
+    setSurface(level, 58, 84, { baseHeight: 7, kind: 'bounce' });
+    setSurface(level, 66, 84, { baseHeight: 7, kind: 'bounce' });
+    setSurface(level, 71, 84, { baseHeight: 7, kind: 'bounce' });
+    setSurface(level, 84, 84, { baseHeight: 4, kind: 'bounce' });
+    setSurface(level, 87, 84, { baseHeight: 3, kind: 'bounce' });
+    setSurface(level, 90, 84, { baseHeight: 2, kind: 'bounce' });
+    setSurface(level, 14, 85, { baseHeight: 2, kind: 'bounce' });
+    setSurface(level, 20, 85, { baseHeight: 4, kind: 'bounce' });
+    setSurface(level, 26, 85, { baseHeight: 6, kind: 'bounce' });
+    setSurface(level, 75, 85, { baseHeight: 7, kind: 'bounce' });
+    setSurface(level, 90, 85, { baseHeight: 2, kind: 'bounce' });
+    setSurface(level, 90, 86, { baseHeight: 2, kind: 'bounce' });
+    setSurface(level, 32, 87, { baseHeight: 8, kind: 'bounce' });
+    setSurface(level, 34, 87, { baseHeight: 8, kind: 'bounce' });
+    setSurface(level, 38, 87, { baseHeight: 8, kind: 'bounce' });
+    setSurface(level, 44, 87, { baseHeight: 8, kind: 'bounce' });
+    setSurface(level, 50, 87, { baseHeight: 8, kind: 'bounce' });
+    setSurface(level, 59, 87, { baseHeight: 8, kind: 'bounce' });
+    setSurface(level, 64, 87, { baseHeight: 8, kind: 'bounce' });
+    setSurface(level, 68, 87, { baseHeight: 8, kind: 'bounce' });
+    setSurface(level, 72, 87, { baseHeight: 8, kind: 'bounce' });
+    setSurface(level, 87, 88, { baseHeight: 3, kind: 'bounce' });
+    setSurface(level, 14, 90, { baseHeight: 2, kind: 'bounce' });
+    setSurface(level, 23, 90, { baseHeight: 5, kind: 'bounce' });
+    setSurface(level, 29, 90, { baseHeight: 7, kind: 'bounce' });
+    setSurface(level, 36, 90, { baseHeight: 9, kind: 'bounce' });
+    setSurface(level, 39, 90, { baseHeight: 9, kind: 'bounce' });
+    setSurface(level, 41, 90, { baseHeight: 9, kind: 'bounce' });
+    setSurface(level, 44, 90, { baseHeight: 9, kind: 'bounce' });
+    setSurface(level, 48, 90, { baseHeight: 9, kind: 'bounce' });
+    setSurface(level, 52, 90, { baseHeight: 9, kind: 'bounce' });
+    setSurface(level, 54, 90, { baseHeight: 9, kind: 'bounce' });
+    setSurface(level, 59, 90, { baseHeight: 9, kind: 'bounce' });
+    setSurface(level, 64, 90, { baseHeight: 9, kind: 'bounce' });
+    setSurface(level, 68, 90, { baseHeight: 9, kind: 'bounce' });
+    setSurface(level, 78, 90, { baseHeight: 6, kind: 'bounce' });
+    setSurface(level, 84, 90, { baseHeight: 4, kind: 'bounce' });
+    setSurface(level, 17, 91, { baseHeight: 3, kind: 'bounce' });
+    setSurface(level, 20, 91, { baseHeight: 4, kind: 'bounce' });
+    setSurface(level, 26, 91, { baseHeight: 6, kind: 'bounce' });
+    setSurface(level, 72, 91, { baseHeight: 8, kind: 'bounce' });
+    setSurface(level, 32, 92, { baseHeight: 8, kind: 'bounce' });
+    setSurface(level, 75, 92, { baseHeight: 7, kind: 'bounce' });
+    setSurface(level, 87, 92, { baseHeight: 3, kind: 'bounce' });
+    setSurface(level, 90, 92, { baseHeight: 2, kind: 'bounce' });
+    setSurface(level, 41, 93, { baseHeight: 10, kind: 'bounce' });
+    setSurface(level, 44, 93, { baseHeight: 10, kind: 'bounce' });
+    setSurface(level, 48, 93, { baseHeight: 10, kind: 'bounce' });
+    setSurface(level, 53, 93, { baseHeight: 10, kind: 'bounce' });
+    setSurface(level, 57, 93, { baseHeight: 10, kind: 'bounce' });
+    setSurface(level, 62, 93, { baseHeight: 10, kind: 'bounce' });
+    setSurface(level, 66, 93, { baseHeight: 10, kind: 'bounce' });
+    setSurface(level, 69, 93, { baseHeight: 9, kind: 'bounce' });
+    setSurface(level, 90, 93, { baseHeight: 2, kind: 'bounce' });
+    setSurface(level, 35, 94, { baseHeight: 9, kind: 'bounce' });
+    setSurface(level, 38, 94, { baseHeight: 10, kind: 'bounce' });
+    setSurface(level, 42, 95, { baseHeight: 11, kind: 'bounce' });
+    setSurface(level, 45, 95, { baseHeight: 11, kind: 'bounce' });
+    setSurface(level, 48, 95, { baseHeight: 11, kind: 'bounce' });
+    setSurface(level, 51, 95, { baseHeight: 11, kind: 'bounce' });
+    setSurface(level, 54, 95, { baseHeight: 11, kind: 'bounce' });
+    setSurface(level, 57, 95, { baseHeight: 11, kind: 'bounce' });
+    setSurface(level, 60, 95, { baseHeight: 11, kind: 'bounce' });
+    setSurface(level, 63, 95, { baseHeight: 11, kind: 'bounce' });
+    setSurface(level, 14, 96, { baseHeight: 2, kind: 'bounce' });
+    setSurface(level, 19, 96, { baseHeight: 4, kind: 'bounce' });
+    setSurface(level, 40, 96, { baseHeight: 11, kind: 'bounce' });
+    setSurface(level, 14, 97, { baseHeight: 2, kind: 'bounce' });
+    setSurface(level, 29, 97, { baseHeight: 7, kind: 'bounce' });
+    setSurface(level, 45, 97, { baseHeight: 12, kind: 'bounce' });
+    setSurface(level, 48, 97, { baseHeight: 12, kind: 'bounce' });
+    setSurface(level, 50, 97, { baseHeight: 12, kind: 'bounce' });
+    setSurface(level, 54, 97, { baseHeight: 12, kind: 'bounce' });
+    setSurface(level, 57, 97, { baseHeight: 12, kind: 'bounce' });
+    setSurface(level, 61, 97, { baseHeight: 12, kind: 'bounce' });
+    setSurface(level, 64, 97, { baseHeight: 11, kind: 'bounce' });
+    setSurface(level, 72, 97, { baseHeight: 8, kind: 'bounce' });
+    setSurface(level, 81, 97, { baseHeight: 5, kind: 'bounce' });
+    setSurface(level, 84, 97, { baseHeight: 4, kind: 'bounce' });
+    setSurface(level, 87, 97, { baseHeight: 3, kind: 'bounce' });
+    setSurface(level, 32, 98, { baseHeight: 8, kind: 'bounce' });
+    setSurface(level, 42, 98, { baseHeight: 12, kind: 'bounce' });
+    setSurface(level, 90, 98, { baseHeight: 2, kind: 'bounce' });
+    setSurface(level, 35, 99, { baseHeight: 9, kind: 'bounce' });
+    setSurface(level, 40, 99, { baseHeight: 11, kind: 'bounce' });
+    setSurface(level, 44, 99, { baseHeight: 13, kind: 'bounce' });
+    setSurface(level, 46, 99, { baseHeight: 13, kind: 'bounce' });
+    setSurface(level, 48, 99, { baseHeight: 13, kind: 'bounce' });
+    setSurface(level, 50, 99, { baseHeight: 13, kind: 'bounce' });
+    setSurface(level, 53, 99, { baseHeight: 13, kind: 'bounce' });
+    setSurface(level, 55, 99, { baseHeight: 13, kind: 'bounce' });
+    setSurface(level, 57, 99, { baseHeight: 13, kind: 'bounce' });
+    setSurface(level, 59, 99, { baseHeight: 13, kind: 'bounce' });
+    setSurface(level, 62, 99, { baseHeight: 12, kind: 'bounce' });
+    setSurface(level, 69, 99, { baseHeight: 9, kind: 'bounce' });
+    setSurface(level, 46, 100, { baseHeight: 15, kind: 'bounce' });
+    setSurface(level, 47, 100, { baseHeight: 15, kind: 'bounce' });
+    setSurface(level, 64, 100, { baseHeight: 11, kind: 'bounce' });
+    setSurface(level, 78, 100, { baseHeight: 6, kind: 'bounce' });
+    setSurface(level, 23, 101, { baseHeight: 5, kind: 'bounce' });
+    setSurface(level, 26, 101, { baseHeight: 6, kind: 'bounce' });
+    setSurface(level, 38, 101, { baseHeight: 10, kind: 'bounce' });
+    setSurface(level, 47, 101, { baseHeight: 15, kind: 'bounce' });
+    setSurface(level, 50, 101, { baseHeight: 15, kind: 'bounce' });
+    setSurface(level, 52, 101, { baseHeight: 15, kind: 'bounce' });
+    setSurface(level, 55, 101, { baseHeight: 15, kind: 'bounce' });
+    setSurface(level, 56, 101, { baseHeight: 15, kind: 'bounce' });
+    setSurface(level, 58, 101, { baseHeight: 15, kind: 'bounce' });
+    setSurface(level, 66, 101, { baseHeight: 10, kind: 'bounce' });
+    setSurface(level, 75, 101, { baseHeight: 7, kind: 'bounce' });
+    setSurface(level, 44, 102, { baseHeight: 13, kind: 'bounce' });
+    setSurface(level, 46, 102, { baseHeight: 15, kind: 'bounce' });
+    setSurface(level, 47, 102, { baseHeight: 17, kind: 'bounce' });
+    setSurface(level, 48, 102, { baseHeight: 17, kind: 'bounce' });
+    setSurface(level, 49, 102, { baseHeight: 17, kind: 'bounce' });
+    setSurface(level, 50, 102, { baseHeight: 17, kind: 'bounce' });
+    setSurface(level, 51, 102, { baseHeight: 17, kind: 'bounce' });
+    setSurface(level, 53, 102, { baseHeight: 17, kind: 'bounce' });
+    setSurface(level, 54, 102, { baseHeight: 17, kind: 'bounce' });
+    setSurface(level, 55, 102, { baseHeight: 17, kind: 'bounce' });
+    setSurface(level, 56, 102, { baseHeight: 17, kind: 'bounce' });
+    setSurface(level, 57, 102, { baseHeight: 17, kind: 'bounce' });
+    setSurface(level, 60, 102, { baseHeight: 13, kind: 'bounce' });
+    setSurface(level, 90, 102, { baseHeight: 2, kind: 'bounce' });
+    setSurface(level, 14, 103, { baseHeight: 2, kind: 'bounce' });
+    setSurface(level, 32, 103, { baseHeight: 8, kind: 'bounce' });
+    setSurface(level, 45, 103, { baseHeight: 15, kind: 'bounce' });
+    setSurface(level, 47, 103, { baseHeight: 17, kind: 'bounce' });
+    setSurface(level, 48, 103, { baseHeight: 17, kind: 'bounce' });
+    setSurface(level, 49, 103, { baseHeight: 17, kind: 'bounce' });
+    setSurface(level, 50, 103, { baseHeight: 17, kind: 'bounce' });
+    setSurface(level, 51, 103, { baseHeight: 17, kind: 'bounce' });
+    setSurface(level, 52, 103, { baseHeight: 17, kind: 'bounce' });
+    setSurface(level, 53, 103, { baseHeight: 17, kind: 'bounce' });
+    setSurface(level, 54, 103, { baseHeight: 17, kind: 'bounce' });
+    setSurface(level, 55, 103, { baseHeight: 17, kind: 'bounce' });
+    setSurface(level, 56, 103, { baseHeight: 17, kind: 'bounce' });
+    setSurface(level, 57, 103, { baseHeight: 17, kind: 'bounce' });
+    setSurface(level, 58, 103, { baseHeight: 15, kind: 'bounce' });
+    setSurface(level, 62, 103, { baseHeight: 12, kind: 'bounce' });
+    setSurface(level, 64, 103, { baseHeight: 11, kind: 'bounce' });
+    setSurface(level, 87, 103, { baseHeight: 3, kind: 'bounce' });
+    setSurface(level, 14, 104, { baseHeight: 2, kind: 'bounce' });
+    setSurface(level, 35, 104, { baseHeight: 9, kind: 'bounce' });
+    setSurface(level, 44, 104, { baseHeight: 13, kind: 'bounce' });
+    setSurface(level, 47, 104, { baseHeight: 17, kind: 'bounce' });
+    setSurface(level, 48, 104, { baseHeight: 17, kind: 'bounce' });
+    setSurface(level, 50, 104, { baseHeight: 17, kind: 'bounce' });
+    setSurface(level, 54, 104, { baseHeight: 17, kind: 'bounce' });
+    setSurface(level, 56, 104, { baseHeight: 17, kind: 'bounce' });
+    setSurface(level, 57, 104, { baseHeight: 17, kind: 'bounce' });
+    setSurface(level, 72, 104, { baseHeight: 8, kind: 'bounce' });
+    setSurface(level, 20, 105, { baseHeight: 4, kind: 'bounce' });
+    setSurface(level, 29, 105, { baseHeight: 7, kind: 'bounce' });
+    setSurface(level, 38, 105, { baseHeight: 10, kind: 'bounce' });
+    setSurface(level, 47, 105, { baseHeight: 17, kind: 'bounce' });
+    setSurface(level, 48, 105, { baseHeight: 17, kind: 'bounce' });
+    setSurface(level, 49, 105, { baseHeight: 17, kind: 'bounce' });
+    setSurface(level, 50, 105, { baseHeight: 17, kind: 'bounce' });
+    setSurface(level, 54, 105, { baseHeight: 17, kind: 'bounce' });
+    setSurface(level, 55, 105, { baseHeight: 17, kind: 'bounce' });
+    setSurface(level, 58, 105, { baseHeight: 15, kind: 'bounce' });
+    setSurface(level, 60, 105, { baseHeight: 13, kind: 'bounce' });
+    setSurface(level, 69, 105, { baseHeight: 9, kind: 'bounce' });
+    setSurface(level, 42, 106, { baseHeight: 12, kind: 'bounce' });
+    setSurface(level, 45, 106, { baseHeight: 15, kind: 'bounce' });
+    setSurface(level, 47, 106, { baseHeight: 17, kind: 'bounce' });
+    setSurface(level, 48, 106, { baseHeight: 17, kind: 'bounce' });
+    setSurface(level, 49, 106, { baseHeight: 17, kind: 'bounce' });
+    setSurface(level, 54, 106, { baseHeight: 17, kind: 'bounce' });
+    setSurface(level, 55, 106, { baseHeight: 17, kind: 'bounce' });
+    setSurface(level, 56, 106, { baseHeight: 17, kind: 'bounce' });
+    setSurface(level, 57, 106, { baseHeight: 15, kind: 'bounce' });
+    setSurface(level, 64, 106, { baseHeight: 11, kind: 'bounce' });
+    setSurface(level, 90, 106, { baseHeight: 2, kind: 'bounce' });
+    setSurface(level, 17, 107, { baseHeight: 3, kind: 'bounce' });
+    setSurface(level, 44, 107, { baseHeight: 13, kind: 'bounce' });
+    setSurface(level, 47, 107, { baseHeight: 17, kind: 'bounce' });
+    setSurface(level, 48, 107, { baseHeight: 17, kind: 'bounce' });
+    setSurface(level, 50, 107, { baseHeight: 17, kind: 'bounce' });
+    setSurface(level, 54, 107, { baseHeight: 17, kind: 'bounce' });
+    setSurface(level, 57, 107, { baseHeight: 17, kind: 'bounce' });
+    setSurface(level, 62, 107, { baseHeight: 12, kind: 'bounce' });
+    setSurface(level, 66, 107, { baseHeight: 10, kind: 'bounce' });
+    setSurface(level, 46, 108, { baseHeight: 15, kind: 'bounce' });
+    setSurface(level, 47, 108, { baseHeight: 17, kind: 'bounce' });
+    setSurface(level, 48, 108, { baseHeight: 17, kind: 'bounce' });
+    setSurface(level, 49, 108, { baseHeight: 17, kind: 'bounce' });
+    setSurface(level, 50, 108, { baseHeight: 17, kind: 'bounce' });
+    setSurface(level, 51, 108, { baseHeight: 17, kind: 'bounce' });
+    setSurface(level, 52, 108, { baseHeight: 17, kind: 'bounce' });
+    setSurface(level, 53, 108, { baseHeight: 17, kind: 'bounce' });
+    setSurface(level, 54, 108, { baseHeight: 17, kind: 'bounce' });
+    setSurface(level, 55, 108, { baseHeight: 17, kind: 'bounce' });
+    setSurface(level, 56, 108, { baseHeight: 17, kind: 'bounce' });
+    setSurface(level, 57, 108, { baseHeight: 17, kind: 'bounce' });
+    setSurface(level, 60, 108, { baseHeight: 13, kind: 'bounce' });
+    setSurface(level, 21, 109, { baseHeight: 5, kind: 'bounce' });
+    setSurface(level, 35, 109, { baseHeight: 9, kind: 'bounce' });
+    setSurface(level, 47, 109, { baseHeight: 15, kind: 'bounce' });
+    setSurface(level, 48, 109, { baseHeight: 17, kind: 'bounce' });
+    setSurface(level, 49, 109, { baseHeight: 17, kind: 'bounce' });
+    setSurface(level, 50, 109, { baseHeight: 17, kind: 'bounce' });
+    setSurface(level, 51, 109, { baseHeight: 17, kind: 'bounce' });
+    setSurface(level, 52, 109, { baseHeight: 17, kind: 'bounce' });
+    setSurface(level, 53, 109, { baseHeight: 17, kind: 'bounce' });
+    setSurface(level, 54, 109, { baseHeight: 17, kind: 'bounce' });
+    setSurface(level, 55, 109, { baseHeight: 17, kind: 'bounce' });
+    setSurface(level, 56, 109, { baseHeight: 17, kind: 'bounce' });
+    setSurface(level, 57, 109, { baseHeight: 17, kind: 'bounce' });
+    setSurface(level, 58, 109, { baseHeight: 15, kind: 'bounce' });
+    setSurface(level, 64, 109, { baseHeight: 11, kind: 'bounce' });
+    setSurface(level, 78, 109, { baseHeight: 6, kind: 'bounce' });
+    setSurface(level, 87, 109, { baseHeight: 3, kind: 'bounce' });
+    setSurface(level, 26, 110, { baseHeight: 6, kind: 'bounce' });
+    setSurface(level, 42, 110, { baseHeight: 12, kind: 'bounce' });
+    setSurface(level, 44, 110, { baseHeight: 13, kind: 'bounce' });
+    setSurface(level, 49, 110, { baseHeight: 15, kind: 'bounce' });
+    setSurface(level, 50, 110, { baseHeight: 15, kind: 'bounce' });
+    setSurface(level, 51, 110, { baseHeight: 15, kind: 'bounce' });
+    setSurface(level, 54, 110, { baseHeight: 15, kind: 'bounce' });
+    setSurface(level, 57, 110, { baseHeight: 15, kind: 'bounce' });
+    setSurface(level, 75, 110, { baseHeight: 7, kind: 'bounce' });
+    setSurface(level, 81, 110, { baseHeight: 5, kind: 'bounce' });
+    setSurface(level, 84, 110, { baseHeight: 4, kind: 'bounce' });
+    setSurface(level, 90, 110, { baseHeight: 2, kind: 'bounce' });
+    setSurface(level, 14, 111, { baseHeight: 2, kind: 'bounce' });
+    setSurface(level, 32, 111, { baseHeight: 8, kind: 'bounce' });
+    setSurface(level, 38, 111, { baseHeight: 10, kind: 'bounce' });
+    setSurface(level, 40, 111, { baseHeight: 11, kind: 'bounce' });
+    setSurface(level, 48, 111, { baseHeight: 15, kind: 'bounce' });
+    setSurface(level, 52, 111, { baseHeight: 15, kind: 'bounce' });
+    setSurface(level, 55, 111, { baseHeight: 15, kind: 'bounce' });
+    setSurface(level, 57, 111, { baseHeight: 15, kind: 'bounce' });
+    setSurface(level, 60, 111, { baseHeight: 13, kind: 'bounce' });
+    setSurface(level, 62, 111, { baseHeight: 12, kind: 'bounce' });
+    setSurface(level, 69, 111, { baseHeight: 9, kind: 'bounce' });
+    setSurface(level, 72, 111, { baseHeight: 8, kind: 'bounce' });
+    setSurface(level, 29, 112, { baseHeight: 7, kind: 'bounce' });
+    setSurface(level, 42, 112, { baseHeight: 12, kind: 'bounce' });
+    setSurface(level, 45, 112, { baseHeight: 13, kind: 'bounce' });
+    setSurface(level, 48, 112, { baseHeight: 13, kind: 'bounce' });
+    setSurface(level, 51, 112, { baseHeight: 13, kind: 'bounce' });
+    setSurface(level, 55, 112, { baseHeight: 13, kind: 'bounce' });
+    setSurface(level, 58, 112, { baseHeight: 13, kind: 'bounce' });
+    setSurface(level, 59, 112, { baseHeight: 13, kind: 'bounce' });
+    setSurface(level, 64, 112, { baseHeight: 11, kind: 'bounce' });
+    setSurface(level, 66, 113, { baseHeight: 10, kind: 'bounce' });
+    setSurface(level, 81, 113, { baseHeight: 5, kind: 'bounce' });
+    setSurface(level, 90, 113, { baseHeight: 2, kind: 'bounce' });
+    setSurface(level, 23, 114, { baseHeight: 5, kind: 'bounce' });
+    setSurface(level, 35, 114, { baseHeight: 9, kind: 'bounce' });
+    setSurface(level, 43, 114, { baseHeight: 12, kind: 'bounce' });
+    setSurface(level, 45, 114, { baseHeight: 12, kind: 'bounce' });
+    setSurface(level, 48, 114, { baseHeight: 12, kind: 'bounce' });
+    setSurface(level, 51, 114, { baseHeight: 12, kind: 'bounce' });
+    setSurface(level, 53, 114, { baseHeight: 12, kind: 'bounce' });
+    setSurface(level, 57, 114, { baseHeight: 12, kind: 'bounce' });
+    setSurface(level, 61, 114, { baseHeight: 12, kind: 'bounce' });
+    setSurface(level, 64, 115, { baseHeight: 11, kind: 'bounce' });
+    setSurface(level, 14, 116, { baseHeight: 2, kind: 'bounce' });
+    setSurface(level, 38, 116, { baseHeight: 10, kind: 'bounce' });
+    setSurface(level, 41, 116, { baseHeight: 11, kind: 'bounce' });
+    setSurface(level, 43, 116, { baseHeight: 11, kind: 'bounce' });
+    setSurface(level, 45, 116, { baseHeight: 11, kind: 'bounce' });
+    setSurface(level, 49, 116, { baseHeight: 11, kind: 'bounce' });
+    setSurface(level, 53, 116, { baseHeight: 11, kind: 'bounce' });
+    setSurface(level, 56, 116, { baseHeight: 11, kind: 'bounce' });
+    setSurface(level, 59, 116, { baseHeight: 11, kind: 'bounce' });
+    setSurface(level, 62, 116, { baseHeight: 11, kind: 'bounce' });
+    setSurface(level, 84, 116, { baseHeight: 4, kind: 'bounce' });
+    setSurface(level, 90, 116, { baseHeight: 2, kind: 'bounce' });
+    setSurface(level, 26, 117, { baseHeight: 6, kind: 'bounce' });
+    setSurface(level, 69, 117, { baseHeight: 9, kind: 'bounce' });
+    setSurface(level, 40, 118, { baseHeight: 10, kind: 'bounce' });
+    setSurface(level, 44, 118, { baseHeight: 10, kind: 'bounce' });
+    setSurface(level, 45, 118, { baseHeight: 10, kind: 'bounce' });
+    setSurface(level, 49, 118, { baseHeight: 10, kind: 'bounce' });
+    setSurface(level, 53, 118, { baseHeight: 10, kind: 'bounce' });
+    setSurface(level, 58, 118, { baseHeight: 10, kind: 'bounce' });
+    setSurface(level, 62, 118, { baseHeight: 10, kind: 'bounce' });
+    setSurface(level, 66, 118, { baseHeight: 10, kind: 'bounce' });
+    setSurface(level, 72, 118, { baseHeight: 8, kind: 'bounce' });
+    setSurface(level, 78, 118, { baseHeight: 6, kind: 'bounce' });
+    setSurface(level, 87, 118, { baseHeight: 3, kind: 'bounce' });
+    setSurface(level, 20, 119, { baseHeight: 4, kind: 'bounce' });
+    setSurface(level, 29, 119, { baseHeight: 7, kind: 'bounce' });
+    setSurface(level, 75, 119, { baseHeight: 7, kind: 'bounce' });
+    setSurface(level, 14, 120, { baseHeight: 2, kind: 'bounce' });
+    setSurface(level, 32, 120, { baseHeight: 8, kind: 'bounce' });
+    setSurface(level, 90, 120, { baseHeight: 2, kind: 'bounce' });
+    setSurface(level, 23, 121, { baseHeight: 5, kind: 'bounce' });
+    setSurface(level, 37, 121, { baseHeight: 9, kind: 'bounce' });
+    setSurface(level, 41, 121, { baseHeight: 9, kind: 'bounce' });
+    setSurface(level, 44, 121, { baseHeight: 9, kind: 'bounce' });
+    setSurface(level, 47, 121, { baseHeight: 9, kind: 'bounce' });
+    setSurface(level, 52, 121, { baseHeight: 9, kind: 'bounce' });
+    setSurface(level, 54, 121, { baseHeight: 9, kind: 'bounce' });
+    setSurface(level, 58, 121, { baseHeight: 9, kind: 'bounce' });
+    setSurface(level, 62, 121, { baseHeight: 9, kind: 'bounce' });
+    setSurface(level, 66, 121, { baseHeight: 9, kind: 'bounce' });
+    setSurface(level, 69, 121, { baseHeight: 9, kind: 'bounce' });
+    setSurface(level, 84, 123, { baseHeight: 4, kind: 'bounce' });
+    setSurface(level, 38, 124, { baseHeight: 8, kind: 'bounce' });
+    setSurface(level, 43, 124, { baseHeight: 8, kind: 'bounce' });
+    setSurface(level, 48, 124, { baseHeight: 8, kind: 'bounce' });
+    setSurface(level, 53, 124, { baseHeight: 8, kind: 'bounce' });
+    setSurface(level, 58, 124, { baseHeight: 8, kind: 'bounce' });
+    setSurface(level, 63, 124, { baseHeight: 8, kind: 'bounce' });
+    setSurface(level, 68, 124, { baseHeight: 8, kind: 'bounce' });
+    setSurface(level, 72, 124, { baseHeight: 8, kind: 'bounce' });
+    setSurface(level, 75, 124, { baseHeight: 7, kind: 'bounce' });
+    setSurface(level, 90, 124, { baseHeight: 2, kind: 'bounce' });
+    setSurface(level, 14, 125, { baseHeight: 2, kind: 'bounce' });
+    setSurface(level, 35, 125, { baseHeight: 8, kind: 'bounce' });
+    setSurface(level, 29, 126, { baseHeight: 7, kind: 'bounce' });
+    setSurface(level, 78, 126, { baseHeight: 6, kind: 'bounce' });
+    setSurface(level, 87, 126, { baseHeight: 3, kind: 'bounce' });
+    setSurface(level, 30, 127, { baseHeight: 7, kind: 'bounce' });
+    setSurface(level, 31, 127, { baseHeight: 7, kind: 'bounce' });
+    setSurface(level, 34, 127, { baseHeight: 7, kind: 'bounce' });
+    setSurface(level, 36, 127, { baseHeight: 7, kind: 'bounce' });
+    setSurface(level, 40, 127, { baseHeight: 7, kind: 'bounce' });
+    setSurface(level, 44, 127, { baseHeight: 7, kind: 'bounce' });
+    setSurface(level, 48, 127, { baseHeight: 7, kind: 'bounce' });
+    setSurface(level, 52, 127, { baseHeight: 7, kind: 'bounce' });
+    setSurface(level, 57, 127, { baseHeight: 7, kind: 'bounce' });
+    setSurface(level, 61, 127, { baseHeight: 7, kind: 'bounce' });
+    setSurface(level, 66, 127, { baseHeight: 7, kind: 'bounce' });
+    setSurface(level, 71, 127, { baseHeight: 7, kind: 'bounce' });
+    setSurface(level, 90, 127, { baseHeight: 2, kind: 'bounce' });
+    setSurface(level, 23, 128, { baseHeight: 5, kind: 'bounce' });
+    setSurface(level, 26, 128, { baseHeight: 6, kind: 'bounce' });
+    setSurface(level, 81, 128, { baseHeight: 5, kind: 'bounce' });
+    setSurface(level, 20, 129, { baseHeight: 4, kind: 'bounce' });
+    setSurface(level, 31, 130, { baseHeight: 6, kind: 'bounce' });
+    setSurface(level, 39, 130, { baseHeight: 6, kind: 'bounce' });
+    setSurface(level, 44, 130, { baseHeight: 6, kind: 'bounce' });
+    setSurface(level, 50, 130, { baseHeight: 6, kind: 'bounce' });
+    setSurface(level, 55, 130, { baseHeight: 6, kind: 'bounce' });
+    setSurface(level, 60, 130, { baseHeight: 6, kind: 'bounce' });
+    setSurface(level, 66, 130, { baseHeight: 6, kind: 'bounce' });
+    setSurface(level, 72, 130, { baseHeight: 6, kind: 'bounce' });
+    setSurface(level, 75, 130, { baseHeight: 6, kind: 'bounce' });
+    setSurface(level, 90, 130, { baseHeight: 2, kind: 'bounce' });
+    setSurface(level, 14, 131, { baseHeight: 2, kind: 'bounce' });
+    setSurface(level, 28, 131, { baseHeight: 6, kind: 'bounce' });
+    setSurface(level, 36, 131, { baseHeight: 6, kind: 'bounce' });
+    setSurface(level, 39, 131, { baseHeight: 6, kind: 'bounce' });
+    setSurface(level, 17, 132, { baseHeight: 3, kind: 'bounce' });
+    setSurface(level, 23, 133, { baseHeight: 5, kind: 'bounce' });
+    setSurface(level, 27, 133, { baseHeight: 5, kind: 'bounce' });
+    setSurface(level, 31, 133, { baseHeight: 5, kind: 'bounce' });
+    setSurface(level, 33, 133, { baseHeight: 5, kind: 'bounce' });
+    setSurface(level, 38, 133, { baseHeight: 5, kind: 'bounce' });
+    setSurface(level, 43, 133, { baseHeight: 5, kind: 'bounce' });
+    setSurface(level, 47, 133, { baseHeight: 5, kind: 'bounce' });
+    setSurface(level, 54, 133, { baseHeight: 5, kind: 'bounce' });
+    setSurface(level, 61, 133, { baseHeight: 5, kind: 'bounce' });
+    setSurface(level, 69, 133, { baseHeight: 5, kind: 'bounce' });
+    setSurface(level, 79, 133, { baseHeight: 5, kind: 'bounce' });
+    setSurface(level, 90, 133, { baseHeight: 2, kind: 'bounce' });
+    setSurface(level, 84, 134, { baseHeight: 4, kind: 'bounce' });
+    setSurface(level, 87, 134, { baseHeight: 3, kind: 'bounce' });
+    setSurface(level, 14, 136, { baseHeight: 2, kind: 'bounce' });
+    setSurface(level, 24, 136, { baseHeight: 4, kind: 'bounce' });
+    setSurface(level, 27, 136, { baseHeight: 4, kind: 'bounce' });
+    setSurface(level, 28, 136, { baseHeight: 4, kind: 'bounce' });
+    setSurface(level, 34, 136, { baseHeight: 4, kind: 'bounce' });
+    setSurface(level, 46, 136, { baseHeight: 4, kind: 'bounce' });
+    setSurface(level, 52, 136, { baseHeight: 4, kind: 'bounce' });
+    setSurface(level, 58, 136, { baseHeight: 4, kind: 'bounce' });
+    setSurface(level, 64, 136, { baseHeight: 4, kind: 'bounce' });
+    setSurface(level, 71, 136, { baseHeight: 4, kind: 'bounce' });
+    setSurface(level, 77, 136, { baseHeight: 4, kind: 'bounce' });
+    setSurface(level, 80, 136, { baseHeight: 4, kind: 'bounce' });
+    setSurface(level, 90, 138, { baseHeight: 2, kind: 'bounce' });
+    setSurface(level, 19, 139, { baseHeight: 3, kind: 'bounce' });
+    setSurface(level, 23, 139, { baseHeight: 3, kind: 'bounce' });
+    setSurface(level, 28, 139, { baseHeight: 3, kind: 'bounce' });
+    setSurface(level, 36, 139, { baseHeight: 3, kind: 'bounce' });
+    setSurface(level, 42, 139, { baseHeight: 3, kind: 'bounce' });
+    setSurface(level, 49, 139, { baseHeight: 3, kind: 'bounce' });
+    setSurface(level, 61, 139, { baseHeight: 3, kind: 'bounce' });
+    setSurface(level, 69, 139, { baseHeight: 3, kind: 'bounce' });
+    setSurface(level, 77, 139, { baseHeight: 3, kind: 'bounce' });
+    setSurface(level, 84, 139, { baseHeight: 3, kind: 'bounce' });
+    setSurface(level, 90, 139, { baseHeight: 2, kind: 'bounce' });
+    setSurface(level, 90, 140, { baseHeight: 2, kind: 'bounce' });
+    setSurface(level, 13, 142, { baseHeight: 2, kind: 'bounce' });
+    setSurface(level, 27, 142, { baseHeight: 2, kind: 'bounce' });
+    setSurface(level, 33, 142, { baseHeight: 2, kind: 'bounce' });
+    setSurface(level, 39, 142, { baseHeight: 2, kind: 'bounce' });
+    setSurface(level, 45, 142, { baseHeight: 2, kind: 'bounce' });
+    setSurface(level, 51, 142, { baseHeight: 2, kind: 'bounce' });
+    setSurface(level, 56, 142, { baseHeight: 2, kind: 'bounce' });
+    setSurface(level, 61, 142, { baseHeight: 2, kind: 'bounce' });
+    setSurface(level, 66, 142, { baseHeight: 2, kind: 'bounce' });
+    setSurface(level, 71, 142, { baseHeight: 2, kind: 'bounce' });
+    setSurface(level, 76, 142, { baseHeight: 2, kind: 'bounce' });
+    setSurface(level, 81, 142, { baseHeight: 2, kind: 'bounce' });
+    setSurface(level, 85, 142, { baseHeight: 2, kind: 'bounce' });
+    setSurface(level, 88, 142, { baseHeight: 2, kind: 'bounce' });
+    setSurface(level, 14, 143, { baseHeight: 2, kind: 'bounce' });
+    setSurface(level, 90, 143, { baseHeight: 2, kind: 'bounce' });
 
-    // === Ring 1 (base) — z=2, massive outer ring ===
-    fillTrack(level, 26, 50, 148, 100, 2);
+    // --- Goal ---
+    setGoal(level, 2.5, 194.5);
 
-    // === Ring 2 — z=3 ===
-    fillTrack(level, 44, 62, 112, 76, 3);
-    // Ramp: Ring 1 → Ring 2 (south side, gradual 6-tile ramp)
-    placeRamp(level, { x: 80, y: 138, dir: 'north', length: 6, width: 20, startZ: 2, endZ: 3 });
-    // Ramp: Ring 1 → Ring 2 (west side, alternate path)
-    placeRamp(level, { x: 38, y: 85, dir: 'east', length: 6, width: 14, startZ: 2, endZ: 3 });
-
-    // === Ring 3 — z=4 ===
-    fillTrack(level, 58, 70, 84, 60, 4);
-    // Ramp: Ring 2 → Ring 3 (east side, gradual)
-    placeRamp(level, { x: 142, y: 90, dir: 'west', length: 6, width: 16, startZ: 3, endZ: 4 });
-    // Ramp: Ring 2 → Ring 3 (north side, alternate)
-    placeRamp(level, { x: 85, y: 64, dir: 'south', length: 6, width: 14, startZ: 3, endZ: 4 });
-
-    // === Ring 4 — z=5 ===
-    fillTrack(level, 70, 78, 60, 44, 5);
-    // Ramp: Ring 3 → Ring 4 (south side, gradual)
-    placeRamp(level, { x: 88, y: 122, dir: 'north', length: 6, width: 14, startZ: 4, endZ: 5 });
-    // Ramp: Ring 3 → Ring 4 (west side, alternate)
-    placeRamp(level, { x: 64, y: 95, dir: 'east', length: 6, width: 12, startZ: 4, endZ: 5 });
-
-    // === Ring 5 — z=6 ===
-    fillTrack(level, 80, 84, 40, 32, 6);
-    // Ramp: Ring 4 → Ring 5 (east side, gradual)
-    placeRamp(level, { x: 120, y: 94, dir: 'west', length: 6, width: 12, startZ: 5, endZ: 6 });
-    // Ramp: Ring 4 → Ring 5 (north side, alternate)
-    placeRamp(level, { x: 94, y: 78, dir: 'south', length: 6, width: 10, startZ: 5, endZ: 6 });
-
-    // === Ring 6 — z=7 ===
-    fillTrack(level, 88, 90, 24, 20, 7);
-    // Ramp: Ring 5 → Ring 6 (south side, gradual)
-    placeRamp(level, { x: 94, y: 110, dir: 'north', length: 6, width: 10, startZ: 6, endZ: 7 });
-
-    // === Ring 7 (summit plateau) — z=8 ===
-    fillTrack(level, 94, 94, 12, 12, 8);
-    // Ramp: Ring 6 → Ring 7 (west side, final ascent)
-    placeRamp(level, { x: 88, y: 97, dir: 'east', length: 6, width: 8, startZ: 7, endZ: 8 });
-
-    // === Peak — z=9 (goal) ===
-    fillTrack(level, 97, 97, 6, 6, 9);
-    // Ramp: Ring 7 → Peak (gentle final ramp)
-    placeRamp(level, { x: 97, y: 94, dir: 'south', length: 3, width: 6, startZ: 8, endZ: 9 });
-
-    // Goal at the peak!
-    setGoal(level, 100, 100, 0.55);
-
-    // === SECRET TUNNEL (hidden until all 20 levels beaten) ===
-    // Entrance: Ring 3, north side — midway up the mountain
-    // Path: goes through the mountain interior, exits far east side
-    // Exit: hidden platform at (180, 100) at z=2
-    placeTunnel(level, {
-      id: 'secret_tunnel',
-      path: [
-        { x: 70.5, y: 72.5, z: 4 },   // entry on Ring 3 north edge
-        { x: 90.5, y: 65.5, z: 3 },    // through the mountain interior
-        { x: 120.5, y: 60.5, z: 2 },   // curving east and down
-        { x: 150.5, y: 80.5, z: 2 },   // emerging east of Ring 1
-        { x: 180.5, y: 100.5, z: 2 }   // exit at secret platform
-      ],
-      speed: 8,
-      radius: 0.4,
-      exitType: 'emerge',
-      funnelRadius: 2,
-      entryZ: 4,
-      hidden: true,
-      hiddenFallback: 4  // Ring 3 height — funnel appears as flat z=4 when not revealed
-    });
-    // Secret platform (5x5 at z=2, far east side — only reachable via tunnel)
-    for (let dx = -2; dx <= 2; dx++) {
-      for (let dy = -2; dy <= 2; dy++) {
-        setSurface(level, 180 + dx, 100 + dy, { baseHeight: 2, shape: SHAPES.FLAT, hidden: true, landingPad: true });
-      }
-    }
-    // Secret goal on the hidden platform
-    setTrigger(level, 182, 100, { kind: 'secret_goal', radius: 0.5, hidden: true });
-
-    // Route graph
-    addGraphNode(level, { id: 'start', type: 'entry', x: 11, y: 101, z: 2 });
-    addGraphNode(level, { id: 'ring1', type: 'hub', x: 100, y: 100, z: 2 });
-    addGraphNode(level, { id: 'ring2', type: 'hub', x: 100, y: 100, z: 3 });
-    addGraphNode(level, { id: 'ring3', type: 'hub', x: 100, y: 100, z: 4 });
-    addGraphNode(level, { id: 'ring4', type: 'hub', x: 100, y: 100, z: 5 });
-    addGraphNode(level, { id: 'ring5', type: 'hub', x: 100, y: 100, z: 6 });
-    addGraphNode(level, { id: 'ring6', type: 'hub', x: 100, y: 100, z: 7 });
-    addGraphNode(level, { id: 'ring7', type: 'hub', x: 100, y: 100, z: 8 });
-    addGraphNode(level, { id: 'goal', type: 'goal', x: 100, y: 100, z: 9 });
-    addGraphEdge(level, { from: 'start', to: 'ring1', kind: 'roll' });
-    addGraphEdge(level, { from: 'ring1', to: 'ring2', kind: 'roll' });
-    addGraphEdge(level, { from: 'ring2', to: 'ring3', kind: 'roll' });
-    addGraphEdge(level, { from: 'ring3', to: 'ring4', kind: 'roll' });
-    addGraphEdge(level, { from: 'ring4', to: 'ring5', kind: 'roll' });
-    addGraphEdge(level, { from: 'ring5', to: 'ring6', kind: 'roll' });
-    addGraphEdge(level, { from: 'ring6', to: 'ring7', kind: 'roll' });
-    addGraphEdge(level, { from: 'ring7', to: 'goal', kind: 'descent' });
     return registerLevel(level);
   }
-  // ═══════════════════════════════════════════════════════════════════════════
-  // LEVEL 15 — Ice Crossing
-  // Advanced ice level with narrow ice bridges over void and tight turns.
-  // ═══════════════════════════════════════════════════════════════════════════
+
+  // ─── Level 15: Ice Crossing ───
   function buildIceCrossing() {
     const level = createLevelShell({
       id: 'ice_crossing',
       name: 'Ice Crossing',
       width: 55,
       height: 55,
-      timeLimit: 40,
-      start: { x: 5, y: 5 },
-      reward: { presses: 7000, unlocks: ['marble_ice_crossing_complete'], claimKey: 'ice_crossing' }
+      start: { x: 5.5, y: 5.5, z: 6 },
+      timeLimit: 40
     });
-    // Start (normal friction)
-    fillTrack(level, 3, 3, 5, 5, 6);
-    // Section 1: Ice bridge east (3 wide, over void)
-    fillTrack(level, 8, 4, 12, 3, 6, { friction: 0.5 });
-    // Safe island
-    fillTrack(level, 20, 3, 5, 5, 6);
-    // Section 2: Ice bridge south (2 wide — tighter)
-    fillTrack(level, 21, 8, 2, 10, 6, { friction: 0.5 });
-    // Safe island
-    fillTrack(level, 19, 18, 5, 5, 6);
-    // Section 3: Ice L-turn (must control momentum around corner)
-    fillTrack(level, 24, 19, 10, 2, 6, { friction: 0.5 });
-    fillTrack(level, 32, 21, 2, 10, 6, { friction: 0.5 });
-    // Safe island
-    fillTrack(level, 30, 31, 5, 5, 6);
-    // Section 4: Ice zigzag (1 tile wide — extreme precision)
-    fillTrack(level, 28, 36, 8, 1, 6, { friction: 0.4 });
-    fillTrack(level, 28, 37, 1, 4, 6, { friction: 0.4 });
-    fillTrack(level, 28, 41, 8, 1, 6, { friction: 0.4 });
-    fillTrack(level, 35, 37, 1, 4, 6, { friction: 0.4 });
-    // Safe island
-    fillTrack(level, 36, 39, 4, 4, 6);
-    // Section 5: Downhill ice ramp to goal
-    placeRamp(level, { x: 37, y: 43, dir: 'south', length: 5, width: 3, startZ: 6, endZ: 4, extra: { friction: 0.5 } });
-    fillTrack(level, 36, 48, 5, 4, 4);
-    setGoal(level, 38, 50, 0.55);
-    // Route graph
-    addGraphNode(level, { id: 'start', type: 'entry', x: 6, y: 6, z: 6 });
-    addGraphNode(level, { id: 'i1', type: 'route', x: 22, y: 5, z: 6 });
-    addGraphNode(level, { id: 'i2', type: 'route', x: 21, y: 20, z: 6 });
-    addGraphNode(level, { id: 'i3', type: 'route', x: 32, y: 33, z: 6 });
-    addGraphNode(level, { id: 'goal', type: 'goal', x: 39, y: 51, z: 4 });
-    addGraphEdge(level, { from: 'start', to: 'i1', kind: 'roll', tag: 'ice' });
-    addGraphEdge(level, { from: 'i1', to: 'i2', kind: 'roll', tag: 'ice' });
-    addGraphEdge(level, { from: 'i2', to: 'i3', kind: 'roll', tag: 'ice' });
-    addGraphEdge(level, { from: 'i3', to: 'goal', kind: 'descent', tag: 'ice' });
+
+    // --- Surface tiles ---
+    fillTrack(level, 3, 3, 5, 3, 6);
+    fillTrack(level, 20, 3, 5, 3, 6);
+    setSurface(level, 8, 4, { baseHeight: 6, kind: 'track' });
+    fillTrack(level, 13, 4, 3, 1, 6);
+    setSurface(level, 19, 4, { baseHeight: 6, kind: 'track' });
+    setSurface(level, 16, 5, { baseHeight: 6, kind: 'track' });
+    fillTrack(level, 3, 6, 4, 1, 6);
+    fillTrack(level, 10, 6, 3, 1, 6);
+    setSurface(level, 18, 6, { baseHeight: 6, kind: 'track' });
+    fillTrack(level, 22, 6, 3, 2, 6);
+    fillTrack(level, 3, 7, 3, 1, 6);
+    fillTrack(level, 22, 8, 1, 3, 6);
+    fillTrack(level, 21, 14, 1, 9, 6);
+    fillTrack(level, 19, 18, 2, 5, 6);
+    setSurface(level, 28, 19, { baseHeight: 6, kind: 'track' });
+    fillTrack(level, 31, 19, 2, 2, 6);
+    fillTrack(level, 22, 20, 4, 1, 6);
+    fillTrack(level, 22, 21, 2, 2, 6);
+    setSurface(level, 33, 21, { baseHeight: 6, kind: 'track' });
+    setSurface(level, 32, 22, { baseHeight: 6, kind: 'track' });
+    setSurface(level, 33, 24, { baseHeight: 6, kind: 'track' });
+    setSurface(level, 33, 29, { baseHeight: 6, kind: 'track' });
+    fillTrack(level, 32, 30, 1, 2, 6);
+    fillTrack(level, 34, 31, 1, 5, 6);
+    fillTrack(level, 33, 34, 1, 2, 6);
+    setSurface(level, 38, 40, { baseHeight: 6, kind: 'track' });
+    setSurface(level, 36, 42, { baseHeight: 6, kind: 'track' });
+    fillTrack(level, 36, 48, 2, 1, 4);
+    fillTrack(level, 39, 48, 2, 1, 4);
+    fillTrack(level, 36, 49, 1, 3, 4);
+    fillTrack(level, 40, 49, 1, 3, 4);
+    setSurface(level, 38, 50, { baseHeight: 4, kind: 'track' });
+    // Ramps
+    setSurface(level, 37, 43, { baseHeight: 6, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 38, 43, { baseHeight: 6, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 39, 43, { baseHeight: 6, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 37, 44, { baseHeight: 5.6, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 38, 44, { baseHeight: 5.6, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 39, 44, { baseHeight: 5.6, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 37, 45, { baseHeight: 5.2, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 38, 45, { baseHeight: 5.2, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 39, 45, { baseHeight: 5.2, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 37, 46, { baseHeight: 4.8, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 38, 46, { baseHeight: 4.8, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 39, 46, { baseHeight: 4.8, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 37, 47, { baseHeight: 4.4, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 38, 47, { baseHeight: 4.4, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 39, 47, { baseHeight: 4.4, shape: 'slope_s', kind: 'track' });
+    // Ice tiles
+    fillSurfaceRect(level, 9, 4, 4, 2, { baseHeight: 6, kind: 'ice' });
+    fillSurfaceRect(level, 16, 4, 3, 1, { baseHeight: 6, kind: 'ice' });
+    fillSurfaceRect(level, 8, 5, 1, 2, { baseHeight: 6, kind: 'ice' });
+    fillSurfaceRect(level, 13, 5, 3, 2, { baseHeight: 6, kind: 'ice' });
+    fillSurfaceRect(level, 17, 5, 3, 1, { baseHeight: 6, kind: 'ice' });
+    fillSurfaceRect(level, 7, 6, 1, 2, { baseHeight: 6, kind: 'ice' });
+    setSurface(level, 9, 6, { baseHeight: 6, kind: 'ice' });
+    fillSurfaceRect(level, 16, 6, 2, 1, { baseHeight: 6, kind: 'ice' });
+    fillSurfaceRect(level, 19, 6, 3, 1, { baseHeight: 6, kind: 'ice' });
+    setSurface(level, 6, 7, { baseHeight: 6, kind: 'ice' });
+    fillSurfaceRect(level, 20, 7, 2, 1, { baseHeight: 6, kind: 'ice' });
+    fillSurfaceRect(level, 21, 8, 1, 6, { baseHeight: 6, kind: 'ice' });
+    fillSurfaceRect(level, 22, 11, 1, 9, { baseHeight: 6, kind: 'ice' });
+    fillSurfaceRect(level, 23, 18, 1, 2, { baseHeight: 6, kind: 'ice' });
+    fillSurfaceRect(level, 24, 19, 4, 1, { baseHeight: 6, kind: 'ice' });
+    fillSurfaceRect(level, 29, 19, 2, 2, { baseHeight: 6, kind: 'ice' });
+    fillSurfaceRect(level, 33, 19, 1, 2, { baseHeight: 6, kind: 'ice' });
+    fillSurfaceRect(level, 26, 20, 3, 1, { baseHeight: 6, kind: 'ice' });
+    setSurface(level, 32, 21, { baseHeight: 6, kind: 'ice' });
+    fillSurfaceRect(level, 33, 22, 1, 2, { baseHeight: 6, kind: 'ice' });
+    fillSurfaceRect(level, 32, 23, 1, 7, { baseHeight: 6, kind: 'ice' });
+    fillSurfaceRect(level, 33, 25, 1, 4, { baseHeight: 6, kind: 'ice' });
+    fillSurfaceRect(level, 33, 30, 1, 4, { baseHeight: 6, kind: 'ice' });
+    fillSurfaceRect(level, 32, 32, 1, 5, { baseHeight: 6, kind: 'ice' });
+    fillSurfaceRect(level, 33, 36, 3, 1, { baseHeight: 6, kind: 'ice' });
+    fillSurfaceRect(level, 35, 37, 1, 5, { baseHeight: 6, kind: 'ice' });
+    fillSurfaceRect(level, 36, 41, 4, 1, { baseHeight: 6, kind: 'ice' });
+    fillSurfaceRect(level, 37, 42, 3, 1, { baseHeight: 6, kind: 'ice' });
+    fillSurfaceRect(level, 38, 48, 1, 2, { baseHeight: 4, kind: 'ice' });
+    fillSurfaceRect(level, 37, 49, 1, 3, { baseHeight: 4, kind: 'ice' });
+    fillSurfaceRect(level, 39, 49, 1, 3, { baseHeight: 4, kind: 'ice' });
+    setSurface(level, 38, 51, { baseHeight: 4, kind: 'ice' });
+
+    // --- Goal ---
+    setGoal(level, 38.5, 50.5);
+
     return registerLevel(level);
   }
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  // LEVEL 16 — Crumble Cascade
-  // Advanced crumble level. Cascading crumble sections with no safe path.
-  // ═══════════════════════════════════════════════════════════════════════════
+  // ─── Level 16: Crumble Cascade ───
   function buildCrumbleCascade() {
     const level = createLevelShell({
       id: 'crumble_cascade',
       name: 'Crumble Cascade',
       width: 50,
       height: 60,
-      timeLimit: 30,
-      start: { x: 5, y: 5 },
-      reward: { presses: 7500, unlocks: ['marble_crumble_cascade_complete'], claimKey: 'crumble_cascade' }
+      start: { x: 5.5, y: 5.5, z: 12 },
+      timeLimit: 30
     });
-    // Start at z=12
+
+    // --- Surface tiles ---
     fillTrack(level, 3, 3, 5, 4, 12);
-    // Tier 1: Crumble bridge east (4 wide, moderate speed)
-    fillTrack(level, 8, 3, 12, 4, 12, { crumble: { delay: 0.25, respawn: 3.0 } });
-    fillTrack(level, 20, 3, 4, 4, 12);
-    // Ramp down to z=10
-    placeRamp(level, { x: 21, y: 7, dir: 'south', length: 3, width: 3, startZ: 12, endZ: 10 });
-    // Tier 2: Crumble bridge west (3 wide, faster)
-    fillTrack(level, 19, 10, 4, 3, 10);
-    fillTrack(level, 7, 10, 12, 3, 10, { crumble: { delay: 0.2, respawn: 2.5 } });
-    fillTrack(level, 3, 10, 4, 3, 10);
-    // Ramp down to z=8
-    placeRamp(level, { x: 4, y: 13, dir: 'south', length: 3, width: 3, startZ: 10, endZ: 8 });
-    // Tier 3: Crumble zigzag (2 wide)
-    fillTrack(level, 3, 16, 4, 3, 8);
-    fillTrack(level, 7, 16, 10, 2, 8, { crumble: { delay: 0.2, respawn: 2.5 } });
-    fillTrack(level, 17, 16, 3, 7, 8);
-    fillTrack(level, 10, 22, 10, 2, 8, { crumble: { delay: 0.2, respawn: 2.5 } });
-    fillTrack(level, 7, 22, 3, 3, 8);
-    // Ramp down to z=6
-    placeRamp(level, { x: 8, y: 25, dir: 'south', length: 3, width: 3, startZ: 8, endZ: 6 });
-    // Tier 4: Fast crumble sprint (2 wide)
-    fillTrack(level, 7, 28, 3, 3, 6);
-    fillTrack(level, 10, 29, 14, 2, 6, { crumble: { delay: 0.15, respawn: 2.0 } });
-    fillTrack(level, 24, 28, 4, 3, 6);
-    // Ramp down to z=4
-    placeRamp(level, { x: 25, y: 31, dir: 'south', length: 3, width: 3, startZ: 6, endZ: 4 });
-    // Tier 5: Ultra-fast crumble (1 wide — must sprint)
-    fillTrack(level, 24, 34, 3, 3, 4);
-    fillTrack(level, 24, 37, 1, 12, 4, { crumble: { delay: 0.1, respawn: 1.8 } });
-    fillTrack(level, 23, 49, 4, 3, 4);
-    // Ramp down to z=2
-    placeRamp(level, { x: 24, y: 52, dir: 'south', length: 3, width: 3, startZ: 4, endZ: 2 });
-    // Goal
-    fillTrack(level, 22, 55, 6, 4, 2);
-    setGoal(level, 25, 57, 0.55);
-    // Route graph
-    addGraphNode(level, { id: 'start', type: 'entry', x: 5, y: 5, z: 12 });
-    addGraphNode(level, { id: 't1', type: 'route', x: 22, y: 5, z: 12 });
-    addGraphNode(level, { id: 't2', type: 'route', x: 5, y: 12, z: 10 });
-    addGraphNode(level, { id: 't3', type: 'route', x: 12, y: 20, z: 8 });
-    addGraphNode(level, { id: 't4', type: 'route', x: 26, y: 30, z: 6 });
-    addGraphNode(level, { id: 'goal', type: 'goal', x: 26, y: 58, z: 2 });
-    addGraphEdge(level, { from: 'start', to: 't1', kind: 'roll', tag: 'crumble' });
-    addGraphEdge(level, { from: 't1', to: 't2', kind: 'descent', tag: 'crumble' });
-    addGraphEdge(level, { from: 't2', to: 't3', kind: 'descent', tag: 'crumble' });
-    addGraphEdge(level, { from: 't3', to: 't4', kind: 'descent', tag: 'crumble' });
-    addGraphEdge(level, { from: 't4', to: 'goal', kind: 'descent', tag: 'crumble' });
+    fillTrack(level, 3, 10, 1, 3, 10);
+    fillTrack(level, 7, 22, 1, 3, 8);
+    fillTrack(level, 27, 29, 1, 2, 6);
+    setSurface(level, 25, 57, { baseHeight: 2, kind: 'track' });
+    // Ramps
+    setSurface(level, 21, 7, { baseHeight: 12, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 22, 7, { baseHeight: 12, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 23, 7, { baseHeight: 12, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 21, 8, { baseHeight: 11.3, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 22, 8, { baseHeight: 11.3, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 23, 8, { baseHeight: 11.3, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 21, 9, { baseHeight: 10.7, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 22, 9, { baseHeight: 10.7, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 23, 9, { baseHeight: 10.7, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 4, 13, { baseHeight: 10, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 5, 13, { baseHeight: 10, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 6, 13, { baseHeight: 10, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 4, 14, { baseHeight: 9.3, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 5, 14, { baseHeight: 9.3, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 6, 14, { baseHeight: 9.3, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 4, 15, { baseHeight: 8.7, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 5, 15, { baseHeight: 8.7, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 6, 15, { baseHeight: 8.7, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 8, 25, { baseHeight: 8, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 9, 25, { baseHeight: 8, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 8, 26, { baseHeight: 7.3, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 9, 26, { baseHeight: 7.3, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 8, 27, { baseHeight: 6.7, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 9, 27, { baseHeight: 6.7, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 25, 31, { baseHeight: 6, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 26, 31, { baseHeight: 6, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 25, 32, { baseHeight: 5.3, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 26, 32, { baseHeight: 5.3, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 25, 33, { baseHeight: 4.7, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 26, 33, { baseHeight: 4.7, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 24, 52, { baseHeight: 4, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 25, 52, { baseHeight: 4, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 26, 52, { baseHeight: 4, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 24, 53, { baseHeight: 3.3, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 25, 53, { baseHeight: 3.3, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 26, 53, { baseHeight: 3.3, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 24, 54, { baseHeight: 2.7, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 25, 54, { baseHeight: 2.7, shape: 'slope_s', kind: 'track' });
+    setSurface(level, 26, 54, { baseHeight: 2.7, shape: 'slope_s', kind: 'track' });
+    // Crumble tiles
+    fillSurfaceRect(level, 8, 3, 16, 4, { baseHeight: 12, kind: 'crumble', delay: 0.15, downtime: 4.0 });
+    fillSurfaceRect(level, 4, 10, 19, 3, { baseHeight: 10, kind: 'crumble', delay: 0.15, downtime: 4.0 });
+    fillSurfaceRect(level, 4, 16, 16, 2, { baseHeight: 8, kind: 'crumble', delay: 0.15, downtime: 4.0 });
+    fillSurfaceRect(level, 4, 18, 3, 1, { baseHeight: 8, kind: 'crumble', delay: 0.15, downtime: 4.0 });
+    fillSurfaceRect(level, 17, 18, 3, 6, { baseHeight: 8, kind: 'crumble', delay: 0.15, downtime: 4.0 });
+    fillSurfaceRect(level, 8, 22, 9, 2, { baseHeight: 8, kind: 'crumble', delay: 0.15, downtime: 4.0 });
+    fillSurfaceRect(level, 8, 24, 2, 1, { baseHeight: 8, kind: 'crumble', delay: 0.15, downtime: 4.0 });
+    fillSurfaceRect(level, 8, 28, 2, 3, { baseHeight: 6, kind: 'crumble', delay: 0.15, downtime: 4.0 });
+    fillSurfaceRect(level, 10, 29, 17, 2, { baseHeight: 6, kind: 'crumble', delay: 0.15, downtime: 4.0 });
+    fillSurfaceRect(level, 24, 34, 3, 3, { baseHeight: 4, kind: 'crumble', delay: 0.15, downtime: 4.0 });
+    fillSurfaceRect(level, 24, 37, 1, 15, { baseHeight: 4, kind: 'crumble', delay: 0.15, downtime: 4.0 });
+    fillSurfaceRect(level, 25, 49, 2, 3, { baseHeight: 4, kind: 'crumble', delay: 0.15, downtime: 4.0 });
+    fillSurfaceRect(level, 24, 55, 3, 2, { baseHeight: 2, kind: 'crumble', delay: 0.15, downtime: 4.0 });
+    fillSurfaceRect(level, 24, 57, 1, 2, { baseHeight: 2, kind: 'crumble', delay: 0.15, downtime: 4.0 });
+    fillSurfaceRect(level, 26, 57, 1, 2, { baseHeight: 2, kind: 'crumble', delay: 0.15, downtime: 4.0 });
+    setSurface(level, 25, 58, { baseHeight: 2, kind: 'crumble', delay: 0.15, downtime: 4.0 });
+
+    // --- Goal ---
+    setGoal(level, 25.5, 57.5);
+
     return registerLevel(level);
   }
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  // LEVEL 17 — The Gauntlet V2
-  // Combines all hazard types in a brutal gauntlet run.
-  // ═══════════════════════════════════════════════════════════════════════════
+  // ─── Level 17: The Gauntlet ───
   function buildTheGauntletV2() {
     const level = createLevelShell({
       id: 'the_gauntlet_v2',
       name: 'The Gauntlet',
       width: 60,
       height: 50,
-      timeLimit: 30,
-      start: { x: 5, y: 24 },
-      reward: { presses: 8000, unlocks: ['marble_the_gauntlet_v2_complete'], claimKey: 'the_gauntlet_v2' }
+      start: { x: 5.5, y: 24.5, z: 6 },
+      timeLimit: 30
     });
-    // Start at z=6
-    fillTrack(level, 3, 22, 5, 5, 6);
-    // Section 1: Sweeper + narrow path
-    fillTrack(level, 8, 22, 8, 5, 6);
+
+    // --- Surface tiles ---
+    fillTrack(level, 32, 21, 10, 2, 6);
+    fillTrack(level, 3, 22, 6, 1, 6);
+    setSurface(level, 10, 22, { baseHeight: 6, kind: 'track' });
+    fillTrack(level, 12, 22, 4, 1, 6);
+    fillTrack(level, 28, 22, 3, 2, 6);
+    fillTrack(level, 3, 23, 4, 4, 6);
+    setSurface(level, 9, 23, { baseHeight: 6, kind: 'track' });
+    fillTrack(level, 11, 23, 4, 1, 6);
+    fillTrack(level, 18, 23, 2, 3, 6);
+    fillTrack(level, 31, 23, 5, 3, 6);
+    fillTrack(level, 37, 23, 5, 2, 6);
+    fillTrack(level, 7, 24, 2, 1, 6);
+    setSurface(level, 10, 24, { baseHeight: 6, kind: 'track' });
+    fillTrack(level, 12, 24, 3, 3, 6);
+    fillTrack(level, 17, 24, 1, 2, 6);
+    fillTrack(level, 29, 24, 2, 3, 6);
+    fillTrack(level, 36, 24, 1, 4, 6);
+    setSurface(level, 9, 25, { baseHeight: 6, kind: 'track' });
+    setSurface(level, 11, 25, { baseHeight: 6, kind: 'track' });
+    fillTrack(level, 28, 25, 1, 2, 6);
+    fillTrack(level, 38, 25, 1, 3, 6);
+    fillTrack(level, 40, 25, 2, 3, 6);
+    fillTrack(level, 7, 26, 2, 1, 6);
+    setSurface(level, 10, 26, { baseHeight: 6, kind: 'track' });
+    setSurface(level, 15, 26, { baseHeight: 6, kind: 'track' });
+    fillTrack(level, 32, 26, 2, 2, 6);
+    fillTrack(level, 35, 26, 1, 2, 6);
+    fillTrack(level, 37, 26, 1, 2, 6);
+    fillTrack(level, 39, 26, 1, 2, 6);
+    setSurface(level, 34, 27, { baseHeight: 6, kind: 'track' });
+    fillTrack(level, 55, 38, 3, 5, 6);
+    fillTrack(level, 49, 39, 2, 3, 6);
+    fillTrack(level, 53, 39, 2, 1, 6);
+    fillTrack(level, 51, 40, 2, 1, 6);
+    fillTrack(level, 53, 41, 2, 1, 6);
+    setSurface(level, 48, 22, { baseHeight: 6, kind: 'track' });
+    setSurface(level, 8, 23, { baseHeight: 6, kind: 'track' });
+    setSurface(level, 8, 25, { baseHeight: 6, kind: 'track' });
+    setSurface(level, 37, 25, { baseHeight: 6, kind: 'track' });
+    setSurface(level, 46, 28, { baseHeight: 6, kind: 'track' });
+    setSurface(level, 48, 35, { baseHeight: 6, kind: 'track' });
+    setSurface(level, 54, 38, { baseHeight: 6, kind: 'track' });
+    setSurface(level, 52, 39, { baseHeight: 6, kind: 'track' });
+    setSurface(level, 54, 40, { baseHeight: 6, kind: 'track' });
+    setSurface(level, 52, 41, { baseHeight: 6, kind: 'track' });
+    setSurface(level, 54, 42, { baseHeight: 6, kind: 'track' });
+    // Crumble tiles
+    setSurface(level, 9, 22, { baseHeight: 6, kind: 'crumble', delay: 0.15, downtime: 4.0 });
+    setSurface(level, 11, 22, { baseHeight: 6, kind: 'crumble', delay: 0.15, downtime: 4.0 });
+    fillSurfaceRect(level, 42, 22, 4, 2, { baseHeight: 6, kind: 'crumble', delay: 0.15, downtime: 4.0 });
+    setSurface(level, 7, 23, { baseHeight: 6, kind: 'crumble', delay: 0.15, downtime: 4.0 });
+    setSurface(level, 10, 23, { baseHeight: 6, kind: 'crumble', delay: 0.15, downtime: 4.0 });
+    fillSurfaceRect(level, 22, 23, 6, 3, { baseHeight: 6, kind: 'crumble', delay: 0.15, downtime: 4.0 });
+    setSurface(level, 9, 24, { baseHeight: 6, kind: 'crumble', delay: 0.15, downtime: 4.0 });
+    setSurface(level, 11, 24, { baseHeight: 6, kind: 'crumble', delay: 0.15, downtime: 4.0 });
+    setSurface(level, 7, 25, { baseHeight: 6, kind: 'crumble', delay: 0.15, downtime: 4.0 });
+    setSurface(level, 10, 25, { baseHeight: 6, kind: 'crumble', delay: 0.15, downtime: 4.0 });
+    fillSurfaceRect(level, 42, 25, 4, 2, { baseHeight: 6, kind: 'crumble', delay: 0.15, downtime: 4.0 });
+    setSurface(level, 9, 26, { baseHeight: 6, kind: 'crumble', delay: 0.15, downtime: 4.0 });
+    setSurface(level, 11, 26, { baseHeight: 6, kind: 'crumble', delay: 0.15, downtime: 4.0 });
+    setSurface(level, 53, 38, { baseHeight: 6, kind: 'crumble', delay: 0.15, downtime: 4.0 });
+    setSurface(level, 51, 39, { baseHeight: 6, kind: 'crumble', delay: 0.15, downtime: 4.0 });
+    setSurface(level, 53, 40, { baseHeight: 6, kind: 'crumble', delay: 0.15, downtime: 4.0 });
+    setSurface(level, 51, 41, { baseHeight: 6, kind: 'crumble', delay: 0.15, downtime: 4.0 });
+    setSurface(level, 53, 42, { baseHeight: 6, kind: 'crumble', delay: 0.15, downtime: 4.0 });
+    // Bounce tiles
+    setSurface(level, 31, 22, { baseHeight: 6, kind: 'bounce' });
+    setSurface(level, 36, 23, { baseHeight: 6, kind: 'bounce' });
+    setSurface(level, 28, 24, { baseHeight: 6, kind: 'bounce' });
+    setSurface(level, 39, 25, { baseHeight: 6, kind: 'bounce' });
+    setSurface(level, 31, 26, { baseHeight: 6, kind: 'bounce' });
+    setSurface(level, 34, 26, { baseHeight: 6, kind: 'bounce' });
+    setSurface(level, 47, 31, { baseHeight: 6, kind: 'bounce' });
+    // Ice tiles
+    fillSurfaceRect(level, 15, 23, 3, 1, { baseHeight: 6, kind: 'ice' });
+    fillSurfaceRect(level, 20, 23, 2, 3, { baseHeight: 6, kind: 'ice' });
+    fillSurfaceRect(level, 15, 24, 2, 2, { baseHeight: 6, kind: 'ice' });
+    fillSurfaceRect(level, 42, 24, 4, 1, { baseHeight: 6, kind: 'ice' });
+    fillSurfaceRect(level, 46, 39, 3, 3, { baseHeight: 6, kind: 'ice' });
+    // Conveyor tiles
+    setSurface(level, 46, 22, { baseHeight: 6, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 47, 22, { baseHeight: 6, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 46, 23, { baseHeight: 6, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 47, 23, { baseHeight: 6, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 48, 23, { baseHeight: 6, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 46, 24, { baseHeight: 6, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 47, 24, { baseHeight: 6, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 48, 24, { baseHeight: 6, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 46, 25, { baseHeight: 6, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 47, 25, { baseHeight: 6, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 48, 25, { baseHeight: 6, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 46, 26, { baseHeight: 6, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 47, 26, { baseHeight: 6, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 48, 26, { baseHeight: 6, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 46, 27, { baseHeight: 6, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 47, 27, { baseHeight: 6, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 48, 27, { baseHeight: 6, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 47, 28, { baseHeight: 6, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 48, 28, { baseHeight: 6, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 46, 29, { baseHeight: 6, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 47, 29, { baseHeight: 6, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 48, 29, { baseHeight: 6, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 46, 30, { baseHeight: 6, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 47, 30, { baseHeight: 6, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 48, 30, { baseHeight: 6, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 46, 31, { baseHeight: 6, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 48, 31, { baseHeight: 6, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 46, 32, { baseHeight: 6, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 47, 32, { baseHeight: 6, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 48, 32, { baseHeight: 6, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 46, 33, { baseHeight: 6, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 47, 33, { baseHeight: 6, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 48, 33, { baseHeight: 6, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 46, 34, { baseHeight: 6, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 47, 34, { baseHeight: 6, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 48, 34, { baseHeight: 6, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 46, 35, { baseHeight: 6, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 47, 35, { baseHeight: 6, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 46, 36, { baseHeight: 6, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 47, 36, { baseHeight: 6, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 48, 36, { baseHeight: 6, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 46, 37, { baseHeight: 6, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 47, 37, { baseHeight: 6, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 48, 37, { baseHeight: 6, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 46, 38, { baseHeight: 6, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 47, 38, { baseHeight: 6, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 48, 38, { baseHeight: 6, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+
+    // --- Timed Gates ---
+    addTimedGate(level, 'gate_1', 8.5, 24.5, 8, 1, 5);
+    addTimedGate(level, 'gate_3', 54.5, 40.5, 8, 1, 5);
+    addTimedGate(level, 'gate_2', 52.5, 40.5, 8, 1, 3);
+
+    // --- Sweepers ---
     addActor(level, {
       id: 'sweep1', kind: ACTOR_KINDS.SWEEPER,
-      x: 6, y: 12.25, z: 6, topHeight: 6,
-      width: 2, height: 1, armLength: 2.0, armWidth: 0.22, angularSpeed: 1.6, fatal: true
+      x: 48.5, y: 22.5, z: 6, topHeight: 6,
+      width: 1, height: 1, armLength: 2.5, armWidth: 0.22, angularSpeed: 1.2, fatal: true
     });
-    // Section 2: Gate + crumble combo
-    fillTrack(level, 16, 23, 6, 3, 6);
-    addTimedGate(level, 'gate1', 18, 23, 6, 1, 3, 1.3, 1.0);
-    fillTrack(level, 22, 23, 6, 3, 6, { crumble: { delay: 0.2, respawn: 2.5 } });
-    fillTrack(level, 28, 22, 4, 5, 6);
-    // Section 3: Ice + sweeper
-    fillTrack(level, 32, 21, 10, 7, 6, { friction: 0.5 });
     addActor(level, {
       id: 'sweep2', kind: ACTOR_KINDS.SWEEPER,
-      x: 18.5, y: 12.25, z: 6, topHeight: 6,
-      width: 2, height: 1, armLength: 2.5, armWidth: 0.22, angularSpeed: -1.8, fatal: true
+      x: 34.5, y: 23.5, z: 6, topHeight: 6,
+      width: 1, height: 1, armLength: 2.5, armWidth: 0.22, angularSpeed: 1.5, fatal: true
     });
-    fillTrack(level, 42, 22, 4, 5, 6);
-    // Section 4: Conveyor + gate gauntlet
-    fillTrack(level, 46, 22, 3, 5, 6, { conveyor: { x: 0, y: -2.5, strength: 2.5 } });
-    addTimedGate(level, 'gate2', 46, 24, 6, 3, 1, 1.0, 0.8);
-    fillTrack(level, 46, 27, 3, 4, 6);
-    fillTrack(level, 46, 31, 3, 4, 6, { conveyor: { x: 0, y: 2.5, strength: 2.5 } });
-    addTimedGate(level, 'gate3', 46, 33, 6, 3, 1, 1.0, 0.8);
-    fillTrack(level, 46, 35, 3, 4, 6);
-    // Section 5: Final hazard strip sprint
-    fillTrack(level, 46, 39, 10, 3, 6);
-    addHazardRect(level, 48, 39, 2, 1);
-    addHazardRect(level, 52, 41, 2, 1);
-    // Goal
-    fillTrack(level, 53, 38, 5, 5, 6);
-    setGoal(level, 55, 40, 0.55);
-    // Route graph
-    addGraphNode(level, { id: 'start', type: 'entry', x: 6, y: 25, z: 6 });
-    addGraphNode(level, { id: 's1', type: 'route', x: 12, y: 25, z: 6 });
-    addGraphNode(level, { id: 's2', type: 'route', x: 25, y: 25, z: 6 });
-    addGraphNode(level, { id: 's3', type: 'route', x: 37, y: 25, z: 6 });
-    addGraphNode(level, { id: 's4', type: 'route', x: 48, y: 33, z: 6 });
-    addGraphNode(level, { id: 'goal', type: 'goal', x: 56, y: 41, z: 6 });
-    addGraphEdge(level, { from: 'start', to: 's1', kind: 'roll' });
-    addGraphEdge(level, { from: 's1', to: 's2', kind: 'timed_cross' });
-    addGraphEdge(level, { from: 's2', to: 's3', kind: 'roll', tag: 'ice' });
-    addGraphEdge(level, { from: 's3', to: 's4', kind: 'timed_cross' });
-    addGraphEdge(level, { from: 's4', to: 'goal', kind: 'roll' });
+    addActor(level, {
+      id: 'sweep3', kind: ACTOR_KINDS.SWEEPER,
+      x: 40.5, y: 23.5, z: 6, topHeight: 6,
+      width: 1, height: 1, armLength: 2.5, armWidth: 0.22, angularSpeed: 1.7999999999999998, fatal: true
+    });
+    addActor(level, {
+      id: 'sweep4', kind: ACTOR_KINDS.SWEEPER,
+      x: 13.5, y: 24.5, z: 6, topHeight: 6,
+      width: 1, height: 1, armLength: 2.5, armWidth: 0.22, angularSpeed: 1.2, fatal: true
+    });
+    addActor(level, {
+      id: 'sweep5', kind: ACTOR_KINDS.SWEEPER,
+      x: 30.5, y: 24.5, z: 6, topHeight: 6,
+      width: 1, height: 1, armLength: 2.5, armWidth: 0.22, angularSpeed: 1.5, fatal: true
+    });
+    addActor(level, {
+      id: 'sweep6', kind: ACTOR_KINDS.SWEEPER,
+      x: 37.5, y: 25.5, z: 6, topHeight: 6,
+      width: 1, height: 1, armLength: 2.5, armWidth: 0.22, angularSpeed: 1.7999999999999998, fatal: true
+    });
+    addActor(level, {
+      id: 'sweep7', kind: ACTOR_KINDS.SWEEPER,
+      x: 46.5, y: 28.5, z: 6, topHeight: 6,
+      width: 1, height: 1, armLength: 2.5, armWidth: 0.22, angularSpeed: 1.2, fatal: true
+    });
+    addActor(level, {
+      id: 'sweep8', kind: ACTOR_KINDS.SWEEPER,
+      x: 48.5, y: 35.5, z: 6, topHeight: 6,
+      width: 1, height: 1, armLength: 2.5, armWidth: 0.22, angularSpeed: 1.5, fatal: true
+    });
+
+    // --- Goal ---
+    setGoal(level, 55.5, 40.5);
+
     return registerLevel(level);
   }
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  
-  // ═══════════════════════════════════════════════════════════════════════════
-  // LEVEL 18 — Conveyor Maze
-  // Conveyors push in conflicting directions. Must find the right path.
-  // ═══════════════════════════════════════════════════════════════════════════
+  // ─── Level 18: Conveyor Maze ───
   function buildConveyorMaze() {
     const level = createLevelShell({
       id: 'conveyor_maze',
       name: 'Conveyor Maze',
       width: 120,
       height: 120,
-      timeLimit: 30,
-      start: { x: 10, y: 60 },
-      reward: { presses: 9000, unlocks: ['marble_conveyor_maze_complete'], claimKey: 'conveyor_maze' }
+      start: { x: 10.5, y: 60.5, z: 4 },
+      timeLimit: 30
     });
-    // Start at z=4
-    fillTrack(level, 6, 56, 12, 10, 4);
-    // Main grid — 4x4 rooms connected by conveyor corridors
-    // Room grid: rooms at (12,12), (12,28), (12,44), (28,12), (28,28), (28,44), (44,12), (44,28), (44,44)
-    // Each room is 6x6, corridors are 4 wide
-    // Rooms (safe, no conveyor)
-    const rooms = [
-      [24, 24], [24, 56], [24, 88],
-      [56, 24], [56, 56], [56, 88],
-      [88, 24], [88, 56], [88, 88]
-    ];
-    for (const [rx, ry] of rooms) {
-      fillTrack(level, rx, ry, 12, 12, 4);
-    }
-    // Horizontal corridors (east-west) with conveyors — get narrower as you progress
-    // Row 1 (y=26): 8 wide, push east (widest — easy entry)
-    fillTrack(level, 36, 26, 20, 8, 4, { conveyor: { x: 3.0, y: 0, strength: 2.5 } });
-    fillTrack(level, 68, 26, 20, 8, 4, { conveyor: { x: 3.0, y: 0, strength: 2.5 } });
-    // Row 2 (y=58): 4 wide, push west (medium — tighter)
-    fillTrack(level, 36, 60, 20, 4, 4, { conveyor: { x: -3.0, y: 0, strength: 2.5 } });
-    fillTrack(level, 68, 60, 20, 4, 4, { conveyor: { x: -3.0, y: 0, strength: 2.5 } });
-    // Row 3 (y=90): 1 wide, push east (narrowest — precision required)
-    fillTrack(level, 36, 93, 20, 1, 4, { conveyor: { x: 3.0, y: 0, strength: 3.0 } });
-    fillTrack(level, 68, 93, 20, 1, 4, { conveyor: { x: 3.0, y: 0, strength: 3.0 } });
-    // Vertical corridors (north-south) with conveyors — also narrow progressively
-    // Col 1 (x=26): 8 wide, push south (widest)
-    fillTrack(level, 26, 36, 8, 20, 4, { conveyor: { x: 0, y: 3.0, strength: 2.5 } });
-    fillTrack(level, 26, 68, 8, 20, 4, { conveyor: { x: 0, y: 3.0, strength: 2.5 } });
-    // Col 2 (x=58): 4 wide, push north (medium)
-    fillTrack(level, 60, 36, 4, 20, 4, { conveyor: { x: 0, y: -3.0, strength: 2.5 } });
-    fillTrack(level, 60, 68, 4, 20, 4, { conveyor: { x: 0, y: -3.0, strength: 2.5 } });
-    // Col 3 (x=90): 1 wide, push south (narrowest)
-    fillTrack(level, 93, 36, 1, 20, 4, { conveyor: { x: 0, y: 3.0, strength: 3.0 } });
-    fillTrack(level, 93, 68, 1, 20, 4, { conveyor: { x: 0, y: 3.0, strength: 3.0 } });
-    // Connect start to room (12,28)
-    fillTrack(level, 18, 56, 6, 10, 4);
-    // Goal in room (44,44)
-    setGoal(level, 94, 94, 0.55);
-    // Route graph
-    addGraphNode(level, { id: 'start', type: 'entry', x: 11, y: 61, z: 4 });
-    addGraphNode(level, { id: 'r_12_28', type: 'hub', x: 31, y: 63, z: 4 });
-    addGraphNode(level, { id: 'r_12_44', type: 'hub', x: 31, y: 95, z: 4 });
-    addGraphNode(level, { id: 'r_28_44', type: 'hub', x: 63, y: 95, z: 4 });
-    addGraphNode(level, { id: 'r_44_44', type: 'hub', x: 95, y: 95, z: 4 });
-    addGraphNode(level, { id: 'goal', type: 'goal', x: 95, y: 95, z: 4 });
-    addGraphEdge(level, { from: 'start', to: 'r_12_28', kind: 'roll' });
-    addGraphEdge(level, { from: 'r_12_28', to: 'r_12_44', kind: 'roll', tag: 'conveyor' });
-    addGraphEdge(level, { from: 'r_12_44', to: 'r_28_44', kind: 'roll', tag: 'conveyor' });
-    addGraphEdge(level, { from: 'r_28_44', to: 'r_44_44', kind: 'roll', tag: 'conveyor' });
-    addGraphEdge(level, { from: 'r_44_44', to: 'goal', kind: 'roll' });
+
+    // --- Surface tiles ---
+    fillTrack(level, 88, 24, 12, 1, 4);
+    fillTrack(level, 88, 25, 2, 11, 4);
+    fillTrack(level, 97, 25, 3, 11, 4);
+    fillTrack(level, 56, 26, 12, 8, 4);
+    fillTrack(level, 26, 28, 10, 4, 4);
+    fillTrack(level, 26, 32, 8, 4, 4);
+    fillTrack(level, 90, 34, 7, 2, 4);
+    fillTrack(level, 6, 56, 28, 10, 4);
+    fillTrack(level, 93, 56, 1, 12, 4);
+    fillTrack(level, 34, 60, 2, 4, 4);
+    fillTrack(level, 56, 60, 12, 3, 4);
+    fillTrack(level, 56, 63, 4, 1, 4);
+    fillTrack(level, 61, 63, 2, 1, 4);
+    fillTrack(level, 64, 63, 4, 1, 4);
+    fillTrack(level, 26, 88, 8, 12, 4);
+    fillTrack(level, 58, 88, 3, 12, 4);
+    fillTrack(level, 63, 88, 3, 12, 4);
+    fillTrack(level, 93, 88, 5, 3, 4);
+    fillTrack(level, 56, 90, 2, 8, 4);
+    fillTrack(level, 66, 90, 2, 8, 4);
+    fillTrack(level, 96, 91, 2, 2, 4);
+    fillTrack(level, 34, 92, 2, 3, 4);
+    fillTrack(level, 61, 92, 2, 8, 4);
+    fillTrack(level, 97, 93, 1, 7, 4);
+    setSurface(level, 94, 94, { baseHeight: 4, kind: 'track' });
+    fillTrack(level, 96, 97, 1, 3, 4);
+    fillTrack(level, 93, 98, 3, 2, 4);
+    // Conveyor tiles
+    setSurface(level, 90, 25, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 91, 25, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 92, 25, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 93, 25, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 94, 25, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 95, 25, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 96, 25, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 54, 26, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 55, 26, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 68, 26, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 69, 26, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 70, 26, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 90, 26, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 91, 26, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 92, 26, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 93, 26, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 94, 26, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 95, 26, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 96, 26, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 48, 27, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 49, 27, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 50, 27, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 51, 27, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 52, 27, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 53, 27, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 54, 27, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 55, 27, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 68, 27, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 69, 27, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 70, 27, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 71, 27, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 72, 27, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 73, 27, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 74, 27, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 75, 27, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 90, 27, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 91, 27, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 92, 27, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 93, 27, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 94, 27, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 95, 27, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 96, 27, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 39, 28, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 40, 28, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 41, 28, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 42, 28, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 43, 28, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 44, 28, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 45, 28, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 46, 28, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 47, 28, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 48, 28, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 49, 28, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 50, 28, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 51, 28, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 52, 28, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 53, 28, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 54, 28, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 55, 28, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 68, 28, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 69, 28, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 70, 28, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 71, 28, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 72, 28, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 73, 28, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 74, 28, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 75, 28, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 76, 28, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 77, 28, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 78, 28, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 79, 28, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 80, 28, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 90, 28, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 91, 28, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 92, 28, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 94, 28, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 95, 28, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 96, 28, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 36, 29, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 37, 29, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 38, 29, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 39, 29, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 40, 29, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 41, 29, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 42, 29, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 43, 29, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 44, 29, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 45, 29, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 46, 29, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 47, 29, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 48, 29, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 49, 29, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 50, 29, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 51, 29, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 52, 29, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 53, 29, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 54, 29, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 55, 29, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 68, 29, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 69, 29, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 70, 29, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 71, 29, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 72, 29, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 73, 29, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 74, 29, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 75, 29, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 76, 29, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 77, 29, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 78, 29, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 79, 29, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 80, 29, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 81, 29, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 82, 29, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 83, 29, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 84, 29, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 85, 29, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 86, 29, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 87, 29, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 90, 29, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 91, 29, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 92, 29, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 94, 29, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 95, 29, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 96, 29, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 36, 30, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 37, 30, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 38, 30, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 39, 30, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 40, 30, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 41, 30, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 42, 30, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 43, 30, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 44, 30, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 45, 30, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 46, 30, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 47, 30, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 48, 30, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 49, 30, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 50, 30, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 51, 30, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 52, 30, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 53, 30, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 54, 30, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 55, 30, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 68, 30, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 69, 30, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 70, 30, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 71, 30, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 72, 30, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 73, 30, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 74, 30, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 75, 30, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 76, 30, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 77, 30, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 78, 30, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 79, 30, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 80, 30, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 81, 30, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 82, 30, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 83, 30, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 84, 30, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 85, 30, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 86, 30, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 87, 30, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 90, 30, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 91, 30, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 92, 30, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 93, 30, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 94, 30, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 95, 30, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 96, 30, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 39, 31, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 40, 31, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 41, 31, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 42, 31, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 43, 31, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 44, 31, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 45, 31, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 46, 31, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 47, 31, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 48, 31, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 49, 31, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 50, 31, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 51, 31, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 52, 31, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 53, 31, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 54, 31, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 55, 31, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 68, 31, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 69, 31, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 70, 31, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 71, 31, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 72, 31, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 73, 31, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 74, 31, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 75, 31, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 76, 31, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 77, 31, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 78, 31, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 79, 31, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 80, 31, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 90, 31, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 91, 31, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 92, 31, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 93, 31, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 94, 31, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 95, 31, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 96, 31, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 48, 32, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 49, 32, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 50, 32, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 51, 32, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 52, 32, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 53, 32, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 54, 32, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 55, 32, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 68, 32, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 69, 32, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 70, 32, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 71, 32, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 72, 32, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 73, 32, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 74, 32, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 75, 32, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 90, 32, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 91, 32, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 92, 32, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 93, 32, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 94, 32, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 95, 32, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 96, 32, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 54, 33, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 55, 33, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 68, 33, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 69, 33, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 70, 33, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 90, 33, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 91, 33, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 92, 33, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 93, 33, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 94, 33, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 95, 33, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 96, 33, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 61, 34, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 62, 34, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 61, 35, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 62, 35, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 26, 36, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 27, 36, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 28, 36, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 29, 36, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 30, 36, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 31, 36, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 32, 36, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 33, 36, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 61, 36, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 62, 36, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 93, 36, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 26, 37, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 27, 37, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 28, 37, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 29, 37, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 30, 37, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 31, 37, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 32, 37, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 33, 37, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 61, 37, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 62, 37, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 93, 37, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 26, 38, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 27, 38, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 28, 38, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 29, 38, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 30, 38, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 31, 38, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 32, 38, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 33, 38, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 61, 38, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 62, 38, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 93, 38, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 26, 39, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 27, 39, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 28, 39, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 29, 39, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 30, 39, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 31, 39, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 32, 39, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 33, 39, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 61, 39, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 62, 39, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 93, 39, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 26, 40, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 27, 40, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 28, 40, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 29, 40, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 30, 40, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 31, 40, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 32, 40, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 33, 40, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 61, 40, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 62, 40, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 93, 40, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 26, 41, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 27, 41, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 28, 41, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 29, 41, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 30, 41, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 31, 41, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 32, 41, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 33, 41, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 61, 41, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 62, 41, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 93, 41, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 26, 42, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 27, 42, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 28, 42, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 29, 42, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 30, 42, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 31, 42, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 32, 42, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 33, 42, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 61, 42, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 62, 42, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 93, 42, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 26, 43, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 27, 43, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 28, 43, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 29, 43, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 30, 43, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 31, 43, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 32, 43, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 33, 43, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 61, 43, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 62, 43, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 93, 43, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 26, 44, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 27, 44, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 28, 44, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 29, 44, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 30, 44, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 31, 44, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 32, 44, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 33, 44, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 61, 44, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 62, 44, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 93, 44, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 26, 45, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 27, 45, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 28, 45, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 29, 45, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 30, 45, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 31, 45, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 32, 45, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 33, 45, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 61, 45, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 62, 45, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 93, 45, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 26, 46, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 27, 46, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 28, 46, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 29, 46, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 30, 46, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 31, 46, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 32, 46, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 33, 46, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 61, 46, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 62, 46, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 93, 46, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 26, 47, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 27, 47, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 28, 47, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 29, 47, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 30, 47, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 31, 47, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 32, 47, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 33, 47, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 61, 47, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 62, 47, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 93, 47, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 26, 48, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 27, 48, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 28, 48, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 29, 48, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 30, 48, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 31, 48, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 32, 48, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 33, 48, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 61, 48, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 62, 48, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 93, 48, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 26, 49, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 27, 49, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 28, 49, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 29, 49, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 30, 49, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 31, 49, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 32, 49, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 33, 49, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 61, 49, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 62, 49, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 93, 49, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 26, 50, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 27, 50, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 28, 50, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 29, 50, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 30, 50, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 31, 50, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 32, 50, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 33, 50, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 61, 50, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 62, 50, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 93, 50, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 26, 51, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 27, 51, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 28, 51, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 29, 51, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 30, 51, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 31, 51, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 32, 51, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 33, 51, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 61, 51, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 62, 51, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 93, 51, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 26, 52, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 27, 52, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 28, 52, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 29, 52, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 30, 52, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 31, 52, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 32, 52, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 33, 52, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 61, 52, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 62, 52, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 93, 52, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 26, 53, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 27, 53, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 28, 53, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 29, 53, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 30, 53, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 31, 53, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 32, 53, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 33, 53, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 61, 53, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 62, 53, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 93, 53, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 26, 54, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 27, 54, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 28, 54, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 29, 54, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 30, 54, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 31, 54, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 32, 54, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 33, 54, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 61, 54, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 62, 54, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 93, 54, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 26, 55, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 27, 55, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 28, 55, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 29, 55, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 30, 55, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 31, 55, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 32, 55, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 33, 55, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 61, 55, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 62, 55, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 93, 55, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 61, 56, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 62, 56, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 61, 57, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 62, 57, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 61, 58, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 62, 58, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 61, 59, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 62, 59, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 36, 60, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 37, 60, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 38, 60, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 39, 60, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 40, 60, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 41, 60, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 42, 60, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 43, 60, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 44, 60, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 45, 60, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 46, 60, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 47, 60, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 48, 60, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 49, 60, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 50, 60, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 51, 60, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 52, 60, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 53, 60, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 54, 60, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 55, 60, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 68, 60, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 69, 60, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 70, 60, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 71, 60, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 72, 60, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 73, 60, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 74, 60, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 75, 60, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 76, 60, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 77, 60, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 78, 60, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 79, 60, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 80, 60, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 81, 60, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 82, 60, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 83, 60, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 84, 60, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 85, 60, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 86, 60, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 87, 60, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 88, 60, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 89, 60, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 90, 60, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 91, 60, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 92, 60, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 36, 61, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 37, 61, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 38, 61, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 39, 61, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 40, 61, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 41, 61, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 42, 61, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 43, 61, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 44, 61, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 45, 61, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 46, 61, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 47, 61, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 48, 61, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 49, 61, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 50, 61, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 51, 61, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 52, 61, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 53, 61, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 54, 61, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 55, 61, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 68, 61, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 69, 61, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 70, 61, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 71, 61, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 72, 61, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 73, 61, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 74, 61, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 75, 61, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 76, 61, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 77, 61, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 78, 61, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 79, 61, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 80, 61, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 81, 61, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 82, 61, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 83, 61, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 84, 61, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 85, 61, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 86, 61, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 87, 61, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 88, 61, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 89, 61, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 90, 61, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 91, 61, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 92, 61, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 36, 62, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 37, 62, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 38, 62, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 39, 62, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 40, 62, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 41, 62, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 42, 62, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 43, 62, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 44, 62, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 45, 62, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 46, 62, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 47, 62, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 48, 62, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 49, 62, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 50, 62, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 51, 62, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 52, 62, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 53, 62, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 54, 62, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 55, 62, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 68, 62, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 69, 62, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 70, 62, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 71, 62, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 72, 62, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 73, 62, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 74, 62, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 75, 62, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 76, 62, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 77, 62, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 78, 62, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 79, 62, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 80, 62, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 81, 62, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 82, 62, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 83, 62, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 84, 62, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 85, 62, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 86, 62, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 87, 62, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 88, 62, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 89, 62, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 90, 62, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 91, 62, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 92, 62, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 36, 63, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 37, 63, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 38, 63, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 39, 63, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 40, 63, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 41, 63, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 42, 63, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 43, 63, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 44, 63, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 45, 63, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 46, 63, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 47, 63, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 48, 63, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 49, 63, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 50, 63, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 51, 63, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 52, 63, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 53, 63, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 54, 63, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 55, 63, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 60, 63, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 63, 63, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 68, 63, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 69, 63, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 70, 63, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 71, 63, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 72, 63, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 73, 63, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 74, 63, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 75, 63, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 76, 63, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 77, 63, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 78, 63, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 79, 63, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 80, 63, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 81, 63, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 82, 63, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 83, 63, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 84, 63, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 85, 63, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 86, 63, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 87, 63, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 88, 63, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 89, 63, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 90, 63, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 91, 63, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 92, 63, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 60, 64, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 63, 64, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 60, 65, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 63, 65, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 26, 66, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 27, 66, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 28, 66, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 29, 66, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 30, 66, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 31, 66, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 32, 66, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 33, 66, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 60, 66, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 63, 66, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 26, 67, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 27, 67, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 28, 67, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 29, 67, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 30, 67, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 31, 67, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 32, 67, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 33, 67, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 60, 67, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 63, 67, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 26, 68, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 27, 68, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 28, 68, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 29, 68, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 30, 68, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 31, 68, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 32, 68, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 33, 68, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 60, 68, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 63, 68, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 93, 68, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 26, 69, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 27, 69, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 28, 69, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 29, 69, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 30, 69, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 31, 69, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 32, 69, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 33, 69, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 60, 69, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 63, 69, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 93, 69, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 26, 70, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 27, 70, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 28, 70, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 29, 70, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 30, 70, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 31, 70, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 32, 70, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 33, 70, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 60, 70, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 63, 70, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 93, 70, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 26, 71, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 27, 71, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 28, 71, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 29, 71, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 30, 71, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 31, 71, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 32, 71, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 33, 71, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 60, 71, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 63, 71, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 93, 71, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 26, 72, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 27, 72, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 28, 72, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 29, 72, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 30, 72, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 31, 72, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 32, 72, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 33, 72, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 60, 72, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 63, 72, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 93, 72, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 26, 73, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 27, 73, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 28, 73, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 29, 73, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 30, 73, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 31, 73, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 32, 73, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 33, 73, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 60, 73, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 63, 73, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 93, 73, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 26, 74, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 27, 74, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 28, 74, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 29, 74, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 30, 74, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 31, 74, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 32, 74, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 33, 74, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 60, 74, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 63, 74, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 93, 74, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 26, 75, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 27, 75, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 28, 75, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 29, 75, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 30, 75, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 31, 75, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 32, 75, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 33, 75, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 60, 75, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 63, 75, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 93, 75, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 26, 76, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 27, 76, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 28, 76, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 29, 76, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 30, 76, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 31, 76, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 32, 76, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 33, 76, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 60, 76, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 63, 76, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 93, 76, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 26, 77, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 27, 77, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 28, 77, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 29, 77, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 30, 77, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 31, 77, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 32, 77, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 33, 77, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 60, 77, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 63, 77, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 93, 77, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 26, 78, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 27, 78, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 28, 78, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 29, 78, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 30, 78, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 31, 78, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 32, 78, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 33, 78, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 60, 78, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 63, 78, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 93, 78, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 26, 79, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 27, 79, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 28, 79, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 29, 79, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 30, 79, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 31, 79, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 32, 79, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 33, 79, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 60, 79, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 63, 79, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 93, 79, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 26, 80, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 27, 80, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 28, 80, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 29, 80, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 30, 80, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 31, 80, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 32, 80, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 33, 80, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 60, 80, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 63, 80, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 93, 80, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 26, 81, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 27, 81, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 28, 81, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 29, 81, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 30, 81, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 31, 81, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 32, 81, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 33, 81, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 60, 81, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 63, 81, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 93, 81, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 26, 82, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 27, 82, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 28, 82, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 29, 82, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 30, 82, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 31, 82, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 32, 82, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 33, 82, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 60, 82, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 63, 82, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 93, 82, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 26, 83, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 27, 83, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 28, 83, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 29, 83, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 30, 83, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 31, 83, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 32, 83, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 33, 83, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 60, 83, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 63, 83, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 93, 83, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 26, 84, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 27, 84, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 28, 84, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 29, 84, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 30, 84, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 31, 84, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 32, 84, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 33, 84, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 60, 84, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 63, 84, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 93, 84, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 26, 85, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 27, 85, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 28, 85, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 29, 85, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 30, 85, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 31, 85, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 32, 85, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 33, 85, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 60, 85, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 63, 85, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 93, 85, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 26, 86, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 27, 86, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 28, 86, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 29, 86, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 30, 86, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 31, 86, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 32, 86, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 33, 86, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 60, 86, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 63, 86, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 93, 86, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 26, 87, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 27, 87, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 28, 87, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 29, 87, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 30, 87, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 31, 87, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 32, 87, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 33, 87, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 60, 87, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 63, 87, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 93, 87, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 95, 91, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 95, 92, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 36, 93, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 37, 93, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 38, 93, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 39, 93, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 40, 93, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 41, 93, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 42, 93, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 43, 93, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 44, 93, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 45, 93, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 46, 93, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 47, 93, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 48, 93, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 49, 93, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 50, 93, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 51, 93, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 52, 93, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 53, 93, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 54, 93, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 55, 93, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 68, 93, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 69, 93, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 70, 93, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 71, 93, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 72, 93, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 73, 93, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 74, 93, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 75, 93, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 76, 93, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 77, 93, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 95, 93, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 96, 93, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 75, 94, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 76, 94, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 77, 94, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 78, 94, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 79, 94, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 95, 94, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 96, 94, { baseHeight: 4, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 77, 95, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 78, 95, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 79, 95, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 80, 95, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 81, 95, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 82, 95, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 83, 95, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 84, 95, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 85, 95, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 86, 95, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 87, 95, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 88, 95, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 89, 95, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 90, 95, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 96, 95, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 88, 96, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 89, 96, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 90, 96, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 91, 96, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 92, 96, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 93, 96, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 94, 96, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 95, 96, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 96, 96, { baseHeight: 4, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 93, 97, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 94, 97, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 95, 97, { baseHeight: 4, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+
+    // --- Goal ---
+    setGoal(level, 94.5, 94.5);
+
     return registerLevel(level);
   }
-  // LEVEL 19 — Tunnel Express
-  // Multiple tunnel choices with time pressure. Only one path is efficient.
-  // ═══════════════════════════════════════════════════════════════════════════
+
+  // ─── Level 19: Tunnel Express ───
   function buildTunnelExpress() {
     const level = createLevelShell({
       id: 'tunnel_express',
       name: 'Tunnel Express',
       width: 60,
       height: 55,
-      timeLimit: 30,
-      start: { x: 5, y: 27 },
-      reward: { presses: 9500, unlocks: ['marble_tunnel_express_complete'], claimKey: 'tunnel_express' }
+      start: { x: 5.5, y: 27.5, z: 8 },
+      timeLimit: 30
     });
-    // Start at z=8
-    fillTrack(level, 3, 25, 6, 6, 8);
-    // Hub with 3 tunnel entrances
-    fillTrack(level, 9, 22, 10, 12, 8);
-    // Tunnel A — fast direct route (correct)
+
+    // --- Surface tiles ---
+    fillTrack(level, 22, 7, 1, 6, 8);
+    fillTrack(level, 19, 10, 3, 3, 8);
+    fillTrack(level, 23, 10, 3, 3, 8);
+    fillTrack(level, 19, 16, 7, 3, 8);
+    fillTrack(level, 22, 19, 1, 3, 8);
+    setSurface(level, 15, 22, { baseHeight: 8, kind: 'track' });
+    fillTrack(level, 4, 26, 3, 3, 8);
+    setSurface(level, 43, 25, { baseHeight: 4, kind: 'track' });
+    fillTrack(level, 43, 42, 5, 2, 4);
+    fillTrack(level, 43, 44, 2, 2, 4);
+    fillTrack(level, 46, 44, 2, 1, 4);
+    fillTrack(level, 45, 45, 2, 1, 4);
+    fillTrack(level, 49, 38, 7, 4, 2);
+    fillTrack(level, 51, 42, 5, 1, 2);
+    fillTrack(level, 51, 43, 3, 2, 2);
+    fillTrack(level, 55, 43, 1, 2, 2);
+    setSurface(level, 54, 44, { baseHeight: 2, kind: 'track' });
+    fillTrack(level, 29, 41, 6, 2, 5);
+    fillTrack(level, 29, 43, 2, 3, 5);
+    fillTrack(level, 33, 43, 2, 3, 5);
+    fillTrack(level, 31, 44, 2, 2, 5);
+    fillTrack(level, 14, 49, 3, 1, 18);
+    fillTrack(level, 14, 50, 1, 2, 18);
+    fillTrack(level, 16, 50, 1, 2, 18);
+    setSurface(level, 15, 51, { baseHeight: 18, kind: 'track' });
+
+    // --- Funnel tiles (track at funnel height, tunnels handle funnel shape) ---
+    setSurface(level, 19, 7, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 20, 7, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 21, 7, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 23, 7, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 24, 7, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 25, 7, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 19, 8, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 21, 8, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 23, 8, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 25, 8, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 19, 9, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 20, 9, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 21, 9, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 23, 9, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 24, 9, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 25, 9, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 19, 13, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 20, 13, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 21, 13, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 23, 13, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 24, 13, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 25, 13, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 19, 14, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 21, 14, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 23, 14, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 25, 14, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 19, 15, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 20, 15, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 21, 15, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 23, 15, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 24, 15, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 25, 15, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 19, 19, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 20, 19, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 21, 19, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 23, 19, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 24, 19, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 25, 19, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 19, 20, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 21, 20, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 23, 20, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 25, 20, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 19, 21, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 20, 21, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 21, 21, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 23, 21, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 24, 21, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 25, 21, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 12, 22, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 13, 22, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 14, 22, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 42, 22, { baseHeight: 4, kind: 'track' });
+    setSurface(level, 43, 22, { baseHeight: 4, kind: 'track' });
+    setSurface(level, 44, 22, { baseHeight: 4, kind: 'track' });
+    setSurface(level, 12, 23, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 14, 23, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 42, 23, { baseHeight: 4, kind: 'track' });
+    setSurface(level, 44, 23, { baseHeight: 4, kind: 'track' });
+    setSurface(level, 12, 24, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 13, 24, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 14, 24, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 42, 24, { baseHeight: 4, kind: 'track' });
+    setSurface(level, 43, 24, { baseHeight: 4, kind: 'track' });
+    setSurface(level, 44, 24, { baseHeight: 4, kind: 'track' });
+    setSurface(level, 14, 25, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 15, 25, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 16, 25, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 7, 26, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 8, 26, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 9, 26, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 14, 26, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 16, 26, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 42, 26, { baseHeight: 4, kind: 'track' });
+    setSurface(level, 43, 26, { baseHeight: 4, kind: 'track' });
+    setSurface(level, 44, 26, { baseHeight: 4, kind: 'track' });
+    setSurface(level, 7, 27, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 9, 27, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 14, 27, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 15, 27, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 16, 27, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 42, 27, { baseHeight: 4, kind: 'track' });
+    setSurface(level, 44, 27, { baseHeight: 4, kind: 'track' });
+    setSurface(level, 7, 28, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 8, 28, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 9, 28, { baseHeight: 8, kind: 'track' });
+    setSurface(level, 42, 28, { baseHeight: 4, kind: 'track' });
+    setSurface(level, 43, 28, { baseHeight: 4, kind: 'track' });
+    setSurface(level, 44, 28, { baseHeight: 4, kind: 'track' });
+    setSurface(level, 26, 42, { baseHeight: 5, kind: 'track' });
+    setSurface(level, 27, 42, { baseHeight: 5, kind: 'track' });
+    setSurface(level, 28, 42, { baseHeight: 5, kind: 'track' });
+    setSurface(level, 35, 42, { baseHeight: 5, kind: 'track' });
+    setSurface(level, 36, 42, { baseHeight: 5, kind: 'track' });
+    setSurface(level, 37, 42, { baseHeight: 5, kind: 'track' });
+    setSurface(level, 26, 43, { baseHeight: 5, kind: 'track' });
+    setSurface(level, 28, 43, { baseHeight: 5, kind: 'track' });
+    setSurface(level, 35, 43, { baseHeight: 5, kind: 'track' });
+    setSurface(level, 37, 43, { baseHeight: 5, kind: 'track' });
+    setSurface(level, 26, 44, { baseHeight: 5, kind: 'track' });
+    setSurface(level, 27, 44, { baseHeight: 5, kind: 'track' });
+    setSurface(level, 28, 44, { baseHeight: 5, kind: 'track' });
+    setSurface(level, 35, 44, { baseHeight: 5, kind: 'track' });
+    setSurface(level, 36, 44, { baseHeight: 5, kind: 'track' });
+    setSurface(level, 37, 44, { baseHeight: 5, kind: 'track' });
+    setSurface(level, 47, 45, { baseHeight: 2, kind: 'track' });
+    setSurface(level, 48, 45, { baseHeight: 2, kind: 'track' });
+    setSurface(level, 49, 45, { baseHeight: 2, kind: 'track' });
+    setSurface(level, 47, 46, { baseHeight: 2, kind: 'track' });
+    setSurface(level, 49, 46, { baseHeight: 2, kind: 'track' });
+    setSurface(level, 47, 47, { baseHeight: 2, kind: 'track' });
+    setSurface(level, 48, 47, { baseHeight: 2, kind: 'track' });
+    setSurface(level, 49, 47, { baseHeight: 2, kind: 'track' });
+    setSurface(level, 14, 52, { baseHeight: 18, kind: 'track' });
+    setSurface(level, 15, 52, { baseHeight: 18, kind: 'track' });
+    setSurface(level, 16, 52, { baseHeight: 18, kind: 'track' });
+    setSurface(level, 14, 53, { baseHeight: 18, kind: 'track' });
+    setSurface(level, 16, 53, { baseHeight: 18, kind: 'track' });
+    setSurface(level, 14, 54, { baseHeight: 18, kind: 'track' });
+    setSurface(level, 15, 54, { baseHeight: 18, kind: 'track' });
+    setSurface(level, 16, 54, { baseHeight: 18, kind: 'track' });
+
+    // --- Tunnels ---
     placeTunnel(level, {
-      id: 'tunnel_a',
+      id: 'tunnel_1',
       path: [
-        { x: 15.5, y: 25.5, z: 8 },
-        { x: 28, y: 20, z: 5 },
-        { x: 42, y: 24, z: 4 }
+        { x: 8.5, y: 27.5, z: 6 },
+        { x: 15.5, y: 23.5, z: 8 }
       ],
-      speed: 10,
-      exitType: 'emerge',
-      funnelRadius: 1,
-      funnelDepth: 3
+      speed: 8, funnelRadius: 1
     });
-    // Tunnel B — slow, loops back (wrong)
     placeTunnel(level, {
-      id: 'tunnel_b',
+      id: 'tunnel_2',
       path: [
-        { x: 13.5, y: 23.5, z: 8 },
-        { x: 8, y: 12, z: 6 },
-        { x: 15, y: 6, z: 7 },
-        { x: 22, y: 10, z: 8 }
+        { x: 13.5, y: 23.5, z: 6 },
+        { x: 15.5, y: 50.5, z: 18 }
       ],
-      speed: 5,
-      exitType: 'emerge',
-      funnelRadius: 1,
-      funnelDepth: 2
+      speed: 8, funnelRadius: 1
     });
-    // Tunnel B exit
-    fillTrack(level, 19, 7, 7, 7, 8);
-    // Path back to hub from B
-    fillTrack(level, 16, 14, 4, 8, 8);
-    // Tunnel C — medium speed, goes to mid area (suboptimal)
     placeTunnel(level, {
-      id: 'tunnel_c',
+      id: 'tunnel_3',
       path: [
-        { x: 15.5, y: 31.5, z: 8 },
-        { x: 20, y: 38, z: 6 },
-        { x: 30, y: 42, z: 5 }
+        { x: 15.5, y: 53.5, z: 15 },
+        { x: 42.5, y: 25.5, z: 4 }
       ],
-      speed: 7,
-      exitType: 'emerge',
-      funnelRadius: 1,
-      funnelDepth: 2
+      speed: 8, funnelRadius: 1
     });
-    // Tunnel C exit — leads to goal but longer path
-    fillTrack(level, 27, 40, 8, 6, 5);
-    fillTrack(level, 35, 42, 4, 4, 5);
-    placeRamp(level, { x: 39, y: 43, dir: 'east', length: 4, width: 3, startZ: 5, endZ: 4 });
-    fillTrack(level, 43, 42, 4, 4, 4);
-    // Tunnel A exit — near goal
-    fillTrack(level, 40, 22, 8, 6, 4);
-    // Final tunnel to goal
     placeTunnel(level, {
-      id: 'tunnel_d',
+      id: 'tunnel_4',
       path: [
-        { x: 45.5, y: 25.5, z: 4 },
-        { x: 50, y: 32, z: 3 },
-        { x: 52, y: 40, z: 2 }
+        { x: 43.5, y: 27.5, z: 2 },
+        { x: 45.5, y: 44.5, z: 4 }
       ],
-      speed: 9,
-      exitType: 'emerge',
-      funnelRadius: 1,
-      funnelDepth: 2
+      speed: 8, funnelRadius: 1
     });
-    // Goal area
-    fillTrack(level, 49, 38, 7, 7, 2);
-    // Connect C path to goal area
-    fillTrack(level, 47, 42, 4, 4, 4);
-    placeRamp(level, { x: 48, y: 42, dir: 'south', length: 3, width: 3, startZ: 4, endZ: 2 });
-    fillTrack(level, 47, 45, 4, 3, 2);
-    setGoal(level, 52, 41, 0.55);
-    // Route graph
-    addGraphNode(level, { id: 'start', type: 'entry', x: 6, y: 28, z: 8 });
-    addGraphNode(level, { id: 'hub', type: 'fork', x: 14, y: 28, z: 8 });
-    addGraphNode(level, { id: 'ta_exit', type: 'hub', x: 44, y: 25, z: 4 });
-    addGraphNode(level, { id: 'goal', type: 'goal', x: 53, y: 42, z: 2 });
-    addGraphEdge(level, { from: 'start', to: 'hub', kind: 'roll' });
-    addGraphEdge(level, { from: 'hub', to: 'ta_exit', kind: 'roll', tag: 'tunnel' });
-    addGraphEdge(level, { from: 'ta_exit', to: 'goal', kind: 'roll', tag: 'tunnel' });
+    placeTunnel(level, {
+      id: 'tunnel_5',
+      path: [
+        { x: 48.5, y: 46.5, z: 2 },
+        { x: 22.5, y: 15.5, z: 8 }
+      ],
+      speed: 8, funnelRadius: 1
+    });
+    placeTunnel(level, {
+      id: 'tunnel_6',
+      path: [
+        { x: 24.5, y: 14.5, z: 6 },
+        { x: 15.5, y: 24.5, z: 8 }
+      ],
+      speed: 8, funnelRadius: 1
+    });
+    placeTunnel(level, {
+      id: 'tunnel_7',
+      path: [
+        { x: 15.5, y: 26.5, z: 6 },
+        { x: 22.5, y: 13.5, z: 8 }
+      ],
+      speed: 8, funnelRadius: 1
+    });
+    placeTunnel(level, {
+      id: 'tunnel_8',
+      path: [
+        { x: 20.5, y: 20.5, z: 6 },
+        { x: 32.5, y: 43.5, z: 5 }
+      ],
+      speed: 8, funnelRadius: 1
+    });
+    placeTunnel(level, {
+      id: 'tunnel_9',
+      path: [
+        { x: 36.5, y: 43.5, z: 3 },
+        { x: 44.5, y: 25.5, z: 4 }
+      ],
+      speed: 8, funnelRadius: 1
+    });
+    placeTunnel(level, {
+      id: 'tunnel_10',
+      path: [
+        { x: 43.5, y: 23.5, z: 2 },
+        { x: 22.5, y: 14.5, z: 8 }
+      ],
+      speed: 8, funnelRadius: 1
+    });
+    placeTunnel(level, {
+      id: 'tunnel_11',
+      path: [
+        { x: 24.5, y: 8.5, z: 6 },
+        { x: 31.5, y: 43.5, z: 5 }
+      ],
+      speed: 8, funnelRadius: 1
+    });
+    placeTunnel(level, {
+      id: 'tunnel_12',
+      path: [
+        { x: 27.5, y: 43.5, z: 3 },
+        { x: 54.5, y: 43.5, z: 2 }
+      ],
+      speed: 8, funnelRadius: 1
+    });
+    placeTunnel(level, {
+      id: 'tunnel_void_1',
+      path: [
+        { x: 20.5, y: 8.5, z: 5 },
+        { x: 20.5, y: 8.5, z: -15 }
+      ],
+      speed: 12, funnelRadius: 1, exitType: 'drop'
+    });
+    placeTunnel(level, {
+      id: 'tunnel_void_2',
+      path: [
+        { x: 20.5, y: 14.5, z: 6 },
+        { x: 20.5, y: 14.5, z: -14 }
+      ],
+      speed: 12, funnelRadius: 1, exitType: 'drop'
+    });
+    placeTunnel(level, {
+      id: 'tunnel_void_3',
+      path: [
+        { x: 24.5, y: 20.5, z: 5 },
+        { x: 24.5, y: 20.5, z: -15 }
+      ],
+      speed: 12, funnelRadius: 1, exitType: 'drop'
+    });
+
+    // --- Goal ---
+    setGoal(level, 52.5, 41.5);
+
     return registerLevel(level);
   }
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  // LEVEL 20 — The Final Ascent
-  // Ultimate challenge combining all mechanics in a vertical ascent.
-  // ═══════════════════════════════════════════════════════════════════════════
+  // ─── Level 20: The Final Ascent ───
   function buildTheFinalAscent() {
     const level = createLevelShell({
       id: 'the_final_ascent',
       name: 'The Final Ascent',
       width: 55,
       height: 60,
-      timeLimit: 30,
-      start: { x: 5, y: 54 },
-      reward: { presses: 10000, unlocks: ['marble_the_final_ascent_complete'], claimKey: 'the_final_ascent' }
+      start: { x: 5.5, y: 54.5, z: 2 },
+      timeLimit: 30
     });
-    // Start at z=2 (bottom) — must ascend to z=16 (top)
-    fillTrack(level, 3, 52, 6, 5, 2);
-    // Phase 1: Crumble sprint east at z=2
-    fillTrack(level, 9, 53, 10, 3, 2, { crumble: { delay: 0.2, respawn: 2.5 } });
-    fillTrack(level, 19, 52, 5, 4, 2);
-    // Elevator up to z=6
-    addElevator(level, 'elev1', 20, 53, 2, 6, 3, 3, 0.9, 4.5);
-    fillTrack(level, 24, 52, 5, 4, 6);
-    // Phase 2: Ice corridor with gate at z=6
-    fillTrack(level, 24, 53, 12, 3, 6, { friction: 0.5 });
-    addTimedGate(level, 'gate1', 30, 53, 6, 1, 3, 1.2, 0.9);
-    fillTrack(level, 36, 48, 5, 8, 6);
-    // Ramp up to z=8
-    fillTrack(level, 36, 44, 5, 1, 8);
-    placeRamp(level, { x: 37, y: 48, dir: 'north', length: 4, width: 3, startZ: 6, endZ: 8 });
-    // Phase 3: Sweeper arena at z=8
-    fillTrack(level, 30, 38, 14, 6, 8);
+
+    // --- Surface tiles ---
+    fillTrack(level, 13, 2, 5, 1, 16);
+    fillTrack(level, 13, 3, 1, 3, 16);
+    setSurface(level, 15, 3, { baseHeight: 16, kind: 'track' });
+    fillTrack(level, 17, 3, 1, 3, 16);
+    fillTrack(level, 14, 5, 3, 1, 16);
+    fillTrack(level, 15, 10, 1, 4, 14);
+    fillTrack(level, 14, 20, 3, 2, 14);
+    fillTrack(level, 15, 22, 2, 2, 14);
+    fillTrack(level, 28, 29, 6, 1, 12);
+    fillTrack(level, 15, 30, 7, 2, 12);
+    fillTrack(level, 30, 34, 4, 1, 8);
+    fillTrack(level, 30, 35, 1, 2, 8);
+    fillTrack(level, 33, 35, 1, 9, 8);
+    fillTrack(level, 31, 36, 2, 2, 8);
+    setSurface(level, 31, 38, { baseHeight: 8, kind: 'track' });
+    fillTrack(level, 35, 38, 1, 6, 8);
+    fillTrack(level, 37, 38, 1, 7, 8);
+    fillTrack(level, 32, 39, 1, 4, 8);
+    fillTrack(level, 34, 39, 1, 4, 8);
+    fillTrack(level, 36, 39, 1, 4, 8);
+    fillTrack(level, 38, 39, 1, 6, 8);
+    fillTrack(level, 37, 49, 2, 6, 6);
+    fillTrack(level, 30, 53, 7, 2, 6);
+    fillTrack(level, 28, 54, 2, 1, 6);
+    setSurface(level, 29, 53, { baseHeight: 6, kind: 'track' });
+    fillTrack(level, 5, 50, 3, 1, 2);
+    fillTrack(level, 5, 51, 1, 8, 2);
+    setSurface(level, 7, 51, { baseHeight: 2, kind: 'track' });
+    fillTrack(level, 20, 52, 1, 3, 2);
+    setSurface(level, 8, 53, { baseHeight: 2, kind: 'track' });
+    setSurface(level, 6, 54, { baseHeight: 2, kind: 'track' });
+    fillTrack(level, 8, 55, 1, 4, 2);
+    fillTrack(level, 6, 58, 2, 1, 2);
+    fillTrack(level, 19, 53, 1, 2, 2);
+    // Ramps
+    setSurface(level, 15, 6, { baseHeight: 17, shape: 'slope_n', kind: 'track' });
+    setSurface(level, 15, 7, { baseHeight: 16, shape: 'slope_n', kind: 'track' });
+    setSurface(level, 15, 8, { baseHeight: 15, shape: 'slope_n', kind: 'track' });
+    setSurface(level, 15, 9, { baseHeight: 14, shape: 'slope_n', kind: 'track' });
+    setSurface(level, 15, 24, { baseHeight: 14, shape: 'slope_n', kind: 'track' });
+    setSurface(level, 16, 24, { baseHeight: 14, shape: 'slope_n', kind: 'track' });
+    setSurface(level, 17, 24, { baseHeight: 14, shape: 'slope_n', kind: 'track' });
+    setSurface(level, 15, 27, { baseHeight: 13, shape: 'slope_n', kind: 'track' });
+    setSurface(level, 16, 27, { baseHeight: 13, shape: 'slope_n', kind: 'track' });
+    setSurface(level, 17, 27, { baseHeight: 13, shape: 'slope_n', kind: 'track' });
+    setSurface(level, 15, 28, { baseHeight: 12.5, shape: 'slope_n', kind: 'track' });
+    setSurface(level, 16, 28, { baseHeight: 12.5, shape: 'slope_n', kind: 'track' });
+    setSurface(level, 17, 28, { baseHeight: 12.5, shape: 'slope_n', kind: 'track' });
+    setSurface(level, 15, 29, { baseHeight: 12, shape: 'slope_n', kind: 'track' });
+    setSurface(level, 16, 29, { baseHeight: 12, shape: 'slope_n', kind: 'track' });
+    setSurface(level, 17, 29, { baseHeight: 12, shape: 'slope_n', kind: 'track' });
+    setSurface(level, 37, 45, { baseHeight: 7.5, shape: 'slope_n', kind: 'track' });
+    setSurface(level, 38, 45, { baseHeight: 7.5, shape: 'slope_n', kind: 'track' });
+    setSurface(level, 37, 46, { baseHeight: 7, shape: 'slope_n', kind: 'track' });
+    setSurface(level, 38, 46, { baseHeight: 7, shape: 'slope_n', kind: 'track' });
+    setSurface(level, 37, 47, { baseHeight: 6.5, shape: 'slope_n', kind: 'track' });
+    setSurface(level, 38, 47, { baseHeight: 6.5, shape: 'slope_n', kind: 'track' });
+    setSurface(level, 37, 48, { baseHeight: 6, shape: 'slope_n', kind: 'track' });
+    setSurface(level, 38, 48, { baseHeight: 6, shape: 'slope_n', kind: 'track' });
+    // Crumble tiles
+    fillSurfaceRect(level, 15, 14, 1, 2, { baseHeight: 14, kind: 'crumble', delay: 0.15, downtime: 4.0 });
+    fillSurfaceRect(level, 14, 15, 1, 3, { baseHeight: 14, kind: 'crumble', delay: 0.15, downtime: 4.0 });
+    fillSurfaceRect(level, 16, 15, 1, 3, { baseHeight: 14, kind: 'crumble', delay: 0.15, downtime: 4.0 });
+    fillSurfaceRect(level, 15, 17, 1, 3, { baseHeight: 14, kind: 'crumble', delay: 0.15, downtime: 4.0 });
+    setSurface(level, 14, 19, { baseHeight: 14, kind: 'crumble', delay: 0.15, downtime: 4.0 });
+    setSurface(level, 16, 19, { baseHeight: 14, kind: 'crumble', delay: 0.15, downtime: 4.0 });
+    fillSurfaceRect(level, 15, 25, 3, 2, { baseHeight: 13, kind: 'crumble', delay: 0.15, downtime: 4.0 });
+    setSurface(level, 32, 38, { baseHeight: 8, kind: 'crumble', delay: 0.15, downtime: 4.0 });
+    setSurface(level, 34, 38, { baseHeight: 8, kind: 'crumble', delay: 0.15, downtime: 4.0 });
+    setSurface(level, 36, 38, { baseHeight: 8, kind: 'crumble', delay: 0.15, downtime: 4.0 });
+    setSurface(level, 38, 38, { baseHeight: 8, kind: 'crumble', delay: 0.15, downtime: 4.0 });
+    setSurface(level, 32, 43, { baseHeight: 8, kind: 'crumble', delay: 0.15, downtime: 4.0 });
+    setSurface(level, 34, 43, { baseHeight: 8, kind: 'crumble', delay: 0.15, downtime: 4.0 });
+    setSurface(level, 36, 43, { baseHeight: 8, kind: 'crumble', delay: 0.15, downtime: 4.0 });
+    fillSurfaceRect(level, 16, 50, 1, 6, { baseHeight: 2, kind: 'crumble', delay: 0.15, downtime: 4.0 });
+    fillSurfaceRect(level, 9, 53, 7, 3, { baseHeight: 2, kind: 'crumble', delay: 0.15, downtime: 4.0 });
+    fillSurfaceRect(level, 17, 53, 2, 3, { baseHeight: 2, kind: 'crumble', delay: 0.15, downtime: 4.0 });
+    // Bounce tiles
+    setSurface(level, 30, 32, { baseHeight: 12, kind: 'bounce' });
+    setSurface(level, 31, 32, { baseHeight: 12, kind: 'bounce' });
+    setSurface(level, 32, 32, { baseHeight: 12, kind: 'bounce' });
+    setSurface(level, 33, 32, { baseHeight: 12, kind: 'bounce' });
+    setSurface(level, 16, 34, { baseHeight: 12, kind: 'bounce' });
+    setSurface(level, 15, 35, { baseHeight: 12, kind: 'bounce' });
+    setSurface(level, 17, 35, { baseHeight: 12, kind: 'bounce' });
+    setSurface(level, 31, 35, { baseHeight: 8, kind: 'bounce' });
+    setSurface(level, 32, 35, { baseHeight: 8, kind: 'bounce' });
+    setSurface(level, 14, 37, { baseHeight: 10, kind: 'bounce' });
+    setSurface(level, 16, 37, { baseHeight: 10, kind: 'bounce' });
+    setSurface(level, 18, 37, { baseHeight: 10, kind: 'bounce' });
+    setSurface(level, 13, 39, { baseHeight: 10, kind: 'bounce' });
+    setSurface(level, 15, 39, { baseHeight: 10, kind: 'bounce' });
+    setSurface(level, 17, 39, { baseHeight: 10, kind: 'bounce' });
+    setSurface(level, 19, 39, { baseHeight: 10, kind: 'bounce' });
+    setSurface(level, 12, 41, { baseHeight: 8, kind: 'bounce' });
+    setSurface(level, 14, 41, { baseHeight: 8, kind: 'bounce' });
+    setSurface(level, 16, 41, { baseHeight: 8, kind: 'bounce' });
+    setSurface(level, 18, 41, { baseHeight: 8, kind: 'bounce' });
+    setSurface(level, 20, 41, { baseHeight: 8, kind: 'bounce' });
+    setSurface(level, 13, 43, { baseHeight: 6, kind: 'bounce' });
+    setSurface(level, 15, 43, { baseHeight: 6, kind: 'bounce' });
+    setSurface(level, 17, 43, { baseHeight: 6, kind: 'bounce' });
+    setSurface(level, 19, 43, { baseHeight: 6, kind: 'bounce' });
+    setSurface(level, 14, 45, { baseHeight: 6, kind: 'bounce' });
+    setSurface(level, 16, 45, { baseHeight: 6, kind: 'bounce' });
+    setSurface(level, 18, 45, { baseHeight: 8, kind: 'bounce' });
+    setSurface(level, 15, 47, { baseHeight: 4, kind: 'bounce' });
+    setSurface(level, 17, 47, { baseHeight: 4, kind: 'bounce' });
+    setSurface(level, 16, 49, { baseHeight: 2, kind: 'bounce' });
+    setSurface(level, 24, 52, { baseHeight: 2, kind: 'bounce' });
+    setSurface(level, 28, 52, { baseHeight: 2, kind: 'bounce' });
+    setSurface(level, 24, 53, { baseHeight: 2, kind: 'bounce' });
+    setSurface(level, 28, 53, { baseHeight: 2, kind: 'bounce' });
+    setSurface(level, 27, 54, { baseHeight: 2, kind: 'bounce' });
+    // Ice tiles
+    setSurface(level, 21, 29, { baseHeight: 12, kind: 'ice' });
+    fillSurfaceRect(level, 28, 30, 6, 1, { baseHeight: 12, kind: 'ice' });
+    fillSurfaceRect(level, 28, 31, 1, 3, { baseHeight: 12, kind: 'ice' });
+    fillSurfaceRect(level, 30, 33, 4, 1, { baseHeight: 12, kind: 'ice' });
+    fillSurfaceRect(level, 21, 52, 3, 2, { baseHeight: 2, kind: 'ice' });
+    fillSurfaceRect(level, 25, 52, 3, 2, { baseHeight: 2, kind: 'ice' });
+    // Conveyor tiles
+    setSurface(level, 22, 29, { baseHeight: 12, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 23, 29, { baseHeight: 12, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 24, 29, { baseHeight: 12, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 25, 29, { baseHeight: 12, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 26, 29, { baseHeight: 12, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 27, 29, { baseHeight: 12, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 22, 30, { baseHeight: 12, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 23, 30, { baseHeight: 12, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 24, 30, { baseHeight: 12, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 25, 30, { baseHeight: 12, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 26, 30, { baseHeight: 12, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 27, 30, { baseHeight: 12, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 6, 52, { baseHeight: 2, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 7, 52, { baseHeight: 2, kind: 'conveyor', conveyorX: 1, conveyorY: 0 });
+    setSurface(level, 8, 52, { baseHeight: 2, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 6, 53, { baseHeight: 2, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 7, 53, { baseHeight: 2, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 7, 54, { baseHeight: 2, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 8, 54, { baseHeight: 2, kind: 'conveyor', conveyorX: 0, conveyorY: 1 });
+    setSurface(level, 6, 55, { baseHeight: 2, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 7, 55, { baseHeight: 2, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    setSurface(level, 6, 56, { baseHeight: 2, kind: 'conveyor', conveyorX: 0, conveyorY: -1 });
+    setSurface(level, 7, 56, { baseHeight: 2, kind: 'conveyor', conveyorX: -1, conveyorY: 0 });
+    // Hazard tiles
+    setSurface(level, 29, 31, { baseHeight: 12, kind: 'hazard' });
+    setSurface(level, 30, 31, { baseHeight: 12, kind: 'hazard' });
+    setSurface(level, 31, 31, { baseHeight: 12, kind: 'hazard' });
+    setSurface(level, 32, 31, { baseHeight: 12, kind: 'hazard' });
+    setSurface(level, 33, 31, { baseHeight: 12, kind: 'hazard' });
+    setSurface(level, 29, 32, { baseHeight: 12, kind: 'hazard' });
+    setSurface(level, 15, 33, { baseHeight: 12, kind: 'hazard' });
+    setSurface(level, 17, 33, { baseHeight: 12, kind: 'hazard' });
+    setSurface(level, 29, 33, { baseHeight: 12, kind: 'hazard' });
+    setSurface(level, 14, 34, { baseHeight: 12, kind: 'hazard' });
+    setSurface(level, 18, 34, { baseHeight: 12, kind: 'hazard' });
+
+    // --- Timed Gates ---
+    addTimedGate(level, 'gate_1', 19.5, 54, 4, 1, 2);
+    addTimedGate(level, 'gate_2', 29.5, 54, 8, 1, 2);
+    addTimedGate(level, 'gate_3', 36.5, 54, 8, 1, 2);
+
+    // --- Sweepers ---
     addActor(level, {
       id: 'sweep1', kind: ACTOR_KINDS.SWEEPER,
-      x: 35.5, y: 40.5, z: 8, topHeight: 8,
-      width: 2, height: 1, armLength: 2.5, armWidth: 0.22, angularSpeed: 1.6, fatal: true
+      x: 33.5, y: 41.5, z: 8, topHeight: 8,
+      width: 1, height: 1, armLength: 2.5, armWidth: 0.22, angularSpeed: 1.2, fatal: true
     });
     addActor(level, {
       id: 'sweep2', kind: ACTOR_KINDS.SWEEPER,
-      x: 38, y: 40.5, z: 8, topHeight: 8,
-      width: 2, height: 1, armLength: 2.5, armWidth: 0.22, angularSpeed: -1.8, fatal: true
+      x: 35.5, y: 41.5, z: 8, topHeight: 8,
+      width: 1, height: 1, armLength: 2.5, armWidth: 0.22, angularSpeed: 1.5, fatal: true
     });
-    fillTrack(level, 30, 34, 5, 4, 8);
-    // Bounce up to z=12
-    setSurface(level, 31, 35, { baseHeight: 8, shape: SHAPES.FLAT, bounce: 8 });
-    setSurface(level, 32, 35, { baseHeight: 8, shape: SHAPES.FLAT, bounce: 8 });
-    // Phase 4: Narrow bridge at z=12 with conveyor pushing off
-    fillTrack(level, 28, 28, 6, 6, 12);
-    fillTrack(level, 22, 29, 6, 2, 12, { conveyor: { x: 0, y: -3.0, strength: 3.0 } });
-    fillTrack(level, 18, 28, 4, 4, 12);
-    // Gate before final section
-    addTimedGate(level, 'gate2', 18, 29, 12, 4, 1, 1.0, 0.8);
-    fillTrack(level, 14, 28, 4, 4, 12);
-    // Ramp up to z=14
-    placeRamp(level, { x: 15, y: 24, dir: 'north', length: 4, width: 3, startZ: 12, endZ: 14 });
-    fillTrack(level, 14, 20, 4, 4, 14);
-    // Phase 5: Final crumble bridge to peak
-    fillTrack(level, 14, 14, 3, 6, 14, { crumble: { delay: 0.15, respawn: 2.0 } });
-    fillTrack(level, 13, 10, 5, 4, 14);
-    // Ramp to peak at z=16
-    placeRamp(level, { x: 14, y: 6, dir: 'north', length: 4, width: 3, startZ: 14, endZ: 16 });
-    // Goal at the peak
-    fillTrack(level, 13, 2, 5, 4, 16);
-    setGoal(level, 15, 3, 0.55);
-    // Route graph
-    addGraphNode(level, { id: 'start', type: 'entry', x: 6, y: 55, z: 2 });
-    addGraphNode(level, { id: 'p1', type: 'route', x: 21, y: 54, z: 6 });
-    addGraphNode(level, { id: 'p2', type: 'route', x: 38, y: 46, z: 8 });
-    addGraphNode(level, { id: 'p3', type: 'route', x: 37, y: 40, z: 8 });
-    addGraphNode(level, { id: 'p4', type: 'route', x: 22, y: 30, z: 12 });
-    addGraphNode(level, { id: 'goal', type: 'goal', x: 16, y: 4, z: 16 });
-    addGraphEdge(level, { from: 'start', to: 'p1', kind: 'roll', tag: 'crumble' });
-    addGraphEdge(level, { from: 'p1', to: 'p2', kind: 'roll', tag: 'ice' });
-    addGraphEdge(level, { from: 'p2', to: 'p3', kind: 'roll' });
-    addGraphEdge(level, { from: 'p3', to: 'p4', kind: 'roll', tag: 'bounce' });
-    addGraphEdge(level, { from: 'p4', to: 'goal', kind: 'roll', tag: 'crumble' });
+    addActor(level, {
+      id: 'sweep3', kind: ACTOR_KINDS.SWEEPER,
+      x: 37.5, y: 41.5, z: 8, topHeight: 8,
+      width: 1, height: 1, armLength: 2.5, armWidth: 0.22, angularSpeed: 1.7999999999999998, fatal: true
+    });
+    addActor(level, {
+      id: 'sweep4', kind: ACTOR_KINDS.SWEEPER,
+      x: 38.5, y: 53.5, z: 6, topHeight: 6,
+      width: 1, height: 1, armLength: 2.5, armWidth: 0.22, angularSpeed: 1.2, fatal: true
+    });
+
+    // --- Moving Platforms ---
+    addMovingBridge(level, 'plat1', [
+      { x: 12.5, y: 2.5, z: 16 },
+      { x: 7.5, y: 12.5, z: 12 },
+      { x: 4.5, y: 41.5, z: 6 },
+      { x: 4.5, y: 54.5, z: 2 },
+    ], 2, 2, 0.1818, { pauseDuration: 1.5, midpointPause: 0.5 });
+
+    // --- Goal ---
+    setGoal(level, 15.5, 3.5);
+
     return registerLevel(level);
   }
+
 
 
   function generateCourseFromSpec(spec = {}) {
