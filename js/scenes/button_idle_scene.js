@@ -1189,11 +1189,7 @@ function completeIdleGame() {
     }
 
     function renderFrameworkNotes() {
-      elements.frameworkNotes.innerHTML = CONFIG.frameworkNotes
-        .map((note) => `<div class="card"><div class="card-desc">${escapeHtml(note)}</div></div>`)
-        .join('');
-
-      elements.configPreview.textContent = JSON.stringify(CONFIG, null, 2);
+      // Removed - no longer displayed
     }
 
     function renderButtonPosition() {
@@ -1320,7 +1316,7 @@ function completeIdleGame() {
         : 'Idle abuse is currently unavailable. Keep pretending effort matters.';
 
       elements.clockStatus.textContent = `Tick: ${new Date().toLocaleTimeString()}`;
-      elements.versionStatus.textContent = `Framework v${CONFIG.meta.version}`;
+      elements.versionStatus.textContent = `v${CONFIG.meta.version}`;
     }
 
     function render(save = false) {
@@ -1404,7 +1400,7 @@ function completeIdleGame() {
       }
 
       const idleSeconds = (current - s.session.lastClick) / 1000;
-      if (computed.idleEnabled && idleSeconds > 18 && Math.random() < 0.008) {
+      if (computed.idleEnabled && idleSeconds > 18 && Math.random() < 0.0006) {
         const insults = [
           'The game noticed you are absent and rewarded the behavior.',
           'Your lack of involvement is currently optimal.',
@@ -1427,10 +1423,10 @@ function completeIdleGame() {
       }
 
       if (computed.cursorEvasion > 0) maybeMoveButton(false, computed);
-      if ((computed.cursorEvasion > 0 || computed.liarChance > 0.35) && Math.random() < 0.006) {
+      if ((computed.cursorEvasion > 0 || computed.liarChance > 0.35) && Math.random() < 0.002) {
         spawnFakePopup();
       }
-      if (Math.random() < 0.0025) {
+      if (Math.random() < 0.00037) {
         rotateAmbientMessage();
       }
 
