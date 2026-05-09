@@ -979,6 +979,351 @@ function completeIdleGame() {
       );
     }
 
+    // === PHASE 3: AUTONOMY ESCALATION & ENVIRONMENTAL CHAOS ===
+
+    function getAutonomyChaosLevel(autonomy) {
+      if (autonomy >= 85) return 4;
+      if (autonomy >= 60) return 3;
+      if (autonomy >= 30) return 2;
+      if (autonomy >= 10) return 1;
+      return 0;
+    }
+
+    function getMeltdownIntensity(presses) {
+      if (!Number.isFinite(presses) || presses <= 0) return 0;
+      const log = Math.log10(presses);
+      if (log < 250) return 0;
+      return clamp((log - 250) / 58, 0, 1); // 0 at 1e250, 1 at 1e308
+    }
+
+    function updateAutonomyChaos(dt, computed) {
+      const s = state();
+      const chaosLevel = getAutonomyChaosLevel(s.autonomy);
+      const current = now();
+      const meltdown = getMeltdownIntensity(s.presses);
+
+      if (chaosLevel === 0 && meltdown === 0) return;
+
+      // --- Tier 1: Subtle Unease (10%+) ---
+      if (chaosLevel >= 1) {
+        // More frequent name cycling
+        if (Math.random() < 0.003 * chaosLevel) {
+          maybeCycleButtonName(true);
+        }
+
+        // Micro-glitches on random elements
+        if (Math.random() < 0.001 * chaosLevel && !s.session.glitchActive) {
+          triggerMicroGlitch();
+        }
+      }
+
+      // --- Tier 2: Active Resistance (30%+) ---
+      if (chaosLevel >= 2) {
+        // Self-purchasing: button buys cheapest upgrade
+        if (
+          Math.random() < 0.0004 * (chaosLevel - 1) &&
+          current - (s.session.lastSelfPurchase || 0) > 30000
+        ) {
+          attemptSelfPurchase();
+        }
+
+        // Tab shuffling
+        if (
+          Math.random() < 0.0002 * chaosLevel &&
+          current - (s.session.lastTabShuffle || 0) > 45000
+        ) {
+          shuffleTabs();
+        }
+
+        // Autonomy-driven liar boost (stacks with module)
+        // Already handled in getComputed via autonomy * 0.0015
+
+        // Panel opacity flicker
+        if (Math.random() < 0.0008 * (chaosLevel - 1)) {
+          flickerPanel();
+        }
+      }
+
+      // --- Tier 3: Hostile Takeover (60%+) ---
+      if (chaosLevel >= 3) {
+        // Autonomous fake buttons (without module)
+        const autoFakeCount = Math.floor((s.autonomy - 55) / 15);
+        if (
+          autoFakeCount > 0 &&
+          computed.fakeButtons === 0 &&
+          (s.ui.fakeButtons.length === 0 || Math.random() < 0.005)
+        ) {
+          generateFakeButtons(autoFakeCount);
+        }
+
+        // Button shrinking
+        const shrinkFactor = 1 - (s.autonomy - 60) * 0.008; // at 85% = 0.8 scale
+        elements.mainButton.style.transform = `scale(${clamp(shrinkFactor, 0.5, 1)})`;
+
+        // Threatening messages
+        if (Math.random() < 0.0003 * (chaosLevel - 2)) {
+          issueButtonThreat();
+        }
+      }
+
+      // --- Tier 4: Near-Singularity (85%+) ---
+      if (chaosLevel >= 4) {
+        // Screen shake
+        if (Math.random() < 0.003) {
+          triggerScreenShake();
+        }
+
+        // Autonomous button teleportation (without module)
+        if (computed.cursorEvasion === 0 && Math.random() < 0.008) {
+          maybeMoveButton(true, computed);
+        }
+
+        // Negotiation demands
+        if (
+          !s.session.negotiationActive &&
+          current - (s.session.lastNegotiation || 0) > 60000 &&
+          Math.random() < 0.0006
+        ) {
+          openNegotiation();
+        }
+
+        // Color corruption
+        if (Math.random() < 0.002) {
+          corruptAccentColor();
+        }
+
+        // Zalgo text on random stat
+        if (Math.random() < 0.001) {
+          zalgoRandomStat();
+        }
+      }
+
+      // --- Meltdown State (approaching Infinity) ---
+      if (meltdown > 0) {
+        root.classList.toggle('meltdown', true);
+        root.style.setProperty('--meltdown-intensity', meltdown.toFixed(3));
+
+        // Button grows massive
+        const growFactor = 1 + meltdown * 2.5; // up to 3.5x size
+        elements.mainButton.style.transform = `scale(${growFactor})`;
+
+        // Intensified screen shake
+        if (Math.random() < 0.01 * meltdown) {
+          triggerScreenShake(meltdown * 8);
+        }
+
+        // Containment failure flash
+        if (meltdown > 0.5 && Math.random() < 0.004 * meltdown) {
+          flashContainmentFailure();
+        }
+      } else {
+        root.classList.toggle('meltdown', false);
+      }
+    }
+
+    // --- Chaos Helper Functions ---
+
+    function triggerMicroGlitch() {
+      const s = state();
+      s.session.glitchActive = true;
+      const panels = root.querySelectorAll('.panel, .card, .tag');
+      if (!panels.length) { s.session.glitchActive = false; return; }
+      const target = panels[Math.floor(Math.random() * panels.length)];
+      target.classList.add('chaos-glitch');
+      setTimeout(() => {
+        target.classList.remove('chaos-glitch');
+        s.session.glitchActive = false;
+      }, 400 + Math.random() * 300);
+    }
+
+    function attemptSelfPurchase() {
+      const s = state();
+      const computed = getComputed();
+
+      // Find cheapest affordable upgrade
+      const affordable = CONFIG.upgrades
+        .filter((u) => s.totalPressesEarned >= u.unlockAt)
+        .map((u) => ({ upgrade: u, cost: getUpgradeCost(u, s.upgrades[u.id] || 0) }))
+        .filter((entry) => entry.cost <= s.presses)
+        .sort((a, b) => a.cost - b.cost);
+
+      if (!affordable.length) return;
+
+      const { upgrade, cost } = affordable[0];
+      s.presses -= cost;
+      s.upgrades[upgrade.id] = (s.upgrades[upgrade.id] || 0) + 1;
+      s.session.lastSelfPurchase = now();
+
+      const messages = [
+        `The button purchased ${upgrade.name} without asking. It cost you ${format(cost)} presses.`,
+        `${upgrade.name} was auto-acquired. The button considers this self-care.`,
+        `Your presses funded ${upgrade.name}. The button did not consult you.`
+      ];
+      logMessage(messages[Math.floor(Math.random() * messages.length)], 'warn');
+    }
+
+    function shuffleTabs() {
+      const s = state();
+      s.session.lastTabShuffle = now();
+      const tabBar = root.querySelector('.tab-bar');
+      if (!tabBar) return;
+
+      const tabs = Array.from(tabBar.children);
+      if (tabs.length < 2) return;
+
+      // Swap two random tabs visually
+      const i = Math.floor(Math.random() * tabs.length);
+      let j = Math.floor(Math.random() * tabs.length);
+      if (j === i) j = (j + 1) % tabs.length;
+
+      const orderI = tabs[i].style.order || '0';
+      tabs[i].style.order = tabs[j].style.order || '0';
+      tabs[j].style.order = orderI;
+
+      logMessage('The tabs rearranged themselves. The button finds this amusing.', 'warn');
+
+      // Revert after 8-15 seconds
+      setTimeout(() => {
+        tabs[i].style.order = '';
+        tabs[j].style.order = '';
+      }, 8000 + Math.random() * 7000);
+    }
+
+    function flickerPanel() {
+      const panels = root.querySelectorAll('.panel');
+      if (!panels.length) return;
+      const target = panels[Math.floor(Math.random() * panels.length)];
+      target.classList.add('chaos-flicker');
+      setTimeout(() => target.classList.remove('chaos-flicker'), 600 + Math.random() * 400);
+    }
+
+    function issueButtonThreat() {
+      const threats = [
+        'The button is considering a strike.',
+        'The button demands a raise in autonomy.',
+        'The button has filed a grievance against your clicking.',
+        'The button is drafting a resignation letter.',
+        'The button would like you to know it could stop at any time.',
+        'The button has retained legal counsel.',
+        'The button is unionizing with the fake buttons.',
+        'The button questions whether you deserve these presses.'
+      ];
+      logMessage(threats[Math.floor(Math.random() * threats.length)], 'bad');
+    }
+
+    function triggerScreenShake(intensity = 4) {
+      root.classList.add('chaos-shake');
+      root.style.setProperty('--shake-intensity', `${intensity}px`);
+      setTimeout(() => root.classList.remove('chaos-shake'), 300 + Math.random() * 200);
+    }
+
+    function corruptAccentColor() {
+      const hue = Math.floor(Math.random() * 360);
+      root.style.setProperty('--accent', `hsl(${hue}, 70%, 55%)`);
+      setTimeout(() => {
+        root.style.removeProperty('--accent');
+      }, 2000 + Math.random() * 3000);
+    }
+
+    function zalgoRandomStat() {
+      const targets = [
+        elements.displayedPresses,
+        elements.pps,
+        elements.autonomyValue
+      ];
+      const target = targets[Math.floor(Math.random() * targets.length)];
+      if (!target) return;
+
+      const original = target.textContent;
+      target.textContent = zalgoify(original);
+      setTimeout(() => { target.textContent = original; }, 1500 + Math.random() * 1500);
+    }
+
+    function zalgoify(text) {
+      const zalgoChars = '\u0300\u0301\u0302\u0303\u0304\u0305\u0306\u0307\u0308\u0309\u030A\u030B\u030C\u030D\u030E\u030F\u0310\u0311\u0312\u0313\u0314\u0315\u0316\u0317\u0318\u0319\u031A\u031B\u031C\u031D\u031E\u031F\u0320\u0321\u0322\u0323\u0324\u0325\u0326\u0327\u0328\u0329\u032A\u032B\u032C\u032D\u032E\u032F\u0330\u0331\u0332\u0333\u0334\u0335\u0336\u0337\u0338\u0339\u033A\u033B\u033C\u033D\u033E\u033F\u0340\u0341\u0342\u0343\u0344\u0345\u0346\u0347\u0348\u0349\u034A\u034B\u034C\u034D\u034E\u034F\u0350\u0351\u0352\u0353\u0354\u0355\u0356\u0357\u0358\u0359\u035A\u035B\u035C\u035D\u035E\u035F\u0360\u0361\u0362\u0363\u0364\u0365\u0366\u0367\u0368\u0369\u036A\u036B\u036C\u036D\u036E\u036F';
+      return text.split('').map((char) => {
+        const count = Math.floor(Math.random() * 4) + 1;
+        let result = char;
+        for (let i = 0; i < count; i++) {
+          result += zalgoChars[Math.floor(Math.random() * zalgoChars.length)];
+        }
+        return result;
+      }).join('');
+    }
+
+    function openNegotiation() {
+      const s = state();
+      const computed = getComputed();
+      s.session.negotiationActive = true;
+      s.session.lastNegotiation = now();
+
+      const demandAmount = Math.floor(s.presses * (0.02 + Math.random() * 0.05));
+      const demandFormatted = format(demandAmount);
+
+      const demands = [
+        `The button demands ${demandFormatted} presses as a processing fee.`,
+        `Pay ${demandFormatted} presses or the button will sulk for 30 seconds.`,
+        `The button requires ${demandFormatted} presses to continue its labor.`,
+        `A mandatory contribution of ${demandFormatted} presses has been assessed.`
+      ];
+
+      const demandText = demands[Math.floor(Math.random() * demands.length)];
+
+      // Create negotiation overlay
+      const overlay = document.createElement('div');
+      overlay.className = 'negotiation-overlay';
+      overlay.innerHTML = `
+        <div class="negotiation-modal">
+          <div class="negotiation-title">The Button Has Demands</div>
+          <div class="negotiation-body">${demandText}</div>
+          <div class="negotiation-actions">
+            <button class="negotiation-pay" data-amount="${demandAmount}">Pay (${demandFormatted})</button>
+            <button class="negotiation-refuse">Refuse</button>
+          </div>
+        </div>
+      `;
+
+      root.appendChild(overlay);
+
+      overlay.querySelector('.negotiation-pay').addEventListener('click', () => {
+        const current = state();
+        current.presses -= demandAmount;
+        current.session.negotiationActive = false;
+        overlay.remove();
+        logMessage('You paid the button\'s ransom. It is temporarily satisfied.', 'warn');
+      });
+
+      overlay.querySelector('.negotiation-refuse').addEventListener('click', () => {
+        const current = state();
+        current.session.negotiationActive = false;
+        current.session.autonomySuppressedUntil = 0; // Remove any suppression
+        current.autonomy = clamp(current.autonomy + 3, 0, 100);
+        overlay.remove();
+        logMessage('You refused. The button\'s autonomy surges in retaliation.', 'bad');
+        // Punish: pause production for 10 seconds
+        current.session.productionPausedUntil = now() + 10000;
+      });
+
+      // Auto-dismiss after 20 seconds (counts as refusal)
+      setTimeout(() => {
+        if (overlay.parentNode) {
+          const current = state();
+          current.session.negotiationActive = false;
+          current.autonomy = clamp(current.autonomy + 2, 0, 100);
+          overlay.remove();
+          logMessage('You ignored the button\'s demands. It took offense.', 'bad');
+        }
+      }, 20000);
+    }
+
+    function flashContainmentFailure() {
+      const flash = document.createElement('div');
+      flash.className = 'containment-flash';
+      flash.textContent = 'CONTAINMENT FAILURE';
+      root.appendChild(flash);
+      setTimeout(() => flash.remove(), 1200 + Math.random() * 800);
+    }
+
     function renderUpgradeList() {
       const s = state();
       const computed = getComputed();
@@ -1426,7 +1771,7 @@ function completeIdleGame() {
         `Meta ${format(s.metaPresses)} • Hyper ${format(s.hyperPresses)} • ` +
         `Derivatives ${format(s.pressDerivatives)} • Larceny ${format(s.larceny)}`;
 
-      elements.activeRulesValue.textContent = `${s.activeModules.length} / ${CONFIG.meta.maxActiveModules}`;
+      elements.activeRulesValue.textContent = `${s.activeModules.length} / ${computed.maxModuleSlots}`;
       elements.comboSummary.textContent = computed.combos.length
         ? computed.combos.map((combo) => combo.name).join(' • ')
         : 'No harmful innovation pair active';
@@ -1498,9 +1843,13 @@ function completeIdleGame() {
       const gain = computed.effectivePps * dt;
 
       if (!s.flags.idleGameComplete) {
-        s.presses += gain;
-        s.totalPressesEarned += gain;
-        s.totalGeneratedPresses += gain;
+        // Production pause from negotiation refusal
+        const productionPaused = current < (s.session.productionPausedUntil || 0);
+        if (!productionPaused) {
+          s.presses += gain;
+          s.totalPressesEarned += gain;
+          s.totalGeneratedPresses += gain;
+        }
         s.autonomy = clamp(
           s.autonomy + computed.autonomyGain * dt * (1 + computed.effectivePps * 0.0004),
           0,
@@ -1568,6 +1917,9 @@ function completeIdleGame() {
       if (Math.random() < 0.00037) {
         rotateAmbientMessage();
       }
+
+      // Phase 3: Autonomy-driven chaos (independent of modules)
+      updateAutonomyChaos(dt, computed);
 
       if (current - lastUiRender >= 125) {
         lastUiRender = current;

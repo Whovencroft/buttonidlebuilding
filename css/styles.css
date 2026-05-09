@@ -1423,3 +1423,178 @@
 .small.bad {
   color: #ef5350;
 }
+
+
+/* === PHASE 3: AUTONOMY CHAOS EFFECTS === */
+
+/* Micro-glitch effect */
+@keyframes chaos-glitch-anim {
+  0% { transform: translate(0); filter: none; }
+  20% { transform: translate(-2px, 1px); filter: hue-rotate(90deg); }
+  40% { transform: translate(2px, -1px); filter: saturate(2); }
+  60% { transform: translate(-1px, 2px); filter: hue-rotate(-60deg) brightness(1.3); }
+  80% { transform: translate(1px, -2px); filter: invert(0.1); }
+  100% { transform: translate(0); filter: none; }
+}
+
+.chaos-glitch {
+  animation: chaos-glitch-anim 0.4s ease-in-out;
+}
+
+/* Panel flicker */
+@keyframes chaos-flicker-anim {
+  0% { opacity: 1; }
+  25% { opacity: 0.3; }
+  50% { opacity: 0.8; }
+  75% { opacity: 0.2; }
+  100% { opacity: 1; }
+}
+
+.chaos-flicker {
+  animation: chaos-flicker-anim 0.6s ease-in-out;
+}
+
+/* Screen shake */
+@keyframes chaos-shake-anim {
+  0% { transform: translate(0, 0); }
+  10% { transform: translate(var(--shake-intensity, 4px), calc(var(--shake-intensity, 4px) * -0.5)); }
+  20% { transform: translate(calc(var(--shake-intensity, 4px) * -0.8), var(--shake-intensity, 4px)); }
+  30% { transform: translate(var(--shake-intensity, 4px), calc(var(--shake-intensity, 4px) * 0.3)); }
+  40% { transform: translate(calc(var(--shake-intensity, 4px) * -0.5), calc(var(--shake-intensity, 4px) * -0.8)); }
+  50% { transform: translate(calc(var(--shake-intensity, 4px) * 0.7), var(--shake-intensity, 4px)); }
+  60% { transform: translate(calc(var(--shake-intensity, 4px) * -0.3), calc(var(--shake-intensity, 4px) * -0.5)); }
+  70% { transform: translate(var(--shake-intensity, 4px), calc(var(--shake-intensity, 4px) * 0.2)); }
+  80% { transform: translate(calc(var(--shake-intensity, 4px) * -0.6), var(--shake-intensity, 4px)); }
+  90% { transform: translate(calc(var(--shake-intensity, 4px) * 0.4), calc(var(--shake-intensity, 4px) * -0.3)); }
+  100% { transform: translate(0, 0); }
+}
+
+.chaos-shake {
+  animation: chaos-shake-anim 0.3s ease-in-out;
+}
+
+/* Negotiation overlay */
+.negotiation-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(5, 8, 12, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9000;
+  backdrop-filter: blur(3px);
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.negotiation-modal {
+  background: #141c28;
+  border: 1px solid rgba(255, 152, 0, 0.4);
+  border-radius: 14px;
+  padding: 28px 32px;
+  max-width: 420px;
+  width: 90%;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), 0 0 12px rgba(255, 152, 0, 0.15);
+}
+
+.negotiation-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #ffb74d;
+  margin-bottom: 12px;
+}
+
+.negotiation-body {
+  font-size: 0.88rem;
+  color: #dce5ef;
+  line-height: 1.5;
+  margin-bottom: 18px;
+}
+
+.negotiation-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.negotiation-pay {
+  flex: 1;
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: 1px solid rgba(76, 175, 80, 0.5);
+  background: rgba(76, 175, 80, 0.12);
+  color: #81c784;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.negotiation-pay:hover {
+  background: rgba(76, 175, 80, 0.25);
+  border-color: #81c784;
+}
+
+.negotiation-refuse {
+  flex: 1;
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: 1px solid rgba(244, 67, 54, 0.5);
+  background: rgba(244, 67, 54, 0.12);
+  color: #ef5350;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.negotiation-refuse:hover {
+  background: rgba(244, 67, 54, 0.25);
+  border-color: #ef5350;
+}
+
+/* Containment failure flash */
+@keyframes containment-flash-anim {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+  15% { opacity: 1; transform: translate(-50%, -50%) scale(1.05); }
+  85% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(1.1); }
+}
+
+.containment-flash {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 2.2rem;
+  font-weight: 900;
+  color: #ff1744;
+  text-shadow: 0 0 20px rgba(255, 23, 68, 0.8), 0 0 40px rgba(255, 23, 68, 0.4);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  z-index: 9500;
+  pointer-events: none;
+  animation: containment-flash-anim 1.2s ease-out forwards;
+  white-space: nowrap;
+}
+
+/* Meltdown state */
+.meltdown {
+  --meltdown-glow: rgba(255, 23, 68, calc(var(--meltdown-intensity, 0) * 0.15));
+  box-shadow: inset 0 0 60px var(--meltdown-glow);
+}
+
+.meltdown .button-stage {
+  border-color: rgba(255, 23, 68, calc(var(--meltdown-intensity, 0) * 0.5));
+}
+
+@keyframes meltdown-pulse {
+  0%, 100% { filter: brightness(1); }
+  50% { filter: brightness(calc(1 + var(--meltdown-intensity, 0) * 0.3)); }
+}
+
+.meltdown #mainButton {
+  animation: meltdown-pulse 0.8s ease-in-out infinite;
+  box-shadow: 0 0 calc(var(--meltdown-intensity, 0) * 30px) rgba(255, 23, 68, 0.5);
+}
