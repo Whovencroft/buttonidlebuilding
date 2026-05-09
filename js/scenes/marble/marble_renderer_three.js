@@ -701,7 +701,7 @@
       const isBounce   = !!cell.bounce;
       const isConveyor = !!cell.conveyor;
       const isCrumble  = !!cell.crumble;
-      const isIce      = !isCrumble && !isBounce && !isConveyor && (cell.friction ?? 1) < 0.45;
+      const isIce      = !isCrumble && !isBounce && !isConveyor && (cell.friction ?? 1) < 0.65;
       if (!cell.shape || cell.shape === 'flat') {
         const z = cell.baseHeight;
         if (isCrumble) {

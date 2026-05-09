@@ -929,11 +929,11 @@
     marble.grounded = false;
     // Bounce strength: 2.5x the old jump height.
     // Old jump impulse was 6.9 (max height ~1.06 units).
-    // New bounce target: ~2.65 units height → impulse = sqrt(2 * g * h) = sqrt(2 * 22.5 * 2.65) ≈ 10.9
-    // We scale the tile's bounce value by 1.58 to achieve this (6.9 * 1.58 ≈ 10.9)
+    // New bounce target: ~2.65 units height → impulse = sqrt(2 * g * h) = sqrt(2 * 22.5 * 2.65) ≈ 10.92
+    // Tile bounce value is 6, so multiplier = 10.92 / 6 = 1.82
     const bounceStrength = (typeof groundSurface.bounce === 'object')
-      ? (groundSurface.bounce.strength ?? 5.2) * 1.58
-      : groundSurface.bounce * 1.58;
+      ? (groundSurface.bounce.strength ?? 6) * 1.82
+      : groundSurface.bounce * 1.82;
     marble.vz = Math.max(marble.vz, bounceStrength);
     marble.z = groundSurface.z + marble.collisionRadius + 0.05;
     marble.bounceCooldownTime = BOUNCE_COOLDOWN;
