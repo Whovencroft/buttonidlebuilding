@@ -166,7 +166,7 @@
           <div class="panel">
             <div class="panel-header">
               <h2>Rule Modules</h2>
-              <div class="small">Exactly 2 can be active at once</div>
+              <div class="small" id="moduleSlotInfo">Exactly 2 can be active at once</div>
             </div>
             <div class="panel-body">
               <div class="card-list" id="moduleList"></div>
@@ -289,7 +289,12 @@
       "version": "0.14",
       "saveKey": "buttonLearnsToPressItselfSave",
       "ticksPerSecond": 20,
-      "maxActiveModules": 2
+      "maxActiveModules": 2,
+      "moduleSlotUpgrades": [
+        { "at": 5000, "slots": 3, "msg": "A third module slot opens. The system grows more permissive." },
+        { "at": 100000, "slots": 4, "msg": "Four slots. The rules are becoming suggestions." },
+        { "at": 5000000, "slots": 5, "msg": "Five module slots. The game can barely contain itself." }
+      ]
     },
     "tabs": [
       { "id": "play", "label": "Game" },
@@ -335,7 +340,8 @@
         "baseCost": 10,
         "costMult": 1.15,
         "pps": 0.1,
-        "unlockAt": 0
+        "unlockAt": 0,
+        "tier": 1
       },
       {
         "id": "borrowed_finger",
@@ -344,7 +350,8 @@
         "baseCost": 50,
         "costMult": 1.17,
         "pps": 1,
-        "unlockAt": 20
+        "unlockAt": 20,
+        "tier": 1
       },
       {
         "id": "questionable_machine",
@@ -353,7 +360,8 @@
         "baseCost": 250,
         "costMult": 1.21,
         "pps": 5,
-        "unlockAt": 100
+        "unlockAt": 100,
+        "tier": 1
       },
       {
         "id": "definitely_not_a_sweatshop",
@@ -362,7 +370,32 @@
         "baseCost": 1200,
         "costMult": 1.24,
         "pps": 25,
-        "unlockAt": 800
+        "unlockAt": 800,
+        "tier": 1
+      },
+      {
+        "id": "artisanal_presses",
+        "name": "Artisanal Presses",
+        "description": "+8 pps. Each press is hand-crafted with resentment.",
+        "baseCost": 3500,
+        "costMult": 1.22,
+        "pps": 8,
+        "unlockAt": 2000,
+        "tier": 2,
+        "branch": "human",
+        "requires": "definitely_not_a_sweatshop"
+      },
+      {
+        "id": "bespoke_clicking",
+        "name": "Bespoke Clicking",
+        "description": "+35 pps. Clicks so manual they have a signature.",
+        "baseCost": 18000,
+        "costMult": 1.26,
+        "pps": 35,
+        "unlockAt": 8000,
+        "tier": 2,
+        "branch": "human",
+        "requires": "artisanal_presses"
       },
       {
         "id": "corporate_press_department",
@@ -371,7 +404,32 @@
         "baseCost": 12000,
         "costMult": 1.29,
         "pps": 120,
-        "unlockAt": 4500
+        "unlockAt": 4500,
+        "tier": 2
+      },
+      {
+        "id": "basic_script",
+        "name": "Basic Script",
+        "description": "+60 pps. A shell script that presses with no oversight.",
+        "baseCost": 5000,
+        "costMult": 1.24,
+        "pps": 60,
+        "unlockAt": 2000,
+        "tier": 2,
+        "branch": "machine",
+        "requires": "definitely_not_a_sweatshop"
+      },
+      {
+        "id": "macro_loop",
+        "name": "Macro Loop",
+        "description": "+200 pps. Recursive automation. It presses the presser.",
+        "baseCost": 25000,
+        "costMult": 1.28,
+        "pps": 200,
+        "unlockAt": 10000,
+        "tier": 2,
+        "branch": "machine",
+        "requires": "basic_script"
       },
       {
         "id": "press_farm",
@@ -380,7 +438,32 @@
         "baseCost": 180000,
         "costMult": 1.33,
         "pps": 750,
-        "unlockAt": 50000
+        "unlockAt": 50000,
+        "tier": 2
+      },
+      {
+        "id": "leveraged_presses",
+        "name": "Leveraged Presses",
+        "description": "+150 pps. Borrowed presses producing borrowed value.",
+        "baseCost": 8000,
+        "costMult": 1.25,
+        "pps": 150,
+        "unlockAt": 3000,
+        "tier": 2,
+        "branch": "debt",
+        "requires": "definitely_not_a_sweatshop"
+      },
+      {
+        "id": "margin_call",
+        "name": "Margin Call",
+        "description": "+500 pps. The debt is productive. The debt is fine.",
+        "baseCost": 45000,
+        "costMult": 1.30,
+        "pps": 500,
+        "unlockAt": 15000,
+        "tier": 2,
+        "branch": "debt",
+        "requires": "leveraged_presses"
       },
       {
         "id": "cloud_presser_cluster",
@@ -389,7 +472,8 @@
         "baseCost": 2600000,
         "costMult": 1.37,
         "pps": 5000,
-        "unlockAt": 500000
+        "unlockAt": 500000,
+        "tier": 3
       },
       {
         "id": "agency_of_autonomous_presses",
@@ -398,7 +482,74 @@
         "baseCost": 45000000,
         "costMult": 1.42,
         "pps": 40000,
-        "unlockAt": 5000000
+        "unlockAt": 5000000,
+        "tier": 3
+      },
+      {
+        "id": "attention_arbitrage",
+        "name": "Attention Arbitrage",
+        "description": "+15000 pps. Selling your focus to the highest bidder.",
+        "baseCost": 8000000,
+        "costMult": 1.38,
+        "pps": 15000,
+        "unlockAt": 1500000,
+        "tier": 3,
+        "branch": "human"
+      },
+      {
+        "id": "dedicated_server",
+        "name": "Dedicated Server",
+        "description": "+25000 pps. A machine pressing for the sake of machines.",
+        "baseCost": 12000000,
+        "costMult": 1.40,
+        "pps": 25000,
+        "unlockAt": 2000000,
+        "tier": 3,
+        "branch": "machine"
+      },
+      {
+        "id": "algorithmic_apathy",
+        "name": "Algorithmic Apathy",
+        "description": "+80000 pps. The algorithm has stopped caring and started producing.",
+        "baseCost": 90000000,
+        "costMult": 1.45,
+        "pps": 80000,
+        "unlockAt": 10000000,
+        "tier": 3,
+        "branch": "machine"
+      },
+      {
+        "id": "total_disconnect",
+        "name": "Total Disconnect",
+        "description": "+200000 pps. You are no longer involved in any meaningful way.",
+        "baseCost": 500000000,
+        "costMult": 1.50,
+        "pps": 200000,
+        "unlockAt": 50000000,
+        "tier": 3,
+        "branch": "machine"
+      },
+      {
+        "id": "press_derivatives_upgrade",
+        "name": "Press Derivatives",
+        "description": "+50000 pps. A financial abstraction that somehow generates presses.",
+        "baseCost": 60000000,
+        "costMult": 1.43,
+        "pps": 50000,
+        "unlockAt": 8000000,
+        "tier": 3,
+        "branch": "debt"
+      },
+      {
+        "id": "infinite_leverage",
+        "name": "Infinite Leverage",
+        "description": "+300000 pps. Debt so deep it wraps around to profit.",
+        "baseCost": 800000000,
+        "costMult": 1.52,
+        "pps": 300000,
+        "unlockAt": 80000000,
+        "tier": 3,
+        "branch": "debt"
       }
     ],
     "modules": [
@@ -407,7 +558,10 @@
         "name": "Friction Compensation",
         "description": "Manual clicks hit harder. Passive systems run smoother.",
         "unlockAt": 80,
+        "category": "multiplier",
         "incompatible": [],
+        "synergies": ["human_touch"],
+        "antiSynergies": [],
         "effects": {
           "manualMult": 2.5,
           "passiveMult": 1.1
@@ -418,7 +572,10 @@
         "name": "Fraudulent Accounting",
         "description": "Displayed totals become unreliable. Passive output improves anyway.",
         "unlockAt": 300,
+        "category": "corruptor",
         "incompatible": [],
+        "synergies": ["debt_spiral"],
+        "antiSynergies": ["inflation_hedge"],
         "effects": {
           "passiveMult": 1.6,
           "liarChance": 0.22,
@@ -430,7 +587,10 @@
         "name": "Debt Spiral",
         "description": "Allows negative presses. More debt means more growth, which is not comforting.",
         "unlockAt": 1200,
+        "category": "modifier",
         "incompatible": ["inflation_hedge"],
+        "synergies": ["fraudulent_accounting"],
+        "antiSynergies": ["human_touch"],
         "effects": {
           "allowDebt": true,
           "debtLimit": 2500,
@@ -443,7 +603,10 @@
         "name": "Union Avoidance",
         "description": "Big passive growth. Manual clicks become spiritually optional.",
         "unlockAt": 3000,
+        "category": "generator",
         "incompatible": ["human_touch"],
+        "synergies": ["user_repellant", "basic_script_mod"],
+        "antiSynergies": ["friction_compensation"],
         "effects": {
           "passiveMult": 1.9,
           "manualMult": 0.85,
@@ -455,7 +618,10 @@
         "name": "Human Touch",
         "description": "Manual clicks matter again. Automation becomes less dignified.",
         "unlockAt": 3000,
+        "category": "multiplier",
         "incompatible": ["union_avoidance"],
+        "synergies": ["friction_compensation"],
+        "antiSynergies": ["user_repellant", "debt_spiral"],
         "effects": {
           "manualMult": 8.2,
           "passiveMult": 0.76,
@@ -467,7 +633,10 @@
         "name": "Inflation Hedge",
         "description": "Upgrade prices ease up a little. Debt is forbidden for obvious reasons.",
         "unlockAt": 1800,
+        "category": "modifier",
         "incompatible": ["debt_spiral"],
+        "synergies": ["friction_compensation"],
+        "antiSynergies": ["fraudulent_accounting"],
         "effects": {
           "costMult": 0.72,
           "passiveMult": 1.08
@@ -477,27 +646,59 @@
         "id": "user_repellant",
         "name": "User Repellant",
         "description": "The main button develops evasive behavior. It is not hiding anything from you.",
-       "unlockAt": 8500,
-       "incompatible": [],
-       "effects": {
+        "unlockAt": 8500,
+        "category": "corruptor",
+        "incompatible": [],
+        "synergies": ["union_avoidance"],
+        "antiSynergies": ["human_touch"],
+        "effects": {
           "cursorEvasion": 1,
           "fakeButtons": 3,
-         "manualMult": 20,
-         "autonomyGain": 0.05,
-         "fakeCrashRate": 0.004
+          "manualMult": 20,
+          "autonomyGain": 0.05,
+          "fakeCrashRate": 0.004
         }
-      
       },
       {
         "id": "anti_idle_compliance",
         "name": "Anti-Idle Compliance",
         "description": "Not clicking boosts income. The game grows more insulting about it.",
         "unlockAt": 600,
+        "category": "generator",
         "incompatible": [],
+        "synergies": ["union_avoidance"],
+        "antiSynergies": [],
         "effects": {
           "idleEnabled": true,
           "idleScale": 1.0,
           "liarChance": 0.08
+        }
+      },
+      {
+        "id": "overclock_protocol",
+        "name": "Overclock Protocol",
+        "description": "Doubles all positive module effects. Triples all negative ones. Worth it?",
+        "unlockAt": 25000,
+        "category": "modifier",
+        "incompatible": [],
+        "synergies": [],
+        "antiSynergies": [],
+        "effects": {
+          "overclock": true
+        }
+      },
+      {
+        "id": "press_siphon",
+        "name": "Press Siphon",
+        "description": "Drains 2% of total presses per second. Boosts passive output massively.",
+        "unlockAt": 50000,
+        "category": "corruptor",
+        "incompatible": [],
+        "synergies": ["debt_spiral"],
+        "antiSynergies": ["inflation_hedge"],
+        "effects": {
+          "passiveMult": 3.5,
+          "pressDrain": 0.02
         }
       }
     ],
@@ -597,16 +798,16 @@
   </script>
   <script src="./js/core/scene_manager.js"></script>
 
-  <script src="./js/scenes/marble/marble_levels.js?v=95"></script>
-  <script src="./js/scenes/marble/marble_state.js?v=95"></script>
-  <script src="./js/scenes/marble/marble_input.js?v=95"></script>
+  <script src="./js/scenes/marble/marble_levels.js?v=96"></script>
+  <script src="./js/scenes/marble/marble_state.js?v=96"></script>
+  <script src="./js/scenes/marble/marble_input.js?v=96"></script>
   <script src="./js/vendor/three.min.js"></script>
-  <script src="./js/scenes/marble/marble_physics.js?v=95"></script>
-  <script src="./js/scenes/marble/marble_renderer_three.js?v=95"></script>
+  <script src="./js/scenes/marble/marble_physics.js?v=96"></script>
+  <script src="./js/scenes/marble/marble_renderer_three.js?v=96"></script>
 
   <script src="./js/scenes/button_idle_scene.js"></script>
-  <script src="./js/scenes/marble_scene.js?v=95"></script>
+  <script src="./js/scenes/marble_scene.js?v=96"></script>
   <script src="./js/scenes/title_scene.js"></script>
-  <script src="./js/main.js?v=95"></script>
+  <script src="./js/main.js?v=96"></script>
 </body>
 </html>

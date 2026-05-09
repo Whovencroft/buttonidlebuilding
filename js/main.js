@@ -18,6 +18,7 @@
       larceny: 0,
       upgrades: Object.fromEntries(CONFIG.upgrades.map((u) => [u.id, 0])),
       activeModules: [],
+      overclockedModules: [],
       unlockedLayers: [],
       stats: {
         clicks: 0,
@@ -232,6 +233,7 @@
     switchButtonSceneBtn: $('switchButtonSceneBtn'),
     switchMarbleSceneBtn: $('switchMarbleSceneBtn'),
     particleLayer: $('particleLayer'),
+    moduleSlotInfo: $('moduleSlotInfo'),
     minimalPressCounter: $('minimalPressCounter')
   };
 

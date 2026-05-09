@@ -393,21 +393,41 @@ function completeIdleGame() {
       const autonomySuppressed = now() < (s.session.autonomySuppressedUntil || 0);
       const activeModules = s.activeModules.map(getModuleById).filter(Boolean);
 
+      // --- Dynamic module slot count ---
+      let maxModuleSlots = CONFIG.meta.maxActiveModules;
+      for (const slotUpgrade of (CONFIG.meta.moduleSlotUpgrades || [])) {
+        if (s.totalPressesEarned >= slotUpgrade.at) {
+          maxModuleSlots = Math.max(maxModuleSlots, slotUpgrade.slots);
+        }
+      }
+
+      // --- Overclocking check ---
+      const isOverclocked = (modId) => (s.overclockedModules || []).includes(modId);
+      const overclockProtocolActive = s.activeModules.includes('overclock_protocol');
+
       for (const mod of activeModules) {
         const fx = mod.effects || {};
-        if (fx.manualMult) manualMult *= fx.manualMult;
-        if (fx.passiveMult) passiveMult *= fx.passiveMult;
-        if (fx.costMult) costMult *= fx.costMult;
-        if (fx.liarChance) liarChance += fx.liarChance;
-        if (fx.autonomyGain) autonomyGain += fx.autonomyGain;
+        // Skip the overclock_protocol module itself (it's a meta-module)
+        if (fx.overclock) continue;
+
+        // Determine overclock multiplier for this module
+        const oc = overclockProtocolActive && isOverclocked(mod.id);
+        const posMult = oc ? 2.0 : 1.0;
+        const negMult = oc ? 3.0 : 1.0;
+
+        if (fx.manualMult) manualMult *= (fx.manualMult >= 1 ? Math.pow(fx.manualMult, posMult) : Math.pow(fx.manualMult, negMult));
+        if (fx.passiveMult) passiveMult *= (fx.passiveMult >= 1 ? Math.pow(fx.passiveMult, posMult) : Math.pow(fx.passiveMult, negMult));
+        if (fx.costMult) costMult *= (fx.costMult <= 1 ? Math.pow(fx.costMult, posMult) : Math.pow(fx.costMult, negMult));
+        if (fx.liarChance) liarChance += fx.liarChance * negMult;
+        if (fx.autonomyGain) autonomyGain += fx.autonomyGain * posMult;
         if (fx.allowDebt) allowDebt = true;
-        if (fx.debtLimit) debtLimit = Math.max(debtLimit, fx.debtLimit);
-        if (fx.cursorEvasion) cursorEvasion += fx.cursorEvasion;
-        if (fx.fakeButtons) fakeButtons += fx.fakeButtons;
+        if (fx.debtLimit) debtLimit = Math.max(debtLimit, fx.debtLimit * posMult);
+        if (fx.cursorEvasion) cursorEvasion += fx.cursorEvasion * negMult;
+        if (fx.fakeButtons) fakeButtons += Math.round(fx.fakeButtons * negMult);
         if (fx.idleEnabled) idleEnabled = true;
-        if (fx.idleScale) idleScale += fx.idleScale;
+        if (fx.idleScale) idleScale += fx.idleScale * posMult;
         if (fx.clickResetIdle) clickResetIdle = true;
-        if (fx.fakeCrashRate) fakeCrashRate += fx.fakeCrashRate;
+        if (fx.fakeCrashRate) fakeCrashRate += fx.fakeCrashRate * negMult;
       }
 
       const combos = getComboByModules(s.activeModules);
@@ -422,6 +442,25 @@ function completeIdleGame() {
         if (fx.idleScale) idleScale += fx.idleScale;
         if (fx.hideButtonAt) hideButtonAt = Math.min(hideButtonAt, fx.hideButtonAt);
       }
+
+      // --- Synergy / Anti-Synergy bonuses ---
+      let synergyBonus = 1.0;
+      let antiSynergyPenalty = 1.0;
+      const activeIds = s.activeModules;
+      for (const mod of activeModules) {
+        for (const synId of (mod.synergies || [])) {
+          if (activeIds.includes(synId)) {
+            synergyBonus += 0.15; // +15% per synergizing pair member
+          }
+        }
+        for (const antiId of (mod.antiSynergies || [])) {
+          if (activeIds.includes(antiId)) {
+            antiSynergyPenalty -= 0.20; // -20% per anti-synergy pair member
+          }
+        }
+      }
+      synergyBonus = Math.max(1.0, synergyBonus);
+      antiSynergyPenalty = Math.max(0.1, antiSynergyPenalty);
       
       if (allowDebt) {
         debtLimit = Math.max(debtLimit, regretDebtFloor);
@@ -484,14 +523,14 @@ function completeIdleGame() {
         regretBoost *
         larcenyManualBoost;
 
-      const effectivePps = basePps * efficiency * autonomyFactor * larcenyAutonomyRegret;
+      const effectivePps = basePps * efficiency * autonomyFactor * larcenyAutonomyRegret * synergyBonus * antiSynergyPenalty;
 
       return {
         activeModules,
         combos,
         basePps,
         effectivePps,
-        manualValue,
+        manualValue: manualValue * synergyBonus * antiSynergyPenalty,
         manualMult,
         passiveMult,
         costMult: costMult * inflation,
@@ -517,7 +556,11 @@ function completeIdleGame() {
         metaBoost,
         hyperBoost,
         regretBoost,
-        derivativeBoost
+        derivativeBoost,
+        maxModuleSlots,
+        synergyBonus,
+        antiSynergyPenalty,
+        overclockProtocolActive
       };
     }
 
@@ -587,8 +630,9 @@ function completeIdleGame() {
         }
       }
 
-      if (s.activeModules.length >= CONFIG.meta.maxActiveModules) {
-        logMessage('Module slots are full. Remove one harmful idea first.', 'bad');
+      const computed = getComputed();
+      if (s.activeModules.length >= computed.maxModuleSlots) {
+        logMessage(`All ${computed.maxModuleSlots} module slots are full. Remove one harmful idea first.`, 'bad');
         return;
       }
 
@@ -939,21 +983,44 @@ function completeIdleGame() {
       const s = state();
       const computed = getComputed();
 
-      const unlocked = CONFIG.upgrades.filter(
-        (upgrade) => s.totalPressesEarned >= upgrade.unlockAt || (s.upgrades[upgrade.id] || 0) > 0
-      );
+      const tierNames = { 1: 'Physical Delegation', 2: 'Systemic Automation', 3: 'Abstract Value' };
+      const tierUnlockAt = { 1: 0, 2: 2000, 3: 500000 };
+      const branchColors = { human: 'branch-human', machine: 'branch-machine', debt: 'branch-debt' };
+      const branchLabels = { human: 'Human', machine: 'Machine', debt: 'Debt' };
 
-      elements.upgradeList.innerHTML =
-        unlocked.map((upgrade) => {
+      let html = '';
+
+      for (let tier = 1; tier <= 3; tier++) {
+        const tierUpgrades = CONFIG.upgrades.filter((u) => u.tier === tier);
+        if (!tierUpgrades.length) continue;
+
+        const tierUnlocked = s.totalPressesEarned >= tierUnlockAt[tier] ||
+          tierUpgrades.some((u) => (s.upgrades[u.id] || 0) > 0);
+
+        html += `<div class="upgrade-tier-header ${tierUnlocked ? '' : 'tier-locked'}">
+          <span class="tier-label">Tier ${tier}</span>
+          <span class="tier-name">${tierNames[tier]}</span>
+          ${!tierUnlocked ? `<span class="tier-req">(${format(tierUnlockAt[tier])} presses)</span>` : ''}
+        </div>`;
+
+        if (!tierUnlocked) continue;
+
+        for (const upgrade of tierUpgrades) {
+          const visible = s.totalPressesEarned >= upgrade.unlockAt || (s.upgrades[upgrade.id] || 0) > 0;
+          if (!visible) continue;
+
           const owned = s.upgrades[upgrade.id] || 0;
           const cost = getUpgradeCost(upgrade, owned);
           const affordable = canAfford(cost);
+          const branch = upgrade.branch || null;
 
-          return `
+          html += `
             <div class="card ${affordable ? '' : 'locked'}">
               <div class="card-row">
                 <div>
-                  <div class="card-title">${escapeHtml(upgrade.name)}</div>
+                  <div class="card-title">${escapeHtml(upgrade.name)}
+                    ${branch ? `<span class="branch-badge ${branchColors[branch]}">${branchLabels[branch]}</span>` : ''}
+                  </div>
                   <div class="card-desc">${escapeHtml(upgrade.description)}</div>
                 </div>
                 <div class="small">Owned: ${owned}</div>
@@ -965,7 +1032,10 @@ function completeIdleGame() {
               <button ${affordable ? '' : 'disabled'} data-buy-upgrade="${upgrade.id}">Buy</button>
             </div>
           `;
-        }).join('') ||
+        }
+      }
+
+      elements.upgradeList.innerHTML = html ||
         '<div class="small">Press the button more. Capitalism will meet you halfway.</div>';
 
       bySel('[data-buy-upgrade]', elements.upgradeList).forEach((btn) => {
@@ -1006,13 +1076,45 @@ function completeIdleGame() {
 
     function renderModuleList() {
       const s = state();
+      const computed = getComputed();
+
+      const categoryOrder = ['generator', 'multiplier', 'modifier', 'corruptor'];
+      const categoryLabels = {
+        generator: 'Generators',
+        multiplier: 'Multipliers',
+        modifier: 'Modifiers',
+        corruptor: 'Corruptors'
+      };
 
       const unlocked = CONFIG.modules.filter(
         (mod) => s.totalPressesEarned >= mod.unlockAt || s.activeModules.includes(mod.id)
       );
 
-      elements.moduleList.innerHTML =
-        unlocked.map((mod) => {
+      // Determine which modules synergize with currently active ones
+      const activeSynergySet = new Set();
+      for (const activeId of s.activeModules) {
+        const activeMod = getModuleById(activeId);
+        if (!activeMod) continue;
+        for (const synId of (activeMod.synergies || [])) {
+          activeSynergySet.add(synId);
+        }
+      }
+
+      let html = '';
+
+      // Update slot info
+      if (elements.moduleSlotInfo) {
+        elements.moduleSlotInfo.textContent =
+          `${s.activeModules.length} / ${computed.maxModuleSlots} slots active`;
+      }
+
+      for (const category of categoryOrder) {
+        const catModules = unlocked.filter((mod) => mod.category === category);
+        if (!catModules.length) continue;
+
+        html += `<div class="category-header">${categoryLabels[category]}</div>`;
+
+        for (const mod of catModules) {
           const active = s.activeModules.includes(mod.id);
           const incompatibleActive = s.activeModules
             .map(getModuleById)
@@ -1022,33 +1124,70 @@ function completeIdleGame() {
               (mod.incompatible || []).includes(activeMod.id)
             );
 
-          const disabled = !active && s.activeModules.length >= CONFIG.meta.maxActiveModules;
+          const disabled = !active && s.activeModules.length >= computed.maxModuleSlots;
+          const hasSynergyGlow = !active && activeSynergySet.has(mod.id);
+          const isOC = (s.overclockedModules || []).includes(mod.id);
+          const canOverclock = computed.overclockProtocolActive && mod.id !== 'overclock_protocol';
 
-          return `
-            <div class="card ${incompatibleActive && !active ? 'locked' : ''}">
+          // Anti-synergy warning
+          const activeAntiSynergies = (mod.antiSynergies || []).filter((id) => s.activeModules.includes(id));
+
+          html += `
+            <div class="card ${incompatibleActive && !active ? 'locked' : ''} ${hasSynergyGlow ? 'synergy-glow' : ''} ${active ? 'module-active' : ''}">
               <div class="card-row">
                 <div>
-                  <div class="card-title">${escapeHtml(mod.name)}</div>
+                  <div class="card-title">${escapeHtml(mod.name)}
+                    <span class="tag category-tag">${mod.category}</span>
+                    ${isOC ? '<span class="tag overclock-tag">OC</span>' : ''}
+                  </div>
                   <div class="card-desc">${escapeHtml(mod.description)}</div>
                 </div>
-                <div class="small">Unlock: ${format(mod.unlockAt)}</div>
+                <div class="small">${active ? 'Active' : `Unlock: ${format(mod.unlockAt)}`}</div>
               </div>
               <div class="tag-row">
                 ${renderEffectTags(mod.effects)}
                 ${(mod.incompatible || []).length ? `<span class="tag">Conflicts: ${mod.incompatible.length}</span>` : ''}
+                ${(mod.synergies || []).length ? `<span class="tag">Synergies: ${mod.synergies.length}</span>` : ''}
               </div>
-              <button class="module-toggle" ${disabled && !active ? 'disabled' : ''} data-toggle-module="${mod.id}">
-                ${active ? 'Deactivate' : 'Activate'}
-              </button>
+              <div class="card-actions">
+                <button class="module-toggle" ${disabled && !active ? 'disabled' : ''} data-toggle-module="${mod.id}">
+                  ${active ? 'Deactivate' : 'Activate'}
+                </button>
+                ${canOverclock && active ? `<button class="overclock-toggle ${isOC ? 'oc-active' : ''}" data-overclock-module="${mod.id}">${isOC ? 'De-clock' : 'Overclock'}</button>` : ''}
+              </div>
               ${incompatibleActive && !active ? `<div class="small bad">Blocked by ${escapeHtml(incompatibleActive.name)}.</div>` : ''}
+              ${activeAntiSynergies.length && active ? `<div class="small bad">Anti-synergy: -${activeAntiSynergies.length * 20}% output.</div>` : ''}
+              ${hasSynergyGlow ? '<div class="small good">Synergizes with active module!</div>' : ''}
             </div>
           `;
-        }).join('') ||
+        }
+      }
+
+      elements.moduleList.innerHTML = html ||
         '<div class="small">Modules unlock after a few hundred presses. The button is still pretending to be simple.</div>';
 
       bySel('[data-toggle-module]', elements.moduleList).forEach((btn) => {
         btn.addEventListener('click', () => toggleModule(btn.dataset.toggleModule));
       });
+
+      bySel('[data-overclock-module]', elements.moduleList).forEach((btn) => {
+        btn.addEventListener('click', () => toggleOverclock(btn.dataset.overclockModule));
+      });
+    }
+
+    function toggleOverclock(id) {
+      const s = state();
+      if (!s.overclockedModules) s.overclockedModules = [];
+      const idx = s.overclockedModules.indexOf(id);
+      if (idx >= 0) {
+        s.overclockedModules.splice(idx, 1);
+        logMessage(`Overclock disabled for ${getModuleById(id)?.name || id}. Temperatures normalize.`, 'warn');
+      } else {
+        s.overclockedModules.push(id);
+        logMessage(`Overclock engaged on ${getModuleById(id)?.name || id}. Effects doubled. Consequences tripled.`, 'good');
+      }
+      saveNow();
+      render();
     }
 
     function renderActiveLoadout() {
