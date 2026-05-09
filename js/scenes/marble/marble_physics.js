@@ -1013,9 +1013,11 @@
     // Check if there's a hazard trigger on this tile
     const trigger = window.MarbleLevels.getTriggerCell(runtime.level, groundSurface.tx, groundSurface.ty);
     if (trigger?.kind === 'hazard') return;
+    // Snap to tile center so respawn doesn't place marble on a tile edge
+    // (which could be adjacent to a crumble/hazard tile causing repeated deaths)
     runtime.marble.lastSafePosition = {
-      x: runtime.marble.x,
-      y: runtime.marble.y,
+      x: groundSurface.tx + 0.5,
+      y: groundSurface.ty + 0.5,
       z: runtime.marble.z,
       levelId: runtime.level.id
     };
