@@ -398,6 +398,18 @@
         "requires": "artisanal_presses"
       },
       {
+        "id": "ergonomic_despair",
+        "name": "Ergonomic Despair",
+        "description": "+400 pps. A wrist brace that generates existential value.",
+        "baseCost": 85000,
+        "costMult": 1.30,
+        "pps": 400,
+        "unlockAt": 25000,
+        "tier": 2,
+        "branch": "human",
+        "requires": "bespoke_clicking"
+      },
+      {
         "id": "corporate_press_department",
         "name": "Corporate Press Department",
         "description": "+120 presses/sec. Now with meetings about pressing.",
@@ -497,6 +509,28 @@
         "branch": "human"
       },
       {
+        "id": "empathy_engine",
+        "name": "Empathy Engine",
+        "description": "+65000 pps. It understands your suffering and monetizes it.",
+        "baseCost": 75000000,
+        "costMult": 1.44,
+        "pps": 65000,
+        "unlockAt": 8000000,
+        "tier": 3,
+        "branch": "human"
+      },
+      {
+        "id": "consciousness_dividend",
+        "name": "Consciousness Dividend",
+        "description": "+220000 pps. Your awareness of pressing generates passive returns.",
+        "baseCost": 450000000,
+        "costMult": 1.50,
+        "pps": 220000,
+        "unlockAt": 45000000,
+        "tier": 3,
+        "branch": "human"
+      },
+      {
         "id": "dedicated_server",
         "name": "Dedicated Server",
         "description": "+25000 pps. A machine pressing for the sake of machines.",
@@ -560,8 +594,8 @@
         "unlockAt": 80,
         "category": "multiplier",
         "incompatible": [],
-        "synergies": ["human_touch"],
-        "antiSynergies": [],
+        "synergies": ["human_touch", "inflation_hedge"],
+        "antiSynergies": ["union_avoidance", "press_siphon"],
         "effects": {
           "manualMult": 2.5,
           "passiveMult": 1.1
@@ -583,13 +617,13 @@
         }
       },
       {
-        "id": "debt_spiral",
+"id": "debt_spiral",
         "name": "Debt Spiral",
-        "description": "Allows negative presses. More debt means more growth, which is not comforting.",
-        "unlockAt": 1200,
+        "description": "Lets you buy upgrades with presses you don't have. What could go wrong.",
+        "unlockAt": 500,
         "category": "modifier",
         "incompatible": ["inflation_hedge"],
-        "synergies": ["fraudulent_accounting"],
+        "synergies": ["fraudulent_accounting", "press_siphon"],
         "antiSynergies": ["human_touch"],
         "effects": {
           "allowDebt": true,
@@ -605,7 +639,7 @@
         "unlockAt": 3000,
         "category": "generator",
         "incompatible": ["human_touch"],
-        "synergies": ["user_repellant", "basic_script_mod"],
+        "synergies": ["user_repellant", "anti_idle_compliance"],
         "antiSynergies": ["friction_compensation"],
         "effects": {
           "passiveMult": 1.9,
@@ -620,7 +654,7 @@
         "unlockAt": 3000,
         "category": "multiplier",
         "incompatible": ["union_avoidance"],
-        "synergies": ["friction_compensation"],
+        "synergies": ["friction_compensation", "anti_idle_compliance"],
         "antiSynergies": ["user_repellant", "debt_spiral"],
         "effects": {
           "manualMult": 8.2,
@@ -636,7 +670,7 @@
         "category": "modifier",
         "incompatible": ["debt_spiral"],
         "synergies": ["friction_compensation"],
-        "antiSynergies": ["fraudulent_accounting"],
+        "antiSynergies": ["fraudulent_accounting", "press_siphon"],
         "effects": {
           "costMult": 0.72,
           "passiveMult": 1.08
@@ -666,7 +700,7 @@
         "unlockAt": 600,
         "category": "generator",
         "incompatible": [],
-        "synergies": ["union_avoidance"],
+        "synergies": ["union_avoidance", "human_touch"],
         "antiSynergies": [],
         "effects": {
           "idleEnabled": true,
@@ -695,7 +729,7 @@
         "category": "corruptor",
         "incompatible": [],
         "synergies": ["debt_spiral"],
-        "antiSynergies": ["inflation_hedge"],
+        "antiSynergies": ["inflation_hedge", "friction_compensation"],
         "effects": {
           "passiveMult": 3.5,
           "pressDrain": 0.02
@@ -796,18 +830,18 @@
     "frameworkNotes": []
   }
   </script>
-  <script src="./js/core/scene_manager.js"></script>
+  <script src="./js/core/scene_manager.js?v=100"></script>
 
-  <script src="./js/scenes/marble/marble_levels.js?v=99"></script>
-  <script src="./js/scenes/marble/marble_state.js?v=99"></script>
-  <script src="./js/scenes/marble/marble_input.js?v=99"></script>
-  <script src="./js/vendor/three.min.js"></script>
-  <script src="./js/scenes/marble/marble_physics.js?v=99"></script>
-  <script src="./js/scenes/marble/marble_renderer_three.js?v=99"></script>
+  <script src="./js/scenes/marble/marble_levels.js?v=100"></script>
+  <script src="./js/scenes/marble/marble_state.js?v=100"></script>
+  <script src="./js/scenes/marble/marble_input.js?v=100"></script>
+  <script src="./js/vendor/three.min.js?v=100"></script>
+  <script src="./js/scenes/marble/marble_physics.js?v=100"></script>
+  <script src="./js/scenes/marble/marble_renderer_three.js?v=100"></script>
 
-  <script src="./js/scenes/button_idle_scene.js"></script>
-  <script src="./js/scenes/marble_scene.js?v=99"></script>
-  <script src="./js/scenes/title_scene.js"></script>
-  <script src="./js/main.js?v=99"></script>
+  <script src="./js/scenes/button_idle_scene.js?v=100"></script>
+  <script src="./js/scenes/marble_scene.js?v=100"></script>
+  <script src="./js/scenes/title_scene.js?v=100"></script>
+  <script src="./js/main.js?v=100"></script>
 </body>
 </html>

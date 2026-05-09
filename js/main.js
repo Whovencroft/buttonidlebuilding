@@ -43,7 +43,13 @@
         pointerHoldingButton: false,
         autonomySuppressedUntil: 0,
         autonomyEndingCooldownUntil: 0,
-        lastFakeCrashAt: 0
+        lastFakeCrashAt: 0,
+        productionPausedUntil: 0,
+        negotiationActive: false,
+        lastNegotiation: 0,
+        lastSelfPurchase: 0,
+        lastTabShuffle: 0,
+        glitchActive: false
       },
       ui: {
         activeTab: 'play',

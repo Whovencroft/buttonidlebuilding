@@ -265,6 +265,7 @@ function completeIdleGame() {
         s.autonomy = 0;
         s.upgrades = Object.fromEntries(CONFIG.upgrades.map((u) => [u.id, 0]));
         s.activeModules = [];
+        s.overclockedModules = [];
         s.ui.fakeButtons = [];
         s.ui.mainButtonPos = { x: 50, y: 50 };
         s.session.autonomySuppressedUntil = now() + 180000;
@@ -395,6 +396,7 @@ function completeIdleGame() {
       let clickResetIdle = false;
       let hideButtonAt = 100;
       let fakeCrashRate = 0;
+      let pressDrain = 0;
       const regretDebtFloor = 2500 * Math.max(1, Math.floor(s.regret || 0));
 
       const autonomySuppressed = now() < (s.session.autonomySuppressedUntil || 0);
@@ -435,6 +437,7 @@ function completeIdleGame() {
         if (fx.idleScale) idleScale += fx.idleScale * posMult;
         if (fx.clickResetIdle) clickResetIdle = true;
         if (fx.fakeCrashRate) fakeCrashRate += fx.fakeCrashRate * negMult;
+        if (fx.pressDrain) pressDrain += fx.pressDrain * negMult;
       }
 
       const combos = getComboByModules(s.activeModules);
@@ -573,7 +576,8 @@ function completeIdleGame() {
         synergyBonus,
         antiSynergyPenalty,
         overclockProtocolActive,
-        prestigePpsFloor
+        prestigePpsFloor,
+        pressDrain
       };
     }
 
@@ -1069,9 +1073,11 @@ function completeIdleGame() {
           generateFakeButtons(autoFakeCount);
         }
 
-        // Button shrinking
-        const shrinkFactor = 1 - (s.autonomy - 60) * 0.008; // at 85% = 0.8 scale
-        elements.mainButton.style.transform = `scale(${clamp(shrinkFactor, 0.5, 1)})`;
+        // Button shrinking (only if NOT in meltdown — meltdown overrides with smooth grow)
+        if (meltdown <= 0) {
+          const shrinkFactor = 1 - (s.autonomy - 60) * 0.008; // at 85% = 0.8 scale
+          elements.mainButton.style.transform = `scale(${clamp(shrinkFactor, 0.5, 1)})`;
+        }
 
         // Threatening messages
         if (Math.random() < 0.0003 * (chaosLevel - 2)) {
@@ -1116,8 +1122,9 @@ function completeIdleGame() {
         root.classList.toggle('meltdown', true);
         root.style.setProperty('--meltdown-intensity', meltdown.toFixed(3));
 
-        // Button grows massive
-        const growFactor = 1 + meltdown * 2.5; // up to 3.5x size
+        // Button grows massive — smooth transition from shrink to grow
+        const shrinkBase = chaosLevel >= 3 ? clamp(1 - (s.autonomy - 60) * 0.008, 0.5, 1) : 1;
+        const growFactor = shrinkBase + meltdown * (3.5 - shrinkBase); // lerp from shrink to 3.5x
         elements.mainButton.style.transform = `scale(${growFactor})`;
 
         // Intensified screen shake
@@ -1160,9 +1167,13 @@ function completeIdleGame() {
       const s = state();
       const computed = getComputed();
 
-      // Find cheapest affordable upgrade
+      // Find cheapest affordable upgrade (respecting tier unlock thresholds)
+      const tierUnlockAt = { 1: 0, 2: 2000, 3: 500000 };
       const affordable = CONFIG.upgrades
-        .filter((u) => s.totalPressesEarned >= u.unlockAt)
+        .filter((u) => {
+          const tierReq = tierUnlockAt[u.tier] || 0;
+          return s.totalPressesEarned >= u.unlockAt && s.totalPressesEarned >= tierReq;
+        })
         .map((u) => ({ upgrade: u, cost: getUpgradeCost(u, s.upgrades[u.id] || 0) }))
         .filter((entry) => entry.cost <= s.presses)
         .sort((a, b) => a.cost - b.cost);
@@ -1307,7 +1318,18 @@ function completeIdleGame() {
 
       overlay.querySelector('.negotiation-pay').addEventListener('click', () => {
         const current = state();
+        const computed = getComputed();
+        // Enforce debt limit: don't let negotiation push below debt limit
+        const minPresses = computed.allowDebt ? -computed.debtLimit : 0;
+        if (current.presses - demandAmount < minPresses) {
+          current.session.negotiationActive = false;
+          overlay.remove();
+          logMessage('You tried to pay but lack the funds. The button is unimpressed.', 'bad');
+          current.autonomy = clamp(current.autonomy + 1, 0, 100);
+          return;
+        }
         current.presses -= demandAmount;
+        if (current.presses < 0) current.debt = Math.max(current.debt, -current.presses);
         current.session.negotiationActive = false;
         overlay.remove();
         logMessage('You paid the button\'s ransom. It is temporarily satisfied.', 'warn');
@@ -1805,11 +1827,15 @@ function completeIdleGame() {
 
       elements.formulaList.innerHTML = [
         ['Upgrade cost', 'ceil(baseCost × costMult^owned × inflation × costModifiers)'],
-        ['Passive production', 'sum(upgrade.pps × owned) × efficiency × (1 + autonomy/100)'],
-        ['Manual click', '1 × manualModifiers × (1 + 0.02 × Meta-Presses) × regretBoost'],
+        ['Passive production', '(upgradePps + prestigeFloor) × efficiency × autonomy × synergy × antiSynergy'],
+        ['Prestige PPS floor', 'regret×0.5 + metaPresses×2 + hyperPresses×50 + derivatives×500'],
+        ['Manual click', '1 × manualMult × (1+0.02×MetaPresses) × regretBoost × synergy × antiSynergy'],
+        ['Synergy bonus', '+15% per active synergizing module pair (min 1.0)'],
+        ['Anti-synergy penalty', '-20% per active conflicting module pair (min 0.1)'],
         ['Regret gain', 'floor((log10(presses) - 4)^2 × derivativeBonus)'],
         ['Idle bonus', '1 + log2(idleSeconds + 1) × 0.2 × idleScale'],
-        ['Debt bonus', '1 + ((-presses + 1)^0.35 / 25) × debtComboMult']
+        ['Debt bonus', '1 + ((-presses + 1)^0.35 / 25) × debtComboMult'],
+        ['Press drain', 'presses × drainRate per second (from Press Siphon module)']
       ].map(([label, formula]) => `
         <div class="card">
           <div class="card-title">${escapeHtml(label)}</div>
@@ -2018,6 +2044,11 @@ function completeIdleGame() {
           s.presses += gain;
           s.totalPressesEarned += gain;
           s.totalGeneratedPresses += gain;
+        }
+        // Press Siphon module: drain percentage of presses per second
+        if (computed.pressDrain > 0 && s.presses > 0) {
+          const drained = s.presses * computed.pressDrain * dt;
+          s.presses -= drained;
         }
         s.autonomy = clamp(
           s.autonomy + computed.autonomyGain * dt * (1 + computed.effectivePps * 0.0004),
