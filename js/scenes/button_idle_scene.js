@@ -95,7 +95,14 @@ function completeIdleGame() {
   logMessage('The button has awakened, now begins its journey.', 'good');
   saveNow();
 
-  if (typeof beginEndingTransitionToMarble === 'function') {
+  // Phase 4: Shatter the button into fragments, then transition
+  if (typeof triggerButtonShatter === 'function') {
+    triggerButtonShatter(() => {
+      if (typeof beginEndingTransitionToMarble === 'function') {
+        beginEndingTransitionToMarble();
+      }
+    });
+  } else if (typeof beginEndingTransitionToMarble === 'function') {
     beginEndingTransitionToMarble();
   }
 }
@@ -1122,8 +1129,15 @@ function completeIdleGame() {
         if (meltdown > 0.5 && Math.random() < 0.004 * meltdown) {
           flashContainmentFailure();
         }
+
+        // Phase 4: PPS counter spin-out
+        applyPpsSpinOut(meltdown);
+
+        // Phase 4: Button morphs into marble appearance
+        applyMarbleMorph(meltdown);
       } else {
         root.classList.toggle('meltdown', false);
+        applyMarbleMorph(0);
       }
     }
 
@@ -1328,6 +1342,155 @@ function completeIdleGame() {
       flash.textContent = 'CONTAINMENT FAILURE';
       root.appendChild(flash);
       setTimeout(() => flash.remove(), 1200 + Math.random() * 800);
+    }
+
+    // === PHASE 4: THE CLIMAX — PPS SPIN-OUT, MARBLE MORPH, SHATTER ===
+
+    // PPS counter spin-out during meltdown: numbers flicker wildly
+    function applyPpsSpinOut(meltdownIntensity) {
+      if (meltdownIntensity <= 0) return;
+
+      // Flicker the PPS display with random huge numbers
+      if (Math.random() < 0.15 * meltdownIntensity) {
+        const glitchFormats = [
+          () => (Math.random() * 1e308).toExponential(Math.floor(Math.random() * 6)),
+          () => '???.???e+' + Math.floor(Math.random() * 309),
+          () => 'NaN',
+          () => '∞',
+          () => '-' + (Math.random() * 1e100).toExponential(2),
+          () => String.fromCharCode(...Array.from({length: 8}, () => 48 + Math.floor(Math.random() * 10))),
+          () => '▓'.repeat(Math.floor(Math.random() * 12) + 3),
+          () => format(Math.random() * Number.MAX_SAFE_INTEGER) + '/s'
+        ];
+        elements.pps.textContent = glitchFormats[Math.floor(Math.random() * glitchFormats.length)]();
+        elements.pps.classList.add('pps-spinout');
+      }
+
+      // Flicker the press counter too
+      if (Math.random() < 0.08 * meltdownIntensity) {
+        const pressGlitch = [
+          () => (Math.random() * 1e308).toExponential(1),
+          () => '∞?',
+          () => 'OVERFLOW',
+          () => '9'.repeat(Math.floor(Math.random() * 20) + 5)
+        ];
+        elements.displayedPresses.textContent = pressGlitch[Math.floor(Math.random() * pressGlitch.length)]();
+        elements.displayedPresses.classList.add('press-spinout');
+        setTimeout(() => elements.displayedPresses.classList.remove('press-spinout'), 150);
+      }
+    }
+
+    // Marble morph: as meltdown intensifies, button visually becomes the marble
+    // Marble gradient: radial-gradient at 30%/25% from #fff -> #dbeafe -> #475569
+    function applyMarbleMorph(meltdownIntensity) {
+      const btn = elements.mainButton;
+      if (meltdownIntensity <= 0) {
+        btn.classList.remove('marble-morphing');
+        return;
+      }
+
+      // Start morphing at 0.3 intensity, fully marble by 0.9
+      const morphProgress = clamp((meltdownIntensity - 0.3) / 0.6, 0, 1);
+      if (morphProgress <= 0) {
+        btn.classList.remove('marble-morphing');
+        return;
+      }
+
+      btn.classList.add('marble-morphing');
+      btn.style.setProperty('--marble-morph', morphProgress.toFixed(3));
+
+      // At high morph, hide the button text
+      if (morphProgress > 0.6) {
+        btn.style.color = `rgba(255,255,255,${(1 - morphProgress) * 2})`;
+      }
+    }
+
+    // Button shatter: fragments fly outward, one piece becomes the marble
+    function triggerButtonShatter(callback) {
+      const btn = elements.mainButton;
+      const sandbox = elements.buttonSandbox;
+      const btnRect = btn.getBoundingClientRect();
+      const sandboxRect = sandbox.getBoundingClientRect();
+
+      // Position relative to sandbox
+      const cx = btnRect.left - sandboxRect.left + btnRect.width / 2;
+      const cy = btnRect.top - sandboxRect.top + btnRect.height / 2;
+      const radius = btnRect.width / 2;
+
+      // Hide the original button
+      btn.style.visibility = 'hidden';
+
+      // Create fragment container
+      const fragContainer = document.createElement('div');
+      fragContainer.className = 'shatter-container';
+      fragContainer.style.cssText = `position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:20;`;
+      sandbox.appendChild(fragContainer);
+
+      // Generate 10 fragments (irregular wedge shapes)
+      const fragCount = 10;
+      const angleStep = (Math.PI * 2) / fragCount;
+
+      for (let i = 0; i < fragCount; i++) {
+        const frag = document.createElement('div');
+        frag.className = 'shatter-fragment';
+
+        const angle = angleStep * i + (Math.random() - 0.5) * 0.3;
+        const size = radius * (0.3 + Math.random() * 0.4);
+        const dist = radius * (1.5 + Math.random() * 3);
+
+        // Each fragment is a small rounded piece
+        frag.style.cssText = `
+          position: absolute;
+          left: ${cx - size / 2}px;
+          top: ${cy - size / 2}px;
+          width: ${size}px;
+          height: ${size}px;
+          border-radius: ${20 + Math.random() * 30}%;
+          background: radial-gradient(circle at 40% 35%,
+            rgba(255,255,255,0.2),
+            rgba(37,50,68,0.9) 60%,
+            rgba(27,37,50,1) 100%);
+          box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+          opacity: 1;
+          --frag-dx: ${Math.cos(angle) * dist}px;
+          --frag-dy: ${Math.sin(angle) * dist}px;
+          --frag-rot: ${(Math.random() - 0.5) * 720}deg;
+          animation: shatter-fly ${0.8 + Math.random() * 0.6}s cubic-bezier(0.2, 0, 0.3, 1) forwards;
+        `;
+        fragContainer.appendChild(frag);
+      }
+
+      // Create the marble piece (the one that stays)
+      const marble = document.createElement('div');
+      marble.className = 'shatter-marble';
+      const marbleSize = radius * 0.55;
+      marble.style.cssText = `
+        position: absolute;
+        left: ${cx - marbleSize}px;
+        top: ${cy - marbleSize}px;
+        width: ${marbleSize * 2}px;
+        height: ${marbleSize * 2}px;
+        border-radius: 50%;
+        background: radial-gradient(circle at 30% 25%,
+          #ffffff,
+          #dbeafe 22%,
+          #475569 100%);
+        border: 2px solid rgba(255,255,255,0.65);
+        box-shadow: 0 8px 24px rgba(0,0,0,0.4), 0 0 40px rgba(125,211,252,0.3);
+        opacity: 0;
+        animation: marble-emerge 0.6s 0.3s ease-out forwards;
+      `;
+      fragContainer.appendChild(marble);
+
+      // After shatter completes, call back for transition
+      setTimeout(() => {
+        if (callback) callback();
+        // Clean up fragments after transition starts
+        setTimeout(() => {
+          if (fragContainer.parentNode) fragContainer.remove();
+          btn.style.visibility = '';
+        }, 2000);
+      }, 1000);
     }
 
     function renderUpgradeList() {
