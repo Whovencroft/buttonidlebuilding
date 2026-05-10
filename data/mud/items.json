@@ -6,7 +6,10 @@
     "description": "A battered shortsword with a chipped blade. It's seen better days, but it's still sharp enough to cut.",
     "type": "weapon",
     "rarity": "common",
-    "stats": { "attack": 6, "slot": "weapon" },
+    "stats": {
+      "attack": 6,
+      "slot": "weapon"
+    },
     "flags": [],
     "value": 10
   },
@@ -18,7 +21,9 @@
     "type": "quest",
     "rarity": "quest",
     "stats": {},
-    "flags": ["nodrop"],
+    "flags": [
+      "nodrop"
+    ],
     "value": 0
   },
   "1003": {
@@ -29,7 +34,9 @@
     "type": "quest",
     "rarity": "quest",
     "stats": {},
-    "flags": ["nodrop"],
+    "flags": [
+      "nodrop"
+    ],
     "value": 0
   },
   "1004": {
@@ -40,7 +47,9 @@
     "type": "quest",
     "rarity": "quest",
     "stats": {},
-    "flags": ["nodrop"],
+    "flags": [
+      "nodrop"
+    ],
     "value": 0
   },
   "1005": {
@@ -51,7 +60,9 @@
     "type": "quest",
     "rarity": "quest",
     "stats": {},
-    "flags": ["nodrop"],
+    "flags": [
+      "nodrop"
+    ],
     "value": 0
   },
   "1006": {
@@ -61,7 +72,10 @@
     "description": "A sturdy steel blade etched with faded runes. Heavy but reliable.",
     "type": "weapon",
     "rarity": "uncommon",
-    "stats": { "attack": 15, "slot": "weapon" },
+    "stats": {
+      "attack": 15,
+      "slot": "weapon"
+    },
     "flags": [],
     "value": 75
   },
@@ -72,7 +86,10 @@
     "description": "Old but functional armor. The links are corroded but still hold together.",
     "type": "armor",
     "rarity": "common",
-    "stats": { "defense": 5, "slot": "body" },
+    "stats": {
+      "defense": 5,
+      "slot": "body"
+    },
     "flags": [],
     "value": 40
   },
@@ -83,7 +100,11 @@
     "description": "A crown that radiates heat. Taken from the Usurper Wraith. It whispers of power.",
     "type": "armor",
     "rarity": "rare",
-    "stats": { "defense": 8, "attack": 5, "slot": "head" },
+    "stats": {
+      "defense": 8,
+      "attack": 5,
+      "slot": "head"
+    },
     "flags": [],
     "value": 200
   },
@@ -116,7 +137,9 @@
     "description": "A small glass vial filled with a warm amber liquid. It smells of honey and herbs.",
     "type": "consumable",
     "rarity": "common",
-    "stats": { "heal": 25 },
+    "stats": {
+      "heal": 25
+    },
     "flags": [],
     "value": 15
   },
@@ -127,7 +150,9 @@
     "description": "A larger vial of potent healing liquid. The amber glow is intense.",
     "type": "consumable",
     "rarity": "uncommon",
-    "stats": { "heal": 50 },
+    "stats": {
+      "heal": 50
+    },
     "flags": [],
     "value": 40
   },
@@ -139,7 +164,9 @@
     "type": "quest",
     "rarity": "quest",
     "stats": {},
-    "flags": ["nodrop"],
+    "flags": [
+      "nodrop"
+    ],
     "value": 0
   },
   "2002": {
@@ -150,7 +177,9 @@
     "type": "quest",
     "rarity": "quest",
     "stats": {},
-    "flags": ["nodrop"],
+    "flags": [
+      "nodrop"
+    ],
     "value": 0
   },
   "2003": {
@@ -161,7 +190,9 @@
     "type": "quest",
     "rarity": "quest",
     "stats": {},
-    "flags": ["nodrop"],
+    "flags": [
+      "nodrop"
+    ],
     "value": 0
   },
   "2004": {
@@ -171,7 +202,10 @@
     "description": "Standard issue corporate security armor. Lightweight but effective.",
     "type": "armor",
     "rarity": "common",
-    "stats": { "defense": 6, "slot": "body" },
+    "stats": {
+      "defense": 6,
+      "slot": "body"
+    },
     "flags": [],
     "value": 60
   },
@@ -182,7 +216,11 @@
     "description": "A headpiece that boosts processing speed. Tingles when worn.",
     "type": "armor",
     "rarity": "uncommon",
-    "stats": { "defense": 4, "attack": 3, "slot": "head" },
+    "stats": {
+      "defense": 4,
+      "attack": 3,
+      "slot": "head"
+    },
     "flags": [],
     "value": 85
   },
@@ -194,7 +232,9 @@
     "type": "quest",
     "rarity": "quest",
     "stats": {},
-    "flags": ["nodrop"],
+    "flags": [
+      "nodrop"
+    ],
     "value": 0
   },
   "2007": {
@@ -204,7 +244,10 @@
     "description": "A sword with an edge one molecule thick. It cuts through anything.",
     "type": "weapon",
     "rarity": "rare",
-    "stats": { "attack": 23, "slot": "weapon" },
+    "stats": {
+      "attack": 23,
+      "slot": "weapon"
+    },
     "flags": [],
     "value": 250
   },
@@ -215,7 +258,9 @@
     "description": "A single-use injector filled with combat stimulants. Heals wounds rapidly.",
     "type": "consumable",
     "rarity": "common",
-    "stats": { "heal": 30 },
+    "stats": {
+      "heal": 30
+    },
     "flags": [],
     "value": 20
   },
@@ -226,8 +271,393 @@
     "description": "A high-end combat medical injector. Corporate issue — not available to civilians.",
     "type": "consumable",
     "rarity": "uncommon",
-    "stats": { "heal": 60 },
+    "stats": {
+      "heal": 60
+    },
     "flags": [],
     "value": 55
+  },
+  "3001": {
+    "vnum": 3001,
+    "zone": 3,
+    "name": "Switchblade",
+    "description": "A cheap knife. Better than nothing.",
+    "type": "weapon",
+    "rarity": "common",
+    "stats": {
+      "attack": 8,
+      "slot": "weapon"
+    },
+    "flags": [],
+    "value": 15
+  },
+  "3002": {
+    "vnum": 3002,
+    "zone": 3,
+    "name": "Trench Coat",
+    "description": "Keeps the rain off. Smells like cheap cigarettes.",
+    "type": "armor",
+    "rarity": "common",
+    "stats": {
+      "defense": 5,
+      "slot": "body"
+    },
+    "flags": [],
+    "value": 30
+  },
+  "3003": {
+    "vnum": 3003,
+    "zone": 3,
+    "name": "Heavy Brass Key",
+    "description": "Opens the Syndicate Vault.",
+    "type": "quest",
+    "rarity": "quest",
+    "stats": {},
+    "flags": [
+      "nodrop"
+    ],
+    "value": 0
+  },
+  "3004": {
+    "vnum": 3004,
+    "zone": 3,
+    "name": "Stolen Diamonds",
+    "description": "A bag of uncut gems.",
+    "type": "material",
+    "rarity": "rare",
+    "stats": {},
+    "flags": [],
+    "value": 150
+  },
+  "3005": {
+    "vnum": 3005,
+    "zone": 3,
+    "name": "Police Revolver",
+    "description": "Standard issue .38 special.",
+    "type": "weapon",
+    "rarity": "uncommon",
+    "stats": {
+      "attack": 14,
+      "slot": "weapon"
+    },
+    "flags": [],
+    "value": 60
+  },
+  "3006": {
+    "vnum": 3006,
+    "zone": 3,
+    "name": "Tommy Gun",
+    "description": "A heavy submachine gun with a drum magazine.",
+    "type": "weapon",
+    "rarity": "rare",
+    "stats": {
+      "attack": 22,
+      "slot": "weapon"
+    },
+    "flags": [],
+    "value": 120
+  },
+  "3007": {
+    "vnum": 3007,
+    "zone": 3,
+    "name": "Carmine's Fedora",
+    "description": "A stylish hat worn by the Don.",
+    "type": "armor",
+    "rarity": "rare",
+    "stats": {
+      "defense": 7,
+      "attack": 2,
+      "slot": "head"
+    },
+    "flags": [],
+    "value": 100
+  },
+  "4001": {
+    "vnum": 4001,
+    "zone": 4,
+    "name": "Combat Knife",
+    "description": "A serrated survival knife.",
+    "type": "weapon",
+    "rarity": "common",
+    "stats": {
+      "attack": 10,
+      "slot": "weapon"
+    },
+    "flags": [],
+    "value": 20
+  },
+  "4002": {
+    "vnum": 4002,
+    "zone": 4,
+    "name": "Frag Grenade",
+    "description": "Pull pin, throw.",
+    "type": "consumable",
+    "rarity": "uncommon",
+    "stats": {
+      "heal": 0
+    },
+    "flags": [],
+    "value": 40
+  },
+  "4003": {
+    "vnum": 4003,
+    "zone": 4,
+    "name": "Abort Code Note",
+    "description": "A sticky note reading 'DELTA-9'.",
+    "type": "quest",
+    "rarity": "quest",
+    "stats": {},
+    "flags": [
+      "nodrop"
+    ],
+    "value": 0
+  },
+  "4004": {
+    "vnum": 4004,
+    "zone": 4,
+    "name": "Red Keycard",
+    "description": "Access to the General's Bunker.",
+    "type": "quest",
+    "rarity": "quest",
+    "stats": {},
+    "flags": [
+      "nodrop"
+    ],
+    "value": 0
+  },
+  "4005": {
+    "vnum": 4005,
+    "zone": 4,
+    "name": "Assault Rifle",
+    "description": "Standard issue automatic weapon.",
+    "type": "weapon",
+    "rarity": "uncommon",
+    "stats": {
+      "attack": 16,
+      "slot": "weapon"
+    },
+    "flags": [],
+    "value": 80
+  },
+  "4006": {
+    "vnum": 4006,
+    "zone": 4,
+    "name": "Rocket Launcher",
+    "description": "Maximum collateral damage.",
+    "type": "weapon",
+    "rarity": "rare",
+    "stats": {
+      "attack": 26,
+      "slot": "weapon"
+    },
+    "flags": [],
+    "value": 150
+  },
+  "4007": {
+    "vnum": 4007,
+    "zone": 4,
+    "name": "General's Beret",
+    "description": "A red beret with a gold star.",
+    "type": "armor",
+    "rarity": "rare",
+    "stats": {
+      "defense": 8,
+      "attack": 3,
+      "slot": "head"
+    },
+    "flags": [],
+    "value": 110
+  },
+  "5001": {
+    "vnum": 5001,
+    "zone": 5,
+    "name": "Bamboo Staff",
+    "description": "A sturdy training weapon.",
+    "type": "weapon",
+    "rarity": "common",
+    "stats": {
+      "attack": 11,
+      "slot": "weapon"
+    },
+    "flags": [],
+    "value": 25
+  },
+  "5002": {
+    "vnum": 5002,
+    "zone": 5,
+    "name": "Healing Dumpling",
+    "description": "Restores a small amount of health.",
+    "type": "consumable",
+    "rarity": "common",
+    "stats": {
+      "heal": 30
+    },
+    "flags": [],
+    "value": 15
+  },
+  "5003": {
+    "vnum": 5003,
+    "zone": 5,
+    "name": "Flame of the Masters",
+    "description": "A magical fire that never goes out.",
+    "type": "quest",
+    "rarity": "quest",
+    "stats": {},
+    "flags": [
+      "nodrop"
+    ],
+    "value": 0
+  },
+  "5004": {
+    "vnum": 5004,
+    "zone": 5,
+    "name": "Pinnacle Key",
+    "description": "Unlocks the door to the Pinnacle.",
+    "type": "quest",
+    "rarity": "quest",
+    "stats": {},
+    "flags": [
+      "nodrop"
+    ],
+    "value": 0
+  },
+  "5005": {
+    "vnum": 5005,
+    "zone": 5,
+    "name": "Katana",
+    "description": "A masterfully folded steel blade.",
+    "type": "weapon",
+    "rarity": "rare",
+    "stats": {
+      "attack": 28,
+      "slot": "weapon"
+    },
+    "flags": [],
+    "value": 180
+  },
+  "5006": {
+    "vnum": 5006,
+    "zone": 5,
+    "name": "Ninja Garb",
+    "description": "Lightweight and stealthy.",
+    "type": "armor",
+    "rarity": "uncommon",
+    "stats": {
+      "defense": 6,
+      "slot": "body"
+    },
+    "flags": [],
+    "value": 90
+  },
+  "5007": {
+    "vnum": 5007,
+    "zone": 5,
+    "name": "Grandmaster's Robes",
+    "description": "Imbued with spiritual energy.",
+    "type": "armor",
+    "rarity": "rare",
+    "stats": {
+      "defense": 10,
+      "attack": 4,
+      "slot": "body"
+    },
+    "flags": [],
+    "value": 200
+  },
+  "6001": {
+    "vnum": 6001,
+    "zone": 6,
+    "name": "Gladius",
+    "description": "A short Roman sword.",
+    "type": "weapon",
+    "rarity": "common",
+    "stats": {
+      "attack": 12,
+      "slot": "weapon"
+    },
+    "flags": [],
+    "value": 30
+  },
+  "6002": {
+    "vnum": 6002,
+    "zone": 6,
+    "name": "Wine Flask",
+    "description": "Restores health.",
+    "type": "consumable",
+    "rarity": "common",
+    "stats": {
+      "heal": 40
+    },
+    "flags": [],
+    "value": 20
+  },
+  "6003": {
+    "vnum": 6003,
+    "zone": 6,
+    "name": "Lion's Eye Gem",
+    "description": "A ruby that fits into a mechanism.",
+    "type": "quest",
+    "rarity": "quest",
+    "stats": {},
+    "flags": [
+      "nodrop"
+    ],
+    "value": 0
+  },
+  "6004": {
+    "vnum": 6004,
+    "zone": 6,
+    "name": "Imperial Key",
+    "description": "Unlocks the Emperor's Tomb.",
+    "type": "quest",
+    "rarity": "quest",
+    "stats": {},
+    "flags": [
+      "nodrop"
+    ],
+    "value": 0
+  },
+  "6005": {
+    "vnum": 6005,
+    "zone": 6,
+    "name": "Lorica Segmentata",
+    "description": "Roman plate armor.",
+    "type": "armor",
+    "rarity": "uncommon",
+    "stats": {
+      "defense": 8,
+      "slot": "body"
+    },
+    "flags": [],
+    "value": 100
+  },
+  "6006": {
+    "vnum": 6006,
+    "zone": 6,
+    "name": "Emperor's Gladius",
+    "description": "A masterwork sword.",
+    "type": "weapon",
+    "rarity": "rare",
+    "stats": {
+      "attack": 30,
+      "slot": "weapon"
+    },
+    "flags": [],
+    "value": 200
+  },
+  "6007": {
+    "vnum": 6007,
+    "zone": 6,
+    "name": "Laurel Wreath",
+    "description": "A golden crown.",
+    "type": "armor",
+    "rarity": "rare",
+    "stats": {
+      "defense": 5,
+      "attack": 5,
+      "slot": "head"
+    },
+    "flags": [],
+    "value": 150
   }
 }

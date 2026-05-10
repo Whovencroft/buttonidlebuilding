@@ -261,6 +261,10 @@
         i.keyword.some(k => target.includes(k))
       );
       if (interactable) {
+        // Set flags for puzzle clue discovery
+        if (room.vnum === 3006 && interactable.keyword.includes('desk')) {
+          player.worldFlags.zone_3_knows_combo = true;
+        }
         return [{ type: 'info', text: interactable.description }];
       }
 
@@ -752,9 +756,117 @@
             return [{ type: 'room-desc', text: 'The throne has slid aside, revealing a smooth circular tunnel leading down. The marble is long gone.' }];
           }
           return [{ type: 'info', text: 'The throne is massive and immovable. Perhaps if the statues were aligned correctly...' }];
+        case 'use_safe':
+          return puzzleUseSafeZ3();
+        case 'use_console':
+          return puzzleUseConsoleZ4();
+        case 'use_flame':
+          return puzzleUseFlameZ5();
+        case 'use_gem':
+          return puzzleUseGemZ6();
         default:
           return [{ type: 'info', text: `[Puzzle interaction: ${actionId}]` }];
       }
+    }
+
+    /**
+     * Zone 3 puzzle: Enter the combination on the wall safe.
+     * The combination is 1945 (year the war ended), hinted by the PI's desk note.
+     */
+    function puzzleUseSafeZ3() {
+      const room = currentRoom();
+      if (room?.vnum !== 3008) {
+        return [{ type: 'error', text: "There's no safe here." }];
+      }
+      if (player.worldFlags.zone_3_safe_opened) {
+        return [{ type: 'info', text: 'The safe is already open.' }];
+      }
+      // Check if the player has visited the PI's office (where the clue is)
+      if (!player.worldFlags.zone_3_knows_combo) {
+        return [{ type: 'info', text: 'The safe has a combination dial. You need to find the code.' }];
+      }
+      player.worldFlags.zone_3_safe_opened = true;
+      // Give the brass key
+      player.inventory.push(3003);
+      return [
+        { type: 'success', text: 'You dial 1-9-4-5. The safe clicks open.' },
+        { type: 'success', text: 'Inside you find the Heavy Brass Key.' },
+        { type: 'success', text: '--- ZONE 3 PUZZLE COMPLETE ---' }
+      ];
+    }
+
+    /**
+     * Zone 4 puzzle: Enter the abort code at the silo console.
+     * Code is DELTA-9, found on a sticky note in the control room.
+     */
+    function puzzleUseConsoleZ4() {
+      const room = currentRoom();
+      if (room?.vnum !== 4010) {
+        return [{ type: 'error', text: "There's no console here." }];
+      }
+      if (player.worldFlags.zone_4_launch_aborted) {
+        return [{ type: 'info', text: 'The launch has already been aborted.' }];
+      }
+      // Check if player has the abort code note
+      if (!player.inventory.includes(4003)) {
+        return [{ type: 'info', text: 'The console demands an abort code. You need to find it.' }];
+      }
+      player.worldFlags.zone_4_launch_aborted = true;
+      return [
+        { type: 'success', text: 'You type DELTA-9 into the console. The countdown stops.' },
+        { type: 'room-desc', text: 'LAUNCH ABORTED. The silo powers down with a deep mechanical groan.' },
+        { type: 'success', text: '--- ZONE 4 PUZZLE COMPLETE ---' }
+      ];
+    }
+
+    /**
+     * Zone 5 puzzle: Light the braziers with the Flame of the Masters.
+     * Requires the quest item from the West Pavilion.
+     */
+    function puzzleUseFlameZ5() {
+      const room = currentRoom();
+      if (room?.vnum !== 5008) {
+        return [{ type: 'error', text: "There are no braziers here." }];
+      }
+      if (player.worldFlags.zone_5_braziers_lit) {
+        return [{ type: 'info', text: 'The braziers are already lit. The gate is open.' }];
+      }
+      if (!player.inventory.includes(5003)) {
+        return [{ type: 'info', text: 'The braziers are cold and dark. You need a special flame to light them.' }];
+      }
+      player.worldFlags.zone_5_braziers_lit = true;
+      player.worldFlags[`door_5008_up`] = 'unlocked';
+      return [
+        { type: 'success', text: 'You hold the Flame of the Masters to each brazier. They ignite in sequence.' },
+        { type: 'room-desc', text: 'The sealed gate above rumbles open, revealing the path to the Third Shard.' },
+        { type: 'success', text: '--- ZONE 5 PUZZLE COMPLETE ---' }
+      ];
+    }
+
+    /**
+     * Zone 6 puzzle: Insert the Lion's Eye gem into the mechanism.
+     * Opens the path to the secret passage beneath the catacombs.
+     */
+    function puzzleUseGemZ6() {
+      const room = currentRoom();
+      if (room?.vnum !== 6012) {
+        return [{ type: 'error', text: "There's no mechanism here." }];
+      }
+      if (player.worldFlags.zone_6_mechanism_opened) {
+        return [{ type: 'info', text: 'The mechanism has already been activated.' }];
+      }
+      if (!player.inventory.includes(6003)) {
+        return [{ type: 'info', text: 'The stone lion relief has an empty eye socket. It needs something...' }];
+      }
+      player.worldFlags.zone_6_mechanism_opened = true;
+      player.worldFlags[`door_6012_down`] = 'unlocked';
+      // Remove the gem from inventory
+      player.inventory = player.inventory.filter(v => v !== 6003);
+      return [
+        { type: 'success', text: "You press the Lion's Eye gem into the socket. The wall grinds open." },
+        { type: 'room-desc', text: 'A hidden passage is revealed, leading deeper beneath the catacombs.' },
+        { type: 'success', text: '--- ZONE 6 PUZZLE COMPLETE ---' }
+      ];
     }
 
     /**
