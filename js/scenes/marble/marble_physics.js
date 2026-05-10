@@ -899,8 +899,13 @@
     marble.inTunnel = null;
     marble.sprintHoldTime = 0;
 
-    // Brief invulnerability after respawn
-    runtime.invulnerableUntilTick = (runtime.simTick || 0) + 30; // 0.5s at 60fps
+    // Reset all crumble tiles on death to prevent respawn-death loops
+    if (runtime.dynamicState && runtime.dynamicState.crumble) {
+      runtime.dynamicState.crumble = {};
+    }
+
+    // Brief invulnerability after respawn (extended to 1s to avoid edge cases)
+    runtime.invulnerableUntilTick = (runtime.simTick || 0) + 60; // 1s at 60fps
 
     runtime.lastResult = { type: 'penalized', reason, levelId: runtime.level.id };
     return runtime.lastResult;
@@ -927,13 +932,12 @@
     ensureBounceState(marble);
     if (marble.bounceCooldownTime > 0.05) return false;
     marble.grounded = false;
-    // Bounce strength: 2.5x the old jump height.
-    // Old jump impulse was 6.9 (max height ~1.06 units).
-    // New bounce target: ~2.65 units height → impulse = sqrt(2 * g * h) = sqrt(2 * 22.5 * 2.65) ≈ 10.92
-    // Tile bounce value is 6, so multiplier = 10.92 / 6 = 1.82
+    // Bounce strength: target ~4 units height.
+    // impulse = sqrt(2 * g * h) = sqrt(2 * 22.5 * 4) ≈ 13.42
+    // Tile bounce value is 6, so multiplier = 13.42 / 6 = 2.24
     const bounceStrength = (typeof groundSurface.bounce === 'object')
-      ? (groundSurface.bounce.strength ?? 6) * 1.82
-      : groundSurface.bounce * 1.82;
+      ? (groundSurface.bounce.strength ?? 6) * 2.24
+      : groundSurface.bounce * 2.24;
     marble.vz = Math.max(marble.vz, bounceStrength);
     marble.z = groundSurface.z + marble.collisionRadius + 0.05;
     marble.bounceCooldownTime = BOUNCE_COOLDOWN;
