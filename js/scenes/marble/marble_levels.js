@@ -2767,22 +2767,22 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
       timeLimit: 50
     });
 
-    // --- Surface tiles ---
-    fillTrack(level, 3, 3, 26, 1, 4);
-    fillTrack(level, 3, 4, 7, 4, 4);
-    fillTrack(level, 28, 4, 1, 34, 4);
-    fillTrack(level, 9, 8, 1, 41, 4);
-    fillTrack(level, 14, 18, 9, 1, 4);
-    fillTrack(level, 14, 19, 1, 16, 4);
-    fillTrack(level, 22, 19, 1, 16, 4);
-    fillTrack(level, 15, 34, 7, 1, 4);
-    fillTrack(level, 29, 37, 4, 1, 4);
-    fillTrack(level, 32, 38, 1, 4, 4);
-    setSurface(level, 30, 39, { baseHeight: 4, kind: 'track' });
-    fillTrack(level, 28, 41, 4, 1, 4);
-    fillTrack(level, 28, 42, 1, 7, 4);
-    fillTrack(level, 10, 48, 18, 1, 4);
-    // Ice tiles
+    // --- Surface tiles (all ice) ---
+    fillSurfaceRect(level, 3, 3, 26, 1, { baseHeight: 4, kind: 'ice', ice: true });
+    fillSurfaceRect(level, 3, 4, 7, 4, { baseHeight: 4, kind: 'ice', ice: true });
+    fillSurfaceRect(level, 28, 4, 1, 34, { baseHeight: 4, kind: 'ice', ice: true });
+    fillSurfaceRect(level, 9, 8, 1, 41, { baseHeight: 4, kind: 'ice', ice: true });
+    fillSurfaceRect(level, 14, 18, 9, 1, { baseHeight: 4, kind: 'ice', ice: true });
+    fillSurfaceRect(level, 14, 19, 1, 16, { baseHeight: 4, kind: 'ice', ice: true });
+    fillSurfaceRect(level, 22, 19, 1, 16, { baseHeight: 4, kind: 'ice', ice: true });
+    fillSurfaceRect(level, 15, 34, 7, 1, { baseHeight: 4, kind: 'ice', ice: true });
+    fillSurfaceRect(level, 29, 37, 4, 1, { baseHeight: 4, kind: 'ice', ice: true });
+    fillSurfaceRect(level, 32, 38, 1, 4, { baseHeight: 4, kind: 'ice', ice: true });
+    setSurface(level, 30, 39, { baseHeight: 4, kind: 'ice', ice: true });
+    fillSurfaceRect(level, 28, 41, 4, 1, { baseHeight: 4, kind: 'ice', ice: true });
+    fillSurfaceRect(level, 28, 42, 1, 7, { baseHeight: 4, kind: 'ice', ice: true });
+    fillSurfaceRect(level, 10, 48, 18, 1, { baseHeight: 4, kind: 'ice', ice: true });
+    // Large ice areas
     fillSurfaceRect(level, 10, 4, 18, 14, { baseHeight: 4, kind: 'ice', ice: true });
     fillSurfaceRect(level, 10, 18, 4, 30, { baseHeight: 4, kind: 'ice', ice: true });
     fillSurfaceRect(level, 23, 18, 5, 30, { baseHeight: 4, kind: 'ice', ice: true });
@@ -2791,6 +2791,13 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     fillSurfaceRect(level, 28, 39, 2, 2, { baseHeight: 4, kind: 'ice', ice: true });
     fillSurfaceRect(level, 31, 39, 1, 2, { baseHeight: 4, kind: 'ice', ice: true });
     setSurface(level, 30, 40, { baseHeight: 4, kind: 'ice', ice: true });
+
+    // --- Actors ---
+    addActor(level, {
+      id: 'ice_sweep1', kind: ACTOR_KINDS.SWEEPER,
+      x: 26.5, y: 39.5, z: 4, topHeight: 4,
+      width: 1, height: 1, armLength: 3, armWidth: 0.22, angularSpeed: 1.2, fatal: true
+    });
 
     // --- Goal ---
     setGoal(level, 30.5, 39.5);
@@ -2849,15 +2856,16 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     setSurface(level, 23, 25, { baseHeight: 7, shape: 'slope_n', rise: 0.5, kind: 'track' });
     setSurface(level, 23, 26, { baseHeight: 6.5, shape: 'slope_n', rise: 0.5, kind: 'track' });
     setSurface(level, 23, 27, { baseHeight: 6, shape: 'slope_n', rise: 0.5, kind: 'track' });
-    setSurface(level, 33, 49, { baseHeight: 5.35, shape: 'slope_n', rise: 0.65, kind: 'track' });
-    setSurface(level, 33, 50, { baseHeight: 4.65, shape: 'slope_n', rise: 0.65, kind: 'track' });
-    setSurface(level, 33, 51, { baseHeight: 4.05, shape: 'slope_n', rise: 0.65, kind: 'track' });
-    setSurface(level, 34, 49, { baseHeight: 5.35, shape: 'slope_n', rise: 0.65, kind: 'track' });
-    setSurface(level, 34, 50, { baseHeight: 4.65, shape: 'slope_n', rise: 0.65, kind: 'track' });
-    setSurface(level, 34, 51, { baseHeight: 4.05, shape: 'slope_n', rise: 0.65, kind: 'track' });
-    setSurface(level, 35, 49, { baseHeight: 5.35, shape: 'slope_n', rise: 0.65, kind: 'track' });
-    setSurface(level, 35, 50, { baseHeight: 4.65, shape: 'slope_n', rise: 0.65, kind: 'track' });
-    setSurface(level, 35, 51, { baseHeight: 4.05, shape: 'slope_n', rise: 0.65, kind: 'track' });
+    // Ramp (33-35, y=49-51): slope_n from 6 down to 4, 3 tiles, rise=0.667
+    setSurface(level, 33, 49, { baseHeight: 5.333, shape: 'slope_n', rise: 0.667, kind: 'track' });
+    setSurface(level, 33, 50, { baseHeight: 4.667, shape: 'slope_n', rise: 0.667, kind: 'track' });
+    setSurface(level, 33, 51, { baseHeight: 4.0, shape: 'slope_n', rise: 0.667, kind: 'track' });
+    setSurface(level, 34, 49, { baseHeight: 5.333, shape: 'slope_n', rise: 0.667, kind: 'track' });
+    setSurface(level, 34, 50, { baseHeight: 4.667, shape: 'slope_n', rise: 0.667, kind: 'track' });
+    setSurface(level, 34, 51, { baseHeight: 4.0, shape: 'slope_n', rise: 0.667, kind: 'track' });
+    setSurface(level, 35, 49, { baseHeight: 5.333, shape: 'slope_n', rise: 0.667, kind: 'track' });
+    setSurface(level, 35, 50, { baseHeight: 4.667, shape: 'slope_n', rise: 0.667, kind: 'track' });
+    setSurface(level, 35, 51, { baseHeight: 4.0, shape: 'slope_n', rise: 0.667, kind: 'track' });
     // Track under gates
     setSurface(level, 13, 4, { baseHeight: 8, kind: 'track' });
     setSurface(level, 13, 5, { baseHeight: 8, kind: 'track' });
@@ -2882,37 +2890,37 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     setSurface(level, 44, 54, { baseHeight: 4, kind: 'track' });
 
     // --- Timed Gates ---
-    addTimedGate(level, 'gate_1', 13, 4, 8, 1, 3);
-    addTimedGate(level, 'gate_2', 20, 10, 8, 3, 1);
+    addTimedGate(level, 'gate_1', 13, 4, 8, 1, 3, 1.5, 0.5);
+    addTimedGate(level, 'gate_2', 20, 10, 8, 3, 1, 1.5, 0.5);
     addActor(level, {
       id: 'gate_3a', kind: ACTOR_KINDS.TIMED_GATE,
       x: 31, y: 32, z: 6,
       width: 1, height: 3, topHeight: 6,
-      closedDuration: 1.4, openDuration: 1.1, startOffset: 0
+      closedDuration: 1.5, openDuration: 0.5, startOffset: 0
     });
     addActor(level, {
       id: 'gate_3b', kind: ACTOR_KINDS.TIMED_GATE,
       x: 33, y: 35, z: 6,
       width: 3, height: 1, topHeight: 6,
-      closedDuration: 1.4, openDuration: 1.1, startOffset: 0.5
+      closedDuration: 1.5, openDuration: 0.5, startOffset: 0.5
     });
     addActor(level, {
       id: 'gate_4a', kind: ACTOR_KINDS.TIMED_GATE,
       x: 40, y: 52, z: 4,
       width: 1, height: 3, topHeight: 4,
-      closedDuration: 1.4, openDuration: 1.1, startOffset: 0
+      closedDuration: 1.5, openDuration: 0.5, startOffset: 0
     });
     addActor(level, {
       id: 'gate_4b', kind: ACTOR_KINDS.TIMED_GATE,
       x: 42, y: 52, z: 4,
       width: 1, height: 3, topHeight: 4,
-      closedDuration: 1.4, openDuration: 1.1, startOffset: 0.5
+      closedDuration: 1.5, openDuration: 0.5, startOffset: 0.5
     });
     addActor(level, {
       id: 'gate_4c', kind: ACTOR_KINDS.TIMED_GATE,
       x: 44, y: 52, z: 4,
       width: 1, height: 3, topHeight: 4,
-      closedDuration: 1.4, openDuration: 1.1, startOffset: 1
+      closedDuration: 1.5, openDuration: 0.5, startOffset: 1
     });
 
     // --- Goal ---
@@ -2959,33 +2967,34 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     fillTrack(level, 11, 42, 5, 9, 4);
     fillTrack(level, 10, 43, 1, 8, 4);
     // Track under sweepers
-    setSurface(level, 36, 5, { baseHeight: 4, kind: 'track' });
+    setSurface(level, 34, 7, { baseHeight: 4, kind: 'track' });
     setSurface(level, 13, 7, { baseHeight: 4, kind: 'track' });
     setSurface(level, 19, 7, { baseHeight: 4, kind: 'track' });
-    setSurface(level, 28, 23, { baseHeight: 4, kind: 'track' });
+    setSurface(level, 3, 24, { baseHeight: 4, kind: 'track' });
     setSurface(level, 35, 26, { baseHeight: 4, kind: 'track' });
     setSurface(level, 16, 39, { baseHeight: 4, kind: 'track' });
-    setSurface(level, 10, 42, { baseHeight: 4, kind: 'track' });
+    setSurface(level, 13, 42, { baseHeight: 4, kind: 'track' });
+    setSurface(level, 12, 35, { baseHeight: 4, kind: 'track' });
 
     // --- Sweepers ---
     addActor(level, {
       id: 'sweep1', kind: ACTOR_KINDS.SWEEPER,
-      x: 36.5, y: 5.5, z: 4, topHeight: 4,
+      x: 34.5, y: 7.5, z: 4, topHeight: 4,
       width: 1, height: 1, armLength: 3.5, armWidth: 0.22, angularSpeed: 1.2, fatal: true
     });
     addActor(level, {
       id: 'sweep2', kind: ACTOR_KINDS.SWEEPER,
       x: 13.5, y: 7.5, z: 4, topHeight: 4,
-      width: 1, height: 1, armLength: 2.5, armWidth: 0.22, angularSpeed: 1.5, fatal: true
+      width: 1, height: 1, armLength: 4, armWidth: 0.22, angularSpeed: 1.5, fatal: true
     });
     addActor(level, {
       id: 'sweep3', kind: ACTOR_KINDS.SWEEPER,
       x: 19.5, y: 7.5, z: 4, topHeight: 4,
-      width: 1, height: 1, armLength: 2.5, armWidth: 0.22, angularSpeed: 1.8, fatal: true
+      width: 1, height: 1, armLength: 4, armWidth: 0.22, angularSpeed: 1.8, fatal: true
     });
     addActor(level, {
       id: 'sweep4', kind: ACTOR_KINDS.SWEEPER,
-      x: 28.5, y: 23.5, z: 4, topHeight: 4,
+      x: 3.5, y: 24.5, z: 4, topHeight: 4,
       width: 1, height: 1, armLength: 2.5, armWidth: 0.22, angularSpeed: 1.2, fatal: true
     });
     addActor(level, {
@@ -3000,8 +3009,13 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     });
     addActor(level, {
       id: 'sweep7', kind: ACTOR_KINDS.SWEEPER,
-      x: 10.5, y: 42.5, z: 4, topHeight: 4,
+      x: 13.5, y: 42.5, z: 4, topHeight: 4,
       width: 1, height: 1, armLength: 2, armWidth: 0.22, angularSpeed: 1.2, fatal: true
+    });
+    addActor(level, {
+      id: 'sweep8', kind: ACTOR_KINDS.SWEEPER,
+      x: 12.5, y: 35.5, z: 4, topHeight: 4,
+      width: 1, height: 1, armLength: 2.5, armWidth: 0.22, angularSpeed: 1.5, fatal: true
     });
 
     // --- Goal ---
