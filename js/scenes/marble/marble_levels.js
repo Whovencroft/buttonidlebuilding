@@ -3276,60 +3276,68 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     fillTrack(level, 7, 13, 1, 3, 8);
     fillTrack(level, 1, 15, 1, 3, 6);
     fillTrack(level, 5, 17, 1, 3, 4);
-    fillTrack(level, 18, 19, 2, 4, 0);
+    fillTrack(level, 18, 20, 2, 3, 0);
     fillTrack(level, 15, 22, 3, 3, 0);
     setSurface(level, 18, 23, { baseHeight: 0, kind: 'track' });
-    // Ramps
-    setSurface(level, 2, 8, { baseHeight: 15.8, shape: 'slope_w', rise: 0.2, kind: 'track' });
-    setSurface(level, 3, 8, { baseHeight: 15.6, shape: 'slope_w', rise: 0.2, kind: 'track' });
-    setSurface(level, 4, 8, { baseHeight: 15.4, shape: 'slope_w', rise: 0.2, kind: 'track' });
-    setSurface(level, 5, 8, { baseHeight: 15.2, shape: 'slope_w', rise: 0.2, kind: 'track' });
-    setSurface(level, 6, 8, { baseHeight: 15, shape: 'slope_w', rise: 0.2, kind: 'track' });
-    setSurface(level, 7, 8, { baseHeight: 14.8, shape: 'slope_w', rise: 0.2, kind: 'track' });
-    setSurface(level, 8, 8, { baseHeight: 14.6, shape: 'slope_w', rise: 0.2, kind: 'track' });
-    setSurface(level, 9, 8, { baseHeight: 14.4, shape: 'slope_w', rise: 0.2, kind: 'track' });
-    setSurface(level, 10, 8, { baseHeight: 14.2, shape: 'slope_w', rise: 0.2, kind: 'track' });
-    setSurface(level, 11, 8, { baseHeight: 14, shape: 'slope_w', rise: 0.2, kind: 'track' });
-    setSurface(level, 12, 8, { baseHeight: 13.8, shape: 'slope_w', rise: 0.2, kind: 'track' });
-    setSurface(level, 11, 11, { baseHeight: 12.5, shape: 'slope_w', rise: 0.5, kind: 'track' });
-    setSurface(level, 12, 11, { baseHeight: 12, shape: 'slope_w', rise: 0.5, kind: 'track' });
-    setSurface(level, 13, 11, { baseHeight: 11.5, shape: 'slope_w', rise: 0.5, kind: 'track' });
-    setSurface(level, 14, 11, { baseHeight: 11, shape: 'slope_w', rise: 0.5, kind: 'track' });
-    setSurface(level, 15, 11, { baseHeight: 10.5, shape: 'slope_w', rise: 0.5, kind: 'track' });
-    setSurface(level, 16, 11, { baseHeight: 10, shape: 'slope_w', rise: 0.5, kind: 'track' });
-    setSurface(level, 17, 11, { baseHeight: 9.5, shape: 'slope_w', rise: 0.5, kind: 'track' });
-    setSurface(level, 2, 17, { baseHeight: 5, shape: 'slope_w', kind: 'track' });
-    setSurface(level, 3, 17, { baseHeight: 4, shape: 'slope_w', kind: 'track' });
-    setSurface(level, 4, 17, { baseHeight: 3, shape: 'slope_w', kind: 'track' });
-    setSurface(level, 6, 19, { baseHeight: 3.64, shape: 'slope_w', rise: 0.36, kind: 'track' });
-    setSurface(level, 7, 19, { baseHeight: 3.54, shape: 'slope_w', rise: 0.36, kind: 'track' });
-    setSurface(level, 8, 19, { baseHeight: 3.44, shape: 'slope_w', rise: 0.36, kind: 'track' });
-    setSurface(level, 9, 19, { baseHeight: 3.34, shape: 'slope_w', rise: 0.36, kind: 'track' });
-    setSurface(level, 10, 19, { baseHeight: 3.24, shape: 'slope_w', rise: 0.36, kind: 'track' });
-    setSurface(level, 11, 19, { baseHeight: 3.14, shape: 'slope_w', rise: 0.36, kind: 'track' });
-    setSurface(level, 12, 19, { baseHeight: 3.04, shape: 'slope_w', rise: 0.36, kind: 'track' });
-    setSurface(level, 13, 19, { baseHeight: 2.94, shape: 'slope_w', rise: 0.36, kind: 'track' });
-    setSurface(level, 14, 19, { baseHeight: 2.84, shape: 'slope_w', rise: 0.36, kind: 'track' });
-    setSurface(level, 15, 19, { baseHeight: 2.74, shape: 'slope_w', rise: 0.36, kind: 'track' });
-    setSurface(level, 16, 19, { baseHeight: 2.64, shape: 'slope_w', rise: 0.36, kind: 'track' });
-    setSurface(level, 17, 19, { baseHeight: -0.36, shape: 'slope_w', rise: 0.36, kind: 'track' });
-    setSurface(level, 11, 9, { baseHeight: 12, shape: 'slope_e', kind: 'track' });
-    setSurface(level, 12, 9, { baseHeight: 13, shape: 'slope_e', kind: 'track' });
-    setSurface(level, 8, 13, { baseHeight: 7.8, shape: 'slope_e', rise: 0.2, kind: 'track' });
-    setSurface(level, 9, 13, { baseHeight: 8, shape: 'slope_e', rise: 0.2, kind: 'track' });
-    setSurface(level, 10, 13, { baseHeight: 8.2, shape: 'slope_e', rise: 0.2, kind: 'track' });
-    setSurface(level, 11, 13, { baseHeight: 8.4, shape: 'slope_e', rise: 0.2, kind: 'track' });
-    setSurface(level, 12, 13, { baseHeight: 8.6, shape: 'slope_e', rise: 0.2, kind: 'track' });
-    setSurface(level, 13, 13, { baseHeight: 8.8, shape: 'slope_e', rise: 0.2, kind: 'track' });
-    setSurface(level, 14, 13, { baseHeight: 9, shape: 'slope_e', rise: 0.2, kind: 'track' });
-    setSurface(level, 15, 13, { baseHeight: 9.2, shape: 'slope_e', rise: 0.2, kind: 'track' });
-    setSurface(level, 16, 13, { baseHeight: 9.4, shape: 'slope_e', rise: 0.2, kind: 'track' });
-    setSurface(level, 17, 13, { baseHeight: 9.6, shape: 'slope_e', rise: 0.2, kind: 'track' });
-    setSurface(level, 2, 15, { baseHeight: 5.5, shape: 'slope_e', rise: 0.5, kind: 'track' });
-    setSurface(level, 3, 15, { baseHeight: 6, shape: 'slope_e', rise: 0.5, kind: 'track' });
-    setSurface(level, 4, 15, { baseHeight: 6.5, shape: 'slope_e', rise: 0.5, kind: 'track' });
-    setSurface(level, 5, 15, { baseHeight: 7, shape: 'slope_e', rise: 0.5, kind: 'track' });
-    setSurface(level, 6, 15, { baseHeight: 7.5, shape: 'slope_e', rise: 0.5, kind: 'track' });
+    // Ramp 1: start platform z=16 → landing (13,8) z=14, slope_w (descending east)
+    setSurface(level, 2, 8, { baseHeight: 15.8182, shape: 'slope_w', rise: 0.1818, kind: 'track' });
+    setSurface(level, 3, 8, { baseHeight: 15.6364, shape: 'slope_w', rise: 0.1818, kind: 'track' });
+    setSurface(level, 4, 8, { baseHeight: 15.4545, shape: 'slope_w', rise: 0.1818, kind: 'track' });
+    setSurface(level, 5, 8, { baseHeight: 15.2727, shape: 'slope_w', rise: 0.1818, kind: 'track' });
+    setSurface(level, 6, 8, { baseHeight: 15.0909, shape: 'slope_w', rise: 0.1818, kind: 'track' });
+    setSurface(level, 7, 8, { baseHeight: 14.9091, shape: 'slope_w', rise: 0.1818, kind: 'track' });
+    setSurface(level, 8, 8, { baseHeight: 14.7273, shape: 'slope_w', rise: 0.1818, kind: 'track' });
+    setSurface(level, 9, 8, { baseHeight: 14.5455, shape: 'slope_w', rise: 0.1818, kind: 'track' });
+    setSurface(level, 10, 8, { baseHeight: 14.3636, shape: 'slope_w', rise: 0.1818, kind: 'track' });
+    setSurface(level, 11, 8, { baseHeight: 14.1818, shape: 'slope_w', rise: 0.1818, kind: 'track' });
+    setSurface(level, 12, 8, { baseHeight: 14.0, shape: 'slope_w', rise: 0.1818, kind: 'track' });
+    // Ramp 2: (13,9) z=14 → (10,9) z=13, slope_w (descending west)
+    setSurface(level, 12, 9, { baseHeight: 13.5, shape: 'slope_w', rise: 0.5, kind: 'track' });
+    setSurface(level, 11, 9, { baseHeight: 13.0, shape: 'slope_w', rise: 0.5, kind: 'track' });
+    // Ramp 3: (10,11) z=13 → (18,11) z=10, slope_w (descending east)
+    setSurface(level, 11, 11, { baseHeight: 12.5714, shape: 'slope_w', rise: 0.4286, kind: 'track' });
+    setSurface(level, 12, 11, { baseHeight: 12.1429, shape: 'slope_w', rise: 0.4286, kind: 'track' });
+    setSurface(level, 13, 11, { baseHeight: 11.7143, shape: 'slope_w', rise: 0.4286, kind: 'track' });
+    setSurface(level, 14, 11, { baseHeight: 11.2857, shape: 'slope_w', rise: 0.4286, kind: 'track' });
+    setSurface(level, 15, 11, { baseHeight: 10.8571, shape: 'slope_w', rise: 0.4286, kind: 'track' });
+    setSurface(level, 16, 11, { baseHeight: 10.4286, shape: 'slope_w', rise: 0.4286, kind: 'track' });
+    setSurface(level, 17, 11, { baseHeight: 10.0, shape: 'slope_w', rise: 0.4286, kind: 'track' });
+    // Ramp 4: (18,13) z=10 → (7,13) z=8, slope_e (descending west)
+    setSurface(level, 17, 13, { baseHeight: 9.8, shape: 'slope_e', rise: 0.2, kind: 'track' });
+    setSurface(level, 16, 13, { baseHeight: 9.6, shape: 'slope_e', rise: 0.2, kind: 'track' });
+    setSurface(level, 15, 13, { baseHeight: 9.4, shape: 'slope_e', rise: 0.2, kind: 'track' });
+    setSurface(level, 14, 13, { baseHeight: 9.2, shape: 'slope_e', rise: 0.2, kind: 'track' });
+    setSurface(level, 13, 13, { baseHeight: 9.0, shape: 'slope_e', rise: 0.2, kind: 'track' });
+    setSurface(level, 12, 13, { baseHeight: 8.8, shape: 'slope_e', rise: 0.2, kind: 'track' });
+    setSurface(level, 11, 13, { baseHeight: 8.6, shape: 'slope_e', rise: 0.2, kind: 'track' });
+    setSurface(level, 10, 13, { baseHeight: 8.4, shape: 'slope_e', rise: 0.2, kind: 'track' });
+    setSurface(level, 9, 13, { baseHeight: 8.2, shape: 'slope_e', rise: 0.2, kind: 'track' });
+    setSurface(level, 8, 13, { baseHeight: 8.0, shape: 'slope_e', rise: 0.2, kind: 'track' });
+    // Ramp 5: (7,15) z=8 → (1,15) z=6, slope_e (descending west)
+    setSurface(level, 6, 15, { baseHeight: 7.6, shape: 'slope_e', rise: 0.4, kind: 'track' });
+    setSurface(level, 5, 15, { baseHeight: 7.2, shape: 'slope_e', rise: 0.4, kind: 'track' });
+    setSurface(level, 4, 15, { baseHeight: 6.8, shape: 'slope_e', rise: 0.4, kind: 'track' });
+    setSurface(level, 3, 15, { baseHeight: 6.4, shape: 'slope_e', rise: 0.4, kind: 'track' });
+    setSurface(level, 2, 15, { baseHeight: 6.0, shape: 'slope_e', rise: 0.4, kind: 'track' });
+    // Ramp 6: (1,17) z=6 → (5,17) z=4, slope_w (descending east)
+    setSurface(level, 2, 17, { baseHeight: 5.3333, shape: 'slope_w', rise: 0.6667, kind: 'track' });
+    setSurface(level, 3, 17, { baseHeight: 4.6667, shape: 'slope_w', rise: 0.6667, kind: 'track' });
+    setSurface(level, 4, 17, { baseHeight: 4.0, shape: 'slope_w', rise: 0.6667, kind: 'track' });
+    // Ramp 7: (5,19) z=4 → (17,19) z=0, slope_w (descending east)
+    setSurface(level, 6, 19, { baseHeight: 3.6364, shape: 'slope_w', rise: 0.3636, kind: 'track' });
+    setSurface(level, 7, 19, { baseHeight: 3.2727, shape: 'slope_w', rise: 0.3636, kind: 'track' });
+    setSurface(level, 8, 19, { baseHeight: 2.9091, shape: 'slope_w', rise: 0.3636, kind: 'track' });
+    setSurface(level, 9, 19, { baseHeight: 2.5455, shape: 'slope_w', rise: 0.3636, kind: 'track' });
+    setSurface(level, 10, 19, { baseHeight: 2.1818, shape: 'slope_w', rise: 0.3636, kind: 'track' });
+    setSurface(level, 11, 19, { baseHeight: 1.8182, shape: 'slope_w', rise: 0.3636, kind: 'track' });
+    setSurface(level, 12, 19, { baseHeight: 1.4545, shape: 'slope_w', rise: 0.3636, kind: 'track' });
+    setSurface(level, 13, 19, { baseHeight: 1.0909, shape: 'slope_w', rise: 0.3636, kind: 'track' });
+    setSurface(level, 14, 19, { baseHeight: 0.7273, shape: 'slope_w', rise: 0.3636, kind: 'track' });
+    setSurface(level, 15, 19, { baseHeight: 0.3636, shape: 'slope_w', rise: 0.3636, kind: 'track' });
+    setSurface(level, 16, 19, { baseHeight: 0.0, shape: 'slope_w', rise: 0.3636, kind: 'track' });
+    // End of ramp 7 — flat track connection to goal area
+    setSurface(level, 17, 19, { baseHeight: 0, kind: 'track' });
+    setSurface(level, 17, 20, { baseHeight: 0, kind: 'track' });
 
     // --- Goal ---
     setGoal(level, 16.5, 23.5);
@@ -4824,46 +4832,50 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     fillTrack(level, 7, 22, 1, 3, 8);
     fillTrack(level, 27, 29, 1, 2, 6);
     setSurface(level, 25, 57, { baseHeight: 2, kind: 'track' });
-    // Ramps
-    setSurface(level, 21, 7, { baseHeight: 11.35, shape: 'slope_n', rise: 0.65, kind: 'track' });
-    setSurface(level, 21, 8, { baseHeight: 10.65, shape: 'slope_n', rise: 0.65, kind: 'track' });
-    setSurface(level, 21, 9, { baseHeight: 10.05, shape: 'slope_n', rise: 0.65, kind: 'track' });
-    setSurface(level, 22, 7, { baseHeight: 11.35, shape: 'slope_n', rise: 0.65, kind: 'track' });
-    setSurface(level, 22, 8, { baseHeight: 10.65, shape: 'slope_n', rise: 0.65, kind: 'track' });
-    setSurface(level, 22, 9, { baseHeight: 10.05, shape: 'slope_n', rise: 0.65, kind: 'track' });
-    setSurface(level, 23, 7, { baseHeight: 11.35, shape: 'slope_n', rise: 0.65, kind: 'track' });
-    setSurface(level, 23, 8, { baseHeight: 10.65, shape: 'slope_n', rise: 0.65, kind: 'track' });
-    setSurface(level, 23, 9, { baseHeight: 10.05, shape: 'slope_n', rise: 0.65, kind: 'track' });
-    setSurface(level, 4, 13, { baseHeight: 9.35, shape: 'slope_n', rise: 0.65, kind: 'track' });
-    setSurface(level, 4, 14, { baseHeight: 8.65, shape: 'slope_n', rise: 0.65, kind: 'track' });
-    setSurface(level, 4, 15, { baseHeight: 8.05, shape: 'slope_n', rise: 0.65, kind: 'track' });
-    setSurface(level, 5, 13, { baseHeight: 9.35, shape: 'slope_n', rise: 0.65, kind: 'track' });
-    setSurface(level, 5, 14, { baseHeight: 8.65, shape: 'slope_n', rise: 0.65, kind: 'track' });
-    setSurface(level, 5, 15, { baseHeight: 8.05, shape: 'slope_n', rise: 0.65, kind: 'track' });
-    setSurface(level, 6, 13, { baseHeight: 9.35, shape: 'slope_n', rise: 0.65, kind: 'track' });
-    setSurface(level, 6, 14, { baseHeight: 8.65, shape: 'slope_n', rise: 0.65, kind: 'track' });
-    setSurface(level, 6, 15, { baseHeight: 8.05, shape: 'slope_n', rise: 0.65, kind: 'track' });
-    setSurface(level, 8, 25, { baseHeight: 7.35, shape: 'slope_n', rise: 0.65, kind: 'track' });
-    setSurface(level, 8, 26, { baseHeight: 6.65, shape: 'slope_n', rise: 0.65, kind: 'track' });
-    setSurface(level, 8, 27, { baseHeight: 6.05, shape: 'slope_n', rise: 0.65, kind: 'track' });
-    setSurface(level, 9, 25, { baseHeight: 7.35, shape: 'slope_n', rise: 0.65, kind: 'track' });
-    setSurface(level, 9, 26, { baseHeight: 6.65, shape: 'slope_n', rise: 0.65, kind: 'track' });
-    setSurface(level, 9, 27, { baseHeight: 6.05, shape: 'slope_n', rise: 0.65, kind: 'track' });
-    setSurface(level, 25, 31, { baseHeight: 5.35, shape: 'slope_n', rise: 0.65, kind: 'track' });
-    setSurface(level, 25, 32, { baseHeight: 4.65, shape: 'slope_n', rise: 0.65, kind: 'track' });
-    setSurface(level, 25, 33, { baseHeight: 4.05, shape: 'slope_n', rise: 0.65, kind: 'track' });
-    setSurface(level, 25, 52, { baseHeight: 3.35, shape: 'slope_n', rise: 0.65, kind: 'track' });
-    setSurface(level, 25, 53, { baseHeight: 2.65, shape: 'slope_n', rise: 0.65, kind: 'track' });
-    setSurface(level, 25, 54, { baseHeight: 2.05, shape: 'slope_n', rise: 0.65, kind: 'track' });
-    setSurface(level, 26, 31, { baseHeight: 5.35, shape: 'slope_n', rise: 0.65, kind: 'track' });
-    setSurface(level, 26, 32, { baseHeight: 4.65, shape: 'slope_n', rise: 0.65, kind: 'track' });
-    setSurface(level, 26, 33, { baseHeight: 4.05, shape: 'slope_n', rise: 0.65, kind: 'track' });
-    setSurface(level, 26, 52, { baseHeight: 3.35, shape: 'slope_n', rise: 0.65, kind: 'track' });
-    setSurface(level, 26, 53, { baseHeight: 2.65, shape: 'slope_n', rise: 0.65, kind: 'track' });
-    setSurface(level, 26, 54, { baseHeight: 2.05, shape: 'slope_n', rise: 0.65, kind: 'track' });
-    setSurface(level, 24, 52, { baseHeight: 3.35, shape: 'slope_n', rise: 0.65, kind: 'track' });
-    setSurface(level, 24, 53, { baseHeight: 2.65, shape: 'slope_n', rise: 0.65, kind: 'track' });
-    setSurface(level, 24, 54, { baseHeight: 2.05, shape: 'slope_n', rise: 0.65, kind: 'track' });
+    // Ramp 1: y=6 z=12 → y=10 z=10, slope_n (3 tiles, columns x=21..23)
+    setSurface(level, 21, 7, { baseHeight: 11.3333, shape: 'slope_n', rise: 0.6667, kind: 'track' });
+    setSurface(level, 21, 8, { baseHeight: 10.6667, shape: 'slope_n', rise: 0.6667, kind: 'track' });
+    setSurface(level, 21, 9, { baseHeight: 10.0, shape: 'slope_n', rise: 0.6667, kind: 'track' });
+    setSurface(level, 22, 7, { baseHeight: 11.3333, shape: 'slope_n', rise: 0.6667, kind: 'track' });
+    setSurface(level, 22, 8, { baseHeight: 10.6667, shape: 'slope_n', rise: 0.6667, kind: 'track' });
+    setSurface(level, 22, 9, { baseHeight: 10.0, shape: 'slope_n', rise: 0.6667, kind: 'track' });
+    setSurface(level, 23, 7, { baseHeight: 11.3333, shape: 'slope_n', rise: 0.6667, kind: 'track' });
+    setSurface(level, 23, 8, { baseHeight: 10.6667, shape: 'slope_n', rise: 0.6667, kind: 'track' });
+    setSurface(level, 23, 9, { baseHeight: 10.0, shape: 'slope_n', rise: 0.6667, kind: 'track' });
+    // Ramp 2: y=12 z=10 → y=16 z=8, slope_n (3 tiles, columns x=4..6)
+    setSurface(level, 4, 13, { baseHeight: 9.3333, shape: 'slope_n', rise: 0.6667, kind: 'track' });
+    setSurface(level, 4, 14, { baseHeight: 8.6667, shape: 'slope_n', rise: 0.6667, kind: 'track' });
+    setSurface(level, 4, 15, { baseHeight: 8.0, shape: 'slope_n', rise: 0.6667, kind: 'track' });
+    setSurface(level, 5, 13, { baseHeight: 9.3333, shape: 'slope_n', rise: 0.6667, kind: 'track' });
+    setSurface(level, 5, 14, { baseHeight: 8.6667, shape: 'slope_n', rise: 0.6667, kind: 'track' });
+    setSurface(level, 5, 15, { baseHeight: 8.0, shape: 'slope_n', rise: 0.6667, kind: 'track' });
+    setSurface(level, 6, 13, { baseHeight: 9.3333, shape: 'slope_n', rise: 0.6667, kind: 'track' });
+    setSurface(level, 6, 14, { baseHeight: 8.6667, shape: 'slope_n', rise: 0.6667, kind: 'track' });
+    setSurface(level, 6, 15, { baseHeight: 8.0, shape: 'slope_n', rise: 0.6667, kind: 'track' });
+    // Ramp 3: y=24 z=8 → y=28 z=6, slope_n (3 tiles, columns x=8..9)
+    setSurface(level, 8, 25, { baseHeight: 7.3333, shape: 'slope_n', rise: 0.6667, kind: 'track' });
+    setSurface(level, 8, 26, { baseHeight: 6.6667, shape: 'slope_n', rise: 0.6667, kind: 'track' });
+    setSurface(level, 8, 27, { baseHeight: 6.0, shape: 'slope_n', rise: 0.6667, kind: 'track' });
+    setSurface(level, 9, 25, { baseHeight: 7.3333, shape: 'slope_n', rise: 0.6667, kind: 'track' });
+    setSurface(level, 9, 26, { baseHeight: 6.6667, shape: 'slope_n', rise: 0.6667, kind: 'track' });
+    setSurface(level, 9, 27, { baseHeight: 6.0, shape: 'slope_n', rise: 0.6667, kind: 'track' });
+    // Ramp 4: y=30 z=6 → y=34 z=4, slope_n (3 tiles, columns x=25..26)
+    setSurface(level, 25, 31, { baseHeight: 5.3333, shape: 'slope_n', rise: 0.6667, kind: 'track' });
+    setSurface(level, 25, 32, { baseHeight: 4.6667, shape: 'slope_n', rise: 0.6667, kind: 'track' });
+    setSurface(level, 25, 33, { baseHeight: 4.0, shape: 'slope_n', rise: 0.6667, kind: 'track' });
+    setSurface(level, 26, 31, { baseHeight: 5.3333, shape: 'slope_n', rise: 0.6667, kind: 'track' });
+    setSurface(level, 26, 32, { baseHeight: 4.6667, shape: 'slope_n', rise: 0.6667, kind: 'track' });
+    setSurface(level, 26, 33, { baseHeight: 4.0, shape: 'slope_n', rise: 0.6667, kind: 'track' });
+    // Ramp 5: y=51 z=4 → y=55 z=2, slope_n (3 tiles, columns x=24..26)
+    setSurface(level, 24, 52, { baseHeight: 3.3333, shape: 'slope_n', rise: 0.6667, kind: 'track' });
+    setSurface(level, 24, 53, { baseHeight: 2.6667, shape: 'slope_n', rise: 0.6667, kind: 'track' });
+    setSurface(level, 24, 54, { baseHeight: 2.0, shape: 'slope_n', rise: 0.6667, kind: 'track' });
+    setSurface(level, 25, 52, { baseHeight: 3.3333, shape: 'slope_n', rise: 0.6667, kind: 'track' });
+    setSurface(level, 25, 53, { baseHeight: 2.6667, shape: 'slope_n', rise: 0.6667, kind: 'track' });
+    setSurface(level, 25, 54, { baseHeight: 2.0, shape: 'slope_n', rise: 0.6667, kind: 'track' });
+    setSurface(level, 26, 52, { baseHeight: 3.3333, shape: 'slope_n', rise: 0.6667, kind: 'track' });
+    setSurface(level, 26, 53, { baseHeight: 2.6667, shape: 'slope_n', rise: 0.6667, kind: 'track' });
+    setSurface(level, 26, 54, { baseHeight: 2.0, shape: 'slope_n', rise: 0.6667, kind: 'track' });
     // Crumble tiles
     fillSurfaceRect(level, 8, 3, 16, 4, { baseHeight: 12, kind: 'crumble', crumble: { delay: 0.15, downtime: 4.0 } });
     fillSurfaceRect(level, 4, 10, 19, 3, { baseHeight: 10, kind: 'crumble', crumble: { delay: 0.15, downtime: 4.0 } });
@@ -6452,30 +6464,32 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     fillTrack(level, 8, 55, 1, 4, 2);
     fillTrack(level, 6, 58, 2, 1, 2);
     // Ramps
-    setSurface(level, 15, 6, { baseHeight: 16, shape: 'slope_s', kind: 'track' });
-    setSurface(level, 15, 7, { baseHeight: 15, shape: 'slope_s', kind: 'track' });
-    setSurface(level, 15, 8, { baseHeight: 14, shape: 'slope_s', kind: 'track' });
-    setSurface(level, 15, 9, { baseHeight: 13, shape: 'slope_s', kind: 'track' });
-    setSurface(level, 15, 24, { baseHeight: 13.5, shape: 'slope_s', rise: 0.5, kind: 'track' });
-    setSurface(level, 15, 27, { baseHeight: 12.5, shape: 'slope_s', rise: 0.5, kind: 'track' });
-    setSurface(level, 15, 28, { baseHeight: 12, shape: 'slope_s', rise: 0.5, kind: 'track' });
-    setSurface(level, 15, 29, { baseHeight: 11.5, shape: 'slope_s', rise: 0.5, kind: 'track' });
-    setSurface(level, 16, 24, { baseHeight: 13.5, shape: 'slope_s', rise: 0.5, kind: 'track' });
-    setSurface(level, 16, 27, { baseHeight: 12.5, shape: 'slope_s', rise: 0.5, kind: 'track' });
-    setSurface(level, 16, 28, { baseHeight: 12, shape: 'slope_s', rise: 0.5, kind: 'track' });
-    setSurface(level, 16, 29, { baseHeight: 11.5, shape: 'slope_s', rise: 0.5, kind: 'track' });
-    setSurface(level, 17, 24, { baseHeight: 13.5, shape: 'slope_s', rise: 0.5, kind: 'track' });
-    setSurface(level, 17, 27, { baseHeight: 12.5, shape: 'slope_s', rise: 0.5, kind: 'track' });
-    setSurface(level, 17, 28, { baseHeight: 12, shape: 'slope_s', rise: 0.5, kind: 'track' });
-    setSurface(level, 17, 29, { baseHeight: 11.5, shape: 'slope_s', rise: 0.5, kind: 'track' });
-    setSurface(level, 37, 45, { baseHeight: 7, shape: 'slope_s', rise: 0.5, kind: 'track' });
-    setSurface(level, 37, 46, { baseHeight: 6.5, shape: 'slope_s', rise: 0.5, kind: 'track' });
-    setSurface(level, 37, 47, { baseHeight: 6, shape: 'slope_s', rise: 0.5, kind: 'track' });
-    setSurface(level, 37, 48, { baseHeight: 5.5, shape: 'slope_s', rise: 0.5, kind: 'track' });
-    setSurface(level, 38, 45, { baseHeight: 7, shape: 'slope_s', rise: 0.5, kind: 'track' });
-    setSurface(level, 38, 46, { baseHeight: 6.5, shape: 'slope_s', rise: 0.5, kind: 'track' });
-    setSurface(level, 38, 47, { baseHeight: 6, shape: 'slope_s', rise: 0.5, kind: 'track' });
-    setSurface(level, 38, 48, { baseHeight: 5.5, shape: 'slope_s', rise: 0.5, kind: 'track' });
+    setSurface(level, 15, 6, { baseHeight: 15.5, shape: 'slope_s', rise: 0.5, kind: 'track' });
+    setSurface(level, 15, 7, { baseHeight: 15.0, shape: 'slope_s', rise: 0.5, kind: 'track' });
+    setSurface(level, 15, 8, { baseHeight: 14.5, shape: 'slope_s', rise: 0.5, kind: 'track' });
+    setSurface(level, 15, 9, { baseHeight: 14.0, shape: 'slope_s', rise: 0.5, kind: 'track' });
+    // Ramp: (15,23) z=14 → (15,25) z=13, single tile at y=24
+    setSurface(level, 15, 24, { baseHeight: 13, shape: 'slope_s', rise: 1, kind: 'track' });
+    setSurface(level, 16, 24, { baseHeight: 13, shape: 'slope_s', rise: 1, kind: 'track' });
+    setSurface(level, 17, 24, { baseHeight: 13, shape: 'slope_s', rise: 1, kind: 'track' });
+    // Ramp: (15,26) z=13 → (15,30) z=12, 3 tiles at y=27-29
+    setSurface(level, 15, 27, { baseHeight: 12.6667, shape: 'slope_s', rise: 0.3333, kind: 'track' });
+    setSurface(level, 15, 28, { baseHeight: 12.3333, shape: 'slope_s', rise: 0.3333, kind: 'track' });
+    setSurface(level, 15, 29, { baseHeight: 12.0, shape: 'slope_s', rise: 0.3333, kind: 'track' });
+    setSurface(level, 16, 27, { baseHeight: 12.6667, shape: 'slope_s', rise: 0.3333, kind: 'track' });
+    setSurface(level, 16, 28, { baseHeight: 12.3333, shape: 'slope_s', rise: 0.3333, kind: 'track' });
+    setSurface(level, 16, 29, { baseHeight: 12.0, shape: 'slope_s', rise: 0.3333, kind: 'track' });
+    setSurface(level, 17, 27, { baseHeight: 12.6667, shape: 'slope_s', rise: 0.3333, kind: 'track' });
+    setSurface(level, 17, 28, { baseHeight: 12.3333, shape: 'slope_s', rise: 0.3333, kind: 'track' });
+    setSurface(level, 17, 29, { baseHeight: 12.0, shape: 'slope_s', rise: 0.3333, kind: 'track' });
+    setSurface(level, 37, 45, { baseHeight: 7.5, shape: 'slope_s', rise: 0.5, kind: 'track' });
+    setSurface(level, 37, 46, { baseHeight: 7.0, shape: 'slope_s', rise: 0.5, kind: 'track' });
+    setSurface(level, 37, 47, { baseHeight: 6.5, shape: 'slope_s', rise: 0.5, kind: 'track' });
+    setSurface(level, 37, 48, { baseHeight: 6.0, shape: 'slope_s', rise: 0.5, kind: 'track' });
+    setSurface(level, 38, 45, { baseHeight: 7.5, shape: 'slope_s', rise: 0.5, kind: 'track' });
+    setSurface(level, 38, 46, { baseHeight: 7.0, shape: 'slope_s', rise: 0.5, kind: 'track' });
+    setSurface(level, 38, 47, { baseHeight: 6.5, shape: 'slope_s', rise: 0.5, kind: 'track' });
+    setSurface(level, 38, 48, { baseHeight: 6.0, shape: 'slope_s', rise: 0.5, kind: 'track' });
     // Crumble tiles
     fillSurfaceRect(level, 15, 14, 1, 2, { baseHeight: 14, kind: 'crumble', crumble: { delay: 0.15, downtime: 4.0 } });
     fillSurfaceRect(level, 14, 15, 1, 3, { baseHeight: 14, kind: 'crumble', crumble: { delay: 0.15, downtime: 4.0 } });
@@ -6616,8 +6630,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     });
 
     // --- Elevators (from ACTORS section) ---
-    addElevator(level, 'elev1', 19.5, 52.5, 2, 6, 2, 2, 0.9, 4.5);
-    setSurface(level, 20, 53, { baseHeight: 2, kind: 'track' });
+    addElevator(level, 'elev1', 16.5, 47.5, 2, 6, 2, 2, 0.9, 4.5);
 
     // --- Moving Platforms ---
     addMovingBridge(level, 'plat1', [
@@ -6625,7 +6638,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
       { x: 6.5, y: 11.5, z: 12 },
       { x: 3.5, y: 40.5, z: 6 },
       { x: 3.5, y: 53.5, z: 2 },
-    ], 2, 2, 3.3480, { pauseDuration: 1.5, midpointPause: 0.5 });
+    ], 2, 2, 0.5, { pauseDuration: 1.5, midpointPause: 0.5 });
 
     // --- Goal ---
     setGoal(level, 15.5, 3.5);
