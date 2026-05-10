@@ -2021,6 +2021,43 @@ function completeIdleGame() {
       }
     }
 
+    function refreshButtonStates() {
+      const s = state();
+
+      // Update upgrade Buy buttons
+      bySel('[data-buy-upgrade]', elements.upgradeList).forEach((btn) => {
+        const upgrade = CONFIG.upgrades.find((u) => u.id === btn.dataset.buyUpgrade);
+        if (!upgrade) return;
+        const owned = s.upgrades[upgrade.id] || 0;
+        const cost = getUpgradeCost(upgrade, owned);
+        const affordable = canAfford(cost);
+        btn.disabled = !affordable;
+        const card = btn.closest('.card');
+        if (card) card.classList.toggle('locked', !affordable);
+      });
+
+      // Update layer Convert buttons
+      bySel('[data-layer-reset]', elements.layerList).forEach((btn) => {
+        const layer = CONFIG.layers.find((l) => l.id === btn.dataset.layerReset);
+        if (!layer) return;
+        const gain = getLayerGain(layer);
+        btn.disabled = gain <= 0;
+        const card = btn.closest('.card');
+        if (card) {
+          const baseValue = s[layer.baseResource] || 0;
+          const unlocked = layer.id === 'regret'
+            ? s.totalPressesEarned >= layer.unlockAt
+            : baseValue >= layer.unlockAt || gain > 0 || (s[layer.resourceKey] || 0) > 0;
+          card.classList.toggle('locked', !unlocked);
+        }
+        // Update gain display
+        const gainEl = btn.closest('.card')?.querySelector('.small');
+        if (gainEl && gainEl.textContent.startsWith('Gain:')) {
+          gainEl.textContent = `Gain: ${format(gain)}`;
+        }
+      });
+    }
+
     function renderLive() {
       applyDisclosure();
       applyButtonEvolution();
@@ -2029,6 +2066,7 @@ function completeIdleGame() {
       renderButtonPosition();
       renderAutonomyEnding();
       renderDumbDownCard();
+      refreshButtonStates();
     }
 
     function update(dt) {
