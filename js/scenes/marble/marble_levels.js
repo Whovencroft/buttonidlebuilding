@@ -467,10 +467,14 @@
       const maxDist = cell.funnelMaxDist || 2;
       const t = clamp(dist / maxDist, 0, 1);
       // Bowl shape: rim is at baseHeight (flush with surrounding terrain),
-      // center dips DOWN by 'rise' amount
-      const z = cell.baseHeight - cell.rise * (1 - t);
-      // Gradient: points radially outward (uphill away from center)
-      const gradMag = (dist > 0.001) ? (cell.rise / maxDist) : 0;
+      // center dips DOWN by 'rise' amount.
+      // Cubic falloff (1-t)^3 keeps the rim nearly flat so outer tile
+      // corners stay within 0.01 of baseHeight — preventing visible
+      // wall faces between funnel rim tiles and neighbouring track.
+      const oneMinusT = 1 - t;
+      const z = cell.baseHeight - cell.rise * oneMinusT * oneMinusT * oneMinusT;
+      // Gradient: derivative of cubic bowl is 3·rise·(1-t)²/maxDist
+      const gradMag = (dist > 0.001) ? (3 * cell.rise * oneMinusT * oneMinusT / maxDist) : 0;
       const gx = (dist > 0.001) ? gradMag * (dx / dist) : 0;
       const gy = (dist > 0.001) ? gradMag * (dy / dist) : 0;
       return { z, gradient: { gx, gy } };
@@ -4172,11 +4176,11 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     setSurface(level, 47, 91, { baseHeight: 9.5, shape: 'slope_s', rise: 0.5, kind: 'track' });
     setSurface(level, 58, 91, { baseHeight: 9.5, shape: 'slope_s', rise: 0.5, kind: 'track' });
     setSurface(level, 59, 96, { baseHeight: 11.5, shape: 'slope_s', rise: 0.5, kind: 'track' });
-    setSurface(level, 133, 100, { baseHeight: 0.5, shape: 'slope_s', rise: 0.5, kind: 'track' });
+    setSurface(level, 133, 100, { baseHeight: 0.5, shape: 'slope_n', rise: 0.5, kind: 'track' });
     setSurface(level, 29, 87, { baseHeight: 7.5, shape: 'slope_w', rise: 0.5, kind: 'track' });
     setSurface(level, 15, 98, { baseHeight: 2.5, shape: 'slope_w', rise: 0.5, kind: 'track' });
     setSurface(level, 15, 99, { baseHeight: 2.5, shape: 'slope_w', rise: 0.5, kind: 'track' });
-    setSurface(level, 132, 99, { baseHeight: 0.5, shape: 'slope_w', rise: 0.5, kind: 'track' });
+    setSurface(level, 132, 99, { baseHeight: 0.5, shape: 'slope_e', rise: 0.5, kind: 'track' });
     setSurface(level, 15, 100, { baseHeight: 2.5, shape: 'slope_w', rise: 0.5, kind: 'track' });
     setSurface(level, 15, 101, { baseHeight: 2.5, shape: 'slope_w', rise: 0.5, kind: 'track' });
     setSurface(level, 42, 101, { baseHeight: 12.5, shape: 'slope_w', rise: 0.5, kind: 'track' });
@@ -4186,11 +4190,11 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     setSurface(level, 71, 93, { baseHeight: 8.5, shape: 'slope_e', rise: 0.5, kind: 'track' });
     setSurface(level, 65, 96, { baseHeight: 10.5, shape: 'slope_e', rise: 0.5, kind: 'track' });
     setSurface(level, 77, 98, { baseHeight: 6.5, shape: 'slope_e', rise: 0.5, kind: 'track' });
-    setSurface(level, 134, 99, { baseHeight: 0.5, shape: 'slope_e', rise: 0.5, kind: 'track' });
+    setSurface(level, 134, 99, { baseHeight: 0.5, shape: 'slope_w', rise: 0.5, kind: 'track' });
     setSurface(level, 80, 103, { baseHeight: 5.5, shape: 'slope_e', rise: 0.5, kind: 'track' });
     setSurface(level, 74, 114, { baseHeight: 7.5, shape: 'slope_e', rise: 0.5, kind: 'track' });
     setSurface(level, 83, 115, { baseHeight: 4.5, shape: 'slope_e', rise: 0.5, kind: 'track' });
-    setSurface(level, 133, 98, { baseHeight: 0.5, shape: 'slope_n', rise: 0.5, kind: 'track' });
+    setSurface(level, 133, 98, { baseHeight: 0.5, shape: 'slope_s', rise: 0.5, kind: 'track' });
     setSurface(level, 65, 117, { baseHeight: 10.5, shape: 'slope_n', rise: 0.5, kind: 'track' });
     setSurface(level, 50, 120, { baseHeight: 9.5, shape: 'slope_n', rise: 0.5, kind: 'track' });
     setSurface(level, 33, 124, { baseHeight: 8.5, shape: 'slope_n', rise: 0.5, kind: 'track' });
