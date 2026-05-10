@@ -22,6 +22,7 @@
 
     .app {
       height: 100vh;
+      height: 100dvh; /* dynamic viewport height — accounts for mobile browser chrome */
       display: grid;
       grid-template-rows: auto auto 1fr auto;
       gap: 10px;
@@ -684,7 +685,7 @@
       .grid-2, .grid-3 { grid-template-columns: 1fr; }
       .message { white-space: normal; }
       html, body { overflow: auto; }
-      .app { height: auto; min-height: 100vh; }
+      .app { height: auto; min-height: 100vh; min-height: 100dvh; }
     }
 
     .mini-btn:disabled {
@@ -746,7 +747,9 @@
 .app.app-marble-mode .scene-root,
 .app.app-marble-mode .marble-stage {
   height: 100vh;
+  height: 100dvh;
   min-height: 100vh;
+  min-height: 100dvh;
 }
 
 .app.app-marble-mode .content {

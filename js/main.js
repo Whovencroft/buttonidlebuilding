@@ -249,7 +249,11 @@
   let frameHandle = null;
   let saveHandle = null;
   const TEST_SCENE_SEQUENCE = ['button_idle', 'marble'];
-  const DEBUG_TYPED_COMMAND = 'NEXTSCENE';
+
+  // ─── Debug command registry ─────────────────────────────────────────────────
+  // Type any registered keyword while not focused on an input to trigger it.
+  // Keys reset after 1.8s of inactivity; press Escape to clear the buffer.
+  const DEBUG_COMMANDS = {}; // populated after scene init (see registerDebugCommands)
   let debugCommandBuffer = '';
   let debugCommandLastKeyAt = 0;
   let lastFrame = performance.now();
@@ -435,6 +439,7 @@
     );
   }
 
+  // Handles typed debug commands against the registry.
   function handleDebugSceneCommand(event) {
     if (isTypingTarget(event.target)) return;
 
@@ -453,18 +458,50 @@
 
     debugCommandBuffer += event.key.toUpperCase();
 
-    if (!DEBUG_TYPED_COMMAND.startsWith(debugCommandBuffer)) {
-      debugCommandBuffer = event.key.toUpperCase();
-      if (!DEBUG_TYPED_COMMAND.startsWith(debugCommandBuffer)) {
-        debugCommandBuffer = '';
-        return;
-      }
+    // Check for an exact match first
+    if (DEBUG_COMMANDS[debugCommandBuffer]) {
+      const action = DEBUG_COMMANDS[debugCommandBuffer];
+      debugCommandBuffer = '';
+      action();
+      return;
     }
 
-    if (debugCommandBuffer === DEBUG_TYPED_COMMAND) {
-      debugCommandBuffer = '';
-      advanceToNextSceneForTesting();
+    // If the buffer is not a prefix of any registered command, reset
+    const isPrefix = Object.keys(DEBUG_COMMANDS).some(
+      cmd => cmd.startsWith(debugCommandBuffer)
+    );
+    if (!isPrefix) {
+      // Try starting fresh with just this character
+      debugCommandBuffer = event.key.toUpperCase();
+      const stillPrefix = Object.keys(DEBUG_COMMANDS).some(
+        cmd => cmd.startsWith(debugCommandBuffer)
+      );
+      if (!stillPrefix) {
+        debugCommandBuffer = '';
+      }
     }
+  }
+
+  // Registers all debug commands. Called after scenes are initialized.
+  function registerDebugCommands() {
+    DEBUG_COMMANDS['NEXTSCENE'] = advanceToNextSceneForTesting;
+
+    // Triggers the idle ending: sets the completion flag, unlocks marble,
+    // and begins the shatter → transition sequence.
+    DEBUG_COMMANDS['IDLEEND'] = function triggerIdleEndingForTesting() {
+      if (state.flags.idleGameComplete) {
+        elements.saveStatus.textContent = 'Debug: idle ending already triggered.';
+        return;
+      }
+      state.flags.idleGameComplete = true;
+      state.scenes.marble.unlocked = true;
+      state.scenes.marble.currentLevelId =
+        state.scenes.marble.currentLevelId || 'training_ground';
+      state.ui.autonomyEndingOpen = false;
+      saveGame();
+      beginEndingTransitionToMarble();
+      elements.saveStatus.textContent = 'Debug: idle ending triggered.';
+    };
   }
 
   function applyMarbleReward(result) {
@@ -829,6 +866,7 @@ try {
     // The saved activeScene is preserved in state so returning players can resume
     // from the title screen's buttons.
     state.app.activeScene = 'title';
+    registerDebugCommands();
     renderShell();
     sceneManager.notifyStateLoaded({ state });
     sceneManager.setActiveScene('title', { state, force: true });
