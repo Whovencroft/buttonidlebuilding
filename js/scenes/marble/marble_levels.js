@@ -6638,7 +6638,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
       { x: 6.5, y: 11.5, z: 12 },
       { x: 3.5, y: 40.5, z: 6 },
       { x: 3.5, y: 53.5, z: 2 },
-    ], 2, 2, 0.2, { pauseDuration: 1.5, midpointPause: 0.5 });
+    ], 2, 2, 0.15, { pauseDuration: 1.5, midpointPause: 0.5 });
 
     // --- Goal ---
     setGoal(level, 15.5, 3.5);
