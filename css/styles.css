@@ -774,6 +774,37 @@
   border: 0;
 }
 
+/* Phase 4: Slide all UI off-screen before ending transition */
+.app.app-ending-slideout > .topbar {
+  transform: translateY(-100%);
+  opacity: 0;
+  transition: transform 0.4s cubic-bezier(0.4, 0, 1, 1), opacity 0.3s ease;
+}
+.app.app-ending-slideout > .tabs {
+  transform: translateX(-100%);
+  opacity: 0;
+  transition: transform 0.4s cubic-bezier(0.4, 0, 1, 1) 0.05s, opacity 0.3s ease 0.05s;
+}
+.app.app-ending-slideout > .statusbar {
+  transform: translateY(100%);
+  opacity: 0;
+  transition: transform 0.4s cubic-bezier(0.4, 0, 1, 1) 0.1s, opacity 0.3s ease 0.1s;
+}
+.app.app-ending-slideout .game-grid {
+  opacity: 0;
+  transform: scale(0.9);
+  transition: opacity 0.4s ease 0.15s, transform 0.4s ease 0.15s;
+}
+.app.app-ending-slideout .button-stage {
+  opacity: 0;
+  transform: scale(0.85);
+  transition: opacity 0.35s ease, transform 0.35s ease;
+}
+.app.app-ending-slideout > *,
+.app.app-ending-slideout .game-grid > * {
+  pointer-events: none;
+}
+
 .app.app-scene-transitioning > .topbar,
 .app.app-scene-transitioning > .tabs,
 .app.app-scene-transitioning > .statusbar,

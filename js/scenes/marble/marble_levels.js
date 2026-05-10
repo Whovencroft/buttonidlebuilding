@@ -299,20 +299,23 @@
 
   function setGoal(level, x, y, radius = 0.42) {
     // Level design guideline: goals must be placed on flat, non-bounce, non-crumble terrain tiles.
-    const cell = getSurfaceCell(level, x, y);
+    // Floor coordinates to ensure they map to valid grid indices
+    const tx = Math.floor(x);
+    const ty = Math.floor(y);
+    const cell = getSurfaceCell(level, tx, ty);
     if (cell) {
       if (cell.kind === 'void') {
-        console.warn(`[LevelDesign] setGoal at (${x},${y}) is on a void tile — goal will be unreachable.`);
+        console.warn(`[LevelDesign] setGoal at (${tx},${ty}) is on a void tile — goal will be unreachable.`);
       } else if (cell.shape !== SHAPES.FLAT) {
-        console.warn(`[LevelDesign] setGoal at (${x},${y}) is on a non-flat tile (shape='${cell.shape}') — marble may slide through goal.`);
+        console.warn(`[LevelDesign] setGoal at (${tx},${ty}) is on a non-flat tile (shape='${cell.shape}') — marble may slide through goal.`);
       } else if (cell.bounce > 0) {
-        console.warn(`[LevelDesign] setGoal at (${x},${y}) is on a bounce tile (bounce=${cell.bounce}) — marble will be deflected away from goal.`);
+        console.warn(`[LevelDesign] setGoal at (${tx},${ty}) is on a bounce tile (bounce=${cell.bounce}) — marble will be deflected away from goal.`);
       } else if (cell.crumble) {
-        console.warn(`[LevelDesign] setGoal at (${x},${y}) is on a crumble tile — goal surface may disappear before marble arrives.`);
+        console.warn(`[LevelDesign] setGoal at (${tx},${ty}) is on a crumble tile — goal surface may disappear before marble arrives.`);
       }
     }
-    setTrigger(level, x, y, { kind: 'goal', radius });
-    level.goal = { x: x + 0.5, y: y + 0.5, radius };
+    setTrigger(level, tx, ty, { kind: 'goal', radius });
+    level.goal = { x: tx + 0.5, y: ty + 0.5, radius };
   }
 
   function addActor(level, actor) {

@@ -548,85 +548,119 @@
     state.ui.activeTab = 'play';
     saveGame();
 
-    const buttonRect = elements.mainButton.getBoundingClientRect();
-    const hostRect = elements.sceneHost.getBoundingClientRect();
-
-    const startX = buttonRect.left + buttonRect.width * 0.5;
-    const startY = buttonRect.top + buttonRect.height * 0.5;
-    const targetX = hostRect.left + hostRect.width * 0.5;
-    const targetY = hostRect.top + hostRect.height * 0.5;
-
-    transitionOverlay.hidden = false;
-    transitionOverlay.classList.add('active');
-    transitionNote.textContent = 'The button outgrew counting and dropped into something else.';
-
-    transitionOrb.style.left = `${startX}px`;
-    transitionOrb.style.top = `${startY}px`;
-    transitionOrb.style.width = `${buttonRect.width}px`;
-    transitionOrb.style.height = `${buttonRect.height}px`;
-
+    // Step 1: Slide all UI panels off-screen
     if (elements.appRoot) {
-      elements.appRoot.classList.add('app-scene-transitioning');
+      elements.appRoot.classList.add('app-ending-slideout');
     }
 
-    transitionBackdrop.animate(
-      [
-        { opacity: 0 },
-        { opacity: 1 }
-      ],
-      {
-        duration: 260,
-        easing: 'ease-out',
-        fill: 'forwards'
-      }
-    );
-
-    const dx = targetX - startX;
-    const dy = targetY - startY;
-
-    const orbAnimation = transitionOrb.animate(
-      [
-        {
-          transform: 'translate(-50%, -50%) translate(0px, 0px) scale(1)',
-          borderRadius: '999px',
-          boxShadow: '0 18px 42px rgba(0,0,0,0.3)'
-        },
-        {
-          transform: `translate(-50%, -50%) translate(${dx * 0.14}px, ${dy * 0.32}px) scale(0.9)`,
-          borderRadius: '999px',
-          boxShadow: '0 24px 58px rgba(0,0,0,0.34)',
-          offset: 0.45
-        },
-        {
-          transform: `translate(-50%, -50%) translate(${dx}px, ${dy}px) scale(0.17)`,
-          borderRadius: '50%',
-          boxShadow: '0 10px 24px rgba(0,0,0,0.36)'
-        }
-      ],
-      {
-        duration: 1320,
-        easing: 'cubic-bezier(0.22, 1, 0.36, 1)',
-        fill: 'forwards'
-      }
-    );
-
+    // Step 2: After UI slides out (500ms), start the orb transition
     setTimeout(() => {
-      switchScene('marble', {
-        force: true,
-        silentSave: true,
-        startLevelId: state.scenes.marble.currentLevelId,
-        restartLevel: true,
-        enteredFromEnding: true
-      });
-    }, 650);
+      const buttonRect = elements.mainButton.getBoundingClientRect();
+      const viewportCx = window.innerWidth / 2;
+      const viewportCy = window.innerHeight / 2;
 
-    orbAnimation.finished.finally(() => {
-      setTimeout(() => {
+      // Use button position or center if button is off-screen
+      const startX = buttonRect.width > 0 ? buttonRect.left + buttonRect.width * 0.5 : viewportCx;
+      const startY = buttonRect.height > 0 ? buttonRect.top + buttonRect.height * 0.5 : viewportCy;
+      const targetX = viewportCx;
+      const targetY = viewportCy;
+
+      transitionOverlay.hidden = false;
+      transitionOverlay.classList.add('active');
+      transitionNote.textContent = 'The button outgrew counting and dropped into something else.';
+
+      transitionOrb.style.left = `${startX}px`;
+      transitionOrb.style.top = `${startY}px`;
+      transitionOrb.style.width = '60px';
+      transitionOrb.style.height = '60px';
+
+      if (elements.appRoot) {
+        elements.appRoot.classList.add('app-scene-transitioning');
+      }
+
+      transitionBackdrop.animate(
+        [
+          { opacity: 0 },
+          { opacity: 1 }
+        ],
+        {
+          duration: 400,
+          easing: 'ease-out',
+          fill: 'forwards'
+        }
+      );
+
+      const dx = targetX - startX;
+      const dy = targetY - startY;
+
+      const orbAnimation = transitionOrb.animate(
+        [
+          {
+            transform: 'translate(-50%, -50%) translate(0px, 0px) scale(0.5)',
+            borderRadius: '50%',
+            boxShadow: '0 0 40px rgba(125,211,252,0.5)'
+          },
+          {
+            transform: `translate(-50%, -50%) translate(${dx * 0.5}px, ${dy * 0.5}px) scale(1.2)`,
+            borderRadius: '50%',
+            boxShadow: '0 0 60px rgba(125,211,252,0.6)',
+            offset: 0.5
+          },
+          {
+            transform: `translate(-50%, -50%) translate(${dx}px, ${dy}px) scale(1)`,
+            borderRadius: '50%',
+            boxShadow: '0 0 30px rgba(125,211,252,0.3)'
+          }
+        ],
+        {
+          duration: 1600,
+          easing: 'cubic-bezier(0.22, 1, 0.36, 1)',
+          fill: 'forwards'
+        }
+      );
+
+      // Step 3: Only switch scene AFTER orb animation completes
+      orbAnimation.finished.then(() => {
+        // Brief pause with marble at center before revealing the scene
+        setTimeout(() => {
+          switchScene('marble', {
+            force: true,
+            silentSave: true,
+            startLevelId: state.scenes.marble.currentLevelId,
+            restartLevel: true,
+            enteredFromEnding: true
+          });
+
+          // Fade out the overlay to reveal the marble scene beneath
+          transitionOverlay.animate(
+            [{ opacity: 1 }, { opacity: 0 }],
+            { duration: 800, easing: 'ease-in', fill: 'forwards' }
+          ).finished.then(() => {
+            clearTransitionOverlay();
+            if (elements.appRoot) {
+              elements.appRoot.classList.remove('app-ending-slideout');
+            }
+            renderShell();
+            saveGame();
+          });
+        }, 600);
+      }).catch(() => {
+        // Fallback if animation is cancelled
         clearTransitionOverlay();
+        if (elements.appRoot) {
+          elements.appRoot.classList.remove('app-ending-slideout');
+        }
+        switchScene('marble', {
+          force: true,
+          silentSave: true,
+          startLevelId: state.scenes.marble.currentLevelId,
+          restartLevel: true,
+          enteredFromEnding: true
+        });
         renderShell();
         saveGame();
-      }, 100);
-    });
+      });
+    }, 500);
   }
 
 function switchScene(sceneId, options = {}) {
