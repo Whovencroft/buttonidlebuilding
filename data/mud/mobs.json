@@ -1,0 +1,135 @@
+{
+  "8001": {
+    "vnum": 8001,
+    "zone": 0,
+    "name": "Warden Kael",
+    "keywords": ["warden", "kael", "trainer"],
+    "description": "A grizzled veteran with scars from a dozen realms. His eyes are sharp despite his age. He trains newcomers in the basics of combat.",
+    "tier": "npc",
+    "stats": { "hp": 999, "damage_min": 0, "damage_max": 0, "ac": 50, "speed": 1.0 },
+    "flags": ["npc", "no_attack"],
+    "loot_table": [],
+    "dialogue": {
+      "greet": "Another traveler from beyond the veil. You'll need to learn to fight if you want to survive out there. The dummies are free to use.",
+      "death": null
+    }
+  },
+  "8002": {
+    "vnum": 8002,
+    "zone": 0,
+    "name": "Merchant Zara",
+    "keywords": ["merchant", "zara", "shopkeeper"],
+    "description": "A sharp-eyed woman in mismatched clothing from half a dozen realms. She runs the Bazaar with an iron fist and a silver tongue.",
+    "tier": "npc",
+    "stats": { "hp": 999, "damage_min": 0, "damage_max": 0, "ac": 50, "speed": 1.0 },
+    "flags": ["npc", "no_attack"],
+    "loot_table": [],
+    "dialogue": {
+      "greet": "Buying or selling? I deal in goods from every realm. Check the board for player listings.",
+      "death": null
+    }
+  },
+  "8003": {
+    "vnum": 8003,
+    "zone": 1,
+    "name": "Old Merchant Giles",
+    "keywords": ["merchant", "giles", "old"],
+    "description": "A stooped old man with kind eyes and ink-stained fingers. He sells basic supplies and knows every rumor in Thornhold.",
+    "tier": "npc",
+    "stats": { "hp": 999, "damage_min": 0, "damage_max": 0, "ac": 50, "speed": 1.0 },
+    "flags": ["npc", "no_attack"],
+    "loot_table": [],
+    "dialogue": {
+      "greet": "Welcome, traveler. Need supplies? I've got potions, torches, and rope. Also heard something strange rolled through the market last night — left a groove in the cobblestones.",
+      "death": null
+    }
+  },
+  "1001": {
+    "vnum": 1001,
+    "zone": 1,
+    "name": "Highwayman",
+    "keywords": ["highwayman", "bandit", "thief"],
+    "description": "A ragged figure in a torn cloak, wielding a rusty shortsword. He blocks the road with false bravado.",
+    "tier": "normal",
+    "stats": { "hp": 30, "damage_min": 3, "damage_max": 7, "ac": 5, "speed": 1.0 },
+    "flags": ["aggressive"],
+    "loot_table": [
+      { "item_vnum": 1005, "chance": 0.5 },
+      { "item_vnum": 1006, "chance": 0.3 }
+    ],
+    "dialogue": {
+      "greet": "Your gold or your life!",
+      "death": "Should've... picked a different road..."
+    }
+  },
+  "1002": {
+    "vnum": 1002,
+    "zone": 1,
+    "name": "Hollow Wolf",
+    "keywords": ["wolf", "hollow"],
+    "description": "A gaunt wolf with glowing green eyes. Its ribs are visible through matted fur. It snarls at your approach.",
+    "tier": "normal",
+    "stats": { "hp": 40, "damage_min": 5, "damage_max": 10, "ac": 3, "speed": 1.3 },
+    "flags": ["aggressive"],
+    "loot_table": [
+      { "item_vnum": 1007, "chance": 0.4 }
+    ],
+    "dialogue": {
+      "greet": null,
+      "death": null
+    }
+  },
+  "1003": {
+    "vnum": 1003,
+    "zone": 1,
+    "name": "Goblin Squatter",
+    "keywords": ["goblin", "squatter"],
+    "description": "A small green creature crouched over a cooking pot. It hisses when it sees you, reaching for a crude knife.",
+    "tier": "normal",
+    "stats": { "hp": 20, "damage_min": 2, "damage_max": 5, "ac": 2, "speed": 1.5 },
+    "flags": ["aggressive"],
+    "loot_table": [
+      { "item_vnum": 1006, "chance": 0.6 },
+      { "item_vnum": 1008, "chance": 0.2 }
+    ],
+    "dialogue": {
+      "greet": "Grik! Mine! All mine!",
+      "death": "Grik..."
+    }
+  },
+  "1004": {
+    "vnum": 1004,
+    "zone": 1,
+    "name": "Shadow Stalker",
+    "keywords": ["shadow", "stalker"],
+    "description": "A creature of pure darkness that moves between the trees. Its form is indistinct — just a deeper shadow among shadows.",
+    "tier": "normal",
+    "stats": { "hp": 50, "damage_min": 8, "damage_max": 14, "ac": 8, "speed": 1.1 },
+    "flags": ["aggressive"],
+    "loot_table": [
+      { "item_vnum": 1009, "chance": 0.3 }
+    ],
+    "dialogue": {
+      "greet": null,
+      "death": null
+    }
+  },
+  "1005": {
+    "vnum": 1005,
+    "zone": 1,
+    "name": "Giant Spider",
+    "keywords": ["spider", "giant"],
+    "description": "A spider the size of a large dog. Its mandibles drip with venom and its eight eyes reflect your terrified face back at you.",
+    "tier": "normal",
+    "stats": { "hp": 60, "damage_min": 10, "damage_max": 16, "ac": 6, "speed": 0.9 },
+    "flags": ["aggressive"],
+    "loot_table": [
+      { "item_vnum": 1010, "chance": 0.5 },
+      { "item_vnum": 1004, "chance": 0.2 }
+    ],
+    "dialogue": {
+      "greet": null,
+      "death": null
+    }
+  }
+}

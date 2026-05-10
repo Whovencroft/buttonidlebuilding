@@ -502,6 +502,16 @@
       beginEndingTransitionToMarble();
       elements.saveStatus.textContent = 'Debug: idle ending triggered.';
     };
+
+    // Switches directly to the MUD scene for testing.
+    DEBUG_COMMANDS['MUDSCENE'] = function switchToMudForTesting() {
+      if (!mudScene) {
+        elements.saveStatus.textContent = 'Debug: MUD scene not available.';
+        return;
+      }
+      switchScene('mud', { force: true });
+      elements.saveStatus.textContent = 'Debug: switched to MUD scene.';
+    };
   }
 
   function applyMarbleReward(result) {
@@ -801,6 +811,19 @@ try {
   console.error('Marble scene failed to initialize:', error);
   marbleScene = null;
   state.scenes.marble.unlocked = false;
+}
+
+// ─── MUD Scene Registration ─────────────────────────────────────────────────
+let mudScene = null;
+try {
+  if (!window.MudScene || typeof window.MudScene.create !== 'function') {
+    throw new Error('MudScene.create is unavailable.');
+  }
+  mudScene = window.MudScene.create(api);
+  sceneManager.registerScene(mudScene);
+} catch (error) {
+  console.error('MUD scene failed to initialize:', error);
+  mudScene = null;
 }
 
   function attachShellEvents() {

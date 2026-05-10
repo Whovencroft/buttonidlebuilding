@@ -1,0 +1,380 @@
+{
+  "0": {
+    "vnum": 0,
+    "zone": 0,
+    "name": "The Nexus of Echoes — Central Chamber",
+    "description": "You stand in a vast circular chamber. The walls shimmer with an iridescent light that seems to pulse in rhythm with your heartbeat. Six massive archways ring the perimeter, each radiating a distinct energy. In the center, a cracked obsidian pedestal holds nothing — but a faint circular groove in its surface suggests something once rested here. Something round.",
+    "flags": ["indoors", "no_mob_wander", "safe"],
+    "exits": {
+      "north": { "target_vnum": 1 },
+      "east": { "target_vnum": 2 },
+      "south": { "target_vnum": 3 },
+      "west": { "target_vnum": 4 },
+      "up": { "target_vnum": 5 }
+    },
+    "interactables": [
+      {
+        "keyword": ["pedestal", "groove", "obsidian"],
+        "description": "The obsidian pedestal is cracked but solid. A perfectly circular groove is worn into its surface — about the size of a marble. Dust has settled in the groove, but a thin trail leads away from it, as if something rolled off recently.",
+        "action": null
+      }
+    ],
+    "initial_mobs": [],
+    "initial_items": []
+  },
+  "1": {
+    "vnum": 1,
+    "zone": 0,
+    "name": "The Nexus — Northern Archway",
+    "description": "The northern archway pulses with a warm golden light. Beyond it, you can see rolling green hills and the distant spires of a castle. The air smells of pine and old stone. A sign carved into the arch reads: 'The Shattered Crown — Realm of High Fantasy.'",
+    "flags": ["indoors"],
+    "exits": {
+      "south": { "target_vnum": 0 },
+      "north": { "target_vnum": 1000 }
+    },
+    "interactables": [
+      {
+        "keyword": ["sign", "arch", "archway"],
+        "description": "The carved sign reads: 'The Shattered Crown — Realm of High Fantasy. Danger Level: Moderate. Recommended for newcomers.'",
+        "action": null
+      }
+    ],
+    "initial_mobs": [],
+    "initial_items": []
+  },
+  "2": {
+    "vnum": 2,
+    "zone": 0,
+    "name": "The Nexus — Eastern Archway",
+    "description": "The eastern archway crackles with electric blue energy. Through it, neon signs flicker in an endless rain. Towering megastructures pierce a sky choked with smog and holographic advertisements. A digital readout above the arch displays: 'NEON GRID — SECTOR 7.'",
+    "flags": ["indoors"],
+    "exits": {
+      "west": { "target_vnum": 0 },
+      "east": { "target_vnum": 2000 }
+    },
+    "interactables": [
+      {
+        "keyword": ["readout", "display", "sign"],
+        "description": "The digital readout cycles through text: 'NEON GRID — SECTOR 7. Threat Assessment: HIGH. Augmentation recommended.'",
+        "action": null
+      }
+    ],
+    "initial_mobs": [],
+    "initial_items": []
+  },
+  "3": {
+    "vnum": 3,
+    "zone": 0,
+    "name": "The Nexus — Southern Archway",
+    "description": "The southern archway is wreathed in shadow and the faint glow of a streetlamp. Through it, rain falls on wet cobblestones. A saxophone plays somewhere in the distance. The arch bears a brass plaque: 'Midnight Rain — The Noir District.'",
+    "flags": ["indoors"],
+    "exits": {
+      "north": { "target_vnum": 0 },
+      "south": { "target_vnum": 3000 }
+    },
+    "interactables": [
+      {
+        "keyword": ["plaque", "brass", "sign"],
+        "description": "The brass plaque reads: 'Midnight Rain — The Noir District. Danger Level: Moderate-High. Trust no one.'",
+        "action": null
+      }
+    ],
+    "initial_mobs": [],
+    "initial_items": []
+  },
+  "4": {
+    "vnum": 4,
+    "zone": 0,
+    "name": "The Nexus — Western Archway",
+    "description": "The western archway radiates heat and the smell of gunpowder. Through it, palm trees sway against an orange sunset. An explosion echoes in the distance. Spray-painted across the arch in bold red letters: 'BLOOD & CHROME — NO RULES, NO MERCY.'",
+    "flags": ["indoors"],
+    "exits": {
+      "east": { "target_vnum": 0 },
+      "west": { "target_vnum": 4000 }
+    },
+    "interactables": [
+      {
+        "keyword": ["graffiti", "spray", "letters", "paint"],
+        "description": "The spray paint reads: 'BLOOD & CHROME — NO RULES, NO MERCY. Danger Level: HIGH. Bring ammo.'",
+        "action": null
+      }
+    ],
+    "initial_mobs": [],
+    "initial_items": []
+  },
+  "5": {
+    "vnum": 5,
+    "zone": 0,
+    "name": "The Nexus — Upper Platform",
+    "description": "A spiral staircase leads up to a floating platform above the central chamber. From here you can see all six archways below. Two more passages branch off — one shimmering with cherry blossoms and crackling energy, the other heavy with the dust of ages.",
+    "flags": ["indoors"],
+    "exits": {
+      "down": { "target_vnum": 0 },
+      "east": { "target_vnum": 6 },
+      "west": { "target_vnum": 7 }
+    },
+    "interactables": [],
+    "initial_mobs": [],
+    "initial_items": []
+  },
+  "6": {
+    "vnum": 6,
+    "zone": 0,
+    "name": "The Nexus — Floating Shards Passage",
+    "description": "Cherry blossom petals drift through the air despite no visible trees. The passage ahead opens into a sky filled with floating islands. Lightning arcs between distant peaks. A scroll pinned to the wall reads: 'The Floating Shards — Realm of Spirit and Steel.'",
+    "flags": ["indoors"],
+    "exits": {
+      "west": { "target_vnum": 5 },
+      "east": { "target_vnum": 5000 }
+    },
+    "interactables": [
+      {
+        "keyword": ["scroll", "wall"],
+        "description": "The scroll reads: 'The Floating Shards — Realm of Spirit and Steel. Danger Level: EXTREME. Master your focus or be shattered.'",
+        "action": null
+      }
+    ],
+    "initial_mobs": [],
+    "initial_items": []
+  },
+  "7": {
+    "vnum": 7,
+    "zone": 0,
+    "name": "The Nexus — Forgotten Epoch Passage",
+    "description": "The air here is thick with the smell of old parchment and iron. Through the passage, torchlight flickers on sandstone walls. The distant roar of a crowd echoes from somewhere below. Chiseled into the stone above: 'THE FORGOTTEN EPOCH — WHERE EMPIRES FELL.'",
+    "flags": ["indoors"],
+    "exits": {
+      "east": { "target_vnum": 5 },
+      "west": { "target_vnum": 6000 }
+    },
+    "interactables": [
+      {
+        "keyword": ["chiseled", "stone", "inscription"],
+        "description": "The inscription reads: 'THE FORGOTTEN EPOCH — WHERE EMPIRES FELL. Danger Level: HIGH. History does not forgive.'",
+        "action": null
+      }
+    ],
+    "initial_mobs": [],
+    "initial_items": []
+  },
+  "8": {
+    "vnum": 8,
+    "zone": 0,
+    "name": "The Nexus — Training Hall",
+    "description": "A side chamber off the main hub, fitted with practice dummies and weapon racks. A grizzled figure leans against the wall, arms crossed. This is where newcomers learn to fight.",
+    "flags": ["indoors", "safe"],
+    "exits": {
+      "south": { "target_vnum": 0 }
+    },
+    "interactables": [
+      {
+        "keyword": ["dummy", "dummies", "practice"],
+        "description": "Straw-stuffed practice dummies stand in a row. They look well-used.",
+        "action": null
+      }
+    ],
+    "initial_mobs": [8001],
+    "initial_items": []
+  },
+  "9": {
+    "vnum": 9,
+    "zone": 0,
+    "name": "The Nexus — The Bazaar",
+    "description": "A bustling marketplace fills this wing of the Nexus. Stalls overflow with goods from every realm — enchanted blades beside plasma rifles, fedoras next to samurai helmets. A large board displays current listings from travelers who have passed through.",
+    "flags": ["indoors", "safe"],
+    "exits": {
+      "north": { "target_vnum": 0 }
+    },
+    "interactables": [
+      {
+        "keyword": ["board", "listings", "display"],
+        "description": "[Global Bazaar — player marketplace. Requires server connection.]",
+        "action": null
+      }
+    ],
+    "initial_mobs": [8002],
+    "initial_items": []
+  },
+  "1000": {
+    "vnum": 1000,
+    "zone": 1,
+    "name": "The King's Road — Southern Gate",
+    "description": "You step through the archway and onto a worn cobblestone road. The golden light of the Nexus fades behind you, replaced by the warm sun of a medieval realm. Ahead, the road winds north through rolling farmland toward distant castle spires. A weathered milestone reads: 'Thornhold — 2 leagues.'",
+    "flags": [],
+    "exits": {
+      "south": { "target_vnum": 1 },
+      "north": { "target_vnum": 1001 }
+    },
+    "interactables": [
+      {
+        "keyword": ["milestone", "stone", "sign"],
+        "description": "The milestone is cracked with age. It reads: 'Thornhold — 2 leagues. Beware the Hollow Wood.' Below it, scratched hastily: 'Something round rolled through here. Fast.'",
+        "action": null
+      }
+    ],
+    "initial_mobs": [1001],
+    "initial_items": []
+  },
+  "1001": {
+    "vnum": 1001,
+    "zone": 1,
+    "name": "The King's Road — Farmlands",
+    "description": "Golden wheat fields stretch to either side of the road. A scarecrow stands motionless in the nearest field — or is it motionless? The road continues north toward a dark treeline.",
+    "flags": [],
+    "exits": {
+      "south": { "target_vnum": 1000 },
+      "north": { "target_vnum": 1002 },
+      "east": { "target_vnum": 1003 }
+    },
+    "interactables": [
+      {
+        "keyword": ["scarecrow"],
+        "description": "On closer inspection, the scarecrow is definitely just a scarecrow. Definitely. Its button eyes stare blankly ahead. Wait — is that a marble-sized dent in the post it's mounted on?",
+        "action": null
+      }
+    ],
+    "initial_mobs": [],
+    "initial_items": [1001]
+  },
+  "1002": {
+    "vnum": 1002,
+    "zone": 1,
+    "name": "Edge of the Hollow Wood",
+    "description": "The road ends abruptly at a wall of ancient trees. Their branches interlock overhead, blocking all sunlight. A narrow path leads into the darkness. The air is cold here, and something watches from between the trunks.",
+    "flags": [],
+    "exits": {
+      "south": { "target_vnum": 1001 },
+      "north": { "target_vnum": 1004 }
+    },
+    "interactables": [
+      {
+        "keyword": ["trees", "branches", "wood"],
+        "description": "The trees are impossibly old. Their bark is carved with runes you cannot read. Sap oozes from some of the carvings — it looks almost like the trees are bleeding.",
+        "action": null
+      }
+    ],
+    "initial_mobs": [1002],
+    "initial_items": []
+  },
+  "1003": {
+    "vnum": 1003,
+    "zone": 1,
+    "name": "Abandoned Farmstead",
+    "description": "A ruined farmhouse sits amid overgrown fields. The roof has partially collapsed, and weeds grow through the floorboards. Someone — or something — has been living here recently. A cooking pot still smolders over dead coals.",
+    "flags": [],
+    "exits": {
+      "west": { "target_vnum": 1001 }
+    },
+    "interactables": [
+      {
+        "keyword": ["pot", "cooking", "coals"],
+        "description": "The pot contains a thin, foul-smelling broth. Whatever made this wasn't human — or had very poor taste.",
+        "action": null
+      }
+    ],
+    "initial_mobs": [1003],
+    "initial_items": [1002]
+  },
+  "1004": {
+    "vnum": 1004,
+    "zone": 1,
+    "name": "The Hollow Wood — Dark Path",
+    "description": "The path twists between massive tree trunks. Luminescent fungi provide the only light — a sickly green glow that makes everything look diseased. You hear rustling in the undergrowth.",
+    "flags": [],
+    "exits": {
+      "south": { "target_vnum": 1002 },
+      "north": { "target_vnum": 1005 },
+      "east": { "target_vnum": 1006 }
+    },
+    "interactables": [
+      {
+        "keyword": ["fungi", "mushroom", "glow"],
+        "description": "The fungi pulse with bioluminescence. They're not poisonous to touch, but you wouldn't want to eat them. A thin trail — like something small and round rolled through the moss — leads deeper into the wood.",
+        "action": null
+      }
+    ],
+    "initial_mobs": [1004],
+    "initial_items": []
+  },
+  "1005": {
+    "vnum": 1005,
+    "zone": 1,
+    "name": "The Hollow Wood — Ancient Clearing",
+    "description": "A break in the canopy reveals a circle of standing stones. Moonlight streams down despite it being midday elsewhere. The stones hum with a low vibration you feel in your chest.",
+    "flags": [],
+    "exits": {
+      "south": { "target_vnum": 1004 },
+      "north": { "target_vnum": 1007 }
+    },
+    "interactables": [
+      {
+        "keyword": ["stones", "standing", "circle"],
+        "description": "Seven standing stones form a perfect circle. Each bears a different rune. The ground at the center is worn smooth — as if something has been rolling in circles here for a very long time.",
+        "action": "stone_circle_puzzle"
+      }
+    ],
+    "initial_mobs": [],
+    "initial_items": [1003]
+  },
+  "1006": {
+    "vnum": 1006,
+    "zone": 1,
+    "name": "The Hollow Wood — Spider Den",
+    "description": "Thick webs coat every surface. The path narrows to a crawl space choked with silk. Something large moves in the shadows above. This was a mistake.",
+    "flags": [],
+    "exits": {
+      "west": { "target_vnum": 1004 }
+    },
+    "interactables": [
+      {
+        "keyword": ["web", "webs", "silk"],
+        "description": "The webs are incredibly strong. Wrapped in one of them, you can see the glint of something metallic.",
+        "action": null
+      }
+    ],
+    "initial_mobs": [1005],
+    "initial_items": [1004]
+  },
+  "1007": {
+    "vnum": 1007,
+    "zone": 1,
+    "name": "Thornhold — South Gate",
+    "description": "You emerge from the Hollow Wood to find a walled town ahead. The south gate stands open, guarded by two soldiers in dented armor. Beyond the walls, you can see rooftops and chimney smoke. A sign above the gate reads: 'THORNHOLD — Population: Declining.'",
+    "flags": [],
+    "exits": {
+      "south": { "target_vnum": 1005 },
+      "north": { "target_vnum": 1008 }
+    },
+    "interactables": [
+      {
+        "keyword": ["guards", "soldiers", "gate"],
+        "description": "The guards look tired and underpaid. One nods at you. 'Another adventurer. Good luck in there. Watch for the rats — they've gotten bold since the crown shattered.'",
+        "action": null
+      }
+    ],
+    "initial_mobs": [],
+    "initial_items": []
+  },
+  "1008": {
+    "vnum": 1008,
+    "zone": 1,
+    "name": "Thornhold — Market Square",
+    "description": "The town square is a muddy affair. A few merchants hawk their wares from rickety stalls. A fountain in the center has run dry — its basin filled with dead leaves. Roads lead in every direction.",
+    "flags": ["safe"],
+    "exits": {
+      "south": { "target_vnum": 1007 },
+      "north": { "target_vnum": 1009 },
+      "east": { "target_vnum": 1010 },
+      "west": { "target_vnum": 1011 }
+    },
+    "interactables": [
+      {
+        "keyword": ["fountain", "basin"],
+        "description": "The dry fountain has a small hole in its basin — perfectly round, as if drilled by something spinning at high speed. Water stains suggest something rolled through here when the fountain still flowed.",
+        "action": null
+      }
+    ],
+    "initial_mobs": [8003],
+    "initial_items": []
+  }
+}
