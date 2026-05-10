@@ -1076,7 +1076,7 @@ function completeIdleGame() {
         // Button shrinking (only if NOT in meltdown — meltdown overrides with smooth grow)
         if (meltdown <= 0) {
           const shrinkFactor = 1 - (s.autonomy - 60) * 0.008; // at 85% = 0.8 scale
-          elements.mainButton.style.transform = `scale(${clamp(shrinkFactor, 0.5, 1)})`;
+          elements.mainButton.style.transform = `translate(-50%, -50%) scale(${clamp(shrinkFactor, 0.5, 1)})`;
         }
 
         // Threatening messages
@@ -1125,7 +1125,7 @@ function completeIdleGame() {
         // Button grows massive — smooth transition from shrink to grow
         const shrinkBase = chaosLevel >= 3 ? clamp(1 - (s.autonomy - 60) * 0.008, 0.5, 1) : 1;
         const growFactor = shrinkBase + meltdown * (3.5 - shrinkBase); // lerp from shrink to 3.5x
-        elements.mainButton.style.transform = `scale(${growFactor})`;
+        elements.mainButton.style.transform = `translate(-50%, -50%) scale(${growFactor})`;
 
         // Intensified screen shake
         if (Math.random() < 0.01 * meltdown) {
