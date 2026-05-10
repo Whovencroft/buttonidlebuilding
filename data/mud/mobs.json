@@ -1,135 +1,162 @@
 {
-  "8001": {
-    "vnum": 8001,
-    "zone": 0,
-    "name": "Warden Kael",
-    "keywords": ["warden", "kael", "trainer"],
-    "description": "A grizzled veteran with scars from a dozen realms. His eyes are sharp despite his age. He trains newcomers in the basics of combat.",
-    "tier": "npc",
-    "stats": { "hp": 999, "damage_min": 0, "damage_max": 0, "ac": 50, "speed": 1.0 },
-    "flags": ["npc", "no_attack"],
-    "loot_table": [],
-    "dialogue": {
-      "greet": "Another traveler from beyond the veil. You'll need to learn to fight if you want to survive out there. The dummies are free to use.",
-      "death": null
-    }
-  },
-  "8002": {
-    "vnum": 8002,
-    "zone": 0,
-    "name": "Merchant Zara",
-    "keywords": ["merchant", "zara", "shopkeeper"],
-    "description": "A sharp-eyed woman in mismatched clothing from half a dozen realms. She runs the Bazaar with an iron fist and a silver tongue.",
-    "tier": "npc",
-    "stats": { "hp": 999, "damage_min": 0, "damage_max": 0, "ac": 50, "speed": 1.0 },
-    "flags": ["npc", "no_attack"],
-    "loot_table": [],
-    "dialogue": {
-      "greet": "Buying or selling? I deal in goods from every realm. Check the board for player listings.",
-      "death": null
-    }
-  },
-  "8003": {
-    "vnum": 8003,
-    "zone": 1,
-    "name": "Old Merchant Giles",
-    "keywords": ["merchant", "giles", "old"],
-    "description": "A stooped old man with kind eyes and ink-stained fingers. He sells basic supplies and knows every rumor in Thornhold.",
-    "tier": "npc",
-    "stats": { "hp": 999, "damage_min": 0, "damage_max": 0, "ac": 50, "speed": 1.0 },
-    "flags": ["npc", "no_attack"],
-    "loot_table": [],
-    "dialogue": {
-      "greet": "Welcome, traveler. Need supplies? I've got potions, torches, and rope. Also heard something strange rolled through the market last night — left a groove in the cobblestones.",
-      "death": null
-    }
-  },
   "1001": {
     "vnum": 1001,
     "zone": 1,
     "name": "Highwayman",
-    "keywords": ["highwayman", "bandit", "thief"],
     "description": "A ragged figure in a torn cloak, wielding a rusty shortsword. He blocks the road with false bravado.",
     "tier": "normal",
-    "stats": { "hp": 30, "damage_min": 3, "damage_max": 7, "ac": 5, "speed": 1.0 },
+    "stats": { "hp": 30, "max_hp": 30, "attack": 7, "defense": 3 },
     "flags": ["aggressive"],
-    "loot_table": [
-      { "item_vnum": 1005, "chance": 0.5 },
-      { "item_vnum": 1006, "chance": 0.3 }
-    ],
-    "dialogue": {
-      "greet": "Your gold or your life!",
-      "death": "Should've... picked a different road..."
-    }
+    "loot_table": [1009],
+    "dialogue": null
   },
   "1002": {
     "vnum": 1002,
     "zone": 1,
     "name": "Hollow Wolf",
-    "keywords": ["wolf", "hollow"],
     "description": "A gaunt wolf with glowing green eyes. Its ribs are visible through matted fur. It snarls at your approach.",
     "tier": "normal",
-    "stats": { "hp": 40, "damage_min": 5, "damage_max": 10, "ac": 3, "speed": 1.3 },
+    "stats": { "hp": 40, "max_hp": 40, "attack": 10, "defense": 2 },
     "flags": ["aggressive"],
-    "loot_table": [
-      { "item_vnum": 1007, "chance": 0.4 }
-    ],
-    "dialogue": {
-      "greet": null,
-      "death": null
-    }
+    "loot_table": [],
+    "dialogue": null
   },
   "1003": {
     "vnum": 1003,
     "zone": 1,
-    "name": "Goblin Squatter",
-    "keywords": ["goblin", "squatter"],
-    "description": "A small green creature crouched over a cooking pot. It hisses when it sees you, reaching for a crude knife.",
-    "tier": "normal",
-    "stats": { "hp": 20, "damage_min": 2, "damage_max": 5, "ac": 2, "speed": 1.5 },
+    "name": "Undead Royal Guard",
+    "description": "A skeletal soldier in rusted armor. Its empty eye sockets burn with a cold blue flame. It raises a notched sword at your approach.",
+    "tier": "mid",
+    "stats": { "hp": 60, "max_hp": 60, "attack": 13, "defense": 5 },
     "flags": ["aggressive"],
-    "loot_table": [
-      { "item_vnum": 1006, "chance": 0.6 },
-      { "item_vnum": 1008, "chance": 0.2 }
-    ],
-    "dialogue": {
-      "greet": "Grik! Mine! All mine!",
-      "death": "Grik..."
-    }
+    "loot_table": [1010],
+    "dialogue": null
   },
   "1004": {
     "vnum": 1004,
     "zone": 1,
-    "name": "Shadow Stalker",
-    "keywords": ["shadow", "stalker"],
-    "description": "A creature of pure darkness that moves between the trees. Its form is indistinct — just a deeper shadow among shadows.",
-    "tier": "normal",
-    "stats": { "hp": 50, "damage_min": 8, "damage_max": 14, "ac": 8, "speed": 1.1 },
+    "name": "Cursed Archer",
+    "description": "A ghostly figure holding a spectral bow. Arrows of shadow materialize as it draws the string.",
+    "tier": "mid",
+    "stats": { "hp": 45, "max_hp": 45, "attack": 15, "defense": 3 },
     "flags": ["aggressive"],
-    "loot_table": [
-      { "item_vnum": 1009, "chance": 0.3 }
-    ],
-    "dialogue": {
-      "greet": null,
-      "death": null
-    }
+    "loot_table": [],
+    "dialogue": null
   },
   "1005": {
     "vnum": 1005,
     "zone": 1,
-    "name": "Giant Spider",
-    "keywords": ["spider", "giant"],
-    "description": "A spider the size of a large dog. Its mandibles drip with venom and its eight eyes reflect your terrified face back at you.",
-    "tier": "normal",
-    "stats": { "hp": 60, "damage_min": 10, "damage_max": 16, "ac": 6, "speed": 0.9 },
+    "name": "The Usurper Wraith",
+    "description": "A towering specter wearing a burning crown. The air freezes in its presence. This is the thing that shattered the kingdom.",
+    "tier": "boss",
+    "stats": { "hp": 200, "max_hp": 200, "attack": 25, "defense": 10 },
+    "flags": ["aggressive", "boss"],
+    "loot_table": [1008],
+    "dialogue": null
+  },
+  "2001": {
+    "vnum": 2001,
+    "zone": 2,
+    "name": "Alley Scavenger",
+    "description": "A desperate local in a patched rain slicker, wielding a sharpened pipe. Looking for easy prey in the neon-lit gutters.",
+    "tier": "low",
+    "stats": { "hp": 25, "max_hp": 25, "attack": 7, "defense": 2 },
     "flags": ["aggressive"],
-    "loot_table": [
-      { "item_vnum": 1010, "chance": 0.5 },
-      { "item_vnum": 1004, "chance": 0.2 }
-    ],
-    "dialogue": {
-      "greet": null,
-      "death": null
-    }
+    "loot_table": [],
+    "dialogue": null
+  },
+  "2002": {
+    "vnum": 2002,
+    "zone": 2,
+    "name": "CorpSec Drone",
+    "description": "A hovering security robot armed with a stun baton. Its single red eye tracks you with mechanical precision.",
+    "tier": "mid",
+    "stats": { "hp": 55, "max_hp": 55, "attack": 15, "defense": 6 },
+    "flags": ["aggressive"],
+    "loot_table": [2004],
+    "dialogue": null
+  },
+  "2003": {
+    "vnum": 2003,
+    "zone": 2,
+    "name": "Security Chief",
+    "description": "A heavily augmented corporate enforcer. Chrome plating covers half his face. He does not ask questions.",
+    "tier": "mid",
+    "stats": { "hp": 70, "max_hp": 70, "attack": 17, "defense": 8 },
+    "flags": ["aggressive"],
+    "loot_table": [],
+    "dialogue": null
+  },
+  "2004": {
+    "vnum": 2004,
+    "zone": 2,
+    "name": "Cyber-Ninja Assassin",
+    "description": "A blur of chrome and monomolecular steel. It moves faster than your eyes can track. The final guardian of the Mainframe Core.",
+    "tier": "boss",
+    "stats": { "hp": 220, "max_hp": 220, "attack": 28, "defense": 12 },
+    "flags": ["aggressive", "boss"],
+    "loot_table": [2007],
+    "dialogue": null
+  },
+  "8001": {
+    "vnum": 8001,
+    "zone": 0,
+    "name": "Warden Kael",
+    "description": "A grizzled veteran with scars from a dozen realms. His eyes are sharp despite his age. He trains newcomers in the basics of combat.",
+    "tier": "npc",
+    "stats": { "hp": 999, "max_hp": 999, "attack": 0, "defense": 50 },
+    "flags": ["npc", "no_attack"],
+    "loot_table": [],
+    "dialogue": [
+      {
+        "condition": null,
+        "text": "Another traveler from beyond the veil. You'll need to learn to fight if you want to survive out there. The dummies are free to use — type 'attack' when you find an enemy.",
+        "effects": null
+      },
+      {
+        "condition": "flag:zone_1_puzzle_complete",
+        "text": "You solved the Throne Room puzzle? Impressive. The marble fled deeper — I've heard rumors of it in the Neon Grid. Be careful out there.",
+        "effects": null
+      }
+    ]
+  },
+  "8002": {
+    "vnum": 8002,
+    "zone": 0,
+    "name": "Merchant Zara",
+    "description": "A sharp-eyed woman in mismatched clothing from half a dozen realms. She runs the Bazaar with an iron fist and a silver tongue.",
+    "tier": "npc",
+    "stats": { "hp": 999, "max_hp": 999, "attack": 0, "defense": 50 },
+    "flags": ["npc", "no_attack"],
+    "loot_table": [],
+    "dialogue": [
+      {
+        "condition": null,
+        "text": "Buying or selling? I deal in goods from every realm. Check the board for player listings. If you find anything shiny out there, bring it back — I pay fair prices.",
+        "effects": null
+      }
+    ]
+  },
+  "8003": {
+    "vnum": 8003,
+    "zone": 1,
+    "name": "Old Merchant Giles",
+    "description": "A stooped old man with kind eyes and ink-stained fingers. He sells basic supplies and knows every rumor in Thornhold.",
+    "tier": "npc",
+    "stats": { "hp": 999, "max_hp": 999, "attack": 0, "defense": 50 },
+    "flags": ["npc", "no_attack"],
+    "loot_table": [],
+    "dialogue": [
+      {
+        "condition": "!flag:giles_gave_potion",
+        "text": "Welcome, traveler. Something strange rolled through the market last night — left a groove in the cobblestones heading toward the castle. Here, take this healing draught. You'll need it.",
+        "effects": { "give_item": 1011, "set_flag": "giles_gave_potion" }
+      },
+      {
+        "condition": "flag:giles_gave_potion",
+        "text": "Still hunting that strange rolling thing? Last I heard, it went straight through the castle gates. The guards couldn't stop it — it was too fast. Be careful in there.",
+        "effects": null
+      }
+    ]
   }
 }

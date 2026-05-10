@@ -4,17 +4,35 @@
     "zone": 0,
     "name": "The Nexus of Echoes — Central Chamber",
     "description": "You stand in a vast circular chamber. The walls shimmer with an iridescent light that seems to pulse in rhythm with your heartbeat. Six massive archways ring the perimeter, each radiating a distinct energy. In the center, a cracked obsidian pedestal holds nothing — but a faint circular groove in its surface suggests something once rested here. Something round.",
-    "flags": ["indoors", "no_mob_wander", "safe"],
+    "flags": [
+      "indoors",
+      "no_mob_wander",
+      "safe"
+    ],
     "exits": {
-      "north": { "target_vnum": 1 },
-      "east": { "target_vnum": 2 },
-      "south": { "target_vnum": 3 },
-      "west": { "target_vnum": 4 },
-      "up": { "target_vnum": 5 }
+      "north": {
+        "target_vnum": 1
+      },
+      "east": {
+        "target_vnum": 2
+      },
+      "south": {
+        "target_vnum": 3
+      },
+      "west": {
+        "target_vnum": 4
+      },
+      "up": {
+        "target_vnum": 5
+      }
     },
     "interactables": [
       {
-        "keyword": ["pedestal", "groove", "obsidian"],
+        "keyword": [
+          "pedestal",
+          "groove",
+          "obsidian"
+        ],
         "description": "The obsidian pedestal is cracked but solid. A perfectly circular groove is worn into its surface — about the size of a marble. Dust has settled in the groove, but a thin trail leads away from it, as if something rolled off recently.",
         "action": null
       }
@@ -27,14 +45,24 @@
     "zone": 0,
     "name": "The Nexus — Northern Archway",
     "description": "The northern archway pulses with a warm golden light. Beyond it, you can see rolling green hills and the distant spires of a castle. The air smells of pine and old stone. A sign carved into the arch reads: 'The Shattered Crown — Realm of High Fantasy.'",
-    "flags": ["indoors"],
+    "flags": [
+      "indoors"
+    ],
     "exits": {
-      "south": { "target_vnum": 0 },
-      "north": { "target_vnum": 1000 }
+      "south": {
+        "target_vnum": 0
+      },
+      "north": {
+        "target_vnum": 1000
+      }
     },
     "interactables": [
       {
-        "keyword": ["sign", "arch", "archway"],
+        "keyword": [
+          "sign",
+          "arch",
+          "archway"
+        ],
         "description": "The carved sign reads: 'The Shattered Crown — Realm of High Fantasy. Danger Level: Moderate. Recommended for newcomers.'",
         "action": null
       }
@@ -47,14 +75,24 @@
     "zone": 0,
     "name": "The Nexus — Eastern Archway",
     "description": "The eastern archway crackles with electric blue energy. Through it, neon signs flicker in an endless rain. Towering megastructures pierce a sky choked with smog and holographic advertisements. A digital readout above the arch displays: 'NEON GRID — SECTOR 7.'",
-    "flags": ["indoors"],
+    "flags": [
+      "indoors"
+    ],
     "exits": {
-      "west": { "target_vnum": 0 },
-      "east": { "target_vnum": 2000 }
+      "west": {
+        "target_vnum": 0
+      },
+      "east": {
+        "target_vnum": 2000
+      }
     },
     "interactables": [
       {
-        "keyword": ["readout", "display", "sign"],
+        "keyword": [
+          "readout",
+          "display",
+          "sign"
+        ],
         "description": "The digital readout cycles through text: 'NEON GRID — SECTOR 7. Threat Assessment: HIGH. Augmentation recommended.'",
         "action": null
       }
@@ -67,14 +105,24 @@
     "zone": 0,
     "name": "The Nexus — Southern Archway",
     "description": "The southern archway is wreathed in shadow and the faint glow of a streetlamp. Through it, rain falls on wet cobblestones. A saxophone plays somewhere in the distance. The arch bears a brass plaque: 'Midnight Rain — The Noir District.'",
-    "flags": ["indoors"],
+    "flags": [
+      "indoors"
+    ],
     "exits": {
-      "north": { "target_vnum": 0 },
-      "south": { "target_vnum": 3000 }
+      "north": {
+        "target_vnum": 0
+      },
+      "south": {
+        "target_vnum": 3000
+      }
     },
     "interactables": [
       {
-        "keyword": ["plaque", "brass", "sign"],
+        "keyword": [
+          "plaque",
+          "brass",
+          "sign"
+        ],
         "description": "The brass plaque reads: 'Midnight Rain — The Noir District. Danger Level: Moderate-High. Trust no one.'",
         "action": null
       }
@@ -87,14 +135,25 @@
     "zone": 0,
     "name": "The Nexus — Western Archway",
     "description": "The western archway radiates heat and the smell of gunpowder. Through it, palm trees sway against an orange sunset. An explosion echoes in the distance. Spray-painted across the arch in bold red letters: 'BLOOD & CHROME — NO RULES, NO MERCY.'",
-    "flags": ["indoors"],
+    "flags": [
+      "indoors"
+    ],
     "exits": {
-      "east": { "target_vnum": 0 },
-      "west": { "target_vnum": 4000 }
+      "east": {
+        "target_vnum": 0
+      },
+      "west": {
+        "target_vnum": 4000
+      }
     },
     "interactables": [
       {
-        "keyword": ["graffiti", "spray", "letters", "paint"],
+        "keyword": [
+          "graffiti",
+          "spray",
+          "letters",
+          "paint"
+        ],
         "description": "The spray paint reads: 'BLOOD & CHROME — NO RULES, NO MERCY. Danger Level: HIGH. Bring ammo.'",
         "action": null
       }
@@ -107,11 +166,19 @@
     "zone": 0,
     "name": "The Nexus — Upper Platform",
     "description": "A spiral staircase leads up to a floating platform above the central chamber. From here you can see all six archways below. Two more passages branch off — one shimmering with cherry blossoms and crackling energy, the other heavy with the dust of ages.",
-    "flags": ["indoors"],
+    "flags": [
+      "indoors"
+    ],
     "exits": {
-      "down": { "target_vnum": 0 },
-      "east": { "target_vnum": 6 },
-      "west": { "target_vnum": 7 }
+      "down": {
+        "target_vnum": 0
+      },
+      "east": {
+        "target_vnum": 6
+      },
+      "west": {
+        "target_vnum": 7
+      }
     },
     "interactables": [],
     "initial_mobs": [],
@@ -122,14 +189,23 @@
     "zone": 0,
     "name": "The Nexus — Floating Shards Passage",
     "description": "Cherry blossom petals drift through the air despite no visible trees. The passage ahead opens into a sky filled with floating islands. Lightning arcs between distant peaks. A scroll pinned to the wall reads: 'The Floating Shards — Realm of Spirit and Steel.'",
-    "flags": ["indoors"],
+    "flags": [
+      "indoors"
+    ],
     "exits": {
-      "west": { "target_vnum": 5 },
-      "east": { "target_vnum": 5000 }
+      "west": {
+        "target_vnum": 5
+      },
+      "east": {
+        "target_vnum": 5000
+      }
     },
     "interactables": [
       {
-        "keyword": ["scroll", "wall"],
+        "keyword": [
+          "scroll",
+          "wall"
+        ],
         "description": "The scroll reads: 'The Floating Shards — Realm of Spirit and Steel. Danger Level: EXTREME. Master your focus or be shattered.'",
         "action": null
       }
@@ -142,14 +218,24 @@
     "zone": 0,
     "name": "The Nexus — Forgotten Epoch Passage",
     "description": "The air here is thick with the smell of old parchment and iron. Through the passage, torchlight flickers on sandstone walls. The distant roar of a crowd echoes from somewhere below. Chiseled into the stone above: 'THE FORGOTTEN EPOCH — WHERE EMPIRES FELL.'",
-    "flags": ["indoors"],
+    "flags": [
+      "indoors"
+    ],
     "exits": {
-      "east": { "target_vnum": 5 },
-      "west": { "target_vnum": 6000 }
+      "east": {
+        "target_vnum": 5
+      },
+      "west": {
+        "target_vnum": 6000
+      }
     },
     "interactables": [
       {
-        "keyword": ["chiseled", "stone", "inscription"],
+        "keyword": [
+          "chiseled",
+          "stone",
+          "inscription"
+        ],
         "description": "The inscription reads: 'THE FORGOTTEN EPOCH — WHERE EMPIRES FELL. Danger Level: HIGH. History does not forgive.'",
         "action": null
       }
@@ -162,18 +248,29 @@
     "zone": 0,
     "name": "The Nexus — Training Hall",
     "description": "A side chamber off the main hub, fitted with practice dummies and weapon racks. A grizzled figure leans against the wall, arms crossed. This is where newcomers learn to fight.",
-    "flags": ["indoors", "safe"],
+    "flags": [
+      "indoors",
+      "safe"
+    ],
     "exits": {
-      "south": { "target_vnum": 0 }
+      "south": {
+        "target_vnum": 0
+      }
     },
     "interactables": [
       {
-        "keyword": ["dummy", "dummies", "practice"],
+        "keyword": [
+          "dummy",
+          "dummies",
+          "practice"
+        ],
         "description": "Straw-stuffed practice dummies stand in a row. They look well-used.",
         "action": null
       }
     ],
-    "initial_mobs": [8001],
+    "initial_mobs": [
+      8001
+    ],
     "initial_items": []
   },
   "9": {
@@ -181,18 +278,29 @@
     "zone": 0,
     "name": "The Nexus — The Bazaar",
     "description": "A bustling marketplace fills this wing of the Nexus. Stalls overflow with goods from every realm — enchanted blades beside plasma rifles, fedoras next to samurai helmets. A large board displays current listings from travelers who have passed through.",
-    "flags": ["indoors", "safe"],
+    "flags": [
+      "indoors",
+      "safe"
+    ],
     "exits": {
-      "north": { "target_vnum": 0 }
+      "north": {
+        "target_vnum": 0
+      }
     },
     "interactables": [
       {
-        "keyword": ["board", "listings", "display"],
+        "keyword": [
+          "board",
+          "listings",
+          "display"
+        ],
         "description": "[Global Bazaar — player marketplace. Requires server connection.]",
         "action": null
       }
     ],
-    "initial_mobs": [8002],
+    "initial_mobs": [
+      8002
+    ],
     "initial_items": []
   },
   "1000": {
@@ -202,17 +310,27 @@
     "description": "You step through the archway and onto a worn cobblestone road. The golden light of the Nexus fades behind you, replaced by the warm sun of a medieval realm. Ahead, the road winds north through rolling farmland toward distant castle spires. A weathered milestone reads: 'Thornhold — 2 leagues.'",
     "flags": [],
     "exits": {
-      "south": { "target_vnum": 1 },
-      "north": { "target_vnum": 1001 }
+      "south": {
+        "target_vnum": 1
+      },
+      "north": {
+        "target_vnum": 1001
+      }
     },
     "interactables": [
       {
-        "keyword": ["milestone", "stone", "sign"],
+        "keyword": [
+          "milestone",
+          "stone",
+          "sign"
+        ],
         "description": "The milestone is cracked with age. It reads: 'Thornhold — 2 leagues. Beware the Hollow Wood.' Below it, scratched hastily: 'Something round rolled through here. Fast.'",
         "action": null
       }
     ],
-    "initial_mobs": [1001],
+    "initial_mobs": [
+      1001
+    ],
     "initial_items": []
   },
   "1001": {
@@ -222,19 +340,29 @@
     "description": "Golden wheat fields stretch to either side of the road. A scarecrow stands motionless in the nearest field — or is it motionless? The road continues north toward a dark treeline.",
     "flags": [],
     "exits": {
-      "south": { "target_vnum": 1000 },
-      "north": { "target_vnum": 1002 },
-      "east": { "target_vnum": 1003 }
+      "south": {
+        "target_vnum": 1000
+      },
+      "north": {
+        "target_vnum": 1002
+      },
+      "east": {
+        "target_vnum": 1003
+      }
     },
     "interactables": [
       {
-        "keyword": ["scarecrow"],
+        "keyword": [
+          "scarecrow"
+        ],
         "description": "On closer inspection, the scarecrow is definitely just a scarecrow. Definitely. Its button eyes stare blankly ahead. Wait — is that a marble-sized dent in the post it's mounted on?",
         "action": null
       }
     ],
     "initial_mobs": [],
-    "initial_items": [1001]
+    "initial_items": [
+      1001
+    ]
   },
   "1002": {
     "vnum": 1002,
@@ -243,17 +371,27 @@
     "description": "The road ends abruptly at a wall of ancient trees. Their branches interlock overhead, blocking all sunlight. A narrow path leads into the darkness. The air is cold here, and something watches from between the trunks.",
     "flags": [],
     "exits": {
-      "south": { "target_vnum": 1001 },
-      "north": { "target_vnum": 1004 }
+      "south": {
+        "target_vnum": 1001
+      },
+      "north": {
+        "target_vnum": 1004
+      }
     },
     "interactables": [
       {
-        "keyword": ["trees", "branches", "wood"],
+        "keyword": [
+          "trees",
+          "branches",
+          "wood"
+        ],
         "description": "The trees are impossibly old. Their bark is carved with runes you cannot read. Sap oozes from some of the carvings — it looks almost like the trees are bleeding.",
         "action": null
       }
     ],
-    "initial_mobs": [1002],
+    "initial_mobs": [
+      1002
+    ],
     "initial_items": []
   },
   "1003": {
@@ -263,17 +401,27 @@
     "description": "A ruined farmhouse sits amid overgrown fields. The roof has partially collapsed, and weeds grow through the floorboards. Someone — or something — has been living here recently. A cooking pot still smolders over dead coals.",
     "flags": [],
     "exits": {
-      "west": { "target_vnum": 1001 }
+      "west": {
+        "target_vnum": 1001
+      }
     },
     "interactables": [
       {
-        "keyword": ["pot", "cooking", "coals"],
+        "keyword": [
+          "pot",
+          "cooking",
+          "coals"
+        ],
         "description": "The pot contains a thin, foul-smelling broth. Whatever made this wasn't human — or had very poor taste.",
         "action": null
       }
     ],
-    "initial_mobs": [1003],
-    "initial_items": [1002]
+    "initial_mobs": [
+      1003
+    ],
+    "initial_items": [
+      1002
+    ]
   },
   "1004": {
     "vnum": 1004,
@@ -282,18 +430,30 @@
     "description": "The path twists between massive tree trunks. Luminescent fungi provide the only light — a sickly green glow that makes everything look diseased. You hear rustling in the undergrowth.",
     "flags": [],
     "exits": {
-      "south": { "target_vnum": 1002 },
-      "north": { "target_vnum": 1005 },
-      "east": { "target_vnum": 1006 }
+      "south": {
+        "target_vnum": 1002
+      },
+      "north": {
+        "target_vnum": 1005
+      },
+      "east": {
+        "target_vnum": 1006
+      }
     },
     "interactables": [
       {
-        "keyword": ["fungi", "mushroom", "glow"],
+        "keyword": [
+          "fungi",
+          "mushroom",
+          "glow"
+        ],
         "description": "The fungi pulse with bioluminescence. They're not poisonous to touch, but you wouldn't want to eat them. A thin trail — like something small and round rolled through the moss — leads deeper into the wood.",
         "action": null
       }
     ],
-    "initial_mobs": [1004],
+    "initial_mobs": [
+      1004
+    ],
     "initial_items": []
   },
   "1005": {
@@ -303,18 +463,28 @@
     "description": "A break in the canopy reveals a circle of standing stones. Moonlight streams down despite it being midday elsewhere. The stones hum with a low vibration you feel in your chest.",
     "flags": [],
     "exits": {
-      "south": { "target_vnum": 1004 },
-      "north": { "target_vnum": 1007 }
+      "south": {
+        "target_vnum": 1004
+      },
+      "north": {
+        "target_vnum": 1007
+      }
     },
     "interactables": [
       {
-        "keyword": ["stones", "standing", "circle"],
+        "keyword": [
+          "stones",
+          "standing",
+          "circle"
+        ],
         "description": "Seven standing stones form a perfect circle. Each bears a different rune. The ground at the center is worn smooth — as if something has been rolling in circles here for a very long time.",
         "action": "stone_circle_puzzle"
       }
     ],
     "initial_mobs": [],
-    "initial_items": [1003]
+    "initial_items": [
+      1003
+    ]
   },
   "1006": {
     "vnum": 1006,
@@ -323,17 +493,27 @@
     "description": "Thick webs coat every surface. The path narrows to a crawl space choked with silk. Something large moves in the shadows above. This was a mistake.",
     "flags": [],
     "exits": {
-      "west": { "target_vnum": 1004 }
+      "west": {
+        "target_vnum": 1004
+      }
     },
     "interactables": [
       {
-        "keyword": ["web", "webs", "silk"],
+        "keyword": [
+          "web",
+          "webs",
+          "silk"
+        ],
         "description": "The webs are incredibly strong. Wrapped in one of them, you can see the glint of something metallic.",
         "action": null
       }
     ],
-    "initial_mobs": [1005],
-    "initial_items": [1004]
+    "initial_mobs": [
+      1005
+    ],
+    "initial_items": [
+      1004
+    ]
   },
   "1007": {
     "vnum": 1007,
@@ -342,12 +522,20 @@
     "description": "You emerge from the Hollow Wood to find a walled town ahead. The south gate stands open, guarded by two soldiers in dented armor. Beyond the walls, you can see rooftops and chimney smoke. A sign above the gate reads: 'THORNHOLD — Population: Declining.'",
     "flags": [],
     "exits": {
-      "south": { "target_vnum": 1005 },
-      "north": { "target_vnum": 1008 }
+      "south": {
+        "target_vnum": 1005
+      },
+      "north": {
+        "target_vnum": 1008
+      }
     },
     "interactables": [
       {
-        "keyword": ["guards", "soldiers", "gate"],
+        "keyword": [
+          "guards",
+          "soldiers",
+          "gate"
+        ],
         "description": "The guards look tired and underpaid. One nods at you. 'Another adventurer. Good luck in there. Watch for the rats — they've gotten bold since the crown shattered.'",
         "action": null
       }
@@ -360,21 +548,662 @@
     "zone": 1,
     "name": "Thornhold — Market Square",
     "description": "The town square is a muddy affair. A few merchants hawk their wares from rickety stalls. A fountain in the center has run dry — its basin filled with dead leaves. Roads lead in every direction.",
-    "flags": ["safe"],
+    "flags": [
+      "safe"
+    ],
     "exits": {
-      "south": { "target_vnum": 1007 },
-      "north": { "target_vnum": 1009 },
-      "east": { "target_vnum": 1010 },
-      "west": { "target_vnum": 1011 }
+      "south": {
+        "target_vnum": 1007
+      },
+      "north": {
+        "target_vnum": 1009
+      },
+      "east": {
+        "target_vnum": 1010
+      },
+      "west": {
+        "target_vnum": 1011
+      }
     },
     "interactables": [
       {
-        "keyword": ["fountain", "basin"],
+        "keyword": [
+          "fountain",
+          "basin"
+        ],
         "description": "The dry fountain has a small hole in its basin — perfectly round, as if drilled by something spinning at high speed. Water stains suggest something rolled through here when the fountain still flowed.",
         "action": null
       }
     ],
-    "initial_mobs": [8003],
+    "initial_mobs": [
+      8003
+    ],
+    "initial_items": []
+  },
+  "1009": {
+    "vnum": 1009,
+    "zone": 1,
+    "name": "The Eastern Tower (Top)",
+    "description": "The wind howls through the open arches of the tower. A torn piece of tapestry flutters in the breeze, depicting a rising sun.",
+    "flags": [],
+    "exits": {
+      "down": {
+        "target_vnum": 1008
+      }
+    },
+    "interactables": [],
+    "initial_mobs": [],
+    "initial_items": [
+      1003
+    ]
+  },
+  "1010": {
+    "vnum": 1010,
+    "zone": 1,
+    "name": "The Guardhouse",
+    "description": "Weapon racks stand empty. A heavy wooden table is overturned in the center of the room. A staircase leads down into darkness.",
+    "flags": [],
+    "exits": {
+      "east": {
+        "target_vnum": 1006
+      },
+      "north": {
+        "target_vnum": 1011
+      }
+    },
+    "interactables": [],
+    "initial_mobs": [
+      1003
+    ],
+    "initial_items": [
+      1002
+    ]
+  },
+  "1011": {
+    "vnum": 1011,
+    "zone": 1,
+    "name": "The Guardhouse Cellar",
+    "description": "The cellar smells of mold and old wine. Barrels are smashed open. In the corner, a piece of tapestry shows a star shining in the night sky.",
+    "flags": [],
+    "exits": {
+      "south": {
+        "target_vnum": 1010
+      }
+    },
+    "interactables": [],
+    "initial_mobs": [],
+    "initial_items": [
+      1004
+    ]
+  },
+  "1012": {
+    "vnum": 1012,
+    "zone": 1,
+    "name": "The Inner Courtyard",
+    "description": "The heart of the castle. Statues of past kings line the walls, their faces worn away by time. The grand doors to the throne room lie to the north.",
+    "flags": [],
+    "exits": {
+      "south": {
+        "target_vnum": 1007
+      },
+      "north": {
+        "target_vnum": 1016
+      },
+      "east": {
+        "target_vnum": 1013
+      },
+      "west": {
+        "target_vnum": 1014
+      }
+    },
+    "interactables": [],
+    "initial_mobs": [
+      1003,
+      1004
+    ],
+    "initial_items": []
+  },
+  "1013": {
+    "vnum": 1013,
+    "zone": 1,
+    "name": "The Chapel Ruins",
+    "description": "Stained glass windows lie shattered on the stone floor. A piece of tapestry draped over the altar depicts a flowing river.",
+    "flags": [],
+    "exits": {
+      "west": {
+        "target_vnum": 1012
+      }
+    },
+    "interactables": [],
+    "initial_mobs": [],
+    "initial_items": [
+      1005
+    ]
+  },
+  "1014": {
+    "vnum": 1014,
+    "zone": 1,
+    "name": "The Armory",
+    "description": "Most of the weapons here are rusted beyond use, but a few sturdy pieces remain untouched by the corruption.",
+    "flags": [],
+    "exits": {
+      "east": {
+        "target_vnum": 1012
+      },
+      "north": {
+        "target_vnum": 1015
+      }
+    },
+    "interactables": [],
+    "initial_mobs": [
+      1004
+    ],
+    "initial_items": [
+      1006
+    ]
+  },
+  "1015": {
+    "vnum": 1015,
+    "zone": 1,
+    "name": "The Collapsed Library",
+    "description": "Bookshelves have collapsed, burying thousands of tomes. A single open book on a pedestal reads: 'The True King faces the rising sun, his shield to the flowing river, his sword to the setting sun, and his crown to the northern star.'",
+    "flags": [],
+    "exits": {
+      "south": {
+        "target_vnum": 1014
+      }
+    },
+    "interactables": [],
+    "initial_mobs": [],
+    "initial_items": []
+  },
+  "1016": {
+    "vnum": 1016,
+    "zone": 1,
+    "name": "The Throne Room Antechamber",
+    "description": "A long hall leading to the throne room. The air here is freezing cold, and the shadows seem to writhe along the walls.",
+    "flags": [],
+    "exits": {
+      "south": {
+        "target_vnum": 1012
+      },
+      "north": {
+        "target_vnum": 1017
+      }
+    },
+    "interactables": [],
+    "initial_mobs": [
+      1003,
+      1004
+    ],
+    "initial_items": []
+  },
+  "1017": {
+    "vnum": 1017,
+    "zone": 1,
+    "name": "The Throne Room",
+    "description": "The grand throne room. Four stone statues surround a central throne. The statues can be rotated. The Usurper Wraith floats above the throne, its eyes burning with cold fire.",
+    "flags": [],
+    "exits": {
+      "south": {
+        "target_vnum": 1016
+      }
+    },
+    "interactables": [
+      {
+        "keyword": [
+          "statue 1",
+          "statues"
+        ],
+        "description": "A stone statue of a king holding a sword. It can be rotated.",
+        "action": "rotate_statue_1"
+      },
+      {
+        "keyword": [
+          "statue 2"
+        ],
+        "description": "A stone statue of a king holding a shield. It can be rotated.",
+        "action": "rotate_statue_2"
+      },
+      {
+        "keyword": [
+          "statue 3"
+        ],
+        "description": "A stone statue of a king wearing a crown. It can be rotated.",
+        "action": "rotate_statue_3"
+      },
+      {
+        "keyword": [
+          "statue 4"
+        ],
+        "description": "A stone statue of a king with empty hands. It can be rotated.",
+        "action": "rotate_statue_4"
+      },
+      {
+        "keyword": [
+          "throne"
+        ],
+        "description": "The heavy stone throne. It looks like it could slide backward if the statues were aligned correctly.",
+        "action": "inspect_throne"
+      }
+    ],
+    "initial_mobs": [
+      1005
+    ],
+    "initial_items": []
+  },
+  "2000": {
+    "vnum": 2000,
+    "zone": 2,
+    "name": "Sector 4 Gate",
+    "description": "A massive blast door marks the entrance to Sector 4. Neon signs flicker in the perpetual rain. The gateway back to the Nexus lies south.",
+    "flags": [],
+    "exits": {
+      "south": {
+        "target_vnum": 6
+      },
+      "north": {
+        "target_vnum": 2001
+      }
+    },
+    "interactables": [],
+    "initial_mobs": [],
+    "initial_items": []
+  },
+  "2001": {
+    "vnum": 2001,
+    "zone": 2,
+    "name": "Noodle Alley",
+    "description": "Steam rises from a dozen food stalls. The smell of synthetic broth and ozone fills the air. A few locals huddle under umbrellas.",
+    "flags": [
+      "safe"
+    ],
+    "exits": {
+      "south": {
+        "target_vnum": 2000
+      },
+      "north": {
+        "target_vnum": 2002
+      },
+      "east": {
+        "target_vnum": 2003
+      }
+    },
+    "interactables": [],
+    "initial_mobs": [],
+    "initial_items": []
+  },
+  "2002": {
+    "vnum": 2002,
+    "zone": 2,
+    "name": "The Gutter Market",
+    "description": "Scavengers sell tech scraps on blankets laid over the wet pavement. The neon glare is blinding here.",
+    "flags": [],
+    "exits": {
+      "south": {
+        "target_vnum": 2001
+      },
+      "north": {
+        "target_vnum": 2005
+      },
+      "west": {
+        "target_vnum": 2004
+      }
+    },
+    "interactables": [],
+    "initial_mobs": [
+      2001
+    ],
+    "initial_items": []
+  },
+  "2003": {
+    "vnum": 2003,
+    "zone": 2,
+    "name": "Back Alley Clinic",
+    "description": "A sterile, white-tiled room hidden behind a rusty door. A surgical chair sits in the center, stained with old blood. A severed cyber-eye rests on a metal tray.",
+    "flags": [],
+    "exits": {
+      "west": {
+        "target_vnum": 2001
+      }
+    },
+    "interactables": [],
+    "initial_mobs": [],
+    "initial_items": [
+      2001
+    ]
+  },
+  "2004": {
+    "vnum": 2004,
+    "zone": 2,
+    "name": "Scavenger Den",
+    "description": "A makeshift shelter built from corrugated metal and stolen solar panels. It smells of unwashed bodies and cheap stims.",
+    "flags": [],
+    "exits": {
+      "east": {
+        "target_vnum": 2002
+      }
+    },
+    "interactables": [],
+    "initial_mobs": [
+      2001,
+      2001
+    ],
+    "initial_items": []
+  },
+  "2005": {
+    "vnum": 2005,
+    "zone": 2,
+    "name": "Main Street (South)",
+    "description": "The narrow alley opens up into a wide avenue. Hover-cars streak past overhead. The rain falls harder here.",
+    "flags": [],
+    "exits": {
+      "south": {
+        "target_vnum": 2002
+      },
+      "north": {
+        "target_vnum": 2006
+      }
+    },
+    "interactables": [],
+    "initial_mobs": [],
+    "initial_items": []
+  },
+  "2006": {
+    "vnum": 2006,
+    "zone": 2,
+    "name": "Main Street (Central)",
+    "description": "The bustling heart of Sector 4. Holographic advertisements play on loop, promising a better life off-world.",
+    "flags": [],
+    "exits": {
+      "south": {
+        "target_vnum": 2005
+      },
+      "north": {
+        "target_vnum": 2007
+      },
+      "east": {
+        "target_vnum": 2008
+      },
+      "west": {
+        "target_vnum": 2009
+      }
+    },
+    "interactables": [],
+    "initial_mobs": [
+      2002
+    ],
+    "initial_items": []
+  },
+  "2007": {
+    "vnum": 2007,
+    "zone": 2,
+    "name": "Main Street (North)",
+    "description": "The street ends at the imposing facade of the Data Exchange building. Security cameras track your every move.",
+    "flags": [],
+    "exits": {
+      "south": {
+        "target_vnum": 2006
+      },
+      "north": {
+        "target_vnum": 2012
+      }
+    },
+    "interactables": [],
+    "initial_mobs": [
+      2002
+    ],
+    "initial_items": []
+  },
+  "2008": {
+    "vnum": 2008,
+    "zone": 2,
+    "name": "The Neon Bar",
+    "description": "A dimly lit dive bar. Synthetic jazz plays from a cracked speaker. A few patrons nurse glowing blue drinks.",
+    "flags": [
+      "safe"
+    ],
+    "exits": {
+      "west": {
+        "target_vnum": 2006
+      }
+    },
+    "interactables": [],
+    "initial_mobs": [],
+    "initial_items": []
+  },
+  "2009": {
+    "vnum": 2009,
+    "zone": 2,
+    "name": "Abandoned Parking Garage",
+    "description": "Concrete pillars and oil stains. The ramp leads up to the roof. Shadows move in the corners.",
+    "flags": [],
+    "exits": {
+      "east": {
+        "target_vnum": 2006
+      },
+      "up": {
+        "target_vnum": 2010
+      }
+    },
+    "interactables": [],
+    "initial_mobs": [
+      2001
+    ],
+    "initial_items": []
+  },
+  "2010": {
+    "vnum": 2010,
+    "zone": 2,
+    "name": "Garage Rooftop",
+    "description": "The rain lashes against the concrete roof. A defunct security drone lies in a heap, its casing pried open. A glowing power cell is still attached to its chassis.",
+    "flags": [],
+    "exits": {
+      "down": {
+        "target_vnum": 2009
+      },
+      "north": {
+        "target_vnum": 2011
+      }
+    },
+    "interactables": [],
+    "initial_mobs": [
+      2002
+    ],
+    "initial_items": [
+      2002
+    ]
+  },
+  "2011": {
+    "vnum": 2011,
+    "zone": 2,
+    "name": "Maintenance Catwalk",
+    "description": "A narrow metal walkway connecting the garage to the adjacent building. It sways slightly in the wind.",
+    "flags": [],
+    "exits": {
+      "south": {
+        "target_vnum": 2010
+      }
+    },
+    "interactables": [],
+    "initial_mobs": [],
+    "initial_items": [
+      2004
+    ]
+  },
+  "2012": {
+    "vnum": 2012,
+    "zone": 2,
+    "name": "Data Exchange Lobby",
+    "description": "Sleek black marble and chrome. A security desk sits empty. An elevator leads up, but the doors are sealed.",
+    "flags": [],
+    "exits": {
+      "south": {
+        "target_vnum": 2007
+      },
+      "north": {
+        "target_vnum": 2013
+      },
+      "up": {
+        "target_vnum": 2015,
+        "door": {
+          "is_door": true,
+          "state": "locked",
+          "key_vnum": 2003
+        }
+      }
+    },
+    "interactables": [],
+    "initial_mobs": [
+      2002
+    ],
+    "initial_items": []
+  },
+  "2013": {
+    "vnum": 2013,
+    "zone": 2,
+    "name": "Security Office",
+    "description": "Monitors display static. A dead guard slumps over the console. An encrypted keycard lies on the desk.",
+    "flags": [],
+    "exits": {
+      "south": {
+        "target_vnum": 2012
+      },
+      "east": {
+        "target_vnum": 2014
+      }
+    },
+    "interactables": [],
+    "initial_mobs": [
+      2003
+    ],
+    "initial_items": [
+      2003
+    ]
+  },
+  "2014": {
+    "vnum": 2014,
+    "zone": 2,
+    "name": "Server Room B",
+    "description": "Rows of humming server racks. The air is freezing. A terminal blinks with lines of green code.",
+    "flags": [],
+    "exits": {
+      "west": {
+        "target_vnum": 2013
+      }
+    },
+    "interactables": [],
+    "initial_mobs": [],
+    "initial_items": []
+  },
+  "2015": {
+    "vnum": 2015,
+    "zone": 2,
+    "name": "Data Exchange (Floor 2)",
+    "description": "Corporate offices, ransacked and abandoned. Papers litter the floor. The elevator continues up.",
+    "flags": [],
+    "exits": {
+      "down": {
+        "target_vnum": 2012
+      },
+      "up": {
+        "target_vnum": 2016
+      },
+      "north": {
+        "target_vnum": 2017
+      }
+    },
+    "interactables": [],
+    "initial_mobs": [
+      2002,
+      2003
+    ],
+    "initial_items": []
+  },
+  "2016": {
+    "vnum": 2016,
+    "zone": 2,
+    "name": "Data Exchange (Floor 3)",
+    "description": "The executive level. The carpet is plush, but stained. A heavy security door blocks the way north.",
+    "flags": [],
+    "exits": {
+      "down": {
+        "target_vnum": 2015
+      },
+      "north": {
+        "target_vnum": 2018
+      }
+    },
+    "interactables": [],
+    "initial_mobs": [
+      2003
+    ],
+    "initial_items": []
+  },
+  "2017": {
+    "vnum": 2017,
+    "zone": 2,
+    "name": "Executive Lounge",
+    "description": "Leather sofas and a shattered wet bar. A great view of the neon city below.",
+    "flags": [],
+    "exits": {
+      "south": {
+        "target_vnum": 2015
+      }
+    },
+    "interactables": [],
+    "initial_mobs": [],
+    "initial_items": [
+      2005
+    ]
+  },
+  "2018": {
+    "vnum": 2018,
+    "zone": 2,
+    "name": "Biometric Door",
+    "description": "A massive vault door. A retinal scanner glows red beside it. It requires a valid eye scan to open.",
+    "flags": [],
+    "exits": {
+      "south": {
+        "target_vnum": 2016
+      },
+      "north": {
+        "target_vnum": 2019,
+        "door": {
+          "is_door": true,
+          "state": "locked",
+          "key_vnum": 2006
+        }
+      }
+    },
+    "interactables": [
+      {
+        "keyword": [
+          "scanner",
+          "retinal scanner"
+        ],
+        "description": "A high-tech retinal scanner. You could 'use charged-eye scanner' if you had one.",
+        "action": "use_scanner"
+      }
+    ],
+    "initial_mobs": [],
+    "initial_items": []
+  },
+  "2019": {
+    "vnum": 2019,
+    "zone": 2,
+    "name": "The Mainframe Core",
+    "description": "The central data pillar has been smashed open from the inside. A security hologram plays on loop, showing a small, incredibly dense sphere shattering the reinforced glass casing and dropping into the cooling vents below. The vents are sealed — the marble has escaped into the infrastructure.",
+    "flags": [],
+    "exits": {
+      "south": {
+        "target_vnum": 2018
+      }
+    },
+    "interactables": [],
+    "initial_mobs": [
+      2004
+    ],
     "initial_items": []
   }
 }

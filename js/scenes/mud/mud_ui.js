@@ -61,15 +61,11 @@
         const value = inputEl.value.trim();
         if (!value) return;
 
-        // Add to history
         commandHistory.unshift(value);
         if (commandHistory.length > MAX_HISTORY) commandHistory.pop();
         historyIndex = -1;
 
-        // Echo the command
         appendOutput([{ type: 'input', text: `> ${value}` }]);
-
-        // Execute
         onCommand(value);
         inputEl.value = '';
       } else if (e.key === 'ArrowUp') {
@@ -104,17 +100,18 @@
         logEl.appendChild(div);
       }
 
-      // Trim excess lines
       while (logEl.children.length > MAX_LOG_LINES) {
         logEl.removeChild(logEl.firstChild);
       }
 
-      // Auto-scroll to bottom
       logEl.scrollTop = logEl.scrollHeight;
     }
 
     /**
      * Update the context-sensitive quick-action buttons and status bar.
+     * Context object shape:
+     *   { hp, maxHp, roomName, exits[], roomMobs[], roomItems[],
+     *     roomNpcs[], roomInteractables[], inCombat }
      */
     function updateContext(ctx) {
       if (!ctx) return;
@@ -130,20 +127,18 @@
         roomNameEl.textContent = ctx.roomName;
       }
 
-      // Build quick-action buttons
       if (!actionsEl) return;
       actionsEl.innerHTML = '';
 
-      // Direction buttons
+      // --- Direction row ---
       const dirRow = document.createElement('div');
       dirRow.className = 'mud-dir-buttons';
       for (const dir of ctx.exits) {
-        const btn = createActionButton(dirLabel(dir), dir);
-        dirRow.appendChild(btn);
+        dirRow.appendChild(createActionButton(dirLabel(dir), dir));
       }
       actionsEl.appendChild(dirRow);
 
-      // Context buttons
+      // --- Context row ---
       const ctxRow = document.createElement('div');
       ctxRow.className = 'mud-ctx-buttons';
 
@@ -151,21 +146,36 @@
       ctxRow.appendChild(createActionButton('Look', 'look'));
       ctxRow.appendChild(createActionButton('Inv', 'inventory'));
 
-      // Combat buttons
       if (ctx.inCombat) {
+        // Combat mode: only flee
         ctxRow.appendChild(createActionButton('Flee', 'flee'));
       } else {
-        // Attack buttons for mobs in room
-        for (const mobName of ctx.roomMobs) {
-          ctxRow.appendChild(createActionButton(`Attack ${mobName}`, `attack ${mobName}`));
+        // Attack buttons for hostile mobs
+        for (const mobName of (ctx.roomMobs || [])) {
+          ctxRow.appendChild(createActionButton(`Atk ${shorten(mobName)}`, `attack ${mobName}`));
         }
-        // Take buttons for items in room
-        for (const itemName of ctx.roomItems) {
-          ctxRow.appendChild(createActionButton(`Take ${itemName}`, `take ${itemName}`));
+        // Talk buttons for NPCs
+        for (const npcName of (ctx.roomNpcs || [])) {
+          ctxRow.appendChild(createActionButton(`Talk ${shorten(npcName)}`, `talk ${npcName}`));
+        }
+        // Take buttons for items
+        for (const itemName of (ctx.roomItems || [])) {
+          ctxRow.appendChild(createActionButton(`Take ${shorten(itemName)}`, `take ${itemName}`));
+        }
+        // Examine buttons for interactables
+        for (const intName of (ctx.roomInteractables || [])) {
+          ctxRow.appendChild(createActionButton(`Exam ${shorten(intName)}`, `examine ${intName}`));
         }
       }
 
       actionsEl.appendChild(ctxRow);
+    }
+
+    /**
+     * Shorten a name for button display (max 12 chars).
+     */
+    function shorten(name) {
+      return name.length > 12 ? name.slice(0, 11) + '\u2026' : name;
     }
 
     /**
