@@ -26,6 +26,8 @@
   const ISO_ANGLE  = Math.atan(1 / Math.sqrt(2));  // ~35.26°
   const ISO_YAW    = Math.PI / 4;                  // 45°
   const BASE_FRUSTUM = 9;  // 20% zoom-in vs original 11
+  // Mobile: portrait aspect (h > w) gets 20% more zoom-out for visibility
+  const MOBILE_FRUSTUM_SCALE = 1.2;
 
   const COL = {
     void:          0x000000,
@@ -1128,7 +1130,10 @@
 
   function updateCameraFrustum(cam, w, h, zoom) {
     const aspect = w / h;
-    const frust  = BASE_FRUSTUM / (zoom || 1);
+    // On mobile (portrait), zoom out 20% so the level is more visible
+    const isMobile = h > w;
+    const scale = isMobile ? MOBILE_FRUSTUM_SCALE : 1;
+    const frust = (BASE_FRUSTUM * scale) / (zoom || 1);
     cam.left   = -frust * aspect;
     cam.right  =  frust * aspect;
     cam.top    =  frust;
@@ -1293,9 +1298,14 @@
     const camZ = smoothCamZ;
 
     const dist = 30;
+    // On mobile (portrait), remove the +5 vertical offset that shifts the
+    // marble toward the top of the screen.  On desktop the offset provides
+    // a pleasant "look slightly down" framing with the panel header above.
+    const isMobileView = h > w;
+    const camYOffset = isMobileView ? 0 : 5;
     camera.position.set(
       camX + dist * Math.cos(ISO_YAW),
-      camZ  + dist * Math.sin(ISO_ANGLE) + 5,
+      camZ  + dist * Math.sin(ISO_ANGLE) + camYOffset,
       camY  + dist * Math.cos(ISO_YAW)
     );
     camera.lookAt(camX, camZ, camY);
