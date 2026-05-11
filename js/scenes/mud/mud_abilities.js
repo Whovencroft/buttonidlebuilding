@@ -16,7 +16,7 @@
   'use strict';
 
   /** Power thresholds for each ability tier (0-3) */
-  const POWER_TIERS = [10, 25, 50, 100];
+  const POWER_TIERS = [50, 500, 5000, 50000];
 
   /** QP cost to purchase an ability at each tier */
   const QP_COSTS = [3, 5, 8, 12];
