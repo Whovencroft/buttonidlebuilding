@@ -1,663 +1,1534 @@
 {
+  "1": {
+    "vnum": 1,
+    "zone": 0,
+    "name": "Nexus Map",
+    "description": "A folded parchment showing the layout of the Nexus of Echoes and its six gateway chambers.",
+    "type": "quest",
+    "slot": null,
+    "stats": {},
+    "rarity": "common",
+    "value": 0
+  },
+  "2": {
+    "vnum": 2,
+    "zone": 0,
+    "name": "Healing Draught",
+    "description": "A small vial of glowing red liquid. Restores 25 HP when consumed.",
+    "type": "consumable",
+    "slot": null,
+    "stats": {
+      "heal": 25
+    },
+    "rarity": "common",
+    "value": 10
+  },
+  "3": {
+    "vnum": 3,
+    "zone": 0,
+    "name": "Traveler's Ration",
+    "description": "Dried meat and hardtack. Not delicious, but it'll keep you going. Restores 10 HP.",
+    "type": "consumable",
+    "slot": null,
+    "stats": {
+      "heal": 10
+    },
+    "rarity": "common",
+    "value": 5
+  },
+  "4": {
+    "vnum": 4,
+    "zone": 0,
+    "name": "Training Sword",
+    "description": "A basic iron sword. Good for beginners.",
+    "type": "weapon",
+    "slot": "weapon",
+    "stats": {
+      "attack": 3
+    },
+    "rarity": "common",
+    "value": 15
+  },
+  "5": {
+    "vnum": 5,
+    "zone": 0,
+    "name": "Leather Cap",
+    "description": "A simple leather cap that offers minimal protection.",
+    "type": "armor",
+    "slot": "head",
+    "stats": {
+      "defense": 1
+    },
+    "rarity": "common",
+    "value": 10
+  },
+  "6": {
+    "vnum": 6,
+    "zone": 0,
+    "name": "Courier's Package — Crown",
+    "description": "A sealed package addressed to someone in The Shattered Crown. Courier Dash will pay you for delivering it.",
+    "type": "quest",
+    "slot": null,
+    "stats": {},
+    "rarity": "common",
+    "value": 0
+  },
+  "7": {
+    "vnum": 7,
+    "zone": 0,
+    "name": "Courier's Package — Grid",
+    "description": "A sealed package addressed to someone in Neon Grid. Courier Dash will pay you for delivering it.",
+    "type": "quest",
+    "slot": null,
+    "stats": {},
+    "rarity": "common",
+    "value": 0
+  },
+  "8": {
+    "vnum": 8,
+    "zone": 0,
+    "name": "Bounty Token",
+    "description": "A brass token proving you've completed a bounty. Return it to Bounty Master Krell for your reward.",
+    "type": "quest",
+    "slot": null,
+    "stats": {},
+    "rarity": "common",
+    "value": 0
+  },
   "1001": {
     "vnum": 1001,
     "zone": 1,
-    "name": "Rusty Shortsword",
-    "description": "A battered shortsword with a chipped blade. It's seen better days, but it's still sharp enough to cut.",
+    "name": "Ironwood Longsword",
+    "description": "A blade forged from ironwood-tempered steel. It hums faintly when swung.",
     "type": "weapon",
-    "rarity": "common",
+    "slot": "weapon",
     "stats": {
-      "attack": 6,
-      "slot": "weapon"
+      "attack": 7
     },
-    "flags": [],
-    "value": 10
+    "rarity": "uncommon",
+    "value": 50
   },
   "1002": {
     "vnum": 1002,
     "zone": 1,
-    "name": "The Silver Key",
-    "description": "A heavy silver key bearing the royal crest. It feels important.",
-    "type": "quest",
-    "rarity": "quest",
-    "stats": {},
-    "flags": [
-      "nodrop"
-    ],
-    "value": 0
+    "name": "Crown Guard Shield",
+    "description": "A kite shield bearing the faded crest of the Shattered Crown. Still sturdy despite its age.",
+    "type": "armor",
+    "slot": "shield",
+    "stats": {
+      "defense": 4
+    },
+    "rarity": "uncommon",
+    "value": 45
   },
   "1003": {
     "vnum": 1003,
     "zone": 1,
-    "name": "Tapestry Fragment (East)",
-    "description": "A torn piece of cloth depicting a rising sun. Part of a larger tapestry.",
-    "type": "quest",
-    "rarity": "quest",
+    "name": "Wolf Pelt",
+    "description": "A thick grey wolf pelt. Could be sold or used for crafting.",
+    "type": "material",
+    "slot": null,
     "stats": {},
-    "flags": [
-      "nodrop"
-    ],
-    "value": 0
+    "rarity": "common",
+    "value": 8
   },
   "1004": {
     "vnum": 1004,
     "zone": 1,
-    "name": "Tapestry Fragment (North)",
-    "description": "A torn piece of cloth depicting a shining star. Part of a larger tapestry.",
-    "type": "quest",
-    "rarity": "quest",
+    "name": "Handful of Coins",
+    "description": "A small pouch of tarnished copper and silver coins.",
+    "type": "material",
+    "slot": null,
     "stats": {},
-    "flags": [
-      "nodrop"
-    ],
-    "value": 0
+    "rarity": "common",
+    "value": 12
   },
   "1005": {
     "vnum": 1005,
     "zone": 1,
-    "name": "Tapestry Fragment (South)",
-    "description": "A torn piece of cloth depicting a flowing river. Part of a larger tapestry.",
-    "type": "quest",
-    "rarity": "quest",
+    "name": "Crude Arrow Bundle",
+    "description": "A quiver of poorly-made arrows. Better than nothing.",
+    "type": "material",
+    "slot": null,
     "stats": {},
-    "flags": [
-      "nodrop"
-    ],
-    "value": 0
+    "rarity": "common",
+    "value": 3
   },
   "1006": {
     "vnum": 1006,
     "zone": 1,
-    "name": "Knight's Broadsword",
-    "description": "A sturdy steel blade etched with faded runes. Heavy but reliable.",
-    "type": "weapon",
-    "rarity": "uncommon",
-    "stats": {
-      "attack": 15,
-      "slot": "weapon"
-    },
-    "flags": [],
-    "value": 75
+    "name": "Bone Fragment",
+    "description": "A piece of enchanted bone from an animated skeleton. It still faintly glows.",
+    "type": "material",
+    "slot": null,
+    "stats": {},
+    "rarity": "common",
+    "value": 6
   },
   "1007": {
     "vnum": 1007,
     "zone": 1,
-    "name": "Rusted Chainmail",
-    "description": "Old but functional armor. The links are corroded but still hold together.",
-    "type": "armor",
-    "rarity": "common",
-    "stats": {
-      "defense": 5,
-      "slot": "body"
-    },
-    "flags": [],
-    "value": 40
+    "name": "Boar Tusk",
+    "description": "A massive tusk from a dire boar. Sharp enough to use as a dagger in a pinch.",
+    "type": "material",
+    "slot": null,
+    "stats": {},
+    "rarity": "uncommon",
+    "value": 15
   },
   "1008": {
     "vnum": 1008,
     "zone": 1,
-    "name": "Crown of Embers",
-    "description": "A crown that radiates heat. Taken from the Usurper Wraith. It whispers of power.",
-    "type": "armor",
-    "rarity": "rare",
-    "stats": {
-      "defense": 8,
-      "attack": 5,
-      "slot": "head"
-    },
-    "flags": [],
-    "value": 200
+    "name": "Bandit's Coin Purse",
+    "description": "A leather purse stolen from honest folk. Contains a decent amount of coin.",
+    "type": "material",
+    "slot": null,
+    "stats": {},
+    "rarity": "common",
+    "value": 20
   },
   "1009": {
     "vnum": 1009,
     "zone": 1,
-    "name": "Shadow Essence",
-    "description": "A vial of condensed darkness. It writhes inside the glass like a living thing.",
-    "type": "material",
-    "rarity": "rare",
-    "stats": {},
-    "flags": [],
-    "value": 50
+    "name": "Fine Chainmail Vest",
+    "description": "Well-maintained chainmail taken from a bandit captain. Offers solid protection.",
+    "type": "armor",
+    "slot": "body",
+    "stats": {
+      "defense": 5
+    },
+    "rarity": "uncommon",
+    "value": 60
   },
   "1010": {
     "vnum": 1010,
     "zone": 1,
-    "name": "Venom Sac",
-    "description": "A bulbous sac of spider venom. Handle with extreme care.",
+    "name": "Ironwood Bark",
+    "description": "Bark stripped from a corrupted treant. Despite the corruption, the wood is incredibly strong.",
     "type": "material",
-    "rarity": "uncommon",
+    "slot": null,
     "stats": {},
-    "flags": [],
-    "value": 30
+    "rarity": "uncommon",
+    "value": 18
   },
   "1011": {
     "vnum": 1011,
     "zone": 1,
-    "name": "Healing Draught",
-    "description": "A small glass vial filled with a warm amber liquid. It smells of honey and herbs.",
-    "type": "consumable",
-    "rarity": "common",
-    "stats": {
-      "heal": 25
-    },
-    "flags": [],
-    "value": 15
+    "name": "Wisp Essence",
+    "description": "A captured fragment of will-o'-wisp light in a glass vial. It pulses with faint magic.",
+    "type": "material",
+    "slot": null,
+    "stats": {},
+    "rarity": "rare",
+    "value": 30
   },
   "1012": {
     "vnum": 1012,
     "zone": 1,
-    "name": "Greater Healing Draught",
-    "description": "A larger vial of potent healing liquid. The amber glow is intense.",
-    "type": "consumable",
+    "name": "Troll's Club",
+    "description": "A massive tree trunk used as a weapon. Absurdly heavy but devastatingly powerful.",
+    "type": "weapon",
+    "slot": "weapon",
+    "stats": {
+      "attack": 12
+    },
+    "rarity": "rare",
+    "value": 75
+  },
+  "1013": {
+    "vnum": 1013,
+    "zone": 1,
+    "name": "Wraith Shroud",
+    "description": "A tattered piece of spectral cloth. It's cold to the touch and slightly transparent.",
+    "type": "armor",
+    "slot": "body",
+    "stats": {
+      "defense": 3,
+      "attack": 2
+    },
+    "rarity": "rare",
+    "value": 55
+  },
+  "1014": {
+    "vnum": 1014,
+    "zone": 1,
+    "name": "Spider Silk Thread",
+    "description": "Incredibly strong silk harvested from a giant spider's web. Useful for crafting.",
+    "type": "material",
+    "slot": null,
+    "stats": {},
+    "rarity": "common",
+    "value": 10
+  },
+  "1015": {
+    "vnum": 1015,
+    "zone": 1,
+    "name": "Venom Sac",
+    "description": "A gland full of potent serpent venom. Handle with extreme care.",
+    "type": "material",
+    "slot": null,
+    "stats": {},
     "rarity": "uncommon",
+    "value": 20
+  },
+  "1016": {
+    "vnum": 1016,
+    "zone": 1,
+    "name": "Moonpetal Flower",
+    "description": "A luminescent white flower that only blooms in deep forest shade. The herbalist wants these.",
+    "type": "quest",
+    "slot": null,
+    "stats": {},
+    "rarity": "uncommon",
+    "value": 0
+  },
+  "1017": {
+    "vnum": 1017,
+    "zone": 1,
+    "name": "Greater Healing Draught",
+    "description": "A potent healing potion brewed by the wandering herbalist. Restores 50 HP.",
+    "type": "consumable",
+    "slot": null,
     "stats": {
       "heal": 50
     },
-    "flags": [],
+    "rarity": "uncommon",
+    "value": 40
+  },
+  "1018": {
+    "vnum": 1018,
+    "zone": 1,
+    "name": "Mysterious Compass",
+    "description": "A compass that doesn't point north. It seems to spin randomly... or does it? [RED HERRING — leads nowhere meaningful]",
+    "type": "quest",
+    "slot": null,
+    "stats": {},
+    "rarity": "rare",
+    "value": 0
+  },
+  "1019": {
+    "vnum": 1019,
+    "zone": 1,
+    "name": "Gargoyle Eye",
+    "description": "A crystallized red eye from a gargoyle. It still seems to watch you.",
+    "type": "material",
+    "slot": null,
+    "stats": {},
+    "rarity": "rare",
+    "value": 35
+  },
+  "1020": {
+    "vnum": 1020,
+    "zone": 1,
+    "name": "Knight's Oath Ring",
+    "description": "A signet ring from a cursed knight. The inscription reads: 'Unto dust, unto duty.'",
+    "type": "material",
+    "slot": null,
+    "stats": {},
+    "rarity": "rare",
     "value": 40
   },
   "2001": {
     "vnum": 2001,
     "zone": 2,
-    "name": "Severed Cyber-Eye",
-    "description": "A high-end optical implant, recently removed. The iris still dilates when light hits it.",
-    "type": "quest",
-    "rarity": "quest",
+    "name": "Scrap Metal",
+    "description": "A piece of useless scrap.",
+    "type": "material",
+    "slot": "none",
     "stats": {},
-    "flags": [
-      "nodrop"
-    ],
-    "value": 0
+    "rarity": "common",
+    "value": 5
   },
   "2002": {
     "vnum": 2002,
     "zone": 2,
-    "name": "Power Cell",
-    "description": "A glowing blue energy source. It hums with stored potential.",
-    "type": "quest",
-    "rarity": "quest",
+    "name": "Blaster Battery",
+    "description": "A half-empty energy cell.",
+    "type": "consumable",
+    "slot": "none",
     "stats": {},
-    "flags": [
-      "nodrop"
-    ],
-    "value": 0
+    "rarity": "common",
+    "value": 10
   },
   "2003": {
     "vnum": 2003,
     "zone": 2,
-    "name": "Encrypted Keycard",
-    "description": "A black keycard with corporate markings. Opens the Data Exchange elevator.",
-    "type": "quest",
-    "rarity": "quest",
-    "stats": {},
-    "flags": [
-      "nodrop"
-    ],
-    "value": 0
+    "name": "Spiked Bat",
+    "description": "A baseball bat with nails.",
+    "type": "weapon",
+    "slot": "weapon",
+    "stats": {
+      "attack": 5
+    },
+    "rarity": "common",
+    "value": 20
   },
   "2004": {
     "vnum": 2004,
     "zone": 2,
-    "name": "Kevlar Vest",
-    "description": "Standard issue corporate security armor. Lightweight but effective.",
-    "type": "armor",
-    "rarity": "common",
-    "stats": {
-      "defense": 6,
-      "slot": "body"
-    },
-    "flags": [],
-    "value": 60
+    "name": "Hacker's Datapad",
+    "description": "A cracked tablet with hacking tools.",
+    "type": "quest",
+    "slot": "none",
+    "stats": {},
+    "rarity": "uncommon",
+    "value": 50
   },
   "2005": {
     "vnum": 2005,
     "zone": 2,
-    "name": "Hacker's Neural Interface",
-    "description": "A headpiece that boosts processing speed. Tingles when worn.",
+    "name": "Mech Plating",
+    "description": "Heavy armor salvaged from a mech.",
     "type": "armor",
-    "rarity": "uncommon",
+    "slot": "body",
     "stats": {
-      "defense": 4,
-      "attack": 3,
-      "slot": "head"
+      "defense": 15
     },
-    "flags": [],
-    "value": 85
+    "rarity": "rare",
+    "value": 100
   },
   "2006": {
     "vnum": 2006,
     "zone": 2,
-    "name": "Charged Cyber-Eye",
-    "description": "A cyber-eye powered by a glowing cell. It looks ready to scan. Use it on the retinal scanner.",
-    "type": "quest",
-    "rarity": "quest",
+    "name": "Glitch Dust",
+    "description": "Sparkling dust from a destroyed hologram.",
+    "type": "material",
+    "slot": "none",
     "stats": {},
-    "flags": [
-      "nodrop"
-    ],
-    "value": 0
+    "rarity": "uncommon",
+    "value": 30
   },
   "2007": {
     "vnum": 2007,
     "zone": 2,
-    "name": "Monomolecular Blade",
-    "description": "A sword with an edge one molecule thick. It cuts through anything.",
-    "type": "weapon",
+    "name": "AI Core",
+    "description": "A glowing blue processor.",
+    "type": "material",
+    "slot": "none",
+    "stats": {},
     "rarity": "rare",
-    "stats": {
-      "attack": 23,
-      "slot": "weapon"
-    },
-    "flags": [],
-    "value": 250
+    "value": 150
   },
   "2008": {
     "vnum": 2008,
     "zone": 2,
-    "name": "Stim Pack",
-    "description": "A single-use injector filled with combat stimulants. Heals wounds rapidly.",
-    "type": "consumable",
-    "rarity": "common",
-    "stats": {
-      "heal": 30
-    },
-    "flags": [],
-    "value": 20
+    "name": "Turret Lens",
+    "description": "A targeting lens.",
+    "type": "material",
+    "slot": "none",
+    "stats": {},
+    "rarity": "uncommon",
+    "value": 40
   },
   "2009": {
     "vnum": 2009,
     "zone": 2,
-    "name": "Military-Grade Stim",
-    "description": "A high-end combat medical injector. Corporate issue — not available to civilians.",
-    "type": "consumable",
+    "name": "Hydraulic Piston",
+    "description": "A strong mechanical part.",
+    "type": "material",
+    "slot": "none",
+    "stats": {},
     "rarity": "uncommon",
+    "value": 45
+  },
+  "2010": {
+    "vnum": 2010,
+    "zone": 2,
+    "name": "Neural Lace",
+    "description": "A delicate web of wires for the brain.",
+    "type": "armor",
+    "slot": "head",
     "stats": {
-      "heal": 60
+      "defense": 5,
+      "intelligence": 10
     },
-    "flags": [],
-    "value": 55
+    "rarity": "rare",
+    "value": 200
+  },
+  "2011": {
+    "vnum": 2011,
+    "zone": 2,
+    "name": "Toxic Vial",
+    "description": "A glass tube of green sludge.",
+    "type": "consumable",
+    "slot": "none",
+    "stats": {},
+    "rarity": "common",
+    "value": 15
+  },
+  "2012": {
+    "vnum": 2012,
+    "zone": 2,
+    "name": "Plasma Rifle",
+    "description": "A high-tech energy weapon.",
+    "type": "weapon",
+    "slot": "weapon",
+    "stats": {
+      "attack": 25
+    },
+    "rarity": "epic",
+    "value": 500
+  },
+  "2013": {
+    "vnum": 2013,
+    "zone": 2,
+    "name": "Data Fragment",
+    "description": "A piece of encrypted code.",
+    "type": "material",
+    "slot": "none",
+    "stats": {},
+    "rarity": "uncommon",
+    "value": 60
+  },
+  "2014": {
+    "vnum": 2014,
+    "zone": 2,
+    "name": "Sentinel Core",
+    "description": "The burning hot heart of a sentinel.",
+    "type": "material",
+    "slot": "none",
+    "stats": {},
+    "rarity": "epic",
+    "value": 1000
+  },
+  "2015": {
+    "vnum": 2015,
+    "zone": 2,
+    "name": "Severed Cyber-Eye",
+    "description": "A mechanical eye, currently unpowered.",
+    "type": "quest",
+    "slot": "none",
+    "stats": {},
+    "rarity": "rare",
+    "value": 0
+  },
+  "2016": {
+    "vnum": 2016,
+    "zone": 2,
+    "name": "Power Cell",
+    "description": "A fully charged battery.",
+    "type": "quest",
+    "slot": "none",
+    "stats": {},
+    "rarity": "uncommon",
+    "value": 50
+  },
+  "2017": {
+    "vnum": 2017,
+    "zone": 2,
+    "name": "Charged Cyber-Eye",
+    "description": "A mechanical eye glowing with power.",
+    "type": "quest",
+    "slot": "none",
+    "stats": {},
+    "rarity": "epic",
+    "value": 0
+  },
+  "2018": {
+    "vnum": 2018,
+    "zone": 2,
+    "name": "Encrypted Data Chip",
+    "description": "A highly secure chip. Looks very important.",
+    "type": "quest",
+    "slot": "none",
+    "stats": {},
+    "rarity": "legendary",
+    "value": 1
+  },
+  "2019": {
+    "vnum": 2019,
+    "zone": 2,
+    "name": "Neon Jacket",
+    "description": "A stylish jacket with glowing trim.",
+    "type": "armor",
+    "slot": "body",
+    "stats": {
+      "defense": 8
+    },
+    "rarity": "uncommon",
+    "value": 75
+  },
+  "2020": {
+    "vnum": 2020,
+    "zone": 2,
+    "name": "Synthetic Synth-Burger",
+    "description": "Tastes like chicken, probably isn't.",
+    "type": "consumable",
+    "slot": "none",
+    "stats": {
+      "hp_restore": 20
+    },
+    "rarity": "common",
+    "value": 5
   },
   "3001": {
     "vnum": 3001,
     "zone": 3,
-    "name": "Switchblade",
-    "description": "A cheap knife. Better than nothing.",
+    "name": "Crowbar",
+    "description": "A heavy iron crowbar.",
     "type": "weapon",
-    "rarity": "common",
+    "slot": "hand",
     "stats": {
-      "attack": 8,
-      "slot": "weapon"
+      "attack": 5
     },
-    "flags": [],
-    "value": 15
+    "rarity": "common",
+    "value": 10
   },
   "3002": {
     "vnum": 3002,
     "zone": 3,
-    "name": "Trench Coat",
-    "description": "Keeps the rain off. Smells like cheap cigarettes.",
-    "type": "armor",
-    "rarity": "common",
+    "name": "Police Baton",
+    "description": "A standard issue police baton.",
+    "type": "weapon",
+    "slot": "hand",
     "stats": {
-      "defense": 5,
-      "slot": "body"
+      "attack": 8
     },
-    "flags": [],
-    "value": 30
+    "rarity": "common",
+    "value": 15
   },
   "3003": {
     "vnum": 3003,
     "zone": 3,
-    "name": "Heavy Brass Key",
-    "description": "Opens the Syndicate Vault.",
-    "type": "quest",
-    "rarity": "quest",
-    "stats": {},
-    "flags": [
-      "nodrop"
-    ],
-    "value": 0
+    "name": "Tailored Suit",
+    "description": "A fine, blood-stained suit.",
+    "type": "armor",
+    "slot": "body",
+    "stats": {
+      "defense": 10
+    },
+    "rarity": "uncommon",
+    "value": 50
   },
   "3004": {
     "vnum": 3004,
     "zone": 3,
-    "name": "Stolen Diamonds",
-    "description": "A bag of uncut gems.",
-    "type": "material",
+    "name": "Silenced Pistol",
+    "description": "A sleek pistol with a silencer.",
+    "type": "weapon",
+    "slot": "hand",
+    "stats": {
+      "attack": 20
+    },
     "rarity": "rare",
-    "stats": {},
-    "flags": [],
-    "value": 150
+    "value": 100
   },
   "3005": {
     "vnum": 3005,
     "zone": 3,
-    "name": "Police Revolver",
-    "description": "Standard issue .38 special.",
+    "name": "Concealed Dagger",
+    "description": "A sharp, easily hidden blade.",
     "type": "weapon",
-    "rarity": "uncommon",
+    "slot": "hand",
     "stats": {
-      "attack": 14,
-      "slot": "weapon"
+      "attack": 15
     },
-    "flags": [],
-    "value": 60
+    "rarity": "uncommon",
+    "value": 40
   },
   "3006": {
     "vnum": 3006,
     "zone": 3,
-    "name": "Tommy Gun",
-    "description": "A heavy submachine gun with a drum magazine.",
-    "type": "weapon",
-    "rarity": "rare",
+    "name": "Bottle of Moonshine",
+    "description": "Strong, illegal alcohol.",
+    "type": "consumable",
+    "slot": "none",
     "stats": {
-      "attack": 22,
-      "slot": "weapon"
+      "hp_restore": 20
     },
-    "flags": [],
-    "value": 120
+    "rarity": "common",
+    "value": 5
   },
   "3007": {
     "vnum": 3007,
     "zone": 3,
-    "name": "Carmine's Fedora",
-    "description": "A stylish hat worn by the Don.",
-    "type": "armor",
-    "rarity": "rare",
-    "stats": {
-      "defense": 7,
-      "attack": 2,
-      "slot": "head"
-    },
-    "flags": [],
+    "name": "Wad of Cash",
+    "description": "A thick roll of bills.",
+    "type": "material",
+    "slot": "none",
+    "stats": {},
+    "rarity": "uncommon",
     "value": 100
+  },
+  "3008": {
+    "vnum": 3008,
+    "zone": 3,
+    "name": "Zippo Lighter",
+    "description": "A classic metal lighter.",
+    "type": "material",
+    "slot": "none",
+    "stats": {},
+    "rarity": "common",
+    "value": 10
+  },
+  "3009": {
+    "vnum": 3009,
+    "zone": 3,
+    "name": "Vial of Poison",
+    "description": "A small vial of deadly liquid.",
+    "type": "consumable",
+    "slot": "none",
+    "stats": {
+      "attack_boost": 5
+    },
+    "rarity": "rare",
+    "value": 60
+  },
+  "3010": {
+    "vnum": 3010,
+    "zone": 3,
+    "name": "Brass Knuckles",
+    "description": "Heavy brass knuckles.",
+    "type": "weapon",
+    "slot": "hand",
+    "stats": {
+      "attack": 12
+    },
+    "rarity": "uncommon",
+    "value": 30
+  },
+  "3011": {
+    "vnum": 3011,
+    "zone": 3,
+    "name": "Tommy Gun",
+    "description": "A devastating submachine gun.",
+    "type": "weapon",
+    "slot": "hand",
+    "stats": {
+      "attack": 30
+    },
+    "rarity": "epic",
+    "value": 200
+  },
+  "3012": {
+    "vnum": 3012,
+    "zone": 3,
+    "name": "Blackmail Folder",
+    "description": "A folder full of incriminating photos.",
+    "type": "quest",
+    "slot": "none",
+    "stats": {},
+    "rarity": "rare",
+    "value": 0
+  },
+  "3013": {
+    "vnum": 3013,
+    "zone": 3,
+    "name": "Lucky Coin",
+    "description": "A completely ordinary coin. It doesn't seem lucky at all.",
+    "type": "quest",
+    "slot": "none",
+    "stats": {},
+    "rarity": "common",
+    "value": 1
+  },
+  "3014": {
+    "vnum": 3014,
+    "zone": 3,
+    "name": "Brass Key",
+    "description": "A heavy brass key, looks like it opens a vault.",
+    "type": "quest",
+    "slot": "none",
+    "stats": {},
+    "rarity": "rare",
+    "value": 0
+  },
+  "3015": {
+    "vnum": 3015,
+    "zone": 3,
+    "name": "Trench Coat",
+    "description": "A classic detective's trench coat.",
+    "type": "armor",
+    "slot": "body",
+    "stats": {
+      "defense": 15
+    },
+    "rarity": "uncommon",
+    "value": 60
+  },
+  "3016": {
+    "vnum": 3016,
+    "zone": 3,
+    "name": "Fedora",
+    "description": "A stylish fedora hat.",
+    "type": "armor",
+    "slot": "head",
+    "stats": {
+      "defense": 5
+    },
+    "rarity": "common",
+    "value": 20
+  },
+  "3017": {
+    "vnum": 3017,
+    "zone": 3,
+    "name": "Mama Rosa's Meatballs",
+    "description": "Delicious, healing meatballs.",
+    "type": "consumable",
+    "slot": "none",
+    "stats": {
+      "hp_restore": 50
+    },
+    "rarity": "uncommon",
+    "value": 15
+  },
+  "3018": {
+    "vnum": 3018,
+    "zone": 3,
+    "name": "Jazz Record",
+    "description": "A vinyl record of smooth jazz.",
+    "type": "material",
+    "slot": "none",
+    "stats": {},
+    "rarity": "common",
+    "value": 10
+  },
+  "3019": {
+    "vnum": 3019,
+    "zone": 3,
+    "name": "Broken Pocket Watch",
+    "description": "A watch stopped at 11:59.",
+    "type": "material",
+    "slot": "none",
+    "stats": {},
+    "rarity": "common",
+    "value": 5
+  },
+  "3020": {
+    "vnum": 3020,
+    "zone": 3,
+    "name": "Mysterious Marble",
+    "description": "A smooth glass marble.",
+    "type": "quest",
+    "slot": "none",
+    "stats": {},
+    "rarity": "epic",
+    "value": 0
   },
   "4001": {
     "vnum": 4001,
     "zone": 4,
-    "name": "Combat Knife",
-    "description": "A serrated survival knife.",
+    "name": "M16 Assault Rifle",
+    "description": "A standard issue rifle.",
     "type": "weapon",
-    "rarity": "common",
+    "slot": "hands",
     "stats": {
-      "attack": 10,
-      "slot": "weapon"
+      "attack": 25
     },
-    "flags": [],
-    "value": 20
+    "rarity": "common",
+    "value": 100
   },
   "4002": {
     "vnum": 4002,
     "zone": 4,
-    "name": "Frag Grenade",
-    "description": "Pull pin, throw.",
-    "type": "consumable",
-    "rarity": "uncommon",
+    "name": "Kevlar Vest",
+    "description": "Bullet-resistant armor.",
+    "type": "armor",
+    "slot": "body",
     "stats": {
-      "heal": 0
+      "defense": 20
     },
-    "flags": [],
-    "value": 40
+    "rarity": "uncommon",
+    "value": 150
   },
   "4003": {
     "vnum": 4003,
     "zone": 4,
-    "name": "Abort Code Note",
-    "description": "A sticky note reading 'DELTA-9'.",
-    "type": "quest",
-    "rarity": "quest",
-    "stats": {},
-    "flags": [
-      "nodrop"
-    ],
-    "value": 0
+    "name": "Combat Knife",
+    "description": "A sharp tactical knife.",
+    "type": "weapon",
+    "slot": "hands",
+    "stats": {
+      "attack": 15
+    },
+    "rarity": "common",
+    "value": 50
   },
   "4004": {
     "vnum": 4004,
     "zone": 4,
-    "name": "Red Keycard",
-    "description": "Access to the General's Bunker.",
-    "type": "quest",
-    "rarity": "quest",
-    "stats": {},
-    "flags": [
-      "nodrop"
-    ],
-    "value": 0
+    "name": "Frag Grenade",
+    "description": "An explosive device.",
+    "type": "consumable",
+    "slot": "none",
+    "stats": {
+      "damage": 50
+    },
+    "rarity": "uncommon",
+    "value": 75
   },
   "4005": {
     "vnum": 4005,
     "zone": 4,
-    "name": "Assault Rifle",
-    "description": "Standard issue automatic weapon.",
-    "type": "weapon",
-    "rarity": "uncommon",
+    "name": "Medkit",
+    "description": "Heals wounds.",
+    "type": "consumable",
+    "slot": "none",
     "stats": {
-      "attack": 16,
-      "slot": "weapon"
+      "heal": 100
     },
-    "flags": [],
-    "value": 80
+    "rarity": "common",
+    "value": 40
   },
   "4006": {
     "vnum": 4006,
     "zone": 4,
-    "name": "Rocket Launcher",
-    "description": "Maximum collateral damage.",
+    "name": "Sniper Rifle",
+    "description": "High damage from afar.",
     "type": "weapon",
-    "rarity": "rare",
+    "slot": "hands",
     "stats": {
-      "attack": 26,
-      "slot": "weapon"
+      "attack": 45
     },
-    "flags": [],
-    "value": 150
+    "rarity": "rare",
+    "value": 300
   },
   "4007": {
     "vnum": 4007,
     "zone": 4,
-    "name": "General's Beret",
-    "description": "A red beret with a gold star.",
+    "name": "Combat Boots",
+    "description": "Sturdy footwear.",
     "type": "armor",
-    "rarity": "rare",
+    "slot": "feet",
     "stats": {
-      "defense": 8,
-      "attack": 3,
-      "slot": "head"
+      "defense": 5
     },
-    "flags": [],
-    "value": 110
+    "rarity": "common",
+    "value": 30
+  },
+  "4008": {
+    "vnum": 4008,
+    "zone": 4,
+    "name": "Helmet",
+    "description": "Protects the head.",
+    "type": "armor",
+    "slot": "head",
+    "stats": {
+      "defense": 10
+    },
+    "rarity": "common",
+    "value": 60
+  },
+  "4009": {
+    "vnum": 4009,
+    "zone": 4,
+    "name": "Flamethrower Fuel",
+    "description": "Highly flammable.",
+    "type": "material",
+    "slot": "none",
+    "stats": {},
+    "rarity": "uncommon",
+    "value": 20
+  },
+  "4010": {
+    "vnum": 4010,
+    "zone": 4,
+    "name": "C4 Explosive",
+    "description": "Plastic explosive.",
+    "type": "quest",
+    "slot": "none",
+    "stats": {},
+    "rarity": "rare",
+    "value": 200
+  },
+  "4011": {
+    "vnum": 4011,
+    "zone": 4,
+    "name": "Abort Code Note (DELTA-9)",
+    "description": "A crumpled note with the launch abort code.",
+    "type": "quest",
+    "slot": "none",
+    "stats": {},
+    "rarity": "epic",
+    "value": 0
+  },
+  "4012": {
+    "vnum": 4012,
+    "zone": 4,
+    "name": "Top Secret Folder",
+    "description": "Contains intel about a second silo... wait, this looks fake.",
+    "type": "quest",
+    "slot": "none",
+    "stats": {},
+    "rarity": "common",
+    "value": 5
+  },
+  "4013": {
+    "vnum": 4013,
+    "zone": 4,
+    "name": "Dog Tags",
+    "description": "Belonged to a fallen soldier.",
+    "type": "material",
+    "slot": "none",
+    "stats": {},
+    "rarity": "common",
+    "value": 10
+  },
+  "4014": {
+    "vnum": 4014,
+    "zone": 4,
+    "name": "Rations",
+    "description": "Military food.",
+    "type": "consumable",
+    "slot": "none",
+    "stats": {
+      "heal": 20
+    },
+    "rarity": "common",
+    "value": 15
+  },
+  "4015": {
+    "vnum": 4015,
+    "zone": 4,
+    "name": "Radio Battery",
+    "description": "Powers communication devices.",
+    "type": "quest",
+    "slot": "none",
+    "stats": {},
+    "rarity": "uncommon",
+    "value": 25
+  },
+  "4016": {
+    "vnum": 4016,
+    "zone": 4,
+    "name": "Silo Keycard",
+    "description": "Grants access to the missile silo.",
+    "type": "quest",
+    "slot": "none",
+    "stats": {},
+    "rarity": "rare",
+    "value": 0
+  },
+  "4017": {
+    "vnum": 4017,
+    "zone": 4,
+    "name": "Rocket Launcher",
+    "description": "Heavy anti-armor weapon.",
+    "type": "weapon",
+    "slot": "hands",
+    "stats": {
+      "attack": 80
+    },
+    "rarity": "epic",
+    "value": 500
+  },
+  "4018": {
+    "vnum": 4018,
+    "zone": 4,
+    "name": "Jungle Camo",
+    "description": "Blends in with the environment.",
+    "type": "armor",
+    "slot": "body",
+    "stats": {
+      "defense": 15,
+      "stealth": 10
+    },
+    "rarity": "uncommon",
+    "value": 120
+  },
+  "4019": {
+    "vnum": 4019,
+    "zone": 4,
+    "name": "Mysterious Vial",
+    "description": "Glowing green liquid.",
+    "type": "material",
+    "slot": "none",
+    "stats": {},
+    "rarity": "rare",
+    "value": 80
+  },
+  "4020": {
+    "vnum": 4020,
+    "zone": 4,
+    "name": "Broken Compass",
+    "description": "It just spins wildly.",
+    "type": "junk",
+    "slot": "none",
+    "stats": {},
+    "rarity": "common",
+    "value": 1
   },
   "5001": {
     "vnum": 5001,
     "zone": 5,
-    "name": "Bamboo Staff",
-    "description": "A sturdy training weapon.",
+    "name": "Ninja Kunai",
+    "description": "A sharp throwing knife.",
     "type": "weapon",
-    "rarity": "common",
+    "slot": "wield",
     "stats": {
-      "attack": 11,
-      "slot": "weapon"
+      "damage": 5
     },
-    "flags": [],
-    "value": 25
+    "rarity": "common",
+    "value": 10
   },
   "5002": {
     "vnum": 5002,
     "zone": 5,
-    "name": "Healing Dumpling",
-    "description": "Restores a small amount of health.",
-    "type": "consumable",
-    "rarity": "common",
+    "name": "Oni Club",
+    "description": "A heavy spiked club.",
+    "type": "weapon",
+    "slot": "wield",
     "stats": {
-      "heal": 30
+      "damage": 15
     },
-    "flags": [],
-    "value": 15
+    "rarity": "uncommon",
+    "value": 50
   },
   "5003": {
     "vnum": 5003,
     "zone": 5,
-    "name": "Flame of the Masters",
-    "description": "A magical fire that never goes out.",
-    "type": "quest",
-    "rarity": "quest",
-    "stats": {},
-    "flags": [
-      "nodrop"
-    ],
-    "value": 0
+    "name": "Fox Tail Charm",
+    "description": "A lucky charm shaped like a fox tail.",
+    "type": "accessory",
+    "slot": "hold",
+    "stats": {
+      "luck": 2
+    },
+    "rarity": "rare",
+    "value": 100
   },
   "5004": {
     "vnum": 5004,
     "zone": 5,
-    "name": "Pinnacle Key",
-    "description": "Unlocks the door to the Pinnacle.",
-    "type": "quest",
-    "rarity": "quest",
-    "stats": {},
-    "flags": [
-      "nodrop"
-    ],
-    "value": 0
+    "name": "Bamboo Staff",
+    "description": "A sturdy staff made of bamboo.",
+    "type": "weapon",
+    "slot": "wield",
+    "stats": {
+      "damage": 8
+    },
+    "rarity": "common",
+    "value": 15
   },
   "5005": {
     "vnum": 5005,
     "zone": 5,
-    "name": "Katana",
-    "description": "A masterfully folded steel blade.",
-    "type": "weapon",
-    "rarity": "rare",
+    "name": "Corrupted Beads",
+    "description": "Prayer beads tainted with dark magic.",
+    "type": "armor",
+    "slot": "neck",
     "stats": {
-      "attack": 28,
-      "slot": "weapon"
+      "defense": 2,
+      "magic": -1
     },
-    "flags": [],
-    "value": 180
+    "rarity": "uncommon",
+    "value": 30
   },
   "5006": {
     "vnum": 5006,
     "zone": 5,
-    "name": "Ninja Garb",
-    "description": "Lightweight and stealthy.",
-    "type": "armor",
-    "rarity": "uncommon",
-    "stats": {
-      "defense": 6,
-      "slot": "body"
-    },
-    "flags": [],
-    "value": 90
+    "name": "Thunder Core",
+    "description": "A sparking core of elemental energy.",
+    "type": "material",
+    "slot": "none",
+    "stats": {},
+    "rarity": "rare",
+    "value": 150
   },
   "5007": {
     "vnum": 5007,
     "zone": 5,
-    "name": "Grandmaster's Robes",
-    "description": "Imbued with spiritual energy.",
-    "type": "armor",
+    "name": "Ice Shard",
+    "description": "A never-melting shard of ice.",
+    "type": "material",
+    "slot": "none",
+    "stats": {},
+    "rarity": "uncommon",
+    "value": 40
+  },
+  "5008": {
+    "vnum": 5008,
+    "zone": 5,
+    "name": "Dragon Scale",
+    "description": "A shimmering scale from a young dragon.",
+    "type": "material",
+    "slot": "none",
+    "stats": {},
     "rarity": "rare",
-    "stats": {
-      "defense": 10,
-      "attack": 4,
-      "slot": "body"
-    },
-    "flags": [],
     "value": 200
+  },
+  "5009": {
+    "vnum": 5009,
+    "zone": 5,
+    "name": "Tengu Katana",
+    "description": "A finely crafted sword.",
+    "type": "weapon",
+    "slot": "wield",
+    "stats": {
+      "damage": 18
+    },
+    "rarity": "rare",
+    "value": 250
+  },
+  "5010": {
+    "vnum": 5010,
+    "zone": 5,
+    "name": "Cursed Armor",
+    "description": "Ancient armor that feels heavy with sorrow.",
+    "type": "armor",
+    "slot": "body",
+    "stats": {
+      "defense": 20,
+      "speed": -5
+    },
+    "rarity": "epic",
+    "value": 500
+  },
+  "5011": {
+    "vnum": 5011,
+    "zone": 5,
+    "name": "Paper Talisman",
+    "description": "A magical ward written on paper.",
+    "type": "consumable",
+    "slot": "none",
+    "stats": {
+      "heal": 20
+    },
+    "rarity": "common",
+    "value": 20
+  },
+  "5012": {
+    "vnum": 5012,
+    "zone": 5,
+    "name": "Jade Fang",
+    "description": "A sharp fang made of solid jade.",
+    "type": "material",
+    "slot": "none",
+    "stats": {},
+    "rarity": "rare",
+    "value": 120
+  },
+  "5013": {
+    "vnum": 5013,
+    "zone": 5,
+    "name": "Demon Horn",
+    "description": "A massive horn from a demon general.",
+    "type": "material",
+    "slot": "none",
+    "stats": {},
+    "rarity": "epic",
+    "value": 1000
+  },
+  "5014": {
+    "vnum": 5014,
+    "zone": 5,
+    "name": "General's Halberd",
+    "description": "A terrifying weapon of war.",
+    "type": "weapon",
+    "slot": "wield",
+    "stats": {
+      "damage": 30
+    },
+    "rarity": "legendary",
+    "value": 2000
+  },
+  "5015": {
+    "vnum": 5015,
+    "zone": 5,
+    "name": "Boar Meat",
+    "description": "Tough but nutritious meat.",
+    "type": "consumable",
+    "slot": "none",
+    "stats": {
+      "heal": 15
+    },
+    "rarity": "common",
+    "value": 5
+  },
+  "5016": {
+    "vnum": 5016,
+    "zone": 5,
+    "name": "Flame of the Masters",
+    "description": "A mystical flame that burns without fuel.",
+    "type": "quest",
+    "slot": "none",
+    "stats": {},
+    "rarity": "quest",
+    "value": 0
+  },
+  "5017": {
+    "vnum": 5017,
+    "zone": 5,
+    "name": "Ancient Scroll of Power",
+    "description": "A scroll promising ultimate power. Wait, this is just a recipe for miso soup.",
+    "type": "quest",
+    "slot": "none",
+    "stats": {},
+    "rarity": "quest",
+    "value": 1
+  },
+  "5018": {
+    "vnum": 5018,
+    "zone": 5,
+    "name": "Healing Tea",
+    "description": "A warm cup of soothing tea.",
+    "type": "consumable",
+    "slot": "none",
+    "stats": {
+      "heal": 50
+    },
+    "rarity": "uncommon",
+    "value": 25
+  },
+  "5019": {
+    "vnum": 5019,
+    "zone": 5,
+    "name": "Cherry Blossom Petal",
+    "description": "A perfectly preserved pink petal.",
+    "type": "material",
+    "slot": "none",
+    "stats": {},
+    "rarity": "common",
+    "value": 2
+  },
+  "5020": {
+    "vnum": 5020,
+    "zone": 5,
+    "name": "Cloud Silk",
+    "description": "Fabric woven from the clouds themselves.",
+    "type": "material",
+    "slot": "none",
+    "stats": {},
+    "rarity": "rare",
+    "value": 300
   },
   "6001": {
     "vnum": 6001,
     "zone": 6,
     "name": "Gladius",
-    "description": "A short Roman sword.",
+    "desc": "A sharp Roman short sword.",
     "type": "weapon",
-    "rarity": "common",
+    "slot": "hand",
     "stats": {
-      "attack": 12,
-      "slot": "weapon"
+      "attack": 15
     },
-    "flags": [],
-    "value": 30
+    "rarity": "common",
+    "value": 50
   },
   "6002": {
     "vnum": 6002,
     "zone": 6,
-    "name": "Wine Flask",
-    "description": "Restores health.",
-    "type": "consumable",
-    "rarity": "common",
+    "name": "Scutum",
+    "desc": "A large Roman shield.",
+    "type": "armor",
+    "slot": "shield",
     "stats": {
-      "heal": 40
+      "defense": 20
     },
-    "flags": [],
-    "value": 20
+    "rarity": "common",
+    "value": 60
   },
   "6003": {
     "vnum": 6003,
     "zone": 6,
-    "name": "Lion's Eye Gem",
-    "description": "A ruby that fits into a mechanism.",
-    "type": "quest",
-    "rarity": "quest",
-    "stats": {},
-    "flags": [
-      "nodrop"
-    ],
-    "value": 0
+    "name": "Pharaoh's Crown",
+    "desc": "A golden crown from an ancient tomb.",
+    "type": "armor",
+    "slot": "head",
+    "stats": {
+      "defense": 10,
+      "magic": 15
+    },
+    "rarity": "rare",
+    "value": 500
   },
   "6004": {
     "vnum": 6004,
     "zone": 6,
-    "name": "Imperial Key",
-    "description": "Unlocks the Emperor's Tomb.",
-    "type": "quest",
-    "rarity": "quest",
-    "stats": {},
-    "flags": [
-      "nodrop"
-    ],
-    "value": 0
+    "name": "Viking Battleaxe",
+    "desc": "A heavy, double-bladed axe.",
+    "type": "weapon",
+    "slot": "hand",
+    "stats": {
+      "attack": 25
+    },
+    "rarity": "uncommon",
+    "value": 120
   },
   "6005": {
     "vnum": 6005,
     "zone": 6,
-    "name": "Lorica Segmentata",
-    "description": "Roman plate armor.",
-    "type": "armor",
-    "rarity": "uncommon",
+    "name": "Hoplite Spear",
+    "desc": "A long spear used by Greek soldiers.",
+    "type": "weapon",
+    "slot": "hand",
     "stats": {
-      "defense": 8,
-      "slot": "body"
+      "attack": 18
     },
-    "flags": [],
-    "value": 100
+    "rarity": "common",
+    "value": 70
   },
   "6006": {
     "vnum": 6006,
     "zone": 6,
-    "name": "Emperor's Gladius",
-    "description": "A masterwork sword.",
-    "type": "weapon",
-    "rarity": "rare",
-    "stats": {
-      "attack": 30,
-      "slot": "weapon"
-    },
-    "flags": [],
-    "value": 200
+    "name": "Dungeon Key",
+    "desc": "A rusty iron key.",
+    "type": "quest",
+    "slot": "none",
+    "stats": {},
+    "rarity": "common",
+    "value": 0
   },
   "6007": {
     "vnum": 6007,
     "zone": 6,
-    "name": "Laurel Wreath",
-    "description": "A golden crown.",
-    "type": "armor",
+    "name": "Lion's Eye Gem",
+    "desc": "A sparkling gem shaped like a lion's eye.",
+    "type": "quest",
+    "slot": "none",
+    "stats": {},
+    "rarity": "epic",
+    "value": 1000
+  },
+  "6008": {
+    "vnum": 6008,
+    "zone": 6,
+    "name": "Map to Caesar's Treasury",
+    "desc": "An old parchment map. It looks promising.",
+    "type": "quest",
+    "slot": "none",
+    "stats": {},
+    "rarity": "common",
+    "value": 5
+  },
+  "6009": {
+    "vnum": 6009,
+    "zone": 6,
+    "name": "Amphora of Wine",
+    "desc": "A clay jug filled with ancient wine.",
+    "type": "consumable",
+    "slot": "none",
+    "stats": {
+      "heal": 20
+    },
+    "rarity": "common",
+    "value": 15
+  },
+  "6010": {
+    "vnum": 6010,
+    "zone": 6,
+    "name": "Scorpion Stinger",
+    "desc": "A venomous stinger.",
+    "type": "material",
+    "slot": "none",
+    "stats": {},
+    "rarity": "uncommon",
+    "value": 30
+  },
+  "6011": {
+    "vnum": 6011,
+    "zone": 6,
+    "name": "Elephant Tusk",
+    "desc": "A massive ivory tusk.",
+    "type": "material",
+    "slot": "none",
+    "stats": {},
     "rarity": "rare",
+    "value": 200
+  },
+  "6012": {
+    "vnum": 6012,
+    "zone": 6,
+    "name": "Chariot Wheel",
+    "desc": "A broken wooden wheel.",
+    "type": "material",
+    "slot": "none",
+    "stats": {},
+    "rarity": "common",
+    "value": 10
+  },
+  "6013": {
+    "vnum": 6013,
+    "zone": 6,
+    "name": "Priest's Robes",
+    "desc": "Ceremonial robes.",
+    "type": "armor",
+    "slot": "body",
     "stats": {
       "defense": 5,
-      "attack": 5,
-      "slot": "head"
+      "magic": 20
     },
-    "flags": [],
+    "rarity": "uncommon",
+    "value": 80
+  },
+  "6014": {
+    "vnum": 6014,
+    "zone": 6,
+    "name": "Ghoul Claw",
+    "desc": "A sharp, decaying claw.",
+    "type": "material",
+    "slot": "none",
+    "stats": {},
+    "rarity": "common",
+    "value": 20
+  },
+  "6015": {
+    "vnum": 6015,
+    "zone": 6,
+    "name": "Serpent Scale",
+    "desc": "A shimmering scale from an aqueduct serpent.",
+    "type": "material",
+    "slot": "none",
+    "stats": {},
+    "rarity": "uncommon",
+    "value": 40
+  },
+  "6016": {
+    "vnum": 6016,
+    "zone": 6,
+    "name": "Thief's Dagger",
+    "desc": "A small, easily concealed blade.",
+    "type": "weapon",
+    "slot": "hand",
+    "stats": {
+      "attack": 12,
+      "speed": 5
+    },
+    "rarity": "common",
+    "value": 45
+  },
+  "6017": {
+    "vnum": 6017,
+    "zone": 6,
+    "name": "Arena Sand",
+    "desc": "A handful of blood-stained sand.",
+    "type": "material",
+    "slot": "none",
+    "stats": {},
+    "rarity": "common",
+    "value": 2
+  },
+  "6018": {
+    "vnum": 6018,
+    "zone": 6,
+    "name": "Golem Core",
+    "desc": "A glowing stone that powered a golem.",
+    "type": "material",
+    "slot": "none",
+    "stats": {},
+    "rarity": "rare",
     "value": 150
+  },
+  "6019": {
+    "vnum": 6019,
+    "zone": 6,
+    "name": "Freedom Papers",
+    "desc": "Documents granting a slave their freedom.",
+    "type": "quest",
+    "slot": "none",
+    "stats": {},
+    "rarity": "rare",
+    "value": 0
+  },
+  "6020": {
+    "vnum": 6020,
+    "zone": 6,
+    "name": "Fake Gold Coin",
+    "desc": "It looks like gold, but it's just painted lead.",
+    "type": "junk",
+    "slot": "none",
+    "stats": {},
+    "rarity": "common",
+    "value": 1
   }
 }

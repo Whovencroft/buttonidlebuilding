@@ -1,0 +1,440 @@
+{
+  "q_hub_01": {
+    "id": "q_hub_01",
+    "name": "Welcome to the Nexus",
+    "zone": 0,
+    "giver_vnum": 100,
+    "description": "Instructor Vex wants you to explore the Nexus. Visit the Training Hall, the Bazaar, and the Gateway Chamber.",
+    "type": "explore",
+    "objectives": [
+      { "type": "visit", "target": 8, "description": "Visit the Training Hall" },
+      { "type": "visit", "target": 5, "description": "Visit the Bazaar" },
+      { "type": "visit", "target": 10, "description": "Visit the Gateway Chamber" }
+    ],
+    "rewards": { "gold": 25, "message": "Vex nods approvingly. 'Good. You know the lay of the land now.'" }
+  },
+  "q_hub_02": {
+    "id": "q_hub_02",
+    "name": "Bazaar Delivery",
+    "zone": 0,
+    "giver_vnum": 102,
+    "description": "The shopkeeper needs a package delivered to the Archivist in the Library.",
+    "type": "delivery",
+    "objectives": [
+      { "type": "talk_npc", "target": 103, "description": "Deliver the package to the Archivist" }
+    ],
+    "give_on_accept": 50,
+    "rewards": { "gold": 15, "message": "The Archivist takes the package. 'Ah, the texts I ordered. Thank you.'" }
+  },
+  "q_hub_03": {
+    "id": "q_hub_03",
+    "name": "The Lost Pendant",
+    "zone": 0,
+    "giver_vnum": 104,
+    "description": "A weeping traveler lost her pendant somewhere in the Nexus gardens. Find it and return it to her.",
+    "type": "fetch",
+    "objectives": [
+      { "type": "has_item", "target": 51, "description": "Find the Lost Pendant" }
+    ],
+    "rewards": { "gold": 20, "item": 52, "message": "'My grandmother's pendant! Thank you so much. Please, take this charm.'" },
+    "red_herring": false
+  },
+  "q_z1_01": {
+    "id": "q_z1_01",
+    "name": "Wolf Pelts",
+    "zone": 1,
+    "giver_vnum": 1100,
+    "description": "The village tanner needs 3 wolf pelts. Kill wolves in the Darkwood to collect them.",
+    "type": "kill",
+    "objectives": [
+      { "type": "kill_count", "target": 1003, "count": 3, "description": "Kill 3 Darkwood Wolves" }
+    ],
+    "rewards": { "gold": 30, "attack_bonus": 1, "message": "'Fine pelts! Here's your payment, and I've reinforced your grip — you'll hit harder now.'" }
+  },
+  "q_z1_02": {
+    "id": "q_z1_02",
+    "name": "Herb Gathering",
+    "zone": 1,
+    "giver_vnum": 1101,
+    "description": "The village healer needs Moonpetal herbs from the forest. Gather 5 from the Moonlit Glade.",
+    "type": "fetch",
+    "objectives": [
+      { "type": "has_item", "target": 1050, "count": 5, "description": "Gather 5 Moonpetal Herbs" }
+    ],
+    "rewards": { "gold": 20, "heal_bonus": 5, "message": "'Wonderful! These will save lives. Here — I've brewed you a tonic that permanently strengthens your constitution.'" }
+  },
+  "q_z1_03": {
+    "id": "q_z1_03",
+    "name": "The Cursed Compass",
+    "zone": 1,
+    "giver_vnum": 1102,
+    "description": "A strange merchant claims a Mysterious Compass will lead you to untold riches. Follow its directions through the Darkwood.",
+    "type": "fetch",
+    "objectives": [
+      { "type": "has_item", "target": 1020, "description": "Find the Mysterious Compass" },
+      { "type": "visit", "target": 1035, "description": "Follow the compass to the Dead End Clearing" }
+    ],
+    "rewards": { "gold": 0, "message": "'Ha! You actually followed it? That compass doesn't point anywhere. Consider it a lesson in skepticism, friend.'" },
+    "red_herring": true
+  },
+  "q_z1_04": {
+    "id": "q_z1_04",
+    "name": "Clear the Bandit Camp",
+    "zone": 1,
+    "giver_vnum": 1103,
+    "description": "Bandits have set up camp on the King's Road. Clear them out.",
+    "type": "kill",
+    "objectives": [
+      { "type": "kill_count", "target": 1005, "count": 4, "description": "Kill 4 Highway Bandits" }
+    ],
+    "rewards": { "gold": 50, "item": 1051, "message": "'The roads are safer now. Take this — we found it in their loot pile.'" }
+  },
+  "q_z1_05": {
+    "id": "q_z1_05",
+    "name": "The Singing Stone",
+    "zone": 1,
+    "giver_vnum": 1104,
+    "description": "A bard tells you of a Singing Stone hidden deep in the ruins. He says it holds the secret to the marble's path. Find it.",
+    "type": "fetch",
+    "objectives": [
+      { "type": "visit", "target": 1040, "description": "Search the Deepest Ruin Chamber" },
+      { "type": "has_item", "target": 1052, "description": "Find the Singing Stone" }
+    ],
+    "rewards": { "gold": 5, "message": "'Hmm, it doesn't sing for you either? Perhaps it only sings for round things. Interesting...'" },
+    "red_herring": true
+  },
+  "q_z1_06": {
+    "id": "q_z1_06",
+    "name": "Escort the Pilgrim",
+    "zone": 1,
+    "giver_vnum": 1105,
+    "description": "A pilgrim needs safe passage through the Darkwood to the Chapel of Stars.",
+    "type": "escort",
+    "objectives": [
+      { "type": "visit_with_flag", "target": 1038, "flag": "pilgrim_following", "description": "Escort the Pilgrim to the Chapel" }
+    ],
+    "rewards": { "gold": 35, "defense_bonus": 1, "message": "'Bless you, traveler. The stars will watch over you now.'" }
+  },
+  "q_z2_01": {
+    "id": "q_z2_01",
+    "name": "Data Courier",
+    "zone": 2,
+    "giver_vnum": 2100,
+    "description": "A fixer needs you to deliver a data chip to a contact in the Lower Slums. Don't get caught.",
+    "type": "delivery",
+    "objectives": [
+      { "type": "talk_npc", "target": 2101, "description": "Deliver the chip to the contact in the Lower Slums" }
+    ],
+    "give_on_accept": 2050,
+    "rewards": { "gold": 40, "message": "'Clean delivery. You're good at this. Here's your cut.'" }
+  },
+  "q_z2_02": {
+    "id": "q_z2_02",
+    "name": "Drone Scrap Collection",
+    "zone": 2,
+    "giver_vnum": 2102,
+    "description": "A tech vendor needs drone parts. Destroy security drones and bring back their processors.",
+    "type": "kill",
+    "objectives": [
+      { "type": "kill_count", "target": 2003, "count": 5, "description": "Destroy 5 Security Drones" }
+    ],
+    "rewards": { "gold": 45, "item": 2051, "message": "'Beautiful. These processors are worth a fortune. Here — I modded something for you.'" }
+  },
+  "q_z2_03": {
+    "id": "q_z2_03",
+    "name": "The Ghost in the Machine",
+    "zone": 2,
+    "giver_vnum": 2103,
+    "description": "A hacker claims there's an AI fragment in the old server farm that knows where the marble went. Find it.",
+    "type": "fetch",
+    "objectives": [
+      { "type": "visit", "target": 2042, "description": "Access the Abandoned Server Farm" },
+      { "type": "has_item", "target": 2052, "description": "Retrieve the AI Fragment" }
+    ],
+    "rewards": { "gold": 10, "message": "'The fragment is corrupted. It just keeps repeating coordinates that don't exist. Dead end. Sorry, choom.'" },
+    "red_herring": true
+  },
+  "q_z2_04": {
+    "id": "q_z2_04",
+    "name": "Neon Debt",
+    "zone": 2,
+    "giver_vnum": 2104,
+    "description": "A desperate shop owner owes money to the gangs. Help clear the debt by eliminating their enforcers.",
+    "type": "kill",
+    "objectives": [
+      { "type": "kill_count", "target": 2007, "count": 3, "description": "Eliminate 3 Gang Enforcers" }
+    ],
+    "rewards": { "gold": 55, "attack_bonus": 1, "message": "'They won't bother me again. You're a lifesaver. Take this — military-grade stim.'" }
+  },
+  "q_z2_05": {
+    "id": "q_z2_05",
+    "name": "Signal Trace",
+    "zone": 2,
+    "giver_vnum": 2105,
+    "description": "Someone is broadcasting on a dead frequency. Trace the signal through three relay towers.",
+    "type": "explore",
+    "objectives": [
+      { "type": "visit", "target": 2025, "description": "Check Relay Tower Alpha" },
+      { "type": "visit", "target": 2033, "description": "Check Relay Tower Beta" },
+      { "type": "visit", "target": 2040, "description": "Check Relay Tower Gamma" }
+    ],
+    "rewards": { "gold": 35, "message": "'The signal was just an old automated ad loop. Decades old. Nothing useful. But hey, you mapped those towers for me.'" },
+    "red_herring": true
+  },
+  "q_z3_01": {
+    "id": "q_z3_01",
+    "name": "Missing Persons",
+    "zone": 3,
+    "giver_vnum": 3100,
+    "description": "A worried wife needs you to find her husband. He was last seen near the docks.",
+    "type": "explore",
+    "objectives": [
+      { "type": "visit", "target": 3015, "description": "Search the Docks" },
+      { "type": "visit", "target": 3020, "description": "Check the Warehouse District" }
+    ],
+    "rewards": { "gold": 40, "message": "'He was hiding from his gambling debts? That fool. Thank you, detective.'" }
+  },
+  "q_z3_02": {
+    "id": "q_z3_02",
+    "name": "Rat Extermination",
+    "zone": 3,
+    "giver_vnum": 3101,
+    "description": "The bar owner has a rat problem in the cellar. Big rats. Unnaturally big.",
+    "type": "kill",
+    "objectives": [
+      { "type": "kill_count", "target": 3002, "count": 6, "description": "Kill 6 Sewer Rats" }
+    ],
+    "rewards": { "gold": 25, "item": 3050, "message": "'Drinks are on the house tonight. And take this — found it in the rat nest.'" }
+  },
+  "q_z3_03": {
+    "id": "q_z3_03",
+    "name": "The Informant's Tip",
+    "zone": 3,
+    "giver_vnum": 3102,
+    "description": "An informant says he saw something round and shiny roll through the speakeasy last Tuesday. Follow his lead.",
+    "type": "explore",
+    "objectives": [
+      { "type": "visit", "target": 3025, "description": "Visit the Speakeasy" },
+      { "type": "visit", "target": 3030, "description": "Check the Back Alley" },
+      { "type": "visit", "target": 3035, "description": "Search the Storm Drain" }
+    ],
+    "rewards": { "gold": 5, "message": "'Turns out it was just a ball bearing from a busted machine. The informant sends his apologies. And his bar tab.'" },
+    "red_herring": true
+  },
+  "q_z3_04": {
+    "id": "q_z3_04",
+    "name": "Collect Evidence",
+    "zone": 3,
+    "giver_vnum": 3103,
+    "description": "The DA needs evidence against the crime boss. Search his office and his warehouse.",
+    "type": "fetch",
+    "objectives": [
+      { "type": "has_item", "target": 3051, "description": "Find the Ledger" },
+      { "type": "has_item", "target": 3052, "description": "Find the Photograph" }
+    ],
+    "rewards": { "gold": 60, "defense_bonus": 1, "message": "'This is enough to put him away. The city owes you. Here — bulletproof vest, courtesy of the department.'" }
+  },
+  "q_z3_05": {
+    "id": "q_z3_05",
+    "name": "The Phantom Witness",
+    "zone": 3,
+    "giver_vnum": 3104,
+    "description": "A ghost reportedly haunts the old courthouse. Some say it witnessed the marble pass through decades ago.",
+    "type": "explore",
+    "objectives": [
+      { "type": "visit", "target": 3040, "description": "Enter the Old Courthouse at midnight" }
+    ],
+    "rewards": { "gold": 0, "message": "'There's no ghost. Just pigeons and a broken window that makes weird sounds. Classic misdirection.'" },
+    "red_herring": true
+  },
+  "q_z4_01": {
+    "id": "q_z4_01",
+    "name": "Weapons Cache",
+    "zone": 4,
+    "giver_vnum": 4100,
+    "description": "The resistance needs weapons. There's a cache hidden in the old bunker. Retrieve it.",
+    "type": "fetch",
+    "objectives": [
+      { "type": "has_item", "target": 4050, "description": "Find the Weapons Cache" }
+    ],
+    "rewards": { "gold": 50, "attack_bonus": 2, "message": "'Hell yeah! Now we're talking. Take one for yourself — you earned it, soldier.'" }
+  },
+  "q_z4_02": {
+    "id": "q_z4_02",
+    "name": "Demolition Run",
+    "zone": 4,
+    "giver_vnum": 4101,
+    "description": "Plant explosives at three enemy checkpoints along the highway.",
+    "type": "explore",
+    "objectives": [
+      { "type": "visit", "target": 4020, "description": "Plant charge at Checkpoint Alpha" },
+      { "type": "visit", "target": 4028, "description": "Plant charge at Checkpoint Bravo" },
+      { "type": "visit", "target": 4035, "description": "Plant charge at Checkpoint Charlie" }
+    ],
+    "rewards": { "gold": 65, "message": "'BOOM! Beautiful. Three for three. Here's your hazard pay.'" }
+  },
+  "q_z4_03": {
+    "id": "q_z4_03",
+    "name": "The Colonel's Map",
+    "zone": 4,
+    "giver_vnum": 4102,
+    "description": "A defector says the Colonel has a map showing where 'the sphere' was taken. Infiltrate his compound.",
+    "type": "fetch",
+    "objectives": [
+      { "type": "has_item", "target": 4051, "description": "Steal the Colonel's Map" }
+    ],
+    "rewards": { "gold": 10, "message": "'The map shows... supply routes. That's it. The defector was wrong. Or lying. Probably lying.'" },
+    "red_herring": true
+  },
+  "q_z4_04": {
+    "id": "q_z4_04",
+    "name": "Rescue the POWs",
+    "zone": 4,
+    "giver_vnum": 4103,
+    "description": "Three soldiers are being held in the enemy camp. Break them out.",
+    "type": "kill",
+    "objectives": [
+      { "type": "kill_count", "target": 4005, "count": 4, "description": "Kill 4 Camp Guards" }
+    ],
+    "rewards": { "gold": 55, "defense_bonus": 2, "message": "'You saved our boys. The brass is impressed. Take this armor upgrade — you'll need it.'" }
+  },
+  "q_z4_05": {
+    "id": "q_z4_05",
+    "name": "Chopper Down",
+    "zone": 4,
+    "giver_vnum": 4104,
+    "description": "A helicopter crashed in hostile territory. Recover the black box before the enemy does.",
+    "type": "fetch",
+    "objectives": [
+      { "type": "has_item", "target": 4052, "description": "Recover the Black Box" }
+    ],
+    "rewards": { "gold": 45, "item": 4053, "message": "'The black box is secure. Intel says there's something interesting in the flight data. Here — take these night-vision goggles.'" }
+  },
+  "q_z5_01": {
+    "id": "q_z5_01",
+    "name": "Spirit Cleansing",
+    "zone": 5,
+    "giver_vnum": 5100,
+    "description": "Corrupted spirits haunt the Lower Shards. Defeat them to restore balance.",
+    "type": "kill",
+    "objectives": [
+      { "type": "kill_count", "target": 5004, "count": 5, "description": "Defeat 5 Corrupted Spirits" }
+    ],
+    "rewards": { "gold": 40, "attack_bonus": 1, "message": "'The spirits are at peace. Your ki grows stronger with each act of compassion.'" }
+  },
+  "q_z5_02": {
+    "id": "q_z5_02",
+    "name": "The Tea Master's Request",
+    "zone": 5,
+    "giver_vnum": 5101,
+    "description": "The Tea Master needs rare Cloud Blossoms that only grow on the highest shards.",
+    "type": "fetch",
+    "objectives": [
+      { "type": "has_item", "target": 5050, "count": 3, "description": "Gather 3 Cloud Blossoms" }
+    ],
+    "rewards": { "gold": 30, "heal_bonus": 10, "message": "'Exquisite. Drink this tea — it will permanently fortify your body.'" }
+  },
+  "q_z5_03": {
+    "id": "q_z5_03",
+    "name": "The Dragon's Whisper",
+    "zone": 5,
+    "giver_vnum": 5102,
+    "description": "An old monk says the wind dragon saw the marble fly between the shards. Meditate at three shrines to hear its whisper.",
+    "type": "explore",
+    "objectives": [
+      { "type": "visit", "target": 5020, "description": "Meditate at the Shrine of Wind" },
+      { "type": "visit", "target": 5030, "description": "Meditate at the Shrine of Cloud" },
+      { "type": "visit", "target": 5040, "description": "Meditate at the Shrine of Storm" }
+    ],
+    "rewards": { "gold": 5, "message": "'The dragon whispers... nothing about a marble. It just complains about the weather. Dragons are like that.'" },
+    "red_herring": true
+  },
+  "q_z5_04": {
+    "id": "q_z5_04",
+    "name": "Tournament of Blades",
+    "zone": 5,
+    "giver_vnum": 5103,
+    "description": "Prove your worth in the tournament. Defeat three arena champions.",
+    "type": "kill",
+    "objectives": [
+      { "type": "kill_count", "target": 5008, "count": 1, "description": "Defeat the Bronze Champion" },
+      { "type": "kill_count", "target": 5009, "count": 1, "description": "Defeat the Silver Champion" },
+      { "type": "kill_count", "target": 5010, "count": 1, "description": "Defeat the Gold Champion" }
+    ],
+    "rewards": { "gold": 80, "attack_bonus": 2, "item": 5051, "message": "'You are the new champion! Take this legendary blade — you've earned it.'" }
+  },
+  "q_z5_05": {
+    "id": "q_z5_05",
+    "name": "The Painted Scroll",
+    "zone": 5,
+    "giver_vnum": 5104,
+    "description": "A painter claims she captured the marble in a scroll painting years ago. Find the scroll in the Abandoned Gallery.",
+    "type": "fetch",
+    "objectives": [
+      { "type": "has_item", "target": 5052, "description": "Find the Painted Scroll" }
+    ],
+    "rewards": { "gold": 0, "message": "'The painting shows... a peach. She painted a peach. It's a very nice peach, but it's not a marble.'" },
+    "red_herring": true
+  },
+  "q_z6_01": {
+    "id": "q_z6_01",
+    "name": "Gladiator's Debut",
+    "zone": 6,
+    "giver_vnum": 6100,
+    "description": "The arena master wants fresh blood. Fight in the colosseum to earn your freedom.",
+    "type": "kill",
+    "objectives": [
+      { "type": "kill_count", "target": 6003, "count": 3, "description": "Win 3 Arena Fights" }
+    ],
+    "rewards": { "gold": 50, "defense_bonus": 2, "message": "'The crowd loves you! Here — gladiator's armor. You've earned the right to wear it.'" }
+  },
+  "q_z6_02": {
+    "id": "q_z6_02",
+    "name": "The Scholar's Tablets",
+    "zone": 6,
+    "giver_vnum": 6101,
+    "description": "A scholar needs ancient tablets recovered from the catacombs for translation.",
+    "type": "fetch",
+    "objectives": [
+      { "type": "has_item", "target": 6050, "count": 3, "description": "Recover 3 Ancient Tablets" }
+    ],
+    "rewards": { "gold": 35, "message": "'Fascinating! These describe trade routes from a thousand years ago. Here's your fee.'" }
+  },
+  "q_z6_03": {
+    "id": "q_z6_03",
+    "name": "The Oracle's Vision",
+    "zone": 6,
+    "giver_vnum": 6102,
+    "description": "The Oracle claims to have seen the marble in a vision. She says it rests in the Tomb of the Forgotten King.",
+    "type": "explore",
+    "objectives": [
+      { "type": "visit", "target": 6040, "description": "Enter the Tomb of the Forgotten King" }
+    ],
+    "rewards": { "gold": 0, "message": "'The Oracle's visions are... unreliable. The tomb held only dust and bones. She apologizes. Sort of.'" },
+    "red_herring": true
+  },
+  "q_z6_04": {
+    "id": "q_z6_04",
+    "name": "Supply the Legion",
+    "zone": 6,
+    "giver_vnum": 6103,
+    "description": "The legion quartermaster needs iron ingots. The mines to the east have plenty.",
+    "type": "fetch",
+    "objectives": [
+      { "type": "has_item", "target": 6051, "count": 5, "description": "Gather 5 Iron Ingots" }
+    ],
+    "rewards": { "gold": 45, "attack_bonus": 1, "message": "'Good iron. The smiths will put it to use. And here — a blade forged from the last batch.'" }
+  },
+  "q_z6_05": {
+    "id": "q_z6_05",
+    "name": "The Merchant's Route",
+    "zone": 6,
+    "giver_vnum": 6104,
+    "description": "Bandits plague the trade road. Escort the merchant caravan safely through.",
+    "type": "kill",
+    "objectives": [
+      { "type": "kill_count", "target": 6008, "count": 4, "description": "Kill 4 Road Bandits" }
+    ],
+    "rewards": { "gold": 55, "item": 6052, "message": "'Safe passage! The merchants are grateful. Take this rare artifact they found on the road.'" }
+  }
+}

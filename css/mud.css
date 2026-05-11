@@ -66,6 +66,16 @@
   color: #aaaaaa;
 }
 
+.mud-line-quest {
+  color: #dda0dd;
+  font-weight: bold;
+}
+
+.mud-line-dialogue {
+  color: #87ceeb;
+  font-style: italic;
+}
+
 .mud-line-input {
   color: #888888;
   font-style: italic;

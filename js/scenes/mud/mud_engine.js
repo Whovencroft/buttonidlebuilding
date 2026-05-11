@@ -33,6 +33,7 @@
     say: 'say', speak: 'say',
     talk: 'talk', ask: 'talk', chat: 'talk',
     help: 'help', '?': 'help', commands: 'help',
+    quest: 'quest', quests: 'quest', journal: 'quest', log: 'quest',
     write: 'write', note: 'write',
     combine: 'combine', merge: 'combine', craft: 'combine',
     rotate: 'rotate', turn: 'rotate', spin: 'rotate'
@@ -90,11 +91,14 @@
 
     const COMBAT_TICK_INTERVAL = 2.5; // seconds per auto-attack round
 
+    let quests = {};
+
     // Load world data from global (set by data loader script)
     if (window.MudData) {
       rooms = window.MudData.rooms || {};
       mobs = window.MudData.mobs || {};
       items = window.MudData.items || {};
+      quests = window.MudData.quests || {};
     }
 
     // Restore from save if available
@@ -114,6 +118,9 @@
         gold: 0,
         visitedRooms: [],
         worldFlags: {},
+        activeQuests: [],
+        completedQuests: [],
+        killCounts: {},
         baseClass: null,
         specialization: null,
         abilities: [],
@@ -153,6 +160,7 @@
         case 'talk': return doTalk(target);
         case 'combine': return doCombine(target);
         case 'rotate': return doRotate(target);
+        case 'quest': return doQuest(target);
         case 'help': return doHelp();
         case 'say': return [{ type: 'info', text: `You say: "${target}"` }];
         case 'write': return [{ type: 'info', text: '[Notes system requires server connection]' }];
@@ -467,6 +475,32 @@
         output.push(...applyDialogueEffects(entry.effects));
       }
 
+      // Set talked flag for quest tracking
+      player.worldFlags[`talked_${mobVnum}`] = true;
+
+      // Check if this NPC has quests to offer
+      const availableQuests = Object.values(quests).filter(q =>
+        q.giver_vnum === mobVnum &&
+        !player.activeQuests.includes(q.id) &&
+        !player.completedQuests.includes(q.id)
+      );
+      if (availableQuests.length > 0) {
+        output.push({ type: 'quest', text: `${mob.name} has a task for you:` });
+        for (const q of availableQuests) {
+          output.push({ type: 'quest', text: `  "${q.name}" — ${q.description}` });
+          output.push({ type: 'info', text: `  Type 'quest ${q.name.toLowerCase()}' to accept.` });
+        }
+      }
+
+      // Check if this NPC can complete any active quests
+      const completable = player.activeQuests.filter(qid => {
+        const q = quests[qid];
+        return q && q.giver_vnum === mobVnum && q.objectives.every(obj => isObjectiveMet(obj));
+      });
+      for (const qid of completable) {
+        output.push(...tryCompleteQuest(qid));
+      }
+
       return output;
     }
 
@@ -637,6 +671,7 @@
         { type: 'info', text: '  talk <npc>           — Speak to an NPC' },
         { type: 'info', text: '  attack [target]      — Start combat' },
         { type: 'info', text: '  flee                 — Attempt to escape combat' },
+        { type: 'info', text: '  quest [name]         — View quest log or accept/complete' },
         { type: 'info', text: '  help                 — Show this list' },
         { type: 'info', text: '─── Shortcuts ───' },
         { type: 'info', text: '  n/s/e/w/u/d          — Move in that direction' },
@@ -644,6 +679,208 @@
         { type: 'info', text: '  i                    — Inventory' },
         { type: 'info', text: '  eq                   — Equipment' }
       ];
+    }
+
+    // ─── Quest System ─────────────────────────────────────────────────────────
+
+    /**
+     * Handle the 'quest' command. Shows active quests, or accepts/completes quests.
+     * Syntax: quest | quest list | quest accept <name> | quest complete <name>
+     */
+    function doQuest(target) {
+      if (!target || target === 'list') {
+        return showQuestLog();
+      }
+      if (target === 'available') {
+        return showAvailableQuests();
+      }
+      // Accept or complete by partial name match
+      const questId = findQuestByName(target);
+      if (questId && !player.activeQuests.includes(questId) && !player.completedQuests.includes(questId)) {
+        return acceptQuest(questId);
+      }
+      if (questId && player.activeQuests.includes(questId)) {
+        return tryCompleteQuest(questId);
+      }
+      return [{ type: 'info', text: "Type 'quest' to see your log, or 'quest available' to see what's offered nearby." }];
+    }
+
+    /**
+     * Display the player's active quest log with objective progress.
+     */
+    function showQuestLog() {
+      if (player.activeQuests.length === 0 && player.completedQuests.length === 0) {
+        return [{ type: 'info', text: 'Your quest log is empty. Talk to NPCs to find quests.' }];
+      }
+      const output = [{ type: 'info', text: '─── Quest Log ───' }];
+      for (const qid of player.activeQuests) {
+        const q = quests[qid];
+        if (!q) continue;
+        output.push({ type: 'quest', text: `  [ACTIVE] ${q.name}` });
+        output.push({ type: 'info', text: `    ${q.description}` });
+        for (const obj of q.objectives) {
+          const done = isObjectiveMet(obj);
+          output.push({ type: done ? 'success' : 'info', text: `    ${done ? '[x]' : '[ ]'} ${obj.description}${obj.count ? ` (${getObjectiveProgress(obj)})` : ''}` });
+        }
+      }
+      if (player.completedQuests.length > 0) {
+        output.push({ type: 'info', text: `  Completed: ${player.completedQuests.length} quest(s)` });
+      }
+      return output;
+    }
+
+    /**
+     * Show quests available from NPCs in the current room.
+     */
+    function showAvailableQuests() {
+      const room = currentRoom();
+      const roomMobVnums = getAliveMobsInRoom(room);
+      const available = Object.values(quests).filter(q => {
+        if (player.activeQuests.includes(q.id)) return false;
+        if (player.completedQuests.includes(q.id)) return false;
+        return roomMobVnums.includes(q.giver_vnum);
+      });
+      if (available.length === 0) {
+        return [{ type: 'info', text: 'No new quests available here. Try talking to NPCs in other areas.' }];
+      }
+      const output = [{ type: 'info', text: '─── Available Quests ───' }];
+      for (const q of available) {
+        const giver = mobs[q.giver_vnum];
+        output.push({ type: 'quest', text: `  ${q.name} (from ${giver?.name || 'Unknown'})` });
+        output.push({ type: 'info', text: `    ${q.description}` });
+      }
+      output.push({ type: 'info', text: "  Talk to the NPC to accept, or type 'quest <name>' to accept." });
+      return output;
+    }
+
+    /**
+     * Accept a quest by ID. Adds to active quests and gives starting items.
+     */
+    function acceptQuest(questId) {
+      const q = quests[questId];
+      if (!q) return [{ type: 'error', text: 'Quest not found.' }];
+
+      player.activeQuests.push(questId);
+      player.worldFlags[`quest_${questId}_active`] = true;
+
+      const output = [
+        { type: 'quest', text: `─── Quest Accepted: ${q.name} ───` },
+        { type: 'info', text: q.description }
+      ];
+
+      // Give starting item if specified
+      if (q.give_on_accept && player.inventory.length < 99) {
+        player.inventory.push(q.give_on_accept);
+        output.push({ type: 'success', text: `You receive: ${getItemName(q.give_on_accept)}` });
+      }
+
+      return output;
+    }
+
+    /**
+     * Attempt to complete an active quest. Checks all objectives.
+     */
+    function tryCompleteQuest(questId) {
+      const q = quests[questId];
+      if (!q) return [{ type: 'error', text: 'Quest not found.' }];
+
+      const allMet = q.objectives.every(obj => isObjectiveMet(obj));
+      if (!allMet) {
+        return [
+          { type: 'info', text: `Quest '${q.name}' is not yet complete.` },
+          ...q.objectives.filter(obj => !isObjectiveMet(obj)).map(obj =>
+            ({ type: 'info', text: `  [ ] ${obj.description}` })
+          )
+        ];
+      }
+
+      // Complete the quest
+      player.activeQuests = player.activeQuests.filter(id => id !== questId);
+      player.completedQuests.push(questId);
+      player.worldFlags[`quest_${questId}_done`] = true;
+
+      const output = [{ type: 'quest', text: `─── Quest Complete: ${q.name} ───` }];
+
+      // Apply rewards
+      if (q.rewards) {
+        if (q.rewards.gold) {
+          player.gold += q.rewards.gold;
+          output.push({ type: 'success', text: `Received ${q.rewards.gold} gold. (Total: ${player.gold})` });
+        }
+        if (q.rewards.item && player.inventory.length < 99) {
+          player.inventory.push(q.rewards.item);
+          output.push({ type: 'success', text: `Received: ${getItemName(q.rewards.item)}` });
+        }
+        if (q.rewards.attack_bonus) {
+          player.attackPower += q.rewards.attack_bonus;
+          output.push({ type: 'success', text: `Attack power increased by ${q.rewards.attack_bonus}!` });
+        }
+        if (q.rewards.defense_bonus) {
+          player.defense += q.rewards.defense_bonus;
+          output.push({ type: 'success', text: `Defense increased by ${q.rewards.defense_bonus}!` });
+        }
+        if (q.rewards.heal_bonus) {
+          player.maxHp += q.rewards.heal_bonus;
+          player.hp += q.rewards.heal_bonus;
+          output.push({ type: 'success', text: `Max HP increased by ${q.rewards.heal_bonus}!` });
+        }
+        if (q.rewards.message) {
+          output.push({ type: 'dialogue', text: q.rewards.message });
+        }
+      }
+
+      return output;
+    }
+
+    /**
+     * Check if a single quest objective is met.
+     */
+    function isObjectiveMet(obj) {
+      switch (obj.type) {
+        case 'visit':
+          return player.visitedRooms.includes(obj.target);
+        case 'has_item':
+          if (obj.count) {
+            return player.inventory.filter(v => v === obj.target).length >= obj.count;
+          }
+          return player.inventory.includes(obj.target);
+        case 'kill_count':
+          return (player.killCounts[obj.target] || 0) >= (obj.count || 1);
+        case 'talk_npc':
+          return !!player.worldFlags[`talked_${obj.target}`];
+        case 'visit_with_flag':
+          return player.visitedRooms.includes(obj.target) && !!player.worldFlags[obj.flag];
+        default:
+          return false;
+      }
+    }
+
+    /**
+     * Get progress string for a counted objective (e.g., "3/5").
+     */
+    function getObjectiveProgress(obj) {
+      switch (obj.type) {
+        case 'kill_count':
+          return `${Math.min(player.killCounts[obj.target] || 0, obj.count)}/${obj.count}`;
+        case 'has_item':
+          if (obj.count) {
+            return `${player.inventory.filter(v => v === obj.target).length}/${obj.count}`;
+          }
+          return player.inventory.includes(obj.target) ? '1/1' : '0/1';
+        default:
+          return '';
+      }
+    }
+
+    /**
+     * Find a quest ID by partial name match.
+     */
+    function findQuestByName(target) {
+      const lower = target.toLowerCase();
+      const match = Object.values(quests).find(q =>
+        q.name.toLowerCase().includes(lower)
+      );
+      return match ? match.id : null;
     }
 
     // ─── Combat ──────────────────────────────────────────────────────────────
@@ -686,6 +923,9 @@
       if (combatState.mobHp <= 0) {
         output.push({ type: 'combat', text: `${mob.name} has been defeated!` });
         markMobDefeated(combatState.mobVnum);
+
+        // Track kill count for quests
+        player.killCounts[combatState.mobVnum] = (player.killCounts[combatState.mobVnum] || 0) + 1;
 
         // Loot
         if (mob.loot_table && mob.loot_table.length > 0) {
@@ -1029,7 +1269,7 @@
      */
     function getAliveMobsInRoom(room) {
       if (!room) return [];
-      return (room.initial_mobs || []).filter(v => !isMobDefeated(v));
+      return (room.mobs || []).filter(v => !isMobDefeated(v));
     }
 
     // Track taken items per room (keyed by vnum)
@@ -1083,11 +1323,11 @@
       const room = currentRoom();
       const aliveMobs = getAliveMobsInRoom(room);
       const hostiles = aliveMobs.filter(v => {
-        const mob = data.mobs[v];
+        const mob = mobs[v];
         return mob && !mob.flags?.includes('npc');
       });
       const npcs = aliveMobs.filter(v => {
-        const mob = data.mobs[v];
+        const mob = mobs[v];
         return mob && mob.flags?.includes('npc');
       });
       const interactables = (room?.interactables || [])

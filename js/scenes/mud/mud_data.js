@@ -1,7 +1,7 @@
 /**
  * mud_data.js — MUD World Data Loader
  *
- * Fetches room, mob, and item JSON files and exposes them on window.MudData.
+ * Fetches room, mob, item, and quest JSON files and exposes them on window.MudData.
  * Must be loaded before mud_engine.js.
  */
 (() => {
@@ -13,7 +13,8 @@
   const data = {
     rooms: {},
     mobs: {},
-    items: {}
+    items: {},
+    quests: {}
   };
 
   /**
@@ -39,13 +40,15 @@
     loadPromise = Promise.all([
       fetchJSON('rooms.json'),
       fetchJSON('mobs.json'),
-      fetchJSON('items.json')
-    ]).then(([rooms, mobs, items]) => {
+      fetchJSON('items.json'),
+      fetchJSON('quests.json')
+    ]).then(([rooms, mobs, items, quests]) => {
       data.rooms = rooms;
       data.mobs = mobs;
       data.items = items;
+      data.quests = quests;
       loaded = true;
-      console.log(`[MudData] Loaded: ${Object.keys(rooms).length} rooms, ${Object.keys(mobs).length} mobs, ${Object.keys(items).length} items`);
+      console.log(`[MudData] Loaded: ${Object.keys(rooms).length} rooms, ${Object.keys(mobs).length} mobs, ${Object.keys(items).length} items, ${Object.keys(quests).length} quests`);
     });
 
     return loadPromise;
@@ -62,6 +65,7 @@
     get rooms() { return data.rooms; },
     get mobs() { return data.mobs; },
     get items() { return data.items; },
+    get quests() { return data.quests; },
     load,
     isReady
   };

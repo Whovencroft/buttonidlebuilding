@@ -1,2612 +1,5348 @@
 {
-  "0": {
-    "vnum": 0,
+  "1": {
+    "vnum": 1,
     "zone": 0,
     "name": "The Nexus of Echoes — Central Chamber",
-    "description": "You stand in a vast circular chamber. The walls shimmer with an iridescent light that seems to pulse in rhythm with your heartbeat. Six massive archways ring the perimeter, each radiating a distinct energy. In the center, a cracked obsidian pedestal holds nothing — but a faint circular groove in its surface suggests something once rested here. Something round.",
-    "flags": [
-      "indoors",
-      "no_mob_wander",
-      "safe"
-    ],
+    "description": "A vast circular chamber of polished obsidian. Six archways radiate outward, each shimmering with a different colored light. The ceiling is lost in darkness above, but faint stars seem to drift there. A groove in the floor spirals inward — something round passed through here recently.",
     "exits": {
-      "north": {
-        "target_vnum": 1
-      },
-      "east": {
-        "target_vnum": 2
-      },
-      "south": {
-        "target_vnum": 3
-      },
-      "west": {
-        "target_vnum": 4
-      },
-      "up": {
-        "target_vnum": 5
-      }
+      "north": 2,
+      "south": 3,
+      "east": 4,
+      "west": 5,
+      "up": 6,
+      "northeast": 7
     },
     "interactables": [
       {
         "keyword": [
-          "pedestal",
           "groove",
-          "obsidian"
+          "floor"
         ],
-        "description": "The obsidian pedestal is cracked but solid. A perfectly circular groove is worn into its surface — about the size of a marble. Dust has settled in the groove, but a thin trail leads away from it, as if something rolled off recently.",
+        "description": "A smooth circular groove spirals across the obsidian floor. Whatever made it was rolling fast and with purpose.",
         "action": null
       }
-    ],
-    "initial_mobs": [],
-    "initial_items": []
+    ]
   },
-  "1": {
-    "vnum": 1,
+  "2": {
+    "vnum": 2,
     "zone": 0,
-    "name": "The Nexus — Northern Archway",
-    "description": "The northern archway pulses with a warm golden light. Beyond it, you can see rolling green hills and the distant spires of a castle. The air smells of pine and old stone. A sign carved into the arch reads: 'The Shattered Crown — Realm of High Fantasy.'",
-    "flags": [
-      "indoors"
-    ],
+    "name": "Gateway Chamber — North",
+    "description": "The northern archway pulses with golden light. Beyond it, you glimpse rolling green hills and castle spires. A sign reads: 'The Shattered Crown — Realm of Sword and Sorcery.'",
     "exits": {
-      "south": {
-        "target_vnum": 0
-      },
+      "south": 1,
       "north": {
-        "target_vnum": 1000
+        "target_vnum": 1001,
+        "door": null
       }
     },
     "interactables": [
       {
         "keyword": [
           "sign",
-          "arch",
           "archway"
         ],
-        "description": "The carved sign reads: 'The Shattered Crown — Realm of High Fantasy. Danger Level: Moderate. Recommended for newcomers.'",
+        "description": "The archway hums with magical energy. Step through to enter The Shattered Crown.",
         "action": null
       }
-    ],
-    "initial_mobs": [],
-    "initial_items": []
-  },
-  "2": {
-    "vnum": 2,
-    "zone": 0,
-    "name": "The Nexus — Eastern Archway",
-    "description": "The eastern archway crackles with electric blue energy. Through it, neon signs flicker in an endless rain. Towering megastructures pierce a sky choked with smog and holographic advertisements. A digital readout above the arch displays: 'NEON GRID — SECTOR 7.'",
-    "flags": [
-      "indoors"
-    ],
-    "exits": {
-      "west": {
-        "target_vnum": 0
-      },
-      "east": {
-        "target_vnum": 2000
-      }
-    },
-    "interactables": [
-      {
-        "keyword": [
-          "readout",
-          "display",
-          "sign"
-        ],
-        "description": "The digital readout cycles through text: 'NEON GRID — SECTOR 7. Threat Assessment: HIGH. Augmentation recommended.'",
-        "action": null
-      }
-    ],
-    "initial_mobs": [],
-    "initial_items": []
+    ]
   },
   "3": {
     "vnum": 3,
     "zone": 0,
-    "name": "The Nexus — Southern Archway",
-    "description": "The southern archway is wreathed in shadow and the faint glow of a streetlamp. Through it, rain falls on wet cobblestones. A saxophone plays somewhere in the distance. The arch bears a brass plaque: 'Midnight Rain — The Noir District.'",
-    "flags": [
-      "indoors"
-    ],
+    "name": "Gateway Chamber — South",
+    "description": "The southern archway crackles with blue-white electricity. Neon signs and holographic advertisements flicker beyond. A sign reads: 'Neon Grid — The Digital Frontier.'",
     "exits": {
-      "north": {
-        "target_vnum": 0
-      },
+      "north": 1,
       "south": {
-        "target_vnum": 3000
+        "target_vnum": 2001,
+        "door": null
       }
     },
     "interactables": [
       {
         "keyword": [
-          "plaque",
-          "brass",
-          "sign"
+          "sign",
+          "archway"
         ],
-        "description": "The brass plaque reads: 'Midnight Rain — The Noir District. Danger Level: Moderate-High. Trust no one.'",
+        "description": "Digital static dances across the threshold. Step through to enter Neon Grid.",
         "action": null
       }
-    ],
-    "initial_mobs": [],
-    "initial_items": []
+    ]
   },
   "4": {
     "vnum": 4,
     "zone": 0,
-    "name": "The Nexus — Western Archway",
-    "description": "The western archway radiates heat and the smell of gunpowder. Through it, palm trees sway against an orange sunset. An explosion echoes in the distance. Spray-painted across the arch in bold red letters: 'BLOOD & CHROME — NO RULES, NO MERCY.'",
-    "flags": [
-      "indoors"
-    ],
+    "name": "Gateway Chamber — East",
+    "description": "The eastern archway drips with perpetual rain. Street lamps and saxophone music drift through. A sign reads: 'Midnight Rain — Where Shadows Have Secrets.'",
     "exits": {
+      "west": 1,
       "east": {
-        "target_vnum": 0
-      },
-      "west": {
-        "target_vnum": 4000
+        "target_vnum": 3001,
+        "door": null
       }
     },
     "interactables": [
       {
         "keyword": [
-          "graffiti",
-          "spray",
-          "letters",
-          "paint"
+          "sign",
+          "archway"
         ],
-        "description": "The spray paint reads: 'BLOOD & CHROME — NO RULES, NO MERCY. Danger Level: HIGH. Bring ammo.'",
+        "description": "Rain falls just beyond the threshold but never crosses it. Step through to enter Midnight Rain.",
         "action": null
       }
-    ],
-    "initial_mobs": [],
-    "initial_items": []
+    ]
   },
   "5": {
     "vnum": 5,
     "zone": 0,
-    "name": "The Nexus — Upper Platform",
-    "description": "A spiral staircase leads up to a floating platform above the central chamber. From here you can see all six archways below. Two more passages branch off — one shimmering with cherry blossoms and crackling energy, the other heavy with the dust of ages.",
-    "flags": [
-      "indoors"
-    ],
+    "name": "Gateway Chamber — West",
+    "description": "The western archway glows with orange firelight. Explosions and gunfire echo faintly. A sign reads: 'Blood & Chrome — No Pain, No Gain.'",
     "exits": {
-      "down": {
-        "target_vnum": 0
-      },
-      "east": {
-        "target_vnum": 6
-      },
+      "east": 1,
       "west": {
-        "target_vnum": 7
+        "target_vnum": 4001,
+        "door": null
       }
     },
-    "interactables": [],
-    "initial_mobs": [],
-    "initial_items": []
+    "interactables": [
+      {
+        "keyword": [
+          "sign",
+          "archway"
+        ],
+        "description": "Heat radiates from beyond the threshold. Step through to enter Blood & Chrome.",
+        "action": null
+      }
+    ]
   },
   "6": {
     "vnum": 6,
     "zone": 0,
-    "name": "The Nexus — Floating Shards Passage",
-    "description": "Cherry blossom petals drift through the air despite no visible trees. The passage ahead opens into a sky filled with floating islands. Lightning arcs between distant peaks. A scroll pinned to the wall reads: 'The Floating Shards — Realm of Spirit and Steel.'",
-    "flags": [
-      "indoors"
-    ],
+    "name": "Gateway Chamber — Upper",
+    "description": "The upward archway floats impossibly overhead, reached by crystalline steps that materialize as you approach. Cherry blossoms drift through. A sign reads: 'The Floating Shards — Path of the Ascendant.'",
     "exits": {
-      "west": {
-        "target_vnum": 5
-      },
-      "east": {
-        "target_vnum": 5000
+      "down": 1,
+      "up": {
+        "target_vnum": 5001,
+        "door": null
       }
     },
     "interactables": [
       {
         "keyword": [
-          "scroll",
-          "wall"
+          "sign",
+          "steps"
         ],
-        "description": "The scroll reads: 'The Floating Shards — Realm of Spirit and Steel. Danger Level: EXTREME. Master your focus or be shattered.'",
+        "description": "The crystalline steps shimmer with inner light. Step up to enter The Floating Shards.",
         "action": null
       }
-    ],
-    "initial_mobs": [],
-    "initial_items": []
+    ]
   },
   "7": {
     "vnum": 7,
     "zone": 0,
-    "name": "The Nexus — Forgotten Epoch Passage",
-    "description": "The air here is thick with the smell of old parchment and iron. Through the passage, torchlight flickers on sandstone walls. The distant roar of a crowd echoes from somewhere below. Chiseled into the stone above: 'THE FORGOTTEN EPOCH — WHERE EMPIRES FELL.'",
-    "flags": [
-      "indoors"
-    ],
+    "name": "Gateway Chamber — Northeast",
+    "description": "The northeastern archway is carved from ancient stone, torchlit and echoing with distant crowds. A sign reads: 'The Forgotten Epoch — Where History Lives.'",
     "exits": {
-      "east": {
-        "target_vnum": 5
-      },
-      "west": {
-        "target_vnum": 6000
+      "southwest": 1,
+      "northeast": {
+        "target_vnum": 6001,
+        "door": null
       }
     },
     "interactables": [
       {
         "keyword": [
-          "chiseled",
-          "stone",
-          "inscription"
+          "sign",
+          "archway"
         ],
-        "description": "The inscription reads: 'THE FORGOTTEN EPOCH — WHERE EMPIRES FELL. Danger Level: HIGH. History does not forgive.'",
+        "description": "The smell of dust and iron drifts through. Step through to enter The Forgotten Epoch.",
         "action": null
       }
-    ],
-    "initial_mobs": [],
-    "initial_items": []
+    ]
   },
   "8": {
     "vnum": 8,
     "zone": 0,
-    "name": "The Nexus — Training Hall",
-    "description": "A side chamber off the main hub, fitted with practice dummies and weapon racks. A grizzled figure leans against the wall, arms crossed. This is where newcomers learn to fight.",
-    "flags": [
-      "indoors",
-      "safe"
-    ],
+    "name": "The Training Hall",
+    "description": "A spacious hall with practice dummies, weapon racks, and sparring circles. Instructor Vex stands ready to help newcomers learn the basics of combat.",
     "exits": {
-      "south": {
-        "target_vnum": 0
-      }
+      "south": 10,
+      "east": 1
     },
+    "mobs": [
+      101
+    ],
     "interactables": [
       {
         "keyword": [
           "dummy",
-          "dummies",
-          "practice"
+          "dummies"
         ],
-        "description": "Straw-stuffed practice dummies stand in a row. They look well-used.",
+        "description": "Straw-stuffed practice dummies stand in a row. They look well-beaten.",
+        "action": null
+      },
+      {
+        "keyword": [
+          "rack",
+          "weapons"
+        ],
+        "description": "A rack of basic training weapons — wooden swords, blunt daggers, practice staves.",
         "action": null
       }
-    ],
-    "initial_mobs": [
-      8001
-    ],
-    "initial_items": []
+    ]
   },
   "9": {
     "vnum": 9,
     "zone": 0,
-    "name": "The Nexus — The Bazaar",
-    "description": "A bustling marketplace fills this wing of the Nexus. Stalls overflow with goods from every realm — enchanted blades beside plasma rifles, fedoras next to samurai helmets. A large board displays current listings from travelers who have passed through.",
-    "flags": [
-      "indoors",
-      "safe"
-    ],
+    "name": "The Global Bazaar",
+    "description": "A bustling marketplace where items from all realms converge. Merchant stalls line the walls, each displaying wares from a different zone. A large notice board dominates the center.",
     "exits": {
-      "north": {
-        "target_vnum": 0
-      }
+      "west": 1,
+      "north": 11,
+      "south": 12,
+      "east": 13
     },
+    "mobs": [
+      102
+    ],
     "interactables": [
       {
         "keyword": [
           "board",
-          "listings",
-          "display"
+          "notice"
         ],
-        "description": "[Global Bazaar — player marketplace. Requires server connection.]",
+        "description": "The notice board is covered in player-posted notes and trade requests. [Server feature — coming soon]",
         "action": null
       }
-    ],
-    "initial_mobs": [
-      8002
-    ],
-    "initial_items": []
+    ]
   },
-  "1000": {
-    "vnum": 1000,
-    "zone": 1,
-    "name": "The King's Road — Southern Gate",
-    "description": "You step through the archway and onto a worn cobblestone road. The golden light of the Nexus fades behind you, replaced by the warm sun of a medieval realm. Ahead, the road winds north through rolling farmland toward distant castle spires. A weathered milestone reads: 'Thornhold — 2 leagues.'",
-    "flags": [],
+  "10": {
+    "vnum": 10,
+    "zone": 0,
+    "name": "The Armory",
+    "description": "Racks of weapons and armor line the walls. The Armorer, a scarred dwarf named Grindstone, polishes a blade behind the counter.",
     "exits": {
-      "south": {
-        "target_vnum": 1
-      },
-      "north": {
-        "target_vnum": 1001
+      "north": 8,
+      "east": 14
+    },
+    "mobs": [
+      103
+    ],
+    "interactables": [
+      {
+        "keyword": [
+          "counter",
+          "display"
+        ],
+        "description": "Glass cases display fine weapons and armor pieces, each with a price tag.",
+        "action": null
       }
+    ]
+  },
+  "11": {
+    "vnum": 11,
+    "zone": 0,
+    "name": "The Apothecary",
+    "description": "Shelves of bubbling potions, dried herbs, and strange crystals fill this cramped shop. Madame Veil tends a cauldron in the corner, her eyes never quite meeting yours.",
+    "exits": {
+      "south": 9
+    },
+    "mobs": [
+      104
+    ],
+    "interactables": [
+      {
+        "keyword": [
+          "cauldron",
+          "pot"
+        ],
+        "description": "The cauldron bubbles with a luminescent green liquid. It smells like mint and regret.",
+        "action": null
+      }
+    ]
+  },
+  "12": {
+    "vnum": 12,
+    "zone": 0,
+    "name": "The Courier's Post",
+    "description": "A busy office where messages and packages are sorted. Courier Dash, a wiry halfling, manages deliveries between zones.",
+    "exits": {
+      "north": 9
+    },
+    "mobs": [
+      105
+    ],
+    "interactables": [
+      {
+        "keyword": [
+          "packages",
+          "desk"
+        ],
+        "description": "Stacks of wrapped parcels await delivery. Some are addressed to names you don't recognize.",
+        "action": null
+      }
+    ]
+  },
+  "13": {
+    "vnum": 13,
+    "zone": 0,
+    "name": "The Lore Keeper's Study",
+    "description": "Floor-to-ceiling bookshelves surround a cluttered desk. The Lore Keeper, an ancient elf named Syllith, pores over a massive tome.",
+    "exits": {
+      "west": 9,
+      "north": 15
+    },
+    "mobs": [
+      106
+    ],
+    "interactables": [
+      {
+        "keyword": [
+          "tome",
+          "book",
+          "desk"
+        ],
+        "description": "The tome is written in a dozen languages simultaneously. Syllith seems to read them all at once.",
+        "action": null
+      }
+    ]
+  },
+  "14": {
+    "vnum": 14,
+    "zone": 0,
+    "name": "The Rest Hall",
+    "description": "Comfortable beds and warm hearths fill this communal resting area. Travelers from all zones gather here to share stories and recover.",
+    "exits": {
+      "west": 10,
+      "north": 16
     },
     "interactables": [
       {
         "keyword": [
-          "milestone",
-          "stone",
-          "sign"
+          "bed",
+          "hearth"
         ],
-        "description": "The milestone is cracked with age. It reads: 'Thornhold — 2 leagues. Beware the Hollow Wood.' Below it, scratched hastily: 'Something round rolled through here. Fast.'",
+        "description": "The beds look inviting. A good rest might restore your strength.",
         "action": null
       }
+    ]
+  },
+  "15": {
+    "vnum": 15,
+    "zone": 0,
+    "name": "The Archive",
+    "description": "A quiet wing of the Lore Keeper's domain. Ancient scrolls and maps are preserved behind glass. One map shows all six zones connected by glowing lines to this central hub.",
+    "exits": {
+      "south": 13
+    },
+    "interactables": [
+      {
+        "keyword": [
+          "map",
+          "scrolls"
+        ],
+        "description": "The map shows the Nexus at the center with six paths radiating outward. A seventh path is drawn in faint pencil, leading... down?",
+        "action": null
+      }
+    ]
+  },
+  "16": {
+    "vnum": 16,
+    "zone": 0,
+    "name": "The Bounty Board",
+    "description": "A large wooden board covered in pinned notices. Each one describes a task that needs doing — creatures to slay, items to retrieve, messages to deliver.",
+    "exits": {
+      "south": 14,
+      "east": 17
+    },
+    "mobs": [
+      107
     ],
-    "initial_mobs": [
-      1001
+    "interactables": [
+      {
+        "keyword": [
+          "board",
+          "bounty",
+          "notices"
+        ],
+        "description": "Various bounties are posted here. Talk to the Bounty Master for details.",
+        "action": null
+      }
+    ]
+  },
+  "17": {
+    "vnum": 17,
+    "zone": 0,
+    "name": "The Sparring Pit",
+    "description": "A sunken arena where combatants can test their skills against training constructs. The walls are scorched and dented from countless bouts.",
+    "exits": {
+      "west": 16
+    },
+    "mobs": [
+      108
     ],
-    "initial_items": []
+    "interactables": [
+      {
+        "keyword": [
+          "arena",
+          "pit",
+          "construct"
+        ],
+        "description": "A mechanical training construct stands dormant in the center, waiting to be activated.",
+        "action": null
+      }
+    ]
+  },
+  "18": {
+    "vnum": 18,
+    "zone": 0,
+    "name": "The Wanderer's Tavern",
+    "description": "A cozy tavern tucked into a corner of the Nexus. The barkeep, a jovial orc named Tumble, serves drinks that glow in strange colors.",
+    "exits": {
+      "south": 1,
+      "east": 19
+    },
+    "mobs": [
+      109
+    ],
+    "interactables": [
+      {
+        "keyword": [
+          "bar",
+          "drinks",
+          "menu"
+        ],
+        "description": "The menu lists drinks from every zone: Dragonfire Ale, Neon Fizz, Noir Coffee, Napalm Shot, Sakura Tea, and Gladiator's Mead.",
+        "action": null
+      }
+    ]
+  },
+  "19": {
+    "vnum": 19,
+    "zone": 0,
+    "name": "The Back Room",
+    "description": "A dimly lit room behind the tavern. A hooded figure sits alone at a table, shuffling cards. They look up as you enter.",
+    "exits": {
+      "west": 18
+    },
+    "mobs": [
+      110
+    ],
+    "interactables": [
+      {
+        "keyword": [
+          "cards",
+          "table"
+        ],
+        "description": "The cards have strange symbols on them — not any suit you recognize. The figure seems to be waiting for someone to play.",
+        "action": null
+      }
+    ]
+  },
+  "20": {
+    "vnum": 20,
+    "zone": 0,
+    "name": "The Shrine of Echoes",
+    "description": "A small, peaceful alcove with a glowing crystal at its center. Touching it seems to restore vitality. Faint whispers of past travelers linger in the air.",
+    "exits": {
+      "north": 1
+    },
+    "interactables": [
+      {
+        "keyword": [
+          "crystal",
+          "shrine"
+        ],
+        "description": "The crystal pulses with warm light. You feel your wounds beginning to close.",
+        "action": "use_shrine"
+      }
+    ]
+  },
+  "21": {
+    "vnum": 21,
+    "zone": 0,
+    "name": "The Crafting Bench",
+    "description": "A sturdy workbench with tools for combining materials. A sign reads: 'Combine items here. Place two items and see what happens.'",
+    "exits": {
+      "south": 9,
+      "west": 22
+    },
+    "interactables": [
+      {
+        "keyword": [
+          "bench",
+          "tools",
+          "sign"
+        ],
+        "description": "The workbench has slots for two items. Use 'combine <item1> <item2>' to attempt crafting.",
+        "action": null
+      }
+    ]
+  },
+  "22": {
+    "vnum": 22,
+    "zone": 0,
+    "name": "The Storage Vault",
+    "description": "Personal storage lockers line the walls. Each one is keyed to a specific traveler. Your locker glows faintly, recognizing your presence.",
+    "exits": {
+      "east": 21
+    },
+    "interactables": [
+      {
+        "keyword": [
+          "locker",
+          "vault",
+          "storage"
+        ],
+        "description": "Your personal storage. [Feature coming soon — store items between sessions]",
+        "action": null
+      }
+    ]
+  },
+  "23": {
+    "vnum": 23,
+    "zone": 0,
+    "name": "The Notice Wall",
+    "description": "A wall covered in small notes left by other travelers. Some are helpful tips, others are cryptic warnings, and a few are just jokes.",
+    "exits": {
+      "north": 9
+    },
+    "interactables": [
+      {
+        "keyword": [
+          "notes",
+          "wall",
+          "notice"
+        ],
+        "description": "You read a few notes: 'Beware the third statue.' 'The safe code is a year.' 'Don't trust the cards.' [Player notes — server feature]",
+        "action": null
+      }
+    ]
+  },
+  "24": {
+    "vnum": 24,
+    "zone": 0,
+    "name": "The Meditation Garden",
+    "description": "A tranquil garden with bonsai trees, a small pond, and stepping stones. The air smells of lavender. Time seems to move differently here.",
+    "exits": {
+      "south": 20,
+      "east": 25
+    },
+    "interactables": [
+      {
+        "keyword": [
+          "pond",
+          "garden",
+          "bonsai"
+        ],
+        "description": "Koi fish swim in lazy circles. The water is perfectly clear.",
+        "action": null
+      }
+    ]
+  },
+  "25": {
+    "vnum": 25,
+    "zone": 0,
+    "name": "The Observatory",
+    "description": "A domed room with a massive telescope pointed at the ceiling — which appears to be open sky despite being underground. Stars wheel overhead in patterns that don't match any known constellation.",
+    "exits": {
+      "west": 24
+    },
+    "interactables": [
+      {
+        "keyword": [
+          "telescope",
+          "stars",
+          "sky"
+        ],
+        "description": "Through the telescope you see... the marble. Just for an instant. Rolling across a field of stars. Then it's gone.",
+        "action": null
+      }
+    ]
   },
   "1001": {
     "vnum": 1001,
     "zone": 1,
-    "name": "The King's Road — Farmlands",
-    "description": "Golden wheat fields stretch to either side of the road. A scarecrow stands motionless in the nearest field — or is it motionless? The road continues north toward a dark treeline.",
-    "flags": [],
+    "name": "King's Road — Southern Gate",
+    "description": "A crumbling stone archway marks the entrance to the realm of the Shattered Crown. The road stretches north through rolling green hills dotted with wildflowers. A faded signpost points in several directions. The air smells of grass and distant smoke.",
     "exits": {
+      "north": 1002,
       "south": {
-        "target_vnum": 1000
+        "target_vnum": 2,
+        "door": null
       },
-      "north": {
-        "target_vnum": 1002
-      },
-      "east": {
-        "target_vnum": 1003
-      }
+      "east": 1006,
+      "west": 1010
     },
+    "mobs": [],
+    "initial_items": [],
     "interactables": [
       {
         "keyword": [
-          "scarecrow"
+          "signpost",
+          "sign"
         ],
-        "description": "On closer inspection, the scarecrow is definitely just a scarecrow. Definitely. Its button eyes stare blankly ahead. Wait — is that a marble-sized dent in the post it's mounted on?",
+        "description": "The signpost reads: North — Thornhold Village. East — Farmer's Fields. West — The Old Forest. The paint is peeling.",
         "action": null
       }
-    ],
-    "initial_mobs": [],
-    "initial_items": [
-      1001
     ]
   },
   "1002": {
     "vnum": 1002,
     "zone": 1,
-    "name": "Edge of the Hollow Wood",
-    "description": "The road ends abruptly at a wall of ancient trees. Their branches interlock overhead, blocking all sunlight. A narrow path leads into the darkness. The air is cold here, and something watches from between the trunks.",
-    "flags": [],
+    "name": "King's Road — Rolling Hills",
+    "description": "The road winds between grassy hills. Wildflowers sway in a gentle breeze. To the east, you can see farmland. To the west, the treeline of a dark forest looms.",
     "exits": {
-      "south": {
-        "target_vnum": 1001
-      },
-      "north": {
-        "target_vnum": 1004
-      }
+      "north": 1003,
+      "south": 1001,
+      "east": 1007,
+      "west": 1014
     },
-    "interactables": [
-      {
-        "keyword": [
-          "trees",
-          "branches",
-          "wood"
-        ],
-        "description": "The trees are impossibly old. Their bark is carved with runes you cannot read. Sap oozes from some of the carvings — it looks almost like the trees are bleeding.",
-        "action": null
-      }
+    "mobs": [
+      1001
     ],
-    "initial_mobs": [
-      1002
-    ],
-    "initial_items": []
+    "initial_items": [],
+    "interactables": []
   },
   "1003": {
     "vnum": 1003,
     "zone": 1,
-    "name": "Abandoned Farmstead",
-    "description": "A ruined farmhouse sits amid overgrown fields. The roof has partially collapsed, and weeds grow through the floorboards. Someone — or something — has been living here recently. A cooking pot still smolders over dead coals.",
-    "flags": [],
+    "name": "King's Road — Crossroads",
+    "description": "A stone marker stands at the intersection of several paths. The main road continues north toward a village. A narrower path leads east toward distant mountains, and another west into dense forest.",
     "exits": {
-      "west": {
-        "target_vnum": 1001
-      }
+      "north": 1004,
+      "south": 1002,
+      "east": 1020,
+      "west": 1015
     },
+    "mobs": [
+      1022
+    ],
+    "initial_items": [],
     "interactables": [
       {
         "keyword": [
-          "pot",
-          "cooking",
-          "coals"
+          "marker",
+          "stone"
         ],
-        "description": "The pot contains a thin, foul-smelling broth. Whatever made this wasn't human — or had very poor taste.",
+        "description": "The stone marker has directions carved into it, but someone has scratched 'TURN BACK' over most of them.",
         "action": null
       }
-    ],
-    "initial_mobs": [
-      1003
-    ],
-    "initial_items": [
-      1002
     ]
   },
   "1004": {
     "vnum": 1004,
     "zone": 1,
-    "name": "The Hollow Wood — Dark Path",
-    "description": "The path twists between massive tree trunks. Luminescent fungi provide the only light — a sickly green glow that makes everything look diseased. You hear rustling in the undergrowth.",
-    "flags": [],
+    "name": "Thornhold Village — South End",
+    "description": "The village of Thornhold begins here. Thatched-roof cottages line a muddy street. A blacksmith's hammer rings from the east. Villagers eye you with cautious curiosity.",
     "exits": {
-      "south": {
-        "target_vnum": 1002
-      },
-      "north": {
-        "target_vnum": 1005
-      },
-      "east": {
-        "target_vnum": 1006
-      }
+      "north": 1005,
+      "south": 1003,
+      "east": 1025,
+      "west": 1026
     },
-    "interactables": [
-      {
-        "keyword": [
-          "fungi",
-          "mushroom",
-          "glow"
-        ],
-        "description": "The fungi pulse with bioluminescence. They're not poisonous to touch, but you wouldn't want to eat them. A thin trail — like something small and round rolled through the moss — leads deeper into the wood.",
-        "action": null
-      }
+    "mobs": [
+      1023
     ],
-    "initial_mobs": [
-      1004
-    ],
-    "initial_items": []
+    "initial_items": [],
+    "interactables": []
   },
   "1005": {
     "vnum": 1005,
     "zone": 1,
-    "name": "The Hollow Wood — Ancient Clearing",
-    "description": "A break in the canopy reveals a circle of standing stones. Moonlight streams down despite it being midday elsewhere. The stones hum with a low vibration you feel in your chest.",
-    "flags": [],
+    "name": "Thornhold Village — Square",
+    "description": "The village square is dominated by a dry fountain and a notice board. A tavern sits to the west, and the road continues north toward the castle ruins.",
     "exits": {
-      "south": {
-        "target_vnum": 1004
-      },
-      "north": {
-        "target_vnum": 1007
-      }
+      "north": 1030,
+      "south": 1004,
+      "east": 1027,
+      "west": 1028
     },
-    "interactables": [
-      {
-        "keyword": [
-          "stones",
-          "standing",
-          "circle"
-        ],
-        "description": "Seven standing stones form a perfect circle. Each bears a different rune. The ground at the center is worn smooth — as if something has been rolling in circles here for a very long time.",
-        "action": "stone_circle_puzzle"
-      }
-    ],
-    "initial_mobs": [],
-    "initial_items": [
-      1003
-    ]
-  },
-  "1006": {
-    "vnum": 1006,
-    "zone": 1,
-    "name": "The Hollow Wood — Spider Den",
-    "description": "Thick webs coat every surface. The path narrows to a crawl space choked with silk. Something large moves in the shadows above. This was a mistake.",
-    "flags": [],
-    "exits": {
-      "west": {
-        "target_vnum": 1004
-      }
-    },
-    "interactables": [
-      {
-        "keyword": [
-          "web",
-          "webs",
-          "silk"
-        ],
-        "description": "The webs are incredibly strong. Wrapped in one of them, you can see the glint of something metallic.",
-        "action": null
-      }
-    ],
-    "initial_mobs": [
-      1005
-    ],
-    "initial_items": [
-      1004
-    ]
-  },
-  "1007": {
-    "vnum": 1007,
-    "zone": 1,
-    "name": "Thornhold — South Gate",
-    "description": "You emerge from the Hollow Wood to find a walled town ahead. The south gate stands open, guarded by two soldiers in dented armor. Beyond the walls, you can see rooftops and chimney smoke. A sign above the gate reads: 'THORNHOLD — Population: Declining.'",
-    "flags": [],
-    "exits": {
-      "south": {
-        "target_vnum": 1005
-      },
-      "north": {
-        "target_vnum": 1008
-      }
-    },
-    "interactables": [
-      {
-        "keyword": [
-          "guards",
-          "soldiers",
-          "gate"
-        ],
-        "description": "The guards look tired and underpaid. One nods at you. 'Another adventurer. Good luck in there. Watch for the rats — they've gotten bold since the crown shattered.'",
-        "action": null
-      }
-    ],
-    "initial_mobs": [],
-    "initial_items": []
-  },
-  "1008": {
-    "vnum": 1008,
-    "zone": 1,
-    "name": "Thornhold — Market Square",
-    "description": "The town square is a muddy affair. A few merchants hawk their wares from rickety stalls. A fountain in the center has run dry — its basin filled with dead leaves. Roads lead in every direction.",
-    "flags": [
-      "safe"
-    ],
-    "exits": {
-      "south": {
-        "target_vnum": 1007
-      },
-      "north": {
-        "target_vnum": 1009
-      },
-      "east": {
-        "target_vnum": 1010
-      },
-      "west": {
-        "target_vnum": 1011
-      }
-    },
+    "mobs": [],
+    "initial_items": [],
     "interactables": [
       {
         "keyword": [
           "fountain",
           "basin"
         ],
-        "description": "The dry fountain has a small hole in its basin — perfectly round, as if drilled by something spinning at high speed. Water stains suggest something rolled through here when the fountain still flowed.",
+        "description": "The fountain is dry. A circular dent in the basin suggests something heavy rolled through here recently, cracking the stone.",
+        "action": null
+      },
+      {
+        "keyword": [
+          "board",
+          "notice"
+        ],
+        "description": "Bounties posted: 'Wolf Pack — 3 wolves terrorizing farms. Reward: 30 coin.' 'Missing Herbs — Herbalist seeks Moonpetal flowers.'",
         "action": null
       }
+    ]
+  },
+  "1006": {
+    "vnum": 1006,
+    "zone": 1,
+    "name": "Farmer's Fields — West Pasture",
+    "description": "A fenced pasture where sheep graze nervously. The fence has been broken in several places — something has been getting in at night.",
+    "exits": {
+      "west": 1001,
+      "north": 1007,
+      "east": 1008
+    },
+    "mobs": [
+      1001,
+      1018
     ],
-    "initial_mobs": [
-      8003
+    "initial_items": [],
+    "interactables": [
+      {
+        "keyword": [
+          "fence",
+          "break"
+        ],
+        "description": "The fence posts are snapped clean. Claw marks score the wood. Wolf damage.",
+        "action": null
+      }
+    ]
+  },
+  "1007": {
+    "vnum": 1007,
+    "zone": 1,
+    "name": "Farmer's Fields — East Pasture",
+    "description": "More farmland stretches east. Old Farmer Giles tends his remaining sheep here, looking haggard and worried.",
+    "exits": {
+      "south": 1008,
+      "west": 1002,
+      "north": 1009
+    },
+    "mobs": [
+      1019
     ],
-    "initial_items": []
+    "initial_items": [],
+    "interactables": []
+  },
+  "1008": {
+    "vnum": 1008,
+    "zone": 1,
+    "name": "Farmer's Fields — Barn",
+    "description": "A large red barn with a sagging roof. Hay bales are stacked inside, and the smell of livestock is strong. Something rustles in the loft above.",
+    "exits": {
+      "west": 1006,
+      "north": 1009
+    },
+    "mobs": [
+      1018
+    ],
+    "initial_items": [
+      1003
+    ],
+    "interactables": [
+      {
+        "keyword": [
+          "loft",
+          "hay"
+        ],
+        "description": "The hay loft is accessible by a rickety ladder. You hear squeaking from up there.",
+        "action": null
+      }
+    ]
   },
   "1009": {
     "vnum": 1009,
     "zone": 1,
-    "name": "The Eastern Tower (Top)",
-    "description": "The wind howls through the open arches of the tower. A torn piece of tapestry flutters in the breeze, depicting a rising sun.",
-    "flags": [],
+    "name": "Farmer's Fields — Orchard",
+    "description": "Rows of apple trees stretch in neat lines. Some have been knocked over — something large barreled through here. A trail of crushed apples leads north.",
     "exits": {
-      "down": {
-        "target_vnum": 1008
-      }
+      "south": 1007,
+      "west": 1008
     },
-    "interactables": [],
-    "initial_mobs": [],
-    "initial_items": [
-      1003
+    "mobs": [
+      1006
+    ],
+    "initial_items": [],
+    "interactables": [
+      {
+        "keyword": [
+          "trail",
+          "apples",
+          "trees"
+        ],
+        "description": "The trail of destruction is fresh. Whatever did this was heavy, fast, and didn't care about obstacles.",
+        "action": null
+      }
     ]
   },
   "1010": {
     "vnum": 1010,
     "zone": 1,
-    "name": "The Guardhouse",
-    "description": "Weapon racks stand empty. A heavy wooden table is overturned in the center of the room. A staircase leads down into darkness.",
-    "flags": [],
+    "name": "The Old Forest — Edge",
+    "description": "Ancient oaks tower overhead, their canopy blocking most sunlight. The air is cool and damp. A narrow path leads deeper into the gloom.",
     "exits": {
-      "east": {
-        "target_vnum": 1006
-      },
-      "north": {
-        "target_vnum": 1011
-      }
+      "east": 1001,
+      "north": 1011,
+      "west": 1012
     },
-    "interactables": [],
-    "initial_mobs": [
-      1003
+    "mobs": [
+      1001
     ],
-    "initial_items": [
-      1002
-    ]
+    "initial_items": [],
+    "interactables": []
   },
   "1011": {
     "vnum": 1011,
     "zone": 1,
-    "name": "The Guardhouse Cellar",
-    "description": "The cellar smells of mold and old wine. Barrels are smashed open. In the corner, a piece of tapestry shows a star shining in the night sky.",
-    "flags": [],
+    "name": "The Old Forest — Mossy Path",
+    "description": "Thick moss covers everything — the ground, the trees, even the air feels green. The path splits ahead.",
     "exits": {
-      "south": {
-        "target_vnum": 1010
-      }
+      "south": 1010,
+      "north": 1013,
+      "east": 1014
     },
-    "interactables": [],
-    "initial_mobs": [],
+    "mobs": [
+      1013
+    ],
     "initial_items": [
-      1004
-    ]
+      1016
+    ],
+    "interactables": []
   },
   "1012": {
     "vnum": 1012,
     "zone": 1,
-    "name": "The Inner Courtyard",
-    "description": "The heart of the castle. Statues of past kings line the walls, their faces worn away by time. The grand doors to the throne room lie to the north.",
-    "flags": [],
+    "name": "The Old Forest — Hollow",
+    "description": "A massive hollow tree dominates this clearing. Its interior is large enough to shelter in. Strange mushrooms grow in a ring around it.",
     "exits": {
-      "south": {
-        "target_vnum": 1007
-      },
-      "north": {
-        "target_vnum": 1016
-      },
-      "east": {
-        "target_vnum": 1013
-      },
-      "west": {
-        "target_vnum": 1014
-      }
+      "east": 1010,
+      "north": 1013
     },
-    "interactables": [],
-    "initial_mobs": [
-      1003,
-      1004
+    "mobs": [
+      1014
     ],
-    "initial_items": []
+    "initial_items": [],
+    "interactables": [
+      {
+        "keyword": [
+          "tree",
+          "hollow",
+          "mushrooms"
+        ],
+        "description": "The mushrooms glow faintly blue. The hollow tree smells of earth and age. Something lived here once — something large.",
+        "action": null
+      }
+    ]
   },
   "1013": {
     "vnum": 1013,
     "zone": 1,
-    "name": "The Chapel Ruins",
-    "description": "Stained glass windows lie shattered on the stone floor. A piece of tapestry draped over the altar depicts a flowing river.",
-    "flags": [],
+    "name": "The Old Forest — Deep Woods",
+    "description": "The trees press close here, branches interlocking overhead like skeletal fingers. Visibility drops to a few meters. You hear things moving in the undergrowth.",
     "exits": {
-      "west": {
-        "target_vnum": 1012
-      }
+      "south": 1011,
+      "west": 1012,
+      "north": 1016,
+      "east": 1015
     },
-    "interactables": [],
-    "initial_mobs": [],
-    "initial_items": [
-      1005
-    ]
+    "mobs": [
+      1009,
+      1013
+    ],
+    "initial_items": [],
+    "interactables": []
   },
   "1014": {
     "vnum": 1014,
     "zone": 1,
-    "name": "The Armory",
-    "description": "Most of the weapons here are rusted beyond use, but a few sturdy pieces remain untouched by the corruption.",
-    "flags": [],
+    "name": "The Old Forest — Stream Crossing",
+    "description": "A shallow stream cuts through the forest floor. Stepping stones provide a path across. The water is clear but moves with unnatural speed.",
     "exits": {
-      "east": {
-        "target_vnum": 1012
-      },
-      "north": {
-        "target_vnum": 1015
-      }
+      "west": 1002,
+      "east": 1013,
+      "north": 1017
     },
-    "interactables": [],
-    "initial_mobs": [
-      1004
+    "mobs": [
+      1014
     ],
-    "initial_items": [
-      1006
-    ]
+    "initial_items": [],
+    "interactables": []
   },
   "1015": {
     "vnum": 1015,
     "zone": 1,
-    "name": "The Collapsed Library",
-    "description": "Bookshelves have collapsed, burying thousands of tomes. A single open book on a pedestal reads: 'The True King faces the rising sun, his shield to the flowing river, his sword to the setting sun, and his crown to the northern star.'",
-    "flags": [],
+    "name": "The Old Forest — Witch's Clearing",
+    "description": "A small clearing with a ruined cottage. Herbs hang drying from the eaves and a cauldron sits cold over an unlit fire. The wandering herbalist works here.",
     "exits": {
-      "south": {
-        "target_vnum": 1014
-      }
+      "east": 1003,
+      "south": 1013
     },
-    "interactables": [],
-    "initial_mobs": [],
-    "initial_items": []
+    "mobs": [
+      1020
+    ],
+    "initial_items": [
+      1016,
+      1016
+    ],
+    "interactables": []
   },
   "1016": {
     "vnum": 1016,
     "zone": 1,
-    "name": "The Throne Room Antechamber",
-    "description": "A long hall leading to the throne room. The air here is freezing cold, and the shadows seem to writhe along the walls.",
-    "flags": [],
+    "name": "The Old Forest — Spider Nest",
+    "description": "Thick webs coat every surface. Cocooned shapes hang from branches — some disturbingly humanoid in size. The air vibrates with the movement of many legs.",
     "exits": {
-      "south": {
-        "target_vnum": 1012
-      },
-      "north": {
-        "target_vnum": 1017
-      }
+      "south": 1013,
+      "east": 1017
     },
-    "interactables": [],
-    "initial_mobs": [
-      1003,
-      1004
+    "mobs": [
+      1013,
+      1013
     ],
-    "initial_items": []
+    "initial_items": [
+      1014
+    ],
+    "interactables": []
   },
   "1017": {
     "vnum": 1017,
     "zone": 1,
-    "name": "The Throne Room",
-    "description": "The grand throne room. Four stone statues surround a central throne. The statues can be rotated. The Usurper Wraith floats above the throne, its eyes burning with cold fire.",
-    "flags": [],
+    "name": "The Old Forest — Waterfall Grotto",
+    "description": "The stream ends at a small waterfall cascading into a crystal-clear pool. Behind the waterfall, you can see the dark mouth of a cave.",
     "exits": {
-      "south": {
-        "target_vnum": 1016
-      }
+      "south": 1014,
+      "west": 1016,
+      "east": 1018
     },
+    "mobs": [],
+    "initial_items": [],
     "interactables": [
       {
         "keyword": [
-          "statue 1",
-          "statues"
+          "waterfall",
+          "cave",
+          "pool"
         ],
-        "description": "A stone statue of a king holding a sword. It can be rotated.",
+        "description": "The cave behind the waterfall is narrow but passable. Cool mist sprays your face.",
+        "action": null
+      }
+    ]
+  },
+  "1018": {
+    "vnum": 1018,
+    "zone": 1,
+    "name": "The Old Forest — Hidden Cave",
+    "description": "A damp cave behind the waterfall. Glowing crystals provide dim light. In the back, a stone chest sits undisturbed — covered in dust but for a single circular track across its lid.",
+    "exits": {
+      "west": 1017
+    },
+    "mobs": [],
+    "initial_items": [
+      1018
+    ],
+    "interactables": [
+      {
+        "keyword": [
+          "chest",
+          "track",
+          "crystals"
+        ],
+        "description": "The circular track across the chest's lid is smooth and recent. Something round sat here, then rolled away. The chest itself is empty.",
+        "action": null
+      }
+    ]
+  },
+  "1019": {
+    "vnum": 1019,
+    "zone": 1,
+    "name": "The Old Forest — Treant Grove",
+    "description": "The trees here are impossibly old and impossibly large. Some of them move. Slowly, but they move. Dark sap weeps from twisted bark.",
+    "exits": {
+      "south": 1016,
+      "east": 1020
+    },
+    "mobs": [
+      1009,
+      1009
+    ],
+    "initial_items": [],
+    "interactables": []
+  },
+  "1020": {
+    "vnum": 1020,
+    "zone": 1,
+    "name": "Mountain Path — Foothills",
+    "description": "The terrain rises sharply as the road climbs toward distant peaks. Loose stones make the footing treacherous. The air thins slightly.",
+    "exits": {
+      "west": 1003,
+      "north": 1021,
+      "east": 1022
+    },
+    "mobs": [
+      1002
+    ],
+    "initial_items": [],
+    "interactables": []
+  },
+  "1021": {
+    "vnum": 1021,
+    "zone": 1,
+    "name": "Mountain Path — Switchback",
+    "description": "The path zigzags up the mountainside. Each turn reveals a broader view of the kingdom below — or what remains of it.",
+    "exits": {
+      "south": 1020,
+      "north": 1023
+    },
+    "mobs": [
+      1002,
+      1003
+    ],
+    "initial_items": [],
+    "interactables": []
+  },
+  "1022": {
+    "vnum": 1022,
+    "zone": 1,
+    "name": "Mountain Path — Goblin Camp",
+    "description": "A crude camp of hide tents and smoldering cookfires. Goblin scouts patrol the perimeter. They've been raiding travelers on this road.",
+    "exits": {
+      "west": 1020,
+      "north": 1024
+    },
+    "mobs": [
+      1002,
+      1003,
+      1002
+    ],
+    "initial_items": [
+      1004,
+      1005
+    ],
+    "interactables": []
+  },
+  "1023": {
+    "vnum": 1023,
+    "zone": 1,
+    "name": "Mountain Path — Cliff Face",
+    "description": "The path narrows to a ledge along a sheer cliff. Wind howls past, threatening to push you off. Far below, the forest is a green carpet.",
+    "exits": {
+      "south": 1021,
+      "north": 1024,
+      "east": 1029
+    },
+    "mobs": [
+      1010
+    ],
+    "initial_items": [],
+    "interactables": []
+  },
+  "1024": {
+    "vnum": 1024,
+    "zone": 1,
+    "name": "Mountain Path — Cave Entrance",
+    "description": "A large cave mouth yawns in the mountainside. The smell of rot and the sound of heavy breathing drift from within.",
+    "exits": {
+      "south": 1022,
+      "west": 1023,
+      "north": 1033
+    },
+    "mobs": [
+      1011
+    ],
+    "initial_items": [],
+    "interactables": [
+      {
+        "keyword": [
+          "cave",
+          "entrance"
+        ],
+        "description": "The cave is dark and the breathing is rhythmic. Something large sleeps within — or pretends to.",
+        "action": null
+      }
+    ]
+  },
+  "1025": {
+    "vnum": 1025,
+    "zone": 1,
+    "name": "Thornhold — Blacksmith",
+    "description": "Heat radiates from the forge. Blacksmith Hanna works tirelessly, her hammer striking sparks from glowing metal. Weapons and armor hang on display.",
+    "exits": {
+      "west": 1004
+    },
+    "mobs": [
+      1023
+    ],
+    "initial_items": [],
+    "interactables": []
+  },
+  "1026": {
+    "vnum": 1026,
+    "zone": 1,
+    "name": "Thornhold — Chapel",
+    "description": "A small stone chapel with stained glass windows depicting a crowned figure. The pews are dusty — few pray here anymore. A donation box sits by the door.",
+    "exits": {
+      "east": 1004
+    },
+    "mobs": [],
+    "initial_items": [],
+    "interactables": [
+      {
+        "keyword": [
+          "windows",
+          "glass",
+          "figure"
+        ],
+        "description": "The stained glass shows a king holding a crown that appears to be cracking. Prophetic, perhaps.",
+        "action": null
+      },
+      {
+        "keyword": [
+          "box",
+          "donation"
+        ],
+        "description": "The donation box is empty. It has been for a long time.",
+        "action": null
+      }
+    ]
+  },
+  "1027": {
+    "vnum": 1027,
+    "zone": 1,
+    "name": "Thornhold — Tavern",
+    "description": "The Broken Crown tavern is warm and smoky. A few locals nurse their drinks in silence. The barkeep polishes a glass that will never be clean.",
+    "exits": {
+      "east": 1005
+    },
+    "mobs": [],
+    "initial_items": [
+      1003
+    ],
+    "interactables": [
+      {
+        "keyword": [
+          "barkeep",
+          "bar"
+        ],
+        "description": "The barkeep grunts. 'Ale's a coin. Information's two.'",
+        "action": null
+      }
+    ]
+  },
+  "1028": {
+    "vnum": 1028,
+    "zone": 1,
+    "name": "Thornhold — Market Stalls",
+    "description": "A row of market stalls selling basic goods — bread, rope, torches, and the occasional questionable potion. A shady merchant beckons from the corner.",
+    "exits": {
+      "west": 1005,
+      "north": 1029
+    },
+    "mobs": [
+      1022
+    ],
+    "initial_items": [],
+    "interactables": []
+  },
+  "1029": {
+    "vnum": 1029,
+    "zone": 1,
+    "name": "Thornhold — Back Alley",
+    "description": "A narrow alley behind the market stalls. Rats scurry in the shadows. A locked door leads to what might be a smuggler's den.",
+    "exits": {
+      "south": 1028,
+      "east": 1030
+    },
+    "mobs": [
+      1018
+    ],
+    "initial_items": [],
+    "interactables": [
+      {
+        "keyword": [
+          "door",
+          "locked"
+        ],
+        "description": "The door is reinforced with iron bands. A keyhole suggests it can be opened, but you don't have the key.",
+        "action": null
+      }
+    ]
+  },
+  "1030": {
+    "vnum": 1030,
+    "zone": 1,
+    "name": "Castle Approach",
+    "description": "The road ends at the ruins of a once-magnificent castle. Towers have crumbled, walls have fallen, but the main keep still stands — barely. The gates hang open.",
+    "exits": {
+      "south": 1005,
+      "north": 1031,
+      "west": 1029
+    },
+    "mobs": [
+      1004,
+      1005
+    ],
+    "initial_items": [],
+    "interactables": []
+  },
+  "1031": {
+    "vnum": 1031,
+    "zone": 1,
+    "name": "Castle — Outer Courtyard",
+    "description": "A courtyard choked with weeds and rubble. A dry moat surrounds the inner keep. A drawbridge, half-rotted, spans the gap.",
+    "exits": {
+      "south": 1030,
+      "north": 1032,
+      "east": 1034,
+      "west": 1035
+    },
+    "mobs": [
+      1015
+    ],
+    "initial_items": [],
+    "interactables": [
+      {
+        "keyword": [
+          "drawbridge",
+          "moat"
+        ],
+        "description": "The drawbridge creaks ominously but holds your weight. The moat below is dry and full of bones.",
+        "action": null
+      }
+    ]
+  },
+  "1032": {
+    "vnum": 1032,
+    "zone": 1,
+    "name": "Castle — Inner Courtyard",
+    "description": "Beyond the drawbridge, the inner courtyard is eerily quiet. Four stone statues stand at compass points around a central pedestal. The keep entrance looms to the north.",
+    "exits": {
+      "south": 1031,
+      "north": 1033,
+      "east": 1036,
+      "west": 1037
+    },
+    "mobs": [],
+    "initial_items": [],
+    "interactables": [
+      {
+        "keyword": [
+          "statues",
+          "pedestal"
+        ],
+        "description": "Four statues of knights, each facing a different direction. The pedestal in the center has a circular groove — something rested here once. The statues can be rotated.",
         "action": "rotate_statue_1"
       },
       {
         "keyword": [
-          "statue 2"
+          "pedestal",
+          "groove"
         ],
-        "description": "A stone statue of a king holding a shield. It can be rotated.",
-        "action": "rotate_statue_2"
-      },
+        "description": "A smooth circular depression in the stone. The marble was here. It rested. Then it moved on.",
+        "action": null
+      }
+    ]
+  },
+  "1033": {
+    "vnum": 1033,
+    "zone": 1,
+    "name": "Castle — Great Hall",
+    "description": "The keep's great hall is vast and cold. Tattered banners hang from the ceiling. At the far end, a massive throne sits on a raised dais. Dust motes drift in shafts of light from broken windows.",
+    "exits": {
+      "south": 1032,
+      "north": 1038,
+      "east": 1039
+    },
+    "mobs": [
+      1016
+    ],
+    "initial_items": [],
+    "interactables": [
       {
         "keyword": [
-          "statue 3"
+          "throne",
+          "dais"
         ],
-        "description": "A stone statue of a king wearing a crown. It can be rotated.",
-        "action": "rotate_statue_3"
-      },
-      {
-        "keyword": [
-          "statue 4"
-        ],
-        "description": "A stone statue of a king with empty hands. It can be rotated.",
-        "action": "rotate_statue_4"
-      },
-      {
-        "keyword": [
-          "throne"
-        ],
-        "description": "The heavy stone throne. It looks like it could slide backward if the statues were aligned correctly.",
+        "description": "The throne is carved from a single piece of black stone. It radiates cold. If the statues outside were aligned correctly, something might happen here.",
         "action": "inspect_throne"
       }
+    ]
+  },
+  "1034": {
+    "vnum": 1034,
+    "zone": 1,
+    "name": "Castle — East Tower Base",
+    "description": "The base of the eastern tower. A spiral staircase leads up, though several steps are missing. Gargoyles perch on the walls above.",
+    "exits": {
+      "west": 1031,
+      "up": 1040
+    },
+    "mobs": [
+      1015
     ],
-    "initial_mobs": [
+    "initial_items": [],
+    "interactables": []
+  },
+  "1035": {
+    "vnum": 1035,
+    "zone": 1,
+    "name": "Castle — West Tower Base",
+    "description": "The western tower's base is flooded knee-deep. Something glints beneath the murky water. The stairs up are intact but slippery.",
+    "exits": {
+      "east": 1031,
+      "up": 1041
+    },
+    "mobs": [],
+    "initial_items": [
+      1020
+    ],
+    "interactables": [
+      {
+        "keyword": [
+          "water",
+          "glint"
+        ],
+        "description": "You reach into the cold water and pull out... a tarnished ring with an inscription.",
+        "action": null
+      }
+    ]
+  },
+  "1036": {
+    "vnum": 1036,
+    "zone": 1,
+    "name": "Castle — Armory",
+    "description": "The castle's old armory. Most weapons have rusted to nothing, but a few pieces remain serviceable. Weapon racks line the walls.",
+    "exits": {
+      "west": 1032
+    },
+    "mobs": [
+      1004
+    ],
+    "initial_items": [
+      1001,
+      1002
+    ],
+    "interactables": []
+  },
+  "1037": {
+    "vnum": 1037,
+    "zone": 1,
+    "name": "Castle — Library",
+    "description": "Shelves of rotting books fill this room. Most are illegible, but a few tomes remain intact. A reading desk holds an open journal.",
+    "exits": {
+      "east": 1032
+    },
+    "mobs": [],
+    "initial_items": [],
+    "interactables": [
+      {
+        "keyword": [
+          "journal",
+          "desk",
+          "book"
+        ],
+        "description": "The journal's last entry reads: 'The statues must face inward. All four. Only then will the throne reveal the passage. I pray no one follows what went below.'",
+        "action": null
+      }
+    ]
+  },
+  "1038": {
+    "vnum": 1038,
+    "zone": 1,
+    "name": "Castle — Throne Secret Passage",
+    "description": "Behind the shifted throne, a narrow passage descends into darkness. The walls are smooth — unnaturally so. A circular groove runs along the floor, leading down.",
+    "exits": {
+      "south": 1033
+    },
+    "mobs": [],
+    "initial_items": [],
+    "interactables": [
+      {
+        "keyword": [
+          "groove",
+          "passage",
+          "walls"
+        ],
+        "description": "The groove in the floor is perfectly circular and polished smooth by repeated passage. The marble came through here. Many times.",
+        "action": null
+      }
+    ]
+  },
+  "1039": {
+    "vnum": 1039,
+    "zone": 1,
+    "name": "Castle — Dungeon",
+    "description": "Below the great hall, damp cells line a corridor. Most are empty, but one contains a skeleton still chained to the wall. It clutches something in its bony hand.",
+    "exits": {
+      "west": 1033,
+      "south": 1042
+    },
+    "mobs": [
+      1004,
       1005
     ],
-    "initial_items": []
-  },
-  "2000": {
-    "vnum": 2000,
-    "zone": 2,
-    "name": "Sector 4 Gate",
-    "description": "A massive blast door marks the entrance to Sector 4. Neon signs flicker in the perpetual rain. The gateway back to the Nexus lies south.",
-    "flags": [],
-    "exits": {
-      "south": {
-        "target_vnum": 6
-      },
-      "north": {
-        "target_vnum": 2001
+    "initial_items": [
+      1004
+    ],
+    "interactables": [
+      {
+        "keyword": [
+          "skeleton",
+          "hand",
+          "chains"
+        ],
+        "description": "The skeleton's hand holds a small iron key. It comes free with a dry snap.",
+        "action": null
       }
+    ]
+  },
+  "1040": {
+    "vnum": 1040,
+    "zone": 1,
+    "name": "Castle — East Tower Top",
+    "description": "The top of the eastern tower offers a panoramic view. You can see all six zones from here — shimmering portals in the distance. A telescope is mounted on a tripod.",
+    "exits": {
+      "down": 1034
     },
-    "interactables": [],
-    "initial_mobs": [],
-    "initial_items": []
+    "mobs": [],
+    "initial_items": [],
+    "interactables": [
+      {
+        "keyword": [
+          "telescope",
+          "view"
+        ],
+        "description": "Through the telescope you can see... a tiny sphere rolling across a distant field. It pauses, as if aware of being watched, then accelerates out of sight.",
+        "action": null
+      }
+    ]
+  },
+  "1041": {
+    "vnum": 1041,
+    "zone": 1,
+    "name": "Castle — West Tower Top",
+    "description": "The western tower's peak is a rookery. Ravens nest here, watching with intelligent eyes. One has a small scroll tied to its leg.",
+    "exits": {
+      "down": 1035
+    },
+    "mobs": [],
+    "initial_items": [
+      1018
+    ],
+    "interactables": [
+      {
+        "keyword": [
+          "raven",
+          "scroll",
+          "bird"
+        ],
+        "description": "The scroll reads: 'Follow the compass where it doesn't point. That's where truth hides.' Cryptic and probably useless.",
+        "action": null
+      }
+    ]
+  },
+  "1042": {
+    "vnum": 1042,
+    "zone": 1,
+    "name": "Castle — Crypt Entrance",
+    "description": "Stone steps descend into a crypt beneath the castle. The air is thick with the smell of old death. Torches on the walls flicker with unnatural blue flame.",
+    "exits": {
+      "north": 1039,
+      "south": 1043
+    },
+    "mobs": [
+      1004,
+      1012
+    ],
+    "initial_items": [],
+    "interactables": []
+  },
+  "1043": {
+    "vnum": 1043,
+    "zone": 1,
+    "name": "Castle — Crypt",
+    "description": "Stone sarcophagi line the walls of this underground chamber. Names of forgotten kings are carved into each one. The far wall has collapsed, revealing a natural cavern beyond.",
+    "exits": {
+      "north": 1042,
+      "east": 1044
+    },
+    "mobs": [
+      1012,
+      1012
+    ],
+    "initial_items": [],
+    "interactables": [
+      {
+        "keyword": [
+          "sarcophagi",
+          "names",
+          "kings"
+        ],
+        "description": "The names are too worn to read clearly. One sarcophagus has been opened — it's empty inside, with a circular indentation in the velvet lining.",
+        "action": null
+      }
+    ]
+  },
+  "1044": {
+    "vnum": 1044,
+    "zone": 1,
+    "name": "Castle — Hidden Cavern",
+    "description": "A natural cavern connected to the crypt. Stalactites drip mineral water. In the center, a natural stone bridge spans a bottomless chasm. On the far side, something glows.",
+    "exits": {
+      "west": 1043,
+      "east": 1045
+    },
+    "mobs": [
+      1010
+    ],
+    "initial_items": [],
+    "interactables": [
+      {
+        "keyword": [
+          "bridge",
+          "chasm",
+          "glow"
+        ],
+        "description": "The bridge is narrow but solid. The glow on the far side pulses rhythmically — like a heartbeat.",
+        "action": null
+      }
+    ]
+  },
+  "1045": {
+    "vnum": 1045,
+    "zone": 1,
+    "name": "Castle — The Marble's Rest",
+    "description": "A small chamber at the end of the cavern. A stone pedestal sits in the center with a perfectly spherical indentation. The marble was here — recently. A faint warmth lingers. A note is pinned to the wall.",
+    "exits": {
+      "west": 1044
+    },
+    "mobs": [],
+    "initial_items": [],
+    "interactables": [
+      {
+        "keyword": [
+          "pedestal",
+          "indentation"
+        ],
+        "description": "The indentation is warm to the touch. The marble rested here, perhaps for years. But it sensed you coming and fled.",
+        "action": null
+      },
+      {
+        "keyword": [
+          "note",
+          "wall"
+        ],
+        "description": "The note reads: 'You're getting closer. But I have five more places to be. — M'",
+        "action": null
+      }
+    ]
   },
   "2001": {
     "vnum": 2001,
     "zone": 2,
-    "name": "Noodle Alley",
-    "description": "Steam rises from a dozen food stalls. The smell of synthetic broth and ozone fills the air. A few locals huddle under umbrellas.",
-    "flags": [
-      "safe"
-    ],
+    "name": "Gateway South",
+    "description": "The entrance to the Neon Grid. A massive blast door stands to the south, leading back to the hub. The neon lights reflect off the wet pavement.",
     "exits": {
-      "south": {
-        "target_vnum": 2000
-      },
-      "north": {
-        "target_vnum": 2002
-      },
-      "east": {
-        "target_vnum": 2003
-      }
+      "east": 2002,
+      "north": 2006,
+      "south": 3
     },
-    "interactables": [],
-    "initial_mobs": [],
-    "initial_items": []
+    "mobs": [],
+    "initial_items": [],
+    "interactables": []
   },
   "2002": {
     "vnum": 2002,
     "zone": 2,
-    "name": "The Gutter Market",
-    "description": "Scavengers sell tech scraps on blankets laid over the wet pavement. The neon glare is blinding here.",
-    "flags": [],
+    "name": "Neon Street 2",
+    "description": "A grimy street illuminated by flickering neon signs. The rain never seems to stop here.",
     "exits": {
-      "south": {
-        "target_vnum": 2001
-      },
-      "north": {
-        "target_vnum": 2005
-      },
-      "west": {
-        "target_vnum": 2004
-      }
+      "east": 2003,
+      "west": 2001,
+      "north": 2007
     },
-    "interactables": [],
-    "initial_mobs": [
-      2001
-    ],
-    "initial_items": []
+    "mobs": [],
+    "initial_items": [],
+    "interactables": []
   },
   "2003": {
     "vnum": 2003,
     "zone": 2,
-    "name": "Back Alley Clinic",
-    "description": "A sterile, white-tiled room hidden behind a rusty door. A surgical chair sits in the center, stained with old blood. A severed cyber-eye rests on a metal tray.",
-    "flags": [],
+    "name": "Neon Street 3",
+    "description": "A grimy street illuminated by flickering neon signs. The rain never seems to stop here.",
     "exits": {
-      "west": {
-        "target_vnum": 2001
-      }
+      "east": 2004,
+      "west": 2002,
+      "north": 2008
     },
-    "interactables": [],
-    "initial_mobs": [],
-    "initial_items": [
-      2001
-    ]
+    "mobs": [],
+    "initial_items": [],
+    "interactables": []
   },
   "2004": {
     "vnum": 2004,
     "zone": 2,
-    "name": "Scavenger Den",
-    "description": "A makeshift shelter built from corrugated metal and stolen solar panels. It smells of unwashed bodies and cheap stims.",
-    "flags": [],
+    "name": "Neon Street 4",
+    "description": "A grimy street illuminated by flickering neon signs. The rain never seems to stop here.",
     "exits": {
-      "east": {
-        "target_vnum": 2002
-      }
+      "east": 2005,
+      "west": 2003,
+      "north": 2009
     },
-    "interactables": [],
-    "initial_mobs": [
-      2001,
-      2001
+    "mobs": [
+      2004
     ],
-    "initial_items": []
+    "initial_items": [],
+    "interactables": []
   },
   "2005": {
     "vnum": 2005,
     "zone": 2,
-    "name": "Main Street (South)",
-    "description": "The narrow alley opens up into a wide avenue. Hover-cars streak past overhead. The rain falls harder here.",
-    "flags": [],
+    "name": "Neon Street 5",
+    "description": "A grimy street illuminated by flickering neon signs. The rain never seems to stop here.",
     "exits": {
-      "south": {
-        "target_vnum": 2002
-      },
-      "north": {
-        "target_vnum": 2006
-      }
+      "east": 2006,
+      "west": 2004,
+      "north": 2010
     },
-    "interactables": [],
-    "initial_mobs": [],
-    "initial_items": []
+    "mobs": [],
+    "initial_items": [],
+    "interactables": []
   },
   "2006": {
     "vnum": 2006,
     "zone": 2,
-    "name": "Main Street (Central)",
-    "description": "The bustling heart of Sector 4. Holographic advertisements play on loop, promising a better life off-world.",
-    "flags": [],
+    "name": "Neon Street 6",
+    "description": "A grimy street illuminated by flickering neon signs. The rain never seems to stop here. You notice a perfectly circular groove carved into the concrete wall, as if a sphere rolled along it at high speed.",
     "exits": {
-      "south": {
-        "target_vnum": 2005
-      },
-      "north": {
-        "target_vnum": 2007
-      },
-      "east": {
-        "target_vnum": 2008
-      },
-      "west": {
-        "target_vnum": 2009
-      }
+      "east": 2007,
+      "west": 2005,
+      "north": 2011,
+      "south": 2001
     },
-    "interactables": [],
-    "initial_mobs": [
-      2002
+    "mobs": [],
+    "initial_items": [
+      2006
     ],
-    "initial_items": []
+    "interactables": []
   },
   "2007": {
     "vnum": 2007,
     "zone": 2,
-    "name": "Main Street (North)",
-    "description": "The street ends at the imposing facade of the Data Exchange building. Security cameras track your every move.",
-    "flags": [],
+    "name": "Neon Street 7",
+    "description": "A grimy street illuminated by flickering neon signs. The rain never seems to stop here.",
     "exits": {
-      "south": {
-        "target_vnum": 2006
-      },
-      "north": {
-        "target_vnum": 2012
-      }
+      "east": 2008,
+      "west": 2006,
+      "north": 2012,
+      "south": 2002
     },
-    "interactables": [],
-    "initial_mobs": [
-      2002
+    "mobs": [
+      2007
     ],
-    "initial_items": []
+    "initial_items": [],
+    "interactables": []
   },
   "2008": {
     "vnum": 2008,
     "zone": 2,
-    "name": "The Neon Bar",
-    "description": "A dimly lit dive bar. Synthetic jazz plays from a cracked speaker. A few patrons nurse glowing blue drinks.",
-    "flags": [
-      "safe"
-    ],
+    "name": "Neon Street 8",
+    "description": "A grimy street illuminated by flickering neon signs. The rain never seems to stop here.",
     "exits": {
-      "west": {
-        "target_vnum": 2006
-      }
+      "east": 2009,
+      "west": 2007,
+      "north": 2013,
+      "south": 2003
     },
-    "interactables": [],
-    "initial_mobs": [],
-    "initial_items": []
+    "mobs": [],
+    "initial_items": [],
+    "interactables": []
   },
   "2009": {
     "vnum": 2009,
     "zone": 2,
-    "name": "Abandoned Parking Garage",
-    "description": "Concrete pillars and oil stains. The ramp leads up to the roof. Shadows move in the corners.",
-    "flags": [],
+    "name": "Neon Street 9",
+    "description": "A grimy street illuminated by flickering neon signs. The rain never seems to stop here.",
     "exits": {
-      "east": {
-        "target_vnum": 2006
-      },
-      "up": {
-        "target_vnum": 2010
-      }
+      "east": 2010,
+      "west": 2008,
+      "north": 2014,
+      "south": 2004
     },
-    "interactables": [],
-    "initial_mobs": [
-      2001
-    ],
-    "initial_items": []
+    "mobs": [],
+    "initial_items": [],
+    "interactables": []
   },
   "2010": {
     "vnum": 2010,
     "zone": 2,
-    "name": "Garage Rooftop",
-    "description": "The rain lashes against the concrete roof. A defunct security drone lies in a heap, its casing pried open. A glowing power cell is still attached to its chassis.",
-    "flags": [],
+    "name": "Neon Street 10",
+    "description": "A grimy street illuminated by flickering neon signs. The rain never seems to stop here.",
     "exits": {
-      "down": {
-        "target_vnum": 2009
-      },
-      "north": {
-        "target_vnum": 2011
-      }
+      "east": 2011,
+      "west": 2009,
+      "north": 2015,
+      "south": 2005
     },
-    "interactables": [],
-    "initial_mobs": [
-      2002
+    "mobs": [
+      2010
     ],
-    "initial_items": [
-      2002
-    ]
+    "initial_items": [],
+    "interactables": []
   },
   "2011": {
     "vnum": 2011,
     "zone": 2,
-    "name": "Maintenance Catwalk",
-    "description": "A narrow metal walkway connecting the garage to the adjacent building. It sways slightly in the wind.",
-    "flags": [],
+    "name": "Doc Splice's Clinic",
+    "description": "A sterile-smelling room filled with surgical tools and cybernetic parts.",
     "exits": {
-      "south": {
-        "target_vnum": 2010
-      }
+      "east": 2012,
+      "west": 2010,
+      "north": 2016,
+      "south": 2006
     },
-    "interactables": [],
-    "initial_mobs": [],
-    "initial_items": [
-      2004
-    ]
+    "mobs": [
+      2020
+    ],
+    "initial_items": [],
+    "interactables": []
   },
   "2012": {
     "vnum": 2012,
     "zone": 2,
-    "name": "Data Exchange Lobby",
-    "description": "Sleek black marble and chrome. A security desk sits empty. An elevator leads up, but the doors are sealed.",
-    "flags": [],
+    "name": "Neon Street 12",
+    "description": "A grimy street illuminated by flickering neon signs. The rain never seems to stop here.",
     "exits": {
-      "south": {
-        "target_vnum": 2007
-      },
-      "north": {
-        "target_vnum": 2013
-      },
-      "up": {
-        "target_vnum": 2015,
-        "door": {
-          "is_door": true,
-          "state": "locked",
-          "key_vnum": 2003
-        }
-      }
+      "east": 2013,
+      "west": 2011,
+      "north": 2017,
+      "south": 2007
     },
-    "interactables": [],
-    "initial_mobs": [
-      2002
-    ],
-    "initial_items": []
+    "mobs": [],
+    "initial_items": [],
+    "interactables": []
   },
   "2013": {
     "vnum": 2013,
     "zone": 2,
-    "name": "Security Office",
-    "description": "Monitors display static. A dead guard slumps over the console. An encrypted keycard lies on the desk.",
-    "flags": [],
+    "name": "Neon Street 13",
+    "description": "A grimy street illuminated by flickering neon signs. The rain never seems to stop here.",
     "exits": {
-      "south": {
-        "target_vnum": 2012
-      },
-      "east": {
-        "target_vnum": 2014
-      }
+      "east": 2014,
+      "west": 2012,
+      "north": 2018,
+      "south": 2008
     },
-    "interactables": [],
-    "initial_mobs": [
-      2003
+    "mobs": [
+      2013
     ],
-    "initial_items": [
-      2003
-    ]
+    "initial_items": [],
+    "interactables": []
   },
   "2014": {
     "vnum": 2014,
     "zone": 2,
-    "name": "Server Room B",
-    "description": "Rows of humming server racks. The air is freezing. A terminal blinks with lines of green code.",
-    "flags": [],
+    "name": "Neon Street 14",
+    "description": "A grimy street illuminated by flickering neon signs. The rain never seems to stop here.",
     "exits": {
-      "west": {
-        "target_vnum": 2013
-      }
+      "east": 2015,
+      "west": 2013,
+      "north": 2019,
+      "south": 2009
     },
-    "interactables": [],
-    "initial_mobs": [],
-    "initial_items": []
+    "mobs": [],
+    "initial_items": [],
+    "interactables": []
   },
   "2015": {
     "vnum": 2015,
     "zone": 2,
-    "name": "Data Exchange (Floor 2)",
-    "description": "Corporate offices, ransacked and abandoned. Papers litter the floor. The elevator continues up.",
-    "flags": [],
+    "name": "Neon Street 15",
+    "description": "A grimy street illuminated by flickering neon signs. The rain never seems to stop here.",
     "exits": {
-      "down": {
-        "target_vnum": 2012
-      },
-      "up": {
-        "target_vnum": 2016
-      },
-      "north": {
-        "target_vnum": 2017
-      }
+      "east": 2016,
+      "west": 2014,
+      "north": 2020,
+      "south": 2010
     },
-    "interactables": [],
-    "initial_mobs": [
-      2002,
-      2003
-    ],
-    "initial_items": []
+    "mobs": [],
+    "initial_items": [],
+    "interactables": []
   },
   "2016": {
     "vnum": 2016,
     "zone": 2,
-    "name": "Data Exchange (Floor 3)",
-    "description": "The executive level. The carpet is plush, but stained. A heavy security door blocks the way north.",
-    "flags": [],
+    "name": "Neon Street 16",
+    "description": "A grimy street illuminated by flickering neon signs. The rain never seems to stop here. A puddle of neon-lit water ripples, but you swear you saw a perfect sphere roll through it without leaving a reflection.",
     "exits": {
-      "down": {
-        "target_vnum": 2015
-      },
-      "north": {
-        "target_vnum": 2018
-      }
+      "east": 2017,
+      "west": 2015,
+      "north": 2021,
+      "south": 2011
     },
-    "interactables": [],
-    "initial_mobs": [
-      2003
+    "mobs": [
+      2016
     ],
-    "initial_items": []
+    "initial_items": [
+      2006
+    ],
+    "interactables": []
   },
   "2017": {
     "vnum": 2017,
     "zone": 2,
-    "name": "Executive Lounge",
-    "description": "Leather sofas and a shattered wet bar. A great view of the neon city below.",
-    "flags": [],
+    "name": "Neon Street 17",
+    "description": "A grimy street illuminated by flickering neon signs. The rain never seems to stop here.",
     "exits": {
-      "south": {
-        "target_vnum": 2015
-      }
+      "east": 2018,
+      "west": 2016,
+      "north": 2022,
+      "south": 2012
     },
-    "interactables": [],
-    "initial_mobs": [],
-    "initial_items": [
-      2005
-    ]
+    "mobs": [],
+    "initial_items": [],
+    "interactables": []
   },
   "2018": {
     "vnum": 2018,
     "zone": 2,
-    "name": "Biometric Door",
-    "description": "A massive vault door. A retinal scanner glows red beside it. It requires a valid eye scan to open.",
-    "flags": [],
+    "name": "Neon Street 18",
+    "description": "A grimy street illuminated by flickering neon signs. The rain never seems to stop here.",
     "exits": {
-      "south": {
-        "target_vnum": 2016
-      },
-      "north": {
-        "target_vnum": 2019,
-        "door": {
-          "is_door": true,
-          "state": "locked",
-          "key_vnum": 2006
-        }
-      }
+      "east": 2019,
+      "west": 2017,
+      "north": 2023,
+      "south": 2013
     },
-    "interactables": [
-      {
-        "keyword": [
-          "scanner",
-          "retinal scanner"
-        ],
-        "description": "A high-tech retinal scanner. You could 'use charged-eye scanner' if you had one.",
-        "action": "use_scanner"
-      }
-    ],
-    "initial_mobs": [],
-    "initial_items": []
+    "mobs": [],
+    "initial_items": [],
+    "interactables": []
   },
   "2019": {
     "vnum": 2019,
     "zone": 2,
-    "name": "The Mainframe Core",
-    "description": "The central data pillar has been smashed open from the inside. A security hologram plays on loop, showing a small, incredibly dense sphere shattering the reinforced glass casing and dropping into the cooling vents below. The vents are sealed — the marble has escaped into the infrastructure.",
-    "flags": [],
+    "name": "Neon Street 19",
+    "description": "A grimy street illuminated by flickering neon signs. The rain never seems to stop here.",
     "exits": {
-      "south": {
-        "target_vnum": 2018
-      }
+      "east": 2020,
+      "west": 2018,
+      "north": 2024,
+      "south": 2014
     },
-    "interactables": [],
-    "initial_mobs": [
+    "mobs": [
+      2001
+    ],
+    "initial_items": [],
+    "interactables": []
+  },
+  "2020": {
+    "vnum": 2020,
+    "zone": 2,
+    "name": "Neon Street 20",
+    "description": "A grimy street illuminated by flickering neon signs. The rain never seems to stop here.",
+    "exits": {
+      "east": 2021,
+      "west": 2019,
+      "north": 2025,
+      "south": 2015
+    },
+    "mobs": [],
+    "initial_items": [],
+    "interactables": []
+  },
+  "2021": {
+    "vnum": 2021,
+    "zone": 2,
+    "name": "Neon Mama's Bar",
+    "description": "A loud, crowded dive bar. The floor has a perfectly circular dent in it, as if a heavy marble was dropped.",
+    "exits": {
+      "east": 2022,
+      "west": 2020,
+      "north": 2026,
+      "south": 2016
+    },
+    "mobs": [
+      2021
+    ],
+    "initial_items": [],
+    "interactables": []
+  },
+  "2022": {
+    "vnum": 2022,
+    "zone": 2,
+    "name": "Neon Street 22",
+    "description": "A grimy street illuminated by flickering neon signs. The rain never seems to stop here.",
+    "exits": {
+      "east": 2023,
+      "west": 2021,
+      "north": 2027,
+      "south": 2017
+    },
+    "mobs": [
       2004
     ],
-    "initial_items": []
+    "initial_items": [],
+    "interactables": []
   },
-  "3000": {
-    "vnum": 3000,
-    "zone": 3,
-    "name": "The Docks",
-    "description": "Fog rolls off the dark water. The smell of salt and dead fish hangs heavy. The archway back to the Nexus is to the north.",
-    "flags": [],
+  "2023": {
+    "vnum": 2023,
+    "zone": 2,
+    "name": "Neon Street 23",
+    "description": "A grimy street illuminated by flickering neon signs. The rain never seems to stop here.",
     "exits": {
-      "north": {
-        "target_vnum": 3
-      },
-      "south": {
-        "target_vnum": 3001
-      }
+      "east": 2024,
+      "west": 2022,
+      "north": 2028,
+      "south": 2018
     },
-    "interactables": [],
-    "initial_mobs": [],
-    "initial_items": []
+    "mobs": [],
+    "initial_items": [],
+    "interactables": []
+  },
+  "2024": {
+    "vnum": 2024,
+    "zone": 2,
+    "name": "Neon Street 24",
+    "description": "A grimy street illuminated by flickering neon signs. The rain never seems to stop here.",
+    "exits": {
+      "east": 2025,
+      "west": 2023,
+      "north": 2029,
+      "south": 2019
+    },
+    "mobs": [],
+    "initial_items": [],
+    "interactables": []
+  },
+  "2025": {
+    "vnum": 2025,
+    "zone": 2,
+    "name": "Neon Street 25",
+    "description": "A grimy street illuminated by flickering neon signs. The rain never seems to stop here.",
+    "exits": {
+      "east": 2026,
+      "west": 2024,
+      "north": 2030,
+      "south": 2020
+    },
+    "mobs": [
+      2007
+    ],
+    "initial_items": [],
+    "interactables": []
+  },
+  "2026": {
+    "vnum": 2026,
+    "zone": 2,
+    "name": "Neon Street 26",
+    "description": "A grimy street illuminated by flickering neon signs. The rain never seems to stop here.",
+    "exits": {
+      "east": 2027,
+      "west": 2025,
+      "north": 2031,
+      "south": 2021
+    },
+    "mobs": [],
+    "initial_items": [
+      2006
+    ],
+    "interactables": []
+  },
+  "2027": {
+    "vnum": 2027,
+    "zone": 2,
+    "name": "Neon Street 27",
+    "description": "A grimy street illuminated by flickering neon signs. The rain never seems to stop here.",
+    "exits": {
+      "east": 2028,
+      "west": 2026,
+      "north": 2032,
+      "south": 2022
+    },
+    "mobs": [],
+    "initial_items": [],
+    "interactables": []
+  },
+  "2028": {
+    "vnum": 2028,
+    "zone": 2,
+    "name": "Neon Street 28",
+    "description": "A grimy street illuminated by flickering neon signs. The rain never seems to stop here.",
+    "exits": {
+      "east": 2029,
+      "west": 2027,
+      "north": 2033,
+      "south": 2023
+    },
+    "mobs": [
+      2010
+    ],
+    "initial_items": [],
+    "interactables": []
+  },
+  "2029": {
+    "vnum": 2029,
+    "zone": 2,
+    "name": "Neon Street 29",
+    "description": "A grimy street illuminated by flickering neon signs. The rain never seems to stop here.",
+    "exits": {
+      "east": 2030,
+      "west": 2028,
+      "north": 2034,
+      "south": 2024
+    },
+    "mobs": [],
+    "initial_items": [],
+    "interactables": []
+  },
+  "2030": {
+    "vnum": 2030,
+    "zone": 2,
+    "name": "Neon Street 30",
+    "description": "A grimy street illuminated by flickering neon signs. The rain never seems to stop here.",
+    "exits": {
+      "east": 2031,
+      "west": 2029,
+      "north": 2035,
+      "south": 2025
+    },
+    "mobs": [],
+    "initial_items": [],
+    "interactables": []
+  },
+  "2031": {
+    "vnum": 2031,
+    "zone": 2,
+    "name": "Hacker Den",
+    "description": "A dark room lit only by the glow of dozens of monitors.",
+    "exits": {
+      "east": 2032,
+      "west": 2030,
+      "north": 2036,
+      "south": 2026
+    },
+    "mobs": [
+      2022
+    ],
+    "initial_items": [],
+    "interactables": []
+  },
+  "2032": {
+    "vnum": 2032,
+    "zone": 2,
+    "name": "Neon Street 32",
+    "description": "A grimy street illuminated by flickering neon signs. The rain never seems to stop here.",
+    "exits": {
+      "east": 2033,
+      "west": 2031,
+      "north": 2037,
+      "south": 2027
+    },
+    "mobs": [],
+    "initial_items": [],
+    "interactables": []
+  },
+  "2033": {
+    "vnum": 2033,
+    "zone": 2,
+    "name": "Neon Street 33",
+    "description": "A grimy street illuminated by flickering neon signs. The rain never seems to stop here.",
+    "exits": {
+      "east": 2034,
+      "west": 2032,
+      "north": 2038,
+      "south": 2028
+    },
+    "mobs": [],
+    "initial_items": [],
+    "interactables": []
+  },
+  "2034": {
+    "vnum": 2034,
+    "zone": 2,
+    "name": "Neon Street 34",
+    "description": "A grimy street illuminated by flickering neon signs. The rain never seems to stop here.",
+    "exits": {
+      "east": 2035,
+      "west": 2033,
+      "north": 2039,
+      "south": 2029
+    },
+    "mobs": [
+      2016
+    ],
+    "initial_items": [],
+    "interactables": []
+  },
+  "2035": {
+    "vnum": 2035,
+    "zone": 2,
+    "name": "Neon Street 35",
+    "description": "A grimy street illuminated by flickering neon signs. The rain never seems to stop here.",
+    "exits": {
+      "east": 2036,
+      "west": 2034,
+      "north": 2040,
+      "south": 2030
+    },
+    "mobs": [],
+    "initial_items": [],
+    "interactables": []
+  },
+  "2036": {
+    "vnum": 2036,
+    "zone": 2,
+    "name": "Neon Street 36",
+    "description": "A grimy street illuminated by flickering neon signs. The rain never seems to stop here.",
+    "exits": {
+      "east": 2037,
+      "west": 2035,
+      "north": 2041,
+      "south": 2031
+    },
+    "mobs": [],
+    "initial_items": [
+      2006
+    ],
+    "interactables": []
+  },
+  "2037": {
+    "vnum": 2037,
+    "zone": 2,
+    "name": "Neon Street 37",
+    "description": "A grimy street illuminated by flickering neon signs. The rain never seems to stop here.",
+    "exits": {
+      "east": 2038,
+      "west": 2036,
+      "north": 2042,
+      "south": 2032
+    },
+    "mobs": [
+      2001
+    ],
+    "initial_items": [],
+    "interactables": []
+  },
+  "2038": {
+    "vnum": 2038,
+    "zone": 2,
+    "name": "Neon Street 38",
+    "description": "A grimy street illuminated by flickering neon signs. The rain never seems to stop here.",
+    "exits": {
+      "east": 2039,
+      "west": 2037,
+      "north": 2043,
+      "south": 2033
+    },
+    "mobs": [],
+    "initial_items": [],
+    "interactables": []
+  },
+  "2039": {
+    "vnum": 2039,
+    "zone": 2,
+    "name": "Neon Street 39",
+    "description": "A grimy street illuminated by flickering neon signs. The rain never seems to stop here.",
+    "exits": {
+      "east": 2040,
+      "west": 2038,
+      "north": 2044,
+      "south": 2034
+    },
+    "mobs": [],
+    "initial_items": [],
+    "interactables": []
+  },
+  "2040": {
+    "vnum": 2040,
+    "zone": 2,
+    "name": "Neon Street 40",
+    "description": "A grimy street illuminated by flickering neon signs. The rain never seems to stop here.",
+    "exits": {
+      "east": 2041,
+      "west": 2039,
+      "north": 2045,
+      "south": 2035
+    },
+    "mobs": [
+      2004
+    ],
+    "initial_items": [],
+    "interactables": []
+  },
+  "2041": {
+    "vnum": 2041,
+    "zone": 2,
+    "name": "Fixer's Corner",
+    "description": "A relatively quiet alleyway where shady deals go down.",
+    "exits": {
+      "east": 2042,
+      "west": 2040,
+      "south": 2036
+    },
+    "mobs": [
+      2019
+    ],
+    "initial_items": [],
+    "interactables": []
+  },
+  "2042": {
+    "vnum": 2042,
+    "zone": 2,
+    "name": "Neon Street 42",
+    "description": "A grimy street illuminated by flickering neon signs. The rain never seems to stop here.",
+    "exits": {
+      "east": 2043,
+      "west": 2041,
+      "south": 2037
+    },
+    "mobs": [],
+    "initial_items": [],
+    "interactables": []
+  },
+  "2043": {
+    "vnum": 2043,
+    "zone": 2,
+    "name": "Neon Street 43",
+    "description": "A grimy street illuminated by flickering neon signs. The rain never seems to stop here.",
+    "exits": {
+      "east": 2044,
+      "west": 2042,
+      "south": 2038
+    },
+    "mobs": [
+      2007
+    ],
+    "initial_items": [],
+    "interactables": []
+  },
+  "2044": {
+    "vnum": 2044,
+    "zone": 2,
+    "name": "Neon Street 44",
+    "description": "A grimy street illuminated by flickering neon signs. The rain never seems to stop here.",
+    "exits": {
+      "east": 2045,
+      "west": 2043,
+      "south": 2039
+    },
+    "mobs": [],
+    "initial_items": [],
+    "interactables": []
+  },
+  "2045": {
+    "vnum": 2045,
+    "zone": 2,
+    "name": "Corporate Vault Entrance",
+    "description": "A pristine white hallway leading to a massive vault door. There is a biometric scanner next to the door.",
+    "exits": {
+      "west": 2044,
+      "south": 2040
+    },
+    "mobs": [
+      2017
+    ],
+    "initial_items": [],
+    "interactables": [
+      {
+        "keyword": [
+          "scanner",
+          "biometric scanner"
+        ],
+        "description": "A retinal scanner. It requires a valid eye to open the vault.",
+        "action": "use Charged Cyber-Eye"
+      }
+    ]
   },
   "3001": {
     "vnum": 3001,
     "zone": 3,
-    "name": "Warehouse District",
-    "description": "Rows of corrugated metal warehouses. A single streetlamp flickers, casting long shadows.",
-    "flags": [],
+    "name": "Rain-Soaked Street Corner",
+    "description": "The rain falls relentlessly, pooling in the gutters. A flickering streetlamp casts long shadows. Something rolled through the rain, leaving a dry trail on wet pavement.",
     "exits": {
-      "north": {
-        "target_vnum": 3000
-      },
-      "east": {
-        "target_vnum": 3002
-      },
-      "west": {
-        "target_vnum": 3003
-      }
+      "east": 3002,
+      "west": 4
     },
-    "interactables": [],
-    "initial_mobs": [
+    "mobs": [
       3001
     ],
-    "initial_items": []
+    "initial_items": [],
+    "interactables": []
   },
   "3002": {
     "vnum": 3002,
     "zone": 3,
-    "name": "Warehouse 4",
-    "description": "Crates are stacked to the ceiling. A smuggling operation was interrupted here recently.",
-    "flags": [],
+    "name": "Dark Alleyway",
+    "description": "A narrow alley filled with trash cans and the smell of decay.",
     "exits": {
-      "west": {
-        "target_vnum": 3001
-      }
+      "west": 3001,
+      "north": 3003,
+      "east": 3004
     },
-    "interactables": [],
-    "initial_mobs": [
-      3002
+    "mobs": [
+      3010
     ],
-    "initial_items": [
-      3001
-    ]
+    "initial_items": [],
+    "interactables": []
   },
   "3003": {
     "vnum": 3003,
     "zone": 3,
-    "name": "Cobblestone Street",
-    "description": "Rain slicks the stones. A neon sign for a diner buzzes down the block.",
-    "flags": [],
+    "name": "PI Office",
+    "description": "A dusty office with a desk, a filing cabinet, and a safe in the corner. The window blinds are drawn.",
     "exits": {
-      "east": {
-        "target_vnum": 3001
-      },
-      "south": {
-        "target_vnum": 3004
-      }
+      "south": 3002
     },
-    "interactables": [],
-    "initial_mobs": [],
-    "initial_items": []
+    "mobs": [],
+    "initial_items": [
+      3014
+    ],
+    "interactables": [
+      {
+        "keyword": [
+          "desk"
+        ],
+        "description": "A messy desk with papers scattered about. A calendar is circled on the year 1945.",
+        "action": "examine"
+      },
+      {
+        "keyword": [
+          "safe"
+        ],
+        "description": "A heavy iron safe. It requires a 4-digit combination.",
+        "action": "open"
+      }
+    ]
   },
   "3004": {
     "vnum": 3004,
     "zone": 3,
-    "name": "Rosie's Diner",
-    "description": "The smell of stale coffee and cheap grease. A detective sits in the corner booth.",
-    "flags": [
-      "safe"
-    ],
+    "name": "Neon-Lit Street",
+    "description": "Neon signs reflect in the puddles. The sound of jazz drifts from a nearby club.",
     "exits": {
-      "north": {
-        "target_vnum": 3003
-      },
-      "east": {
-        "target_vnum": 3005
-      }
+      "west": 3002,
+      "east": 3005,
+      "south": 3006,
+      "north": 3019
     },
-    "interactables": [],
-    "initial_mobs": [
-      8004
+    "mobs": [
+      3006
     ],
-    "initial_items": []
+    "initial_items": [],
+    "interactables": []
   },
   "3005": {
     "vnum": 3005,
     "zone": 3,
-    "name": "Back Alley",
-    "description": "Trash cans overflow. A fire escape leads up to an apartment window.",
-    "flags": [],
+    "name": "The Blue Note Jazz Club",
+    "description": "A smoky club filled with the smooth sounds of a saxophone. Patrons sip drinks in dimly lit booths.",
     "exits": {
-      "west": {
-        "target_vnum": 3004
-      },
-      "up": {
-        "target_vnum": 3006
-      }
+      "west": 3004
     },
-    "interactables": [],
-    "initial_mobs": [
-      3001
+    "mobs": [
+      3002
     ],
-    "initial_items": []
+    "initial_items": [],
+    "interactables": []
   },
   "3006": {
     "vnum": 3006,
     "zone": 3,
-    "name": "Private Eye's Office",
-    "description": "A messy desk covered in case files. The frosted glass on the door reads 'P.I.' backwards.",
-    "flags": [],
+    "name": "Diner Exterior",
+    "description": "A classic diner with a glowing 'OPEN' sign. The smell of coffee and grease fills the air.",
     "exits": {
-      "down": {
-        "target_vnum": 3005
-      },
-      "east": {
-        "target_vnum": 3007
-      }
+      "north": 3004,
+      "east": 3007,
+      "south": 3008
     },
-    "interactables": [
-      {
-        "keyword": [
-          "desk",
-          "files"
-        ],
-        "description": "A note on the desk reads: 'The combination is the year the war ended.'",
-        "action": null
-      }
-    ],
-    "initial_mobs": [],
-    "initial_items": [
-      3002
-    ]
+    "mobs": [],
+    "initial_items": [],
+    "interactables": []
   },
   "3007": {
     "vnum": 3007,
     "zone": 3,
-    "name": "Hallway",
-    "description": "Flickering fluorescent lights. Doors line the hall.",
-    "flags": [],
+    "name": "Mama Rosa's Diner",
+    "description": "A cozy diner with red vinyl booths and a checkered floor.",
     "exits": {
-      "west": {
-        "target_vnum": 3006
-      },
-      "east": {
-        "target_vnum": 3008
-      },
-      "down": {
-        "target_vnum": 3009
-      }
+      "west": 3006
     },
-    "interactables": [],
-    "initial_mobs": [
-      3003
+    "mobs": [
+      3005
     ],
-    "initial_items": []
+    "initial_items": [
+      3017
+    ],
+    "interactables": []
   },
   "3008": {
     "vnum": 3008,
     "zone": 3,
-    "name": "Mob Boss Office",
-    "description": "Plush carpets and a mahogany desk. A wall safe is hidden behind a painting.",
-    "flags": [],
+    "name": "Abandoned Warehouse District",
+    "description": "Large, empty warehouses loom in the darkness. The rain seems even colder here.",
     "exits": {
-      "west": {
-        "target_vnum": 3007
-      }
+      "north": 3006,
+      "east": 3009,
+      "south": 3010
     },
-    "interactables": [
-      {
-        "keyword": [
-          "safe",
-          "painting"
-        ],
-        "description": "A heavy steel wall safe with a combination dial.",
-        "action": "use_safe"
-      }
+    "mobs": [
+      3022
     ],
-    "initial_mobs": [
-      3004
-    ],
-    "initial_items": []
+    "initial_items": [],
+    "interactables": []
   },
   "3009": {
     "vnum": 3009,
     "zone": 3,
-    "name": "Lobby",
-    "description": "A deserted apartment lobby. The front doors lead out to the avenue.",
-    "flags": [],
+    "name": "Warehouse 13",
+    "description": "Dusty crates are stacked high. Shadows dance on the walls.",
     "exits": {
-      "up": {
-        "target_vnum": 3007
-      },
-      "south": {
-        "target_vnum": 3010
-      }
+      "west": 3008
     },
-    "interactables": [],
-    "initial_mobs": [],
-    "initial_items": []
+    "mobs": [
+      3008
+    ],
+    "initial_items": [],
+    "interactables": []
   },
   "3010": {
     "vnum": 3010,
     "zone": 3,
-    "name": "Grand Avenue",
-    "description": "Cars rush by, splashing water onto the sidewalk. The rain is relentless.",
-    "flags": [],
+    "name": "The Docks",
+    "description": "The smell of salt and dead fish. Waves crash against the wooden pilings.",
     "exits": {
-      "north": {
-        "target_vnum": 3009
-      },
-      "south": {
-        "target_vnum": 3011
-      }
+      "north": 3008,
+      "east": 3011,
+      "south": 3012
     },
-    "interactables": [],
-    "initial_mobs": [
-      3002
+    "mobs": [
+      3009
     ],
-    "initial_items": []
+    "initial_items": [],
+    "interactables": []
   },
   "3011": {
     "vnum": 3011,
     "zone": 3,
-    "name": "The Blue Note Club",
-    "description": "A jazz club. The music is smooth, but the patrons look dangerous.",
-    "flags": [
-      "safe"
-    ],
+    "name": "Smuggler's Cove",
+    "description": "A hidden section of the docks where illicit goods are unloaded.",
     "exits": {
-      "north": {
-        "target_vnum": 3010
-      },
-      "down": {
-        "target_vnum": 3012
-      }
+      "west": 3010
     },
-    "interactables": [],
-    "initial_mobs": [],
-    "initial_items": []
+    "mobs": [
+      3014
+    ],
+    "initial_items": [],
+    "interactables": []
   },
   "3012": {
     "vnum": 3012,
     "zone": 3,
-    "name": "Speakeasy Basement",
-    "description": "Smoke fills the air. A high-stakes poker game is happening in the corner.",
-    "flags": [],
+    "name": "Sewer Entrance",
+    "description": "A foul-smelling grate leading down into the city's underbelly.",
     "exits": {
-      "up": {
-        "target_vnum": 3011
-      },
-      "east": {
-        "target_vnum": 3013
-      }
+      "north": 3010,
+      "down": 3013
     },
-    "interactables": [],
-    "initial_mobs": [
-      3003
-    ],
-    "initial_items": []
+    "mobs": [],
+    "initial_items": [],
+    "interactables": []
   },
   "3013": {
     "vnum": 3013,
     "zone": 3,
-    "name": "Smuggler's Tunnel",
-    "description": "A damp brick tunnel leading beneath the city streets.",
-    "flags": [],
+    "name": "Sewer Tunnels",
+    "description": "Damp, echoing tunnels filled with murky water.",
     "exits": {
-      "west": {
-        "target_vnum": 3012
-      },
-      "east": {
-        "target_vnum": 3014
-      }
+      "up": 3012,
+      "east": 3014
     },
-    "interactables": [],
-    "initial_mobs": [
-      3001
+    "mobs": [
+      3011
     ],
-    "initial_items": []
+    "initial_items": [],
+    "interactables": []
   },
   "3014": {
     "vnum": 3014,
     "zone": 3,
-    "name": "Sewer Junction",
-    "description": "The smell is overpowering. Water rushes through the grate.",
-    "flags": [],
+    "name": "Deep Sewers",
+    "description": "The water is deeper here, and the smell is unbearable.",
     "exits": {
-      "west": {
-        "target_vnum": 3013
-      },
-      "north": {
-        "target_vnum": 3015
-      }
+      "west": 3013,
+      "east": 3015
     },
-    "interactables": [],
-    "initial_mobs": [
-      3002
+    "mobs": [
+      3011
     ],
-    "initial_items": []
+    "initial_items": [],
+    "interactables": []
   },
   "3015": {
     "vnum": 3015,
     "zone": 3,
-    "name": "Vault Door",
-    "description": "A massive steel door blocks the tunnel. It requires a heavy brass key.",
-    "flags": [],
+    "name": "Hidden Speakeasy Entrance",
+    "description": "A heavy iron door in the sewers. A sliding peephole is visible.",
     "exits": {
-      "south": {
-        "target_vnum": 3014
-      },
-      "north": {
-        "target_vnum": 3016,
-        "door": {
-          "is_door": true,
-          "state": "locked",
-          "key_vnum": 3003
-        }
-      }
+      "west": 3014,
+      "east": 3016
     },
-    "interactables": [],
-    "initial_mobs": [
-      3004
-    ],
-    "initial_items": []
+    "mobs": [],
+    "initial_items": [],
+    "interactables": []
   },
   "3016": {
     "vnum": 3016,
     "zone": 3,
-    "name": "The Syndicate Vault",
-    "description": "Stacks of cash and illicit goods. In the center, a display case has been shattered. A perfect circular hole is punched through the back wall of the vault. The marble didn't stop here.",
-    "flags": [],
+    "name": "The Blind Tiger Speakeasy",
+    "description": "A lavish underground bar. People are drinking and gambling.",
     "exits": {
-      "south": {
-        "target_vnum": 3015
-      }
+      "west": 3015,
+      "north": 3017
     },
-    "interactables": [],
-    "initial_mobs": [
-      3005
+    "mobs": [
+      3004
+    ],
+    "initial_items": [],
+    "interactables": []
+  },
+  "3017": {
+    "vnum": 3017,
+    "zone": 3,
+    "name": "Back Room Casino",
+    "description": "High-stakes poker games are in progress. The air is thick with cigar smoke.",
+    "exits": {
+      "south": 3016,
+      "east": 3018
+    },
+    "mobs": [
+      3015
+    ],
+    "initial_items": [],
+    "interactables": []
+  },
+  "3018": {
+    "vnum": 3018,
+    "zone": 3,
+    "name": "The Vault",
+    "description": "A secure vault room. The heavy door is slightly ajar.",
+    "exits": {
+      "west": 3017
+    },
+    "mobs": [],
+    "initial_items": [
+      3011
+    ],
+    "interactables": []
+  },
+  "3019": {
+    "vnum": 3019,
+    "zone": 3,
+    "name": "Police Station Steps",
+    "description": "Imposing stone steps leading up to the precinct.",
+    "exits": {
+      "north": 3020,
+      "south": 3004
+    },
+    "mobs": [],
+    "initial_items": [],
+    "interactables": []
+  },
+  "3020": {
+    "vnum": 3020,
+    "zone": 3,
+    "name": "Precinct Lobby",
+    "description": "A busy lobby with ringing phones and shouting officers.",
+    "exits": {
+      "south": 3019,
+      "east": 3021,
+      "north": 3022
+    },
+    "mobs": [
+      3007
+    ],
+    "initial_items": [],
+    "interactables": []
+  },
+  "3021": {
+    "vnum": 3021,
+    "zone": 3,
+    "name": "Interrogation Room",
+    "description": "A stark room with a single table and a bright light.",
+    "exits": {
+      "west": 3020
+    },
+    "mobs": [
+      3003
+    ],
+    "initial_items": [],
+    "interactables": []
+  },
+  "3022": {
+    "vnum": 3022,
+    "zone": 3,
+    "name": "Evidence Room",
+    "description": "Shelves filled with tagged items. It looks like some things are missing.",
+    "exits": {
+      "south": 3020,
+      "east": 3023
+    },
+    "mobs": [],
+    "initial_items": [],
+    "interactables": []
+  },
+  "3023": {
+    "vnum": 3023,
+    "zone": 3,
+    "name": "Captain's Office",
+    "description": "A plush office. The captain is nowhere to be seen.",
+    "exits": {
+      "west": 3022,
+      "east": 3024
+    },
+    "mobs": [
+      3021
+    ],
+    "initial_items": [],
+    "interactables": []
+  },
+  "3024": {
+    "vnum": 3024,
+    "zone": 3,
+    "name": "City Street 1",
+    "description": "Another rain-slicked street in the sprawling city.",
+    "exits": {
+      "west": 3023,
+      "east": 3025
+    },
+    "mobs": [],
+    "initial_items": [],
+    "interactables": []
+  },
+  "3025": {
+    "vnum": 3025,
+    "zone": 3,
+    "name": "City Street 2",
+    "description": "Another rain-slicked street in the sprawling city.",
+    "exits": {
+      "west": 3024,
+      "east": 3026
+    },
+    "mobs": [
+      3006,
+      3017
+    ],
+    "initial_items": [],
+    "interactables": []
+  },
+  "3026": {
+    "vnum": 3026,
+    "zone": 3,
+    "name": "City Street 3",
+    "description": "Another rain-slicked street in the sprawling city.",
+    "exits": {
+      "west": 3025,
+      "east": 3027
+    },
+    "mobs": [
+      3013
     ],
     "initial_items": [
-      3004
-    ]
+      3013
+    ],
+    "interactables": []
   },
-  "4000": {
-    "vnum": 4000,
-    "zone": 4,
-    "name": "Jungle LZ",
-    "description": "The chopper dropped you here. The jungle is thick and humid. The archway back to the Nexus is east.",
-    "flags": [],
+  "3027": {
+    "vnum": 3027,
+    "zone": 3,
+    "name": "City Street 4",
+    "description": "Another rain-slicked street in the sprawling city.",
     "exits": {
-      "east": {
-        "target_vnum": 4
-      },
-      "west": {
-        "target_vnum": 4001
-      }
+      "west": 3026,
+      "east": 3028
     },
-    "interactables": [],
-    "initial_mobs": [],
-    "initial_items": []
+    "mobs": [],
+    "initial_items": [],
+    "interactables": []
+  },
+  "3028": {
+    "vnum": 3028,
+    "zone": 3,
+    "name": "City Street 5",
+    "description": "Another rain-slicked street in the sprawling city.",
+    "exits": {
+      "west": 3027,
+      "east": 3029
+    },
+    "mobs": [
+      3006
+    ],
+    "initial_items": [],
+    "interactables": []
+  },
+  "3029": {
+    "vnum": 3029,
+    "zone": 3,
+    "name": "City Street 6",
+    "description": "Another rain-slicked street in the sprawling city.",
+    "exits": {
+      "west": 3028,
+      "east": 3030
+    },
+    "mobs": [
+      3017
+    ],
+    "initial_items": [],
+    "interactables": []
+  },
+  "3030": {
+    "vnum": 3030,
+    "zone": 3,
+    "name": "City Street 7",
+    "description": "Another rain-slicked street in the sprawling city.",
+    "exits": {
+      "west": 3029,
+      "east": 3031
+    },
+    "mobs": [],
+    "initial_items": [],
+    "interactables": []
+  },
+  "3031": {
+    "vnum": 3031,
+    "zone": 3,
+    "name": "City Street 8",
+    "description": "Another rain-slicked street in the sprawling city.",
+    "exits": {
+      "west": 3030,
+      "east": 3032
+    },
+    "mobs": [
+      3006,
+      3013
+    ],
+    "initial_items": [],
+    "interactables": []
+  },
+  "3032": {
+    "vnum": 3032,
+    "zone": 3,
+    "name": "City Street 9",
+    "description": "Another rain-slicked street in the sprawling city.",
+    "exits": {
+      "west": 3031,
+      "east": 3033
+    },
+    "mobs": [],
+    "initial_items": [],
+    "interactables": []
+  },
+  "3033": {
+    "vnum": 3033,
+    "zone": 3,
+    "name": "City Street 10",
+    "description": "Another rain-slicked street in the sprawling city.",
+    "exits": {
+      "west": 3032,
+      "east": 3034
+    },
+    "mobs": [
+      3017
+    ],
+    "initial_items": [],
+    "interactables": []
+  },
+  "3034": {
+    "vnum": 3034,
+    "zone": 3,
+    "name": "City Street 11",
+    "description": "Another rain-slicked street in the sprawling city.",
+    "exits": {
+      "west": 3033,
+      "east": 3035
+    },
+    "mobs": [
+      3006
+    ],
+    "initial_items": [],
+    "interactables": []
+  },
+  "3035": {
+    "vnum": 3035,
+    "zone": 3,
+    "name": "City Street 12",
+    "description": "Another rain-slicked street in the sprawling city.",
+    "exits": {
+      "west": 3034,
+      "east": 3036
+    },
+    "mobs": [],
+    "initial_items": [],
+    "interactables": []
+  },
+  "3036": {
+    "vnum": 3036,
+    "zone": 3,
+    "name": "City Street 13",
+    "description": "Another rain-slicked street in the sprawling city.",
+    "exits": {
+      "west": 3035,
+      "east": 3037
+    },
+    "mobs": [
+      3013
+    ],
+    "initial_items": [],
+    "interactables": []
+  },
+  "3037": {
+    "vnum": 3037,
+    "zone": 3,
+    "name": "City Street 14",
+    "description": "Another rain-slicked street in the sprawling city.",
+    "exits": {
+      "west": 3036,
+      "east": 3038
+    },
+    "mobs": [
+      3006,
+      3017
+    ],
+    "initial_items": [],
+    "interactables": []
+  },
+  "3038": {
+    "vnum": 3038,
+    "zone": 3,
+    "name": "City Street 15",
+    "description": "Another rain-slicked street in the sprawling city.",
+    "exits": {
+      "west": 3037,
+      "east": 3039
+    },
+    "mobs": [],
+    "initial_items": [],
+    "interactables": []
+  },
+  "3039": {
+    "vnum": 3039,
+    "zone": 3,
+    "name": "City Street 16",
+    "description": "Another rain-slicked street in the sprawling city.",
+    "exits": {
+      "west": 3038,
+      "east": 3040
+    },
+    "mobs": [],
+    "initial_items": [],
+    "interactables": []
+  },
+  "3040": {
+    "vnum": 3040,
+    "zone": 3,
+    "name": "City Street 17",
+    "description": "Another rain-slicked street in the sprawling city.",
+    "exits": {
+      "west": 3039,
+      "east": 3041
+    },
+    "mobs": [
+      3006
+    ],
+    "initial_items": [],
+    "interactables": []
+  },
+  "3041": {
+    "vnum": 3041,
+    "zone": 3,
+    "name": "City Street 18",
+    "description": "Another rain-slicked street in the sprawling city.",
+    "exits": {
+      "west": 3040,
+      "east": 3042
+    },
+    "mobs": [
+      3017,
+      3013
+    ],
+    "initial_items": [],
+    "interactables": []
+  },
+  "3042": {
+    "vnum": 3042,
+    "zone": 3,
+    "name": "City Street 19",
+    "description": "Another rain-slicked street in the sprawling city.",
+    "exits": {
+      "west": 3041,
+      "east": 3043
+    },
+    "mobs": [],
+    "initial_items": [],
+    "interactables": []
+  },
+  "3043": {
+    "vnum": 3043,
+    "zone": 3,
+    "name": "City Street 20",
+    "description": "Another rain-slicked street in the sprawling city.",
+    "exits": {
+      "west": 3042,
+      "east": 3044
+    },
+    "mobs": [
+      3006
+    ],
+    "initial_items": [],
+    "interactables": []
+  },
+  "3044": {
+    "vnum": 3044,
+    "zone": 3,
+    "name": "City Street 21",
+    "description": "Another rain-slicked street in the sprawling city.",
+    "exits": {
+      "west": 3043,
+      "east": 3045
+    },
+    "mobs": [],
+    "initial_items": [],
+    "interactables": []
+  },
+  "3045": {
+    "vnum": 3045,
+    "zone": 3,
+    "name": "City Street 22",
+    "description": "Another rain-slicked street in the sprawling city.",
+    "exits": {
+      "west": 3044
+    },
+    "mobs": [
+      3017
+    ],
+    "initial_items": [],
+    "interactables": []
   },
   "4001": {
     "vnum": 4001,
     "zone": 4,
-    "name": "River Crossing",
-    "description": "A muddy river blocks the path. A rope bridge sways dangerously.",
-    "flags": [],
+    "name": "Jungle Edge",
+    "description": "You are in the Jungle Edge. The air is thick with humidity and the smell of gunpowder.",
     "exits": {
-      "east": {
-        "target_vnum": 4000
-      },
-      "west": {
-        "target_vnum": 4002
-      }
+      "east": 5
     },
-    "interactables": [],
-    "initial_mobs": [
-      4001
+    "mobs": [
+      4006
     ],
-    "initial_items": []
+    "initial_items": [],
+    "interactables": [
+      {
+        "keyword": [
+          "console",
+          "terminal"
+        ],
+        "description": "A launch control console.",
+        "action": "use abort code"
+      }
+    ]
   },
   "4002": {
     "vnum": 4002,
     "zone": 4,
-    "name": "Mercenary Camp",
-    "description": "Tents and ammo crates. The mercs were caught off guard.",
-    "flags": [],
+    "name": "Perimeter Fence",
+    "description": "You are in the Perimeter Fence. The air is thick with humidity and the smell of gunpowder.",
     "exits": {
-      "east": {
-        "target_vnum": 4001
-      },
-      "north": {
-        "target_vnum": 4003
-      },
-      "south": {
-        "target_vnum": 4004
-      }
+      "west": 4001,
+      "east": 4003
     },
-    "interactables": [],
-    "initial_mobs": [
-      4002
-    ],
-    "initial_items": [
-      4001
+    "mobs": [],
+    "initial_items": [],
+    "interactables": [
+      {
+        "keyword": [
+          "console",
+          "terminal"
+        ],
+        "description": "A launch control console.",
+        "action": "use abort code"
+      }
     ]
   },
   "4003": {
     "vnum": 4003,
     "zone": 4,
-    "name": "Ammo Dump",
-    "description": "Crates of explosives. A bad place for a firefight.",
-    "flags": [],
+    "name": "Guard Post Alpha",
+    "description": "You are in the Guard Post Alpha. The air is thick with humidity and the smell of gunpowder.",
     "exits": {
-      "south": {
-        "target_vnum": 4002
-      }
+      "west": 4002,
+      "east": 4004
     },
-    "interactables": [],
-    "initial_mobs": [
-      4001
+    "mobs": [
+      4006,
+      4009
     ],
-    "initial_items": [
-      4002
+    "initial_items": [],
+    "interactables": [
+      {
+        "keyword": [
+          "console",
+          "terminal"
+        ],
+        "description": "A launch control console.",
+        "action": "use abort code"
+      }
     ]
   },
   "4004": {
     "vnum": 4004,
     "zone": 4,
-    "name": "Jungle Path",
-    "description": "The foliage is dense. Tripwires are strung across the trail.",
-    "flags": [],
+    "name": "Muddy Trail",
+    "description": "You are in the Muddy Trail. The air is thick with humidity and the smell of gunpowder.",
     "exits": {
-      "north": {
-        "target_vnum": 4002
-      },
-      "west": {
-        "target_vnum": 4005
-      }
+      "west": 4003,
+      "east": 4005
     },
-    "interactables": [],
-    "initial_mobs": [],
-    "initial_items": []
+    "mobs": [],
+    "initial_items": [],
+    "interactables": [
+      {
+        "keyword": [
+          "console",
+          "terminal"
+        ],
+        "description": "A launch control console.",
+        "action": "use abort code"
+      }
+    ]
   },
   "4005": {
     "vnum": 4005,
     "zone": 4,
-    "name": "Base Perimeter",
-    "description": "A chain-link fence topped with razor wire. A hole has been cut through it.",
-    "flags": [],
+    "name": "Barracks Exterior",
+    "description": "You are in the Barracks Exterior. The air is thick with humidity and the smell of gunpowder.",
     "exits": {
-      "east": {
-        "target_vnum": 4004
-      },
-      "west": {
-        "target_vnum": 4006
-      }
+      "west": 4004,
+      "east": 4006
     },
-    "interactables": [],
-    "initial_mobs": [
-      4002
+    "mobs": [
+      4006
     ],
-    "initial_items": []
+    "initial_items": [],
+    "interactables": [
+      {
+        "keyword": [
+          "console",
+          "terminal"
+        ],
+        "description": "A launch control console.",
+        "action": "use abort code"
+      }
+    ]
   },
   "4006": {
     "vnum": 4006,
     "zone": 4,
-    "name": "Compound Courtyard",
-    "description": "Concrete and steel. Guard towers sweep spotlights across the yard.",
-    "flags": [],
+    "name": "Barracks Interior",
+    "description": "You are in the Barracks Interior. The air is thick with humidity and the smell of gunpowder.",
     "exits": {
-      "east": {
-        "target_vnum": 4005
-      },
-      "north": {
-        "target_vnum": 4007
-      }
+      "west": 4005,
+      "east": 4007
     },
-    "interactables": [],
-    "initial_mobs": [
-      4003
+    "mobs": [
+      4001
     ],
-    "initial_items": []
+    "initial_items": [],
+    "interactables": [
+      {
+        "keyword": [
+          "console",
+          "terminal"
+        ],
+        "description": "A launch control console.",
+        "action": "use abort code"
+      }
+    ]
   },
   "4007": {
     "vnum": 4007,
     "zone": 4,
-    "name": "Barracks",
-    "description": "Rows of bunk beds. Lockers have been ransacked.",
-    "flags": [],
+    "name": "Mess Hall",
+    "description": "You are in the Mess Hall. The air is thick with humidity and the smell of gunpowder.",
     "exits": {
-      "south": {
-        "target_vnum": 4006
-      },
-      "east": {
-        "target_vnum": 4008
-      }
+      "west": 4006,
+      "east": 4008
     },
-    "interactables": [],
-    "initial_mobs": [
-      4002
+    "mobs": [
+      4006
     ],
-    "initial_items": [
-      4005
+    "initial_items": [],
+    "interactables": [
+      {
+        "keyword": [
+          "console",
+          "terminal"
+        ],
+        "description": "A launch control console.",
+        "action": "use abort code"
+      }
     ]
   },
   "4008": {
     "vnum": 4008,
     "zone": 4,
-    "name": "Mess Hall",
-    "description": "Overturned tables and spilled rations.",
-    "flags": [
-      "safe"
-    ],
+    "name": "Armory",
+    "description": "You are in the Armory. The air is thick with humidity and the smell of gunpowder.",
     "exits": {
-      "west": {
-        "target_vnum": 4007
-      },
-      "north": {
-        "target_vnum": 4009
-      }
+      "west": 4007,
+      "east": 4009
     },
-    "interactables": [],
-    "initial_mobs": [
-      8005
+    "mobs": [
+      4002
     ],
-    "initial_items": []
+    "initial_items": [
+      4001
+    ],
+    "interactables": [
+      {
+        "keyword": [
+          "console",
+          "terminal"
+        ],
+        "description": "A launch control console.",
+        "action": "use abort code"
+      }
+    ]
   },
   "4009": {
     "vnum": 4009,
     "zone": 4,
-    "name": "Command Center",
-    "description": "Radar screens and tactical maps. A heavy blast door leads down.",
-    "flags": [],
+    "name": "Motor Pool",
+    "description": "You are in the Motor Pool. The air is thick with humidity and the smell of gunpowder.",
     "exits": {
-      "south": {
-        "target_vnum": 4008
-      },
-      "down": {
-        "target_vnum": 4010
-      }
+      "west": 4008,
+      "east": 4010
     },
-    "interactables": [],
-    "initial_mobs": [
-      4003
+    "mobs": [
+      4006
     ],
-    "initial_items": []
+    "initial_items": [],
+    "interactables": [
+      {
+        "keyword": [
+          "console",
+          "terminal"
+        ],
+        "description": "A launch control console.",
+        "action": "use abort code"
+      }
+    ]
   },
   "4010": {
     "vnum": 4010,
     "zone": 4,
-    "name": "Underground Silo",
-    "description": "A massive ICBM sits in the silo. A countdown timer is ticking on the wall.",
-    "flags": [],
+    "name": "Vehicle Maintenance",
+    "description": "You are in the Vehicle Maintenance. The air is thick with humidity and the smell of gunpowder.",
     "exits": {
-      "up": {
-        "target_vnum": 4009
-      },
-      "north": {
-        "target_vnum": 4011
-      }
+      "west": 4009,
+      "east": 4011
     },
+    "mobs": [],
+    "initial_items": [],
     "interactables": [
       {
         "keyword": [
-          "timer",
-          "console"
+          "console",
+          "terminal"
         ],
-        "description": "The launch console requires an abort code.",
-        "action": "use_console"
+        "description": "A launch control console.",
+        "action": "use abort code"
       }
-    ],
-    "initial_mobs": [
-      4004
-    ],
-    "initial_items": []
+    ]
   },
   "4011": {
     "vnum": 4011,
     "zone": 4,
-    "name": "Silo Control Room",
-    "description": "The launch controls. The abort code is written on a sticky note: 'DELTA-9'.",
-    "flags": [],
+    "name": "Helipad Approach",
+    "description": "You are in the Helipad Approach. The air is thick with humidity and the smell of gunpowder.",
     "exits": {
-      "south": {
-        "target_vnum": 4010
-      },
-      "east": {
-        "target_vnum": 4012
-      }
+      "west": 4010,
+      "east": 4012
     },
-    "interactables": [],
-    "initial_mobs": [
-      4003
+    "mobs": [
+      4006
     ],
-    "initial_items": [
-      4003
+    "initial_items": [],
+    "interactables": [
+      {
+        "keyword": [
+          "console",
+          "terminal"
+        ],
+        "description": "A launch control console.",
+        "action": "use abort code"
+      }
     ]
   },
   "4012": {
     "vnum": 4012,
     "zone": 4,
-    "name": "Maintenance Shaft",
-    "description": "A dark, narrow tunnel leading deeper.",
-    "flags": [],
+    "name": "Helipad",
+    "description": "You are in the Helipad. The air is thick with humidity and the smell of gunpowder.",
     "exits": {
-      "west": {
-        "target_vnum": 4011
-      },
-      "down": {
-        "target_vnum": 4013
-      }
+      "west": 4011,
+      "east": 4013
     },
-    "interactables": [],
-    "initial_mobs": [
-      4001
+    "mobs": [
+      4014
     ],
-    "initial_items": []
+    "initial_items": [],
+    "interactables": [
+      {
+        "keyword": [
+          "console",
+          "terminal"
+        ],
+        "description": "A launch control console.",
+        "action": "use abort code"
+      }
+    ]
   },
   "4013": {
     "vnum": 4013,
     "zone": 4,
-    "name": "Generator Room",
-    "description": "Massive turbines hum loudly.",
-    "flags": [],
+    "name": "Command Tent",
+    "description": "You are in the Command Tent. The air is thick with humidity and the smell of gunpowder.",
     "exits": {
-      "up": {
-        "target_vnum": 4012
-      },
-      "north": {
-        "target_vnum": 4014
-      }
+      "west": 4012,
+      "east": 4014
     },
-    "interactables": [],
-    "initial_mobs": [
-      4004
+    "mobs": [
+      4006
     ],
-    "initial_items": []
+    "initial_items": [],
+    "interactables": [
+      {
+        "keyword": [
+          "console",
+          "terminal"
+        ],
+        "description": "A launch control console.",
+        "action": "use abort code"
+      }
+    ]
   },
   "4014": {
     "vnum": 4014,
     "zone": 4,
-    "name": "Blast Door",
-    "description": "A reinforced door blocks the way. It requires the Red Keycard.",
-    "flags": [],
+    "name": "Communications Center",
+    "description": "You are in the Communications Center. The air is thick with humidity and the smell of gunpowder.",
     "exits": {
-      "south": {
-        "target_vnum": 4013
-      },
-      "north": {
-        "target_vnum": 4015,
-        "door": {
-          "is_door": true,
-          "state": "locked",
-          "key_vnum": 4004
-        }
-      }
+      "west": 4013,
+      "east": 4015
     },
-    "interactables": [],
-    "initial_mobs": [
+    "mobs": [
       4004
     ],
-    "initial_items": []
+    "initial_items": [],
+    "interactables": [
+      {
+        "keyword": [
+          "console",
+          "terminal"
+        ],
+        "description": "A launch control console.",
+        "action": "use abort code"
+      }
+    ]
   },
   "4015": {
     "vnum": 4015,
     "zone": 4,
-    "name": "General's Bunker",
-    "description": "The dictator's final holdout. The back wall is blown out — a perfect circular tunnel bored straight through the reinforced concrete. The marble was here.",
-    "flags": [],
+    "name": "Interrogation Room",
+    "description": "You are in the Interrogation Room. The air is thick with humidity and the smell of gunpowder.",
     "exits": {
-      "south": {
-        "target_vnum": 4014
-      }
+      "west": 4014,
+      "east": 4016
     },
-    "interactables": [],
-    "initial_mobs": [
-      4005
-    ],
-    "initial_items": [
+    "mobs": [
       4006
+    ],
+    "initial_items": [],
+    "interactables": [
+      {
+        "keyword": [
+          "console",
+          "terminal"
+        ],
+        "description": "A launch control console.",
+        "action": "use abort code"
+      }
     ]
   },
-  "5000": {
-    "vnum": 5000,
-    "zone": 5,
-    "name": "Bamboo Forest",
-    "description": "Tall green stalks sway in the wind. The archway back to the Nexus is south.",
-    "flags": [],
+  "4016": {
+    "vnum": 4016,
+    "zone": 4,
+    "name": "Holding Cells",
+    "description": "You are in the Holding Cells. The air is thick with humidity and the smell of gunpowder.",
     "exits": {
-      "south": {
-        "target_vnum": 5
-      },
-      "north": {
-        "target_vnum": 5001
-      }
+      "west": 4015,
+      "east": 4017
     },
-    "interactables": [],
-    "initial_mobs": [],
-    "initial_items": []
+    "mobs": [
+      4005
+    ],
+    "initial_items": [],
+    "interactables": [
+      {
+        "keyword": [
+          "console",
+          "terminal"
+        ],
+        "description": "A launch control console.",
+        "action": "use abort code"
+      }
+    ]
+  },
+  "4017": {
+    "vnum": 4017,
+    "zone": 4,
+    "name": "Jungle Path",
+    "description": "You are in the Jungle Path. The air is thick with humidity and the smell of gunpowder.",
+    "exits": {
+      "west": 4016,
+      "east": 4018
+    },
+    "mobs": [
+      4006
+    ],
+    "initial_items": [],
+    "interactables": [
+      {
+        "keyword": [
+          "console",
+          "terminal"
+        ],
+        "description": "A launch control console.",
+        "action": "use abort code"
+      }
+    ]
+  },
+  "4018": {
+    "vnum": 4018,
+    "zone": 4,
+    "name": "Hidden Cache",
+    "description": "You are in the Hidden Cache. The air is thick with humidity and the smell of gunpowder.",
+    "exits": {
+      "west": 4017,
+      "east": 4019
+    },
+    "mobs": [],
+    "initial_items": [],
+    "interactables": [
+      {
+        "keyword": [
+          "console",
+          "terminal"
+        ],
+        "description": "A launch control console.",
+        "action": "use abort code"
+      }
+    ]
+  },
+  "4019": {
+    "vnum": 4019,
+    "zone": 4,
+    "name": "Minefield Edge",
+    "description": "You are in the Minefield Edge. The air is thick with humidity and the smell of gunpowder.",
+    "exits": {
+      "west": 4018,
+      "east": 4020
+    },
+    "mobs": [
+      4006
+    ],
+    "initial_items": [],
+    "interactables": [
+      {
+        "keyword": [
+          "console",
+          "terminal"
+        ],
+        "description": "A launch control console.",
+        "action": "use abort code"
+      }
+    ]
+  },
+  "4020": {
+    "vnum": 4020,
+    "zone": 4,
+    "name": "Minefield Center",
+    "description": "You are in the Minefield Center. The air is thick with humidity and the smell of gunpowder.",
+    "exits": {
+      "west": 4019,
+      "east": 4021
+    },
+    "mobs": [],
+    "initial_items": [],
+    "interactables": [
+      {
+        "keyword": [
+          "console",
+          "terminal"
+        ],
+        "description": "A launch control console.",
+        "action": "use abort code"
+      }
+    ]
+  },
+  "4021": {
+    "vnum": 4021,
+    "zone": 4,
+    "name": "Sniper Tower",
+    "description": "You are in the Sniper Tower. The air is thick with humidity and the smell of gunpowder.",
+    "exits": {
+      "west": 4020,
+      "east": 4022
+    },
+    "mobs": [],
+    "initial_items": [],
+    "interactables": [
+      {
+        "keyword": [
+          "console",
+          "terminal"
+        ],
+        "description": "A launch control console.",
+        "action": "use abort code"
+      }
+    ]
+  },
+  "4022": {
+    "vnum": 4022,
+    "zone": 4,
+    "name": "Trench Line",
+    "description": "You are in the Trench Line. The air is thick with humidity and the smell of gunpowder.",
+    "exits": {
+      "west": 4021,
+      "east": 4023
+    },
+    "mobs": [],
+    "initial_items": [],
+    "interactables": [
+      {
+        "keyword": [
+          "console",
+          "terminal"
+        ],
+        "description": "A launch control console.",
+        "action": "use abort code"
+      }
+    ]
+  },
+  "4023": {
+    "vnum": 4023,
+    "zone": 4,
+    "name": "Bunker Entrance",
+    "description": "You are in the Bunker Entrance. The air is thick with humidity and the smell of gunpowder.",
+    "exits": {
+      "west": 4022,
+      "east": 4024
+    },
+    "mobs": [],
+    "initial_items": [],
+    "interactables": [
+      {
+        "keyword": [
+          "console",
+          "terminal"
+        ],
+        "description": "A launch control console.",
+        "action": "use abort code"
+      }
+    ]
+  },
+  "4024": {
+    "vnum": 4024,
+    "zone": 4,
+    "name": "Bunker Hallway",
+    "description": "You are in the Bunker Hallway. The air is thick with humidity and the smell of gunpowder.",
+    "exits": {
+      "west": 4023,
+      "east": 4025
+    },
+    "mobs": [],
+    "initial_items": [],
+    "interactables": [
+      {
+        "keyword": [
+          "console",
+          "terminal"
+        ],
+        "description": "A launch control console.",
+        "action": "use abort code"
+      }
+    ]
+  },
+  "4025": {
+    "vnum": 4025,
+    "zone": 4,
+    "name": "Bunker Control Room",
+    "description": "You are in the Bunker Control Room. The air is thick with humidity and the smell of gunpowder. A round object triggered a tripwire but was too fast for the explosion to catch. There are circular grooves on the floor.",
+    "exits": {
+      "west": 4024,
+      "east": 4026
+    },
+    "mobs": [],
+    "initial_items": [
+      4011
+    ],
+    "interactables": [
+      {
+        "keyword": [
+          "console",
+          "terminal"
+        ],
+        "description": "A launch control console.",
+        "action": "use abort code"
+      }
+    ]
+  },
+  "4026": {
+    "vnum": 4026,
+    "zone": 4,
+    "name": "Missile Silo Surface",
+    "description": "You are in the Missile Silo Surface. The air is thick with humidity and the smell of gunpowder.",
+    "exits": {
+      "west": 4025,
+      "east": 4027
+    },
+    "mobs": [],
+    "initial_items": [],
+    "interactables": [
+      {
+        "keyword": [
+          "console",
+          "terminal"
+        ],
+        "description": "A launch control console.",
+        "action": "use abort code"
+      }
+    ]
+  },
+  "4027": {
+    "vnum": 4027,
+    "zone": 4,
+    "name": "Silo Elevator",
+    "description": "You are in the Silo Elevator. The air is thick with humidity and the smell of gunpowder.",
+    "exits": {
+      "west": 4026,
+      "east": 4028
+    },
+    "mobs": [],
+    "initial_items": [],
+    "interactables": [
+      {
+        "keyword": [
+          "console",
+          "terminal"
+        ],
+        "description": "A launch control console.",
+        "action": "use abort code"
+      }
+    ]
+  },
+  "4028": {
+    "vnum": 4028,
+    "zone": 4,
+    "name": "Silo Level 1",
+    "description": "You are in the Silo Level 1. The air is thick with humidity and the smell of gunpowder.",
+    "exits": {
+      "west": 4027,
+      "east": 4029
+    },
+    "mobs": [],
+    "initial_items": [],
+    "interactables": [
+      {
+        "keyword": [
+          "console",
+          "terminal"
+        ],
+        "description": "A launch control console.",
+        "action": "use abort code"
+      }
+    ]
+  },
+  "4029": {
+    "vnum": 4029,
+    "zone": 4,
+    "name": "Silo Level 2",
+    "description": "You are in the Silo Level 2. The air is thick with humidity and the smell of gunpowder.",
+    "exits": {
+      "west": 4028,
+      "east": 4030
+    },
+    "mobs": [],
+    "initial_items": [],
+    "interactables": [
+      {
+        "keyword": [
+          "console",
+          "terminal"
+        ],
+        "description": "A launch control console.",
+        "action": "use abort code"
+      }
+    ]
+  },
+  "4030": {
+    "vnum": 4030,
+    "zone": 4,
+    "name": "Silo Level 3",
+    "description": "You are in the Silo Level 3. The air is thick with humidity and the smell of gunpowder.",
+    "exits": {
+      "west": 4029,
+      "east": 4031
+    },
+    "mobs": [],
+    "initial_items": [],
+    "interactables": [
+      {
+        "keyword": [
+          "console",
+          "terminal"
+        ],
+        "description": "A launch control console.",
+        "action": "use abort code"
+      }
+    ]
+  },
+  "4031": {
+    "vnum": 4031,
+    "zone": 4,
+    "name": "Launch Control",
+    "description": "You are in the Launch Control. The air is thick with humidity and the smell of gunpowder.",
+    "exits": {
+      "west": 4030,
+      "east": 4032
+    },
+    "mobs": [
+      4018
+    ],
+    "initial_items": [],
+    "interactables": [
+      {
+        "keyword": [
+          "console",
+          "terminal"
+        ],
+        "description": "A launch control console.",
+        "action": "use abort code"
+      }
+    ]
+  },
+  "4032": {
+    "vnum": 4032,
+    "zone": 4,
+    "name": "Generator Room",
+    "description": "You are in the Generator Room. The air is thick with humidity and the smell of gunpowder.",
+    "exits": {
+      "west": 4031,
+      "east": 4033
+    },
+    "mobs": [],
+    "initial_items": [],
+    "interactables": [
+      {
+        "keyword": [
+          "console",
+          "terminal"
+        ],
+        "description": "A launch control console.",
+        "action": "use abort code"
+      }
+    ]
+  },
+  "4033": {
+    "vnum": 4033,
+    "zone": 4,
+    "name": "Chemical Storage",
+    "description": "You are in the Chemical Storage. The air is thick with humidity and the smell of gunpowder.",
+    "exits": {
+      "west": 4032,
+      "east": 4034
+    },
+    "mobs": [],
+    "initial_items": [],
+    "interactables": [
+      {
+        "keyword": [
+          "console",
+          "terminal"
+        ],
+        "description": "A launch control console.",
+        "action": "use abort code"
+      }
+    ]
+  },
+  "4034": {
+    "vnum": 4034,
+    "zone": 4,
+    "name": "Laboratory",
+    "description": "You are in the Laboratory. The air is thick with humidity and the smell of gunpowder.",
+    "exits": {
+      "west": 4033,
+      "east": 4035
+    },
+    "mobs": [],
+    "initial_items": [],
+    "interactables": [
+      {
+        "keyword": [
+          "console",
+          "terminal"
+        ],
+        "description": "A launch control console.",
+        "action": "use abort code"
+      }
+    ]
+  },
+  "4035": {
+    "vnum": 4035,
+    "zone": 4,
+    "name": "Testing Grounds",
+    "description": "You are in the Testing Grounds. The air is thick with humidity and the smell of gunpowder.",
+    "exits": {
+      "west": 4034,
+      "east": 4036
+    },
+    "mobs": [],
+    "initial_items": [],
+    "interactables": [
+      {
+        "keyword": [
+          "console",
+          "terminal"
+        ],
+        "description": "A launch control console.",
+        "action": "use abort code"
+      }
+    ]
+  },
+  "4036": {
+    "vnum": 4036,
+    "zone": 4,
+    "name": "Training Course",
+    "description": "You are in the Training Course. The air is thick with humidity and the smell of gunpowder.",
+    "exits": {
+      "west": 4035,
+      "east": 4037
+    },
+    "mobs": [],
+    "initial_items": [],
+    "interactables": [
+      {
+        "keyword": [
+          "console",
+          "terminal"
+        ],
+        "description": "A launch control console.",
+        "action": "use abort code"
+      }
+    ]
+  },
+  "4037": {
+    "vnum": 4037,
+    "zone": 4,
+    "name": "Obstacle Course",
+    "description": "You are in the Obstacle Course. The air is thick with humidity and the smell of gunpowder.",
+    "exits": {
+      "west": 4036,
+      "east": 4038
+    },
+    "mobs": [],
+    "initial_items": [],
+    "interactables": [
+      {
+        "keyword": [
+          "console",
+          "terminal"
+        ],
+        "description": "A launch control console.",
+        "action": "use abort code"
+      }
+    ]
+  },
+  "4038": {
+    "vnum": 4038,
+    "zone": 4,
+    "name": "Firing Range",
+    "description": "You are in the Firing Range. The air is thick with humidity and the smell of gunpowder.",
+    "exits": {
+      "west": 4037,
+      "east": 4039
+    },
+    "mobs": [],
+    "initial_items": [],
+    "interactables": [
+      {
+        "keyword": [
+          "console",
+          "terminal"
+        ],
+        "description": "A launch control console.",
+        "action": "use abort code"
+      }
+    ]
+  },
+  "4039": {
+    "vnum": 4039,
+    "zone": 4,
+    "name": "Officers' Quarters",
+    "description": "You are in the Officers' Quarters. The air is thick with humidity and the smell of gunpowder.",
+    "exits": {
+      "west": 4038,
+      "east": 4040
+    },
+    "mobs": [],
+    "initial_items": [],
+    "interactables": [
+      {
+        "keyword": [
+          "console",
+          "terminal"
+        ],
+        "description": "A launch control console.",
+        "action": "use abort code"
+      }
+    ]
+  },
+  "4040": {
+    "vnum": 4040,
+    "zone": 4,
+    "name": "General's Office",
+    "description": "You are in the General's Office. The air is thick with humidity and the smell of gunpowder.",
+    "exits": {
+      "west": 4039,
+      "east": 4041
+    },
+    "mobs": [],
+    "initial_items": [
+      4012
+    ],
+    "interactables": [
+      {
+        "keyword": [
+          "console",
+          "terminal"
+        ],
+        "description": "A launch control console.",
+        "action": "use abort code"
+      }
+    ]
+  },
+  "4041": {
+    "vnum": 4041,
+    "zone": 4,
+    "name": "Secret Tunnel",
+    "description": "You are in the Secret Tunnel. The air is thick with humidity and the smell of gunpowder.",
+    "exits": {
+      "west": 4040,
+      "east": 4042
+    },
+    "mobs": [],
+    "initial_items": [],
+    "interactables": [
+      {
+        "keyword": [
+          "console",
+          "terminal"
+        ],
+        "description": "A launch control console.",
+        "action": "use abort code"
+      }
+    ]
+  },
+  "4042": {
+    "vnum": 4042,
+    "zone": 4,
+    "name": "Underground River",
+    "description": "You are in the Underground River. The air is thick with humidity and the smell of gunpowder.",
+    "exits": {
+      "west": 4041,
+      "east": 4043
+    },
+    "mobs": [],
+    "initial_items": [],
+    "interactables": [
+      {
+        "keyword": [
+          "console",
+          "terminal"
+        ],
+        "description": "A launch control console.",
+        "action": "use abort code"
+      }
+    ]
+  },
+  "4043": {
+    "vnum": 4043,
+    "zone": 4,
+    "name": "Cave System",
+    "description": "You are in the Cave System. The air is thick with humidity and the smell of gunpowder.",
+    "exits": {
+      "west": 4042,
+      "east": 4044
+    },
+    "mobs": [],
+    "initial_items": [],
+    "interactables": [
+      {
+        "keyword": [
+          "console",
+          "terminal"
+        ],
+        "description": "A launch control console.",
+        "action": "use abort code"
+      }
+    ]
+  },
+  "4044": {
+    "vnum": 4044,
+    "zone": 4,
+    "name": "Jungle Waterfall",
+    "description": "You are in the Jungle Waterfall. The air is thick with humidity and the smell of gunpowder.",
+    "exits": {
+      "west": 4043,
+      "east": 4045
+    },
+    "mobs": [],
+    "initial_items": [],
+    "interactables": [
+      {
+        "keyword": [
+          "console",
+          "terminal"
+        ],
+        "description": "A launch control console.",
+        "action": "use abort code"
+      }
+    ]
+  },
+  "4045": {
+    "vnum": 4045,
+    "zone": 4,
+    "name": "Extraction Point",
+    "description": "You are in the Extraction Point. The air is thick with humidity and the smell of gunpowder.",
+    "exits": {
+      "west": 4044
+    },
+    "mobs": [],
+    "initial_items": [],
+    "interactables": [
+      {
+        "keyword": [
+          "console",
+          "terminal"
+        ],
+        "description": "A launch control console.",
+        "action": "use abort code"
+      }
+    ]
   },
   "5001": {
     "vnum": 5001,
     "zone": 5,
-    "name": "Stone Steps",
-    "description": "Ancient stairs carved into the mountain.",
-    "flags": [],
+    "name": "Gateway Upper",
+    "description": "The entrance to the Floating Shards. A magical portal leads down to the hub.",
     "exits": {
-      "south": {
-        "target_vnum": 5000
-      },
-      "up": {
-        "target_vnum": 5002
-      }
+      "east": 5002,
+      "down": 6
     },
-    "interactables": [],
-    "initial_mobs": [
-      5001
+    "mobs": [
+      5022
     ],
-    "initial_items": []
+    "initial_items": [],
+    "interactables": [
+      {
+        "keyword": [
+          "portal",
+          "gateway"
+        ],
+        "description": "A swirling vortex of energy leading down.",
+        "action": "look"
+      }
+    ]
   },
   "5002": {
     "vnum": 5002,
     "zone": 5,
-    "name": "Mountain Shrine",
-    "description": "A small shrine dedicated to the wind spirits.",
-    "flags": [
-      "safe"
-    ],
+    "name": "Floating Shard 2",
+    "description": "You are standing on a floating island in the sky. Bamboo sways in the wind, and cherry blossoms drift through the air.",
     "exits": {
-      "down": {
-        "target_vnum": 5001
-      },
-      "east": {
-        "target_vnum": 5003
-      }
+      "west": 5001,
+      "east": 5003
     },
-    "interactables": [],
-    "initial_mobs": [
-      8006
-    ],
-    "initial_items": []
+    "mobs": [],
+    "initial_items": [],
+    "interactables": []
   },
   "5003": {
     "vnum": 5003,
     "zone": 5,
-    "name": "Rope Bridge",
-    "description": "A terrifying bridge spanning a bottomless gorge.",
-    "flags": [],
+    "name": "Floating Shard 3",
+    "description": "You are standing on a floating island in the sky. Bamboo sways in the wind, and cherry blossoms drift through the air.",
     "exits": {
-      "west": {
-        "target_vnum": 5002
-      },
-      "east": {
-        "target_vnum": 5004
-      }
+      "west": 5002,
+      "east": 5004
     },
-    "interactables": [],
-    "initial_mobs": [
-      5002
-    ],
-    "initial_items": []
+    "mobs": [],
+    "initial_items": [],
+    "interactables": []
   },
   "5004": {
     "vnum": 5004,
     "zone": 5,
-    "name": "The First Shard",
-    "description": "A massive chunk of earth floating in the sky.",
-    "flags": [],
+    "name": "Floating Shard 4",
+    "description": "You are standing on a floating island in the sky. Bamboo sways in the wind, and cherry blossoms drift through the air.",
     "exits": {
-      "west": {
-        "target_vnum": 5003
-      },
-      "up": {
-        "target_vnum": 5005
-      }
+      "west": 5003,
+      "east": 5005
     },
-    "interactables": [],
-    "initial_mobs": [
-      5001
+    "mobs": [
+      5004
     ],
-    "initial_items": []
+    "initial_items": [],
+    "interactables": []
   },
   "5005": {
     "vnum": 5005,
     "zone": 5,
-    "name": "Cherry Blossom Grove",
-    "description": "Pink petals fall like snow.",
-    "flags": [],
+    "name": "Floating Shard 5",
+    "description": "You are standing on a floating island in the sky. Bamboo sways in the wind, and cherry blossoms drift through the air.",
     "exits": {
-      "down": {
-        "target_vnum": 5004
-      },
-      "north": {
-        "target_vnum": 5006
-      }
+      "west": 5004,
+      "east": 5006
     },
-    "interactables": [],
-    "initial_mobs": [
-      5003
-    ],
-    "initial_items": [
-      5001
-    ]
+    "mobs": [],
+    "initial_items": [],
+    "interactables": []
   },
   "5006": {
     "vnum": 5006,
     "zone": 5,
-    "name": "Training Courtyard",
-    "description": "Wooden dummies and weapon racks.",
-    "flags": [],
+    "name": "Floating Shard 6",
+    "description": "You are standing on a floating island in the sky. Bamboo sways in the wind, and cherry blossoms drift through the air. A sphere of perfect clarity bounced between the floating shards, leaving ripples in the clouds.",
     "exits": {
-      "south": {
-        "target_vnum": 5005
-      },
-      "east": {
-        "target_vnum": 5007
-      }
+      "west": 5005,
+      "east": 5007
     },
-    "interactables": [],
-    "initial_mobs": [
-      5002
-    ],
-    "initial_items": [
-      5002
+    "mobs": [],
+    "initial_items": [],
+    "interactables": [
+      {
+        "keyword": [
+          "ripples",
+          "clouds"
+        ],
+        "description": "Faint ripples in the cloud layer, as if a perfect sphere passed through here.",
+        "action": "look"
+      }
     ]
   },
   "5007": {
     "vnum": 5007,
     "zone": 5,
-    "name": "The Second Shard",
-    "description": "Higher still. The air is getting thin.",
-    "flags": [],
+    "name": "Floating Shard 7",
+    "description": "You are standing on a floating island in the sky. Bamboo sways in the wind, and cherry blossoms drift through the air.",
     "exits": {
-      "west": {
-        "target_vnum": 5006
-      },
-      "up": {
-        "target_vnum": 5008
-      }
+      "west": 5006,
+      "east": 5008
     },
-    "interactables": [],
-    "initial_mobs": [
-      5003
+    "mobs": [
+      5007
     ],
-    "initial_items": []
+    "initial_items": [],
+    "interactables": []
   },
   "5008": {
     "vnum": 5008,
     "zone": 5,
-    "name": "Elemental Braziers",
-    "description": "Four unlit braziers surround a sealed gate.",
-    "flags": [],
+    "name": "Floating Shard 8",
+    "description": "You are standing on a floating island in the sky. Bamboo sways in the wind, and cherry blossoms drift through the air.",
     "exits": {
-      "down": {
-        "target_vnum": 5007
-      },
-      "north": {
-        "target_vnum": 5009
-      },
-      "south": {
-        "target_vnum": 5010
-      },
-      "east": {
-        "target_vnum": 5011
-      },
-      "west": {
-        "target_vnum": 5012
-      },
-      "up": {
-        "target_vnum": 5013,
-        "door": {
-          "is_door": true,
-          "state": "locked",
-          "key_vnum": 5003
-        }
-      }
+      "west": 5007,
+      "east": 5009
     },
-    "interactables": [
-      {
-        "keyword": [
-          "braziers",
-          "gate"
-        ],
-        "description": "The braziers must be lit with the Flame of the Masters.",
-        "action": "use_flame"
-      }
-    ],
-    "initial_mobs": [],
-    "initial_items": []
+    "mobs": [],
+    "initial_items": [],
+    "interactables": []
   },
   "5009": {
     "vnum": 5009,
     "zone": 5,
-    "name": "North Pavilion",
-    "description": "A quiet meditation spot.",
-    "flags": [],
+    "name": "Floating Shard 9",
+    "description": "You are standing on a floating island in the sky. Bamboo sways in the wind, and cherry blossoms drift through the air.",
     "exits": {
-      "south": {
-        "target_vnum": 5008
-      }
+      "west": 5008,
+      "east": 5010
     },
-    "interactables": [],
-    "initial_mobs": [
-      5004
-    ],
-    "initial_items": []
+    "mobs": [],
+    "initial_items": [],
+    "interactables": []
   },
   "5010": {
     "vnum": 5010,
     "zone": 5,
-    "name": "South Pavilion",
-    "description": "A quiet meditation spot.",
-    "flags": [],
+    "name": "Floating Shard 10",
+    "description": "You are standing on a floating island in the sky. Bamboo sways in the wind, and cherry blossoms drift through the air.",
     "exits": {
-      "north": {
-        "target_vnum": 5008
-      }
+      "west": 5009,
+      "east": 5011
     },
-    "interactables": [],
-    "initial_mobs": [
-      5004
+    "mobs": [
+      5010
     ],
-    "initial_items": []
+    "initial_items": [],
+    "interactables": []
   },
   "5011": {
     "vnum": 5011,
     "zone": 5,
-    "name": "East Pavilion",
-    "description": "A quiet meditation spot.",
-    "flags": [],
+    "name": "West Pavilion",
+    "description": "An ancient pavilion resting on a cloud. The Flame of the Masters is kept here.",
     "exits": {
-      "west": {
-        "target_vnum": 5008
-      }
+      "west": 5010,
+      "east": 5012
     },
-    "interactables": [],
-    "initial_mobs": [
-      5004
+    "mobs": [
+      5019
     ],
-    "initial_items": []
+    "initial_items": [
+      5016
+    ],
+    "interactables": []
   },
   "5012": {
     "vnum": 5012,
     "zone": 5,
-    "name": "West Pavilion",
-    "description": "A quiet meditation spot.",
-    "flags": [],
+    "name": "Floating Shard 12",
+    "description": "You are standing on a floating island in the sky. Bamboo sways in the wind, and cherry blossoms drift through the air.",
     "exits": {
-      "east": {
-        "target_vnum": 5008
-      }
+      "west": 5011,
+      "east": 5013
     },
-    "interactables": [],
-    "initial_mobs": [
-      5004
-    ],
-    "initial_items": [
-      5003
-    ]
+    "mobs": [],
+    "initial_items": [],
+    "interactables": []
   },
   "5013": {
     "vnum": 5013,
     "zone": 5,
-    "name": "The Third Shard",
-    "description": "The highest floating island.",
-    "flags": [],
+    "name": "Floating Shard 13",
+    "description": "You are standing on a floating island in the sky. Bamboo sways in the wind, and cherry blossoms drift through the air.",
     "exits": {
-      "down": {
-        "target_vnum": 5008
-      },
-      "north": {
-        "target_vnum": 5014
-      }
+      "west": 5012,
+      "east": 5014
     },
-    "interactables": [],
-    "initial_mobs": [
-      5002
+    "mobs": [
+      5013
     ],
-    "initial_items": []
+    "initial_items": [],
+    "interactables": []
   },
   "5014": {
     "vnum": 5014,
     "zone": 5,
-    "name": "Grand Dojo",
-    "description": "A massive wooden hall.",
-    "flags": [],
+    "name": "Floating Shard 14",
+    "description": "You are standing on a floating island in the sky. Bamboo sways in the wind, and cherry blossoms drift through the air.",
     "exits": {
-      "south": {
-        "target_vnum": 5013
-      },
-      "up": {
-        "target_vnum": 5015
-      }
+      "west": 5013,
+      "east": 5015
     },
-    "interactables": [],
-    "initial_mobs": [
-      5003
-    ],
-    "initial_items": []
+    "mobs": [],
+    "initial_items": [],
+    "interactables": []
   },
   "5015": {
     "vnum": 5015,
     "zone": 5,
-    "name": "Master's Chamber",
-    "description": "The grandmaster awaits.",
-    "flags": [],
+    "name": "Floating Shard 15",
+    "description": "You are standing on a floating island in the sky. Bamboo sways in the wind, and cherry blossoms drift through the air.",
     "exits": {
-      "down": {
-        "target_vnum": 5014
-      },
-      "north": {
-        "target_vnum": 5016,
-        "door": {
-          "is_door": true,
-          "state": "locked",
-          "key_vnum": 5004
-        }
-      }
+      "west": 5014,
+      "east": 5016
     },
-    "interactables": [],
-    "initial_mobs": [
-      5005
-    ],
-    "initial_items": [
-      5004
-    ]
+    "mobs": [],
+    "initial_items": [],
+    "interactables": []
   },
   "5016": {
     "vnum": 5016,
     "zone": 5,
-    "name": "The Pinnacle",
-    "description": "The very top of the floating shards. A massive gong has been struck so hard it shattered. A perfect circular hole is punched through the bronze. The marble was here.",
-    "flags": [],
+    "name": "Brazier Courtyard",
+    "description": "A courtyard with unlit braziers. A large gate blocks the way north.",
     "exits": {
-      "south": {
-        "target_vnum": 5015
+      "west": 5015,
+      "east": 5017,
+      "north": {
+        "target_vnum": 5036,
+        "door": true
       }
     },
-    "interactables": [],
-    "initial_mobs": [],
-    "initial_items": [
-      5005
+    "mobs": [
+      5001
+    ],
+    "initial_items": [],
+    "interactables": [
+      {
+        "keyword": [
+          "brazier",
+          "braziers"
+        ],
+        "description": "They need to be lit with the Flame of the Masters.",
+        "action": "light"
+      }
     ]
   },
-  "6000": {
-    "vnum": 6000,
-    "zone": 6,
-    "name": "Roman Road",
-    "description": "A straight, paved road. The archway back to the Nexus is west.",
-    "flags": [],
+  "5017": {
+    "vnum": 5017,
+    "zone": 5,
+    "name": "Floating Shard 17",
+    "description": "You are standing on a floating island in the sky. Bamboo sways in the wind, and cherry blossoms drift through the air.",
     "exits": {
-      "west": {
-        "target_vnum": 6
-      },
-      "east": {
-        "target_vnum": 6001
-      }
+      "west": 5016,
+      "east": 5018
     },
-    "interactables": [],
-    "initial_mobs": [],
-    "initial_items": []
+    "mobs": [],
+    "initial_items": [],
+    "interactables": []
+  },
+  "5018": {
+    "vnum": 5018,
+    "zone": 5,
+    "name": "Floating Shard 18",
+    "description": "You are standing on a floating island in the sky. Bamboo sways in the wind, and cherry blossoms drift through the air.",
+    "exits": {
+      "west": 5017,
+      "east": 5019
+    },
+    "mobs": [],
+    "initial_items": [],
+    "interactables": []
+  },
+  "5019": {
+    "vnum": 5019,
+    "zone": 5,
+    "name": "Floating Shard 19",
+    "description": "You are standing on a floating island in the sky. Bamboo sways in the wind, and cherry blossoms drift through the air.",
+    "exits": {
+      "west": 5018,
+      "east": 5020
+    },
+    "mobs": [
+      5004
+    ],
+    "initial_items": [],
+    "interactables": []
+  },
+  "5020": {
+    "vnum": 5020,
+    "zone": 5,
+    "name": "Floating Shard 20",
+    "description": "You are standing on a floating island in the sky. Bamboo sways in the wind, and cherry blossoms drift through the air.",
+    "exits": {
+      "west": 5019,
+      "east": 5021
+    },
+    "mobs": [],
+    "initial_items": [],
+    "interactables": []
+  },
+  "5021": {
+    "vnum": 5021,
+    "zone": 5,
+    "name": "Cherry Blossom Tea House",
+    "description": "A peaceful tea house surrounded by blooming cherry trees.",
+    "exits": {
+      "west": 5020,
+      "east": 5022
+    },
+    "mobs": [
+      5020
+    ],
+    "initial_items": [
+      5018
+    ],
+    "interactables": []
+  },
+  "5022": {
+    "vnum": 5022,
+    "zone": 5,
+    "name": "Floating Shard 22",
+    "description": "You are standing on a floating island in the sky. Bamboo sways in the wind, and cherry blossoms drift through the air.",
+    "exits": {
+      "west": 5021,
+      "east": 5023
+    },
+    "mobs": [
+      5007
+    ],
+    "initial_items": [],
+    "interactables": []
+  },
+  "5023": {
+    "vnum": 5023,
+    "zone": 5,
+    "name": "Floating Shard 23",
+    "description": "You are standing on a floating island in the sky. Bamboo sways in the wind, and cherry blossoms drift through the air.",
+    "exits": {
+      "west": 5022,
+      "east": 5024
+    },
+    "mobs": [],
+    "initial_items": [],
+    "interactables": []
+  },
+  "5024": {
+    "vnum": 5024,
+    "zone": 5,
+    "name": "Floating Shard 24",
+    "description": "You are standing on a floating island in the sky. Bamboo sways in the wind, and cherry blossoms drift through the air.",
+    "exits": {
+      "west": 5023,
+      "east": 5025
+    },
+    "mobs": [],
+    "initial_items": [],
+    "interactables": []
+  },
+  "5025": {
+    "vnum": 5025,
+    "zone": 5,
+    "name": "Floating Shard 25",
+    "description": "You are standing on a floating island in the sky. Bamboo sways in the wind, and cherry blossoms drift through the air.",
+    "exits": {
+      "west": 5024,
+      "east": 5026
+    },
+    "mobs": [
+      5010
+    ],
+    "initial_items": [],
+    "interactables": []
+  },
+  "5026": {
+    "vnum": 5026,
+    "zone": 5,
+    "name": "Floating Shard 26",
+    "description": "You are standing on a floating island in the sky. Bamboo sways in the wind, and cherry blossoms drift through the air.",
+    "exits": {
+      "west": 5025,
+      "east": 5027
+    },
+    "mobs": [],
+    "initial_items": [],
+    "interactables": []
+  },
+  "5027": {
+    "vnum": 5027,
+    "zone": 5,
+    "name": "Floating Shard 27",
+    "description": "You are standing on a floating island in the sky. Bamboo sways in the wind, and cherry blossoms drift through the air.",
+    "exits": {
+      "west": 5026,
+      "east": 5028
+    },
+    "mobs": [],
+    "initial_items": [],
+    "interactables": []
+  },
+  "5028": {
+    "vnum": 5028,
+    "zone": 5,
+    "name": "Floating Shard 28",
+    "description": "You are standing on a floating island in the sky. Bamboo sways in the wind, and cherry blossoms drift through the air.",
+    "exits": {
+      "west": 5027,
+      "east": 5029
+    },
+    "mobs": [
+      5013
+    ],
+    "initial_items": [],
+    "interactables": []
+  },
+  "5029": {
+    "vnum": 5029,
+    "zone": 5,
+    "name": "Floating Shard 29",
+    "description": "You are standing on a floating island in the sky. Bamboo sways in the wind, and cherry blossoms drift through the air.",
+    "exits": {
+      "west": 5028,
+      "east": 5030
+    },
+    "mobs": [],
+    "initial_items": [],
+    "interactables": []
+  },
+  "5030": {
+    "vnum": 5030,
+    "zone": 5,
+    "name": "Floating Shard 30",
+    "description": "You are standing on a floating island in the sky. Bamboo sways in the wind, and cherry blossoms drift through the air.",
+    "exits": {
+      "west": 5029,
+      "east": 5031
+    },
+    "mobs": [],
+    "initial_items": [],
+    "interactables": []
+  },
+  "5031": {
+    "vnum": 5031,
+    "zone": 5,
+    "name": "Ronin's Camp",
+    "description": "A makeshift camp on a rocky shard.",
+    "exits": {
+      "west": 5030,
+      "east": 5032
+    },
+    "mobs": [
+      5021
+    ],
+    "initial_items": [],
+    "interactables": []
+  },
+  "5032": {
+    "vnum": 5032,
+    "zone": 5,
+    "name": "Floating Shard 32",
+    "description": "You are standing on a floating island in the sky. Bamboo sways in the wind, and cherry blossoms drift through the air.",
+    "exits": {
+      "west": 5031,
+      "east": 5033
+    },
+    "mobs": [],
+    "initial_items": [],
+    "interactables": []
+  },
+  "5033": {
+    "vnum": 5033,
+    "zone": 5,
+    "name": "Floating Shard 33",
+    "description": "You are standing on a floating island in the sky. Bamboo sways in the wind, and cherry blossoms drift through the air.",
+    "exits": {
+      "west": 5032,
+      "east": 5034
+    },
+    "mobs": [],
+    "initial_items": [],
+    "interactables": []
+  },
+  "5034": {
+    "vnum": 5034,
+    "zone": 5,
+    "name": "Floating Shard 34",
+    "description": "You are standing on a floating island in the sky. Bamboo sways in the wind, and cherry blossoms drift through the air.",
+    "exits": {
+      "west": 5033,
+      "east": 5035
+    },
+    "mobs": [
+      5004
+    ],
+    "initial_items": [],
+    "interactables": []
+  },
+  "5035": {
+    "vnum": 5035,
+    "zone": 5,
+    "name": "Floating Shard 35",
+    "description": "You are standing on a floating island in the sky. Bamboo sways in the wind, and cherry blossoms drift through the air.",
+    "exits": {
+      "west": 5034,
+      "east": 5036
+    },
+    "mobs": [],
+    "initial_items": [],
+    "interactables": []
+  },
+  "5036": {
+    "vnum": 5036,
+    "zone": 5,
+    "name": "Floating Shard 36",
+    "description": "You are standing on a floating island in the sky. Bamboo sways in the wind, and cherry blossoms drift through the air.",
+    "exits": {
+      "west": 5035,
+      "east": 5037
+    },
+    "mobs": [],
+    "initial_items": [],
+    "interactables": []
+  },
+  "5037": {
+    "vnum": 5037,
+    "zone": 5,
+    "name": "Floating Shard 37",
+    "description": "You are standing on a floating island in the sky. Bamboo sways in the wind, and cherry blossoms drift through the air.",
+    "exits": {
+      "west": 5036,
+      "east": 5038
+    },
+    "mobs": [
+      5007
+    ],
+    "initial_items": [],
+    "interactables": []
+  },
+  "5038": {
+    "vnum": 5038,
+    "zone": 5,
+    "name": "Floating Shard 38",
+    "description": "You are standing on a floating island in the sky. Bamboo sways in the wind, and cherry blossoms drift through the air.",
+    "exits": {
+      "west": 5037,
+      "east": 5039
+    },
+    "mobs": [],
+    "initial_items": [],
+    "interactables": []
+  },
+  "5039": {
+    "vnum": 5039,
+    "zone": 5,
+    "name": "Floating Shard 39",
+    "description": "You are standing on a floating island in the sky. Bamboo sways in the wind, and cherry blossoms drift through the air.",
+    "exits": {
+      "west": 5038,
+      "east": 5040
+    },
+    "mobs": [],
+    "initial_items": [],
+    "interactables": []
+  },
+  "5040": {
+    "vnum": 5040,
+    "zone": 5,
+    "name": "Floating Shard 40",
+    "description": "You are standing on a floating island in the sky. Bamboo sways in the wind, and cherry blossoms drift through the air.",
+    "exits": {
+      "west": 5039,
+      "east": 5041
+    },
+    "mobs": [
+      5010
+    ],
+    "initial_items": [],
+    "interactables": []
+  },
+  "5041": {
+    "vnum": 5041,
+    "zone": 5,
+    "name": "Demon's Lair",
+    "description": "A dark, corrupted island where the Demon General resides.",
+    "exits": {
+      "west": 5040,
+      "east": 5042
+    },
+    "mobs": [
+      5016
+    ],
+    "initial_items": [],
+    "interactables": []
+  },
+  "5042": {
+    "vnum": 5042,
+    "zone": 5,
+    "name": "Floating Shard 42",
+    "description": "You are standing on a floating island in the sky. Bamboo sways in the wind, and cherry blossoms drift through the air.",
+    "exits": {
+      "west": 5041,
+      "east": 5043
+    },
+    "mobs": [],
+    "initial_items": [],
+    "interactables": []
+  },
+  "5043": {
+    "vnum": 5043,
+    "zone": 5,
+    "name": "Floating Shard 43",
+    "description": "You are standing on a floating island in the sky. Bamboo sways in the wind, and cherry blossoms drift through the air.",
+    "exits": {
+      "west": 5042,
+      "east": 5044
+    },
+    "mobs": [
+      5013
+    ],
+    "initial_items": [],
+    "interactables": []
+  },
+  "5044": {
+    "vnum": 5044,
+    "zone": 5,
+    "name": "Floating Shard 44",
+    "description": "You are standing on a floating island in the sky. Bamboo sways in the wind, and cherry blossoms drift through the air.",
+    "exits": {
+      "west": 5043,
+      "east": 5045
+    },
+    "mobs": [],
+    "initial_items": [],
+    "interactables": []
+  },
+  "5045": {
+    "vnum": 5045,
+    "zone": 5,
+    "name": "Hidden Shrine",
+    "description": "A secluded shrine holding a secret scroll.",
+    "exits": {
+      "west": 5044
+    },
+    "mobs": [],
+    "initial_items": [
+      5017
+    ],
+    "interactables": []
   },
   "6001": {
     "vnum": 6001,
     "zone": 6,
-    "name": "City Gates",
-    "description": "Massive stone arches leading into the ancient city.",
-    "flags": [],
+    "name": "Gateway to the Forgotten Epoch",
+    "description": "A grand entrance to various historical eras. A path leads southwest back to the hub.",
     "exits": {
-      "west": {
-        "target_vnum": 6000
-      },
-      "east": {
-        "target_vnum": 6002
-      }
+      "east": 6002,
+      "south": 6010,
+      "southwest": 7
     },
-    "interactables": [],
-    "initial_mobs": [
+    "mobs": [
       6001
     ],
-    "initial_items": []
+    "initial_items": [],
+    "interactables": []
   },
   "6002": {
     "vnum": 6002,
     "zone": 6,
-    "name": "The Forum",
-    "description": "A bustling marketplace, now deserted and ruined.",
-    "flags": [],
+    "name": "Gladiator Arena - Sector 1",
+    "description": "You are in a gladiator arena. The architecture is ancient and imposing.",
     "exits": {
-      "west": {
-        "target_vnum": 6001
-      },
-      "north": {
-        "target_vnum": 6003
-      },
-      "south": {
-        "target_vnum": 6004
-      }
+      "west": 6001,
+      "east": 6003,
+      "south": 6011
     },
-    "interactables": [],
-    "initial_mobs": [
-      6002
-    ],
-    "initial_items": [
-      6001
-    ]
+    "mobs": [],
+    "initial_items": [],
+    "interactables": []
   },
   "6003": {
     "vnum": 6003,
     "zone": 6,
-    "name": "Temple of Jupiter",
-    "description": "Tall marble columns. The altar has been smashed.",
-    "flags": [],
+    "name": "Egyptian Tomb - Sector 1",
+    "description": "You are in a egyptian tomb. The architecture is ancient and imposing.",
     "exits": {
-      "south": {
-        "target_vnum": 6002
-      }
+      "west": 6002,
+      "east": 6004,
+      "south": 6012
     },
-    "interactables": [],
-    "initial_mobs": [
+    "mobs": [
       6003
     ],
-    "initial_items": [
-      6002
-    ]
+    "initial_items": [],
+    "interactables": []
   },
   "6004": {
     "vnum": 6004,
     "zone": 6,
-    "name": "Baths of Caracalla",
-    "description": "Empty pools and cracked mosaics.",
-    "flags": [
-      "safe"
-    ],
+    "name": "Viking Longhouse - Sector 1",
+    "description": "You are in a viking longhouse. The architecture is ancient and imposing.",
     "exits": {
-      "north": {
-        "target_vnum": 6002
-      },
-      "east": {
-        "target_vnum": 6005
-      }
+      "west": 6003,
+      "east": 6005,
+      "south": 6013
     },
-    "interactables": [],
-    "initial_mobs": [
-      8007
+    "mobs": [
+      6006
     ],
-    "initial_items": []
+    "initial_items": [],
+    "interactables": []
   },
   "6005": {
     "vnum": 6005,
     "zone": 6,
-    "name": "Colosseum Exterior",
-    "description": "The massive amphitheater looms ahead.",
-    "flags": [],
+    "name": "Greek Temple - Sector 1",
+    "description": "You are in a greek temple. The architecture is ancient and imposing.",
     "exits": {
-      "west": {
-        "target_vnum": 6004
-      },
-      "east": {
-        "target_vnum": 6006
-      }
+      "west": 6004,
+      "east": 6006,
+      "south": 6014
     },
-    "interactables": [],
-    "initial_mobs": [
-      6001
+    "mobs": [
+      6005
     ],
-    "initial_items": []
+    "initial_items": [],
+    "interactables": []
   },
   "6006": {
     "vnum": 6006,
     "zone": 6,
-    "name": "Gladiator Pens",
-    "description": "Rusty weapons and bloodstained sand.",
-    "flags": [],
+    "name": "Medieval Dungeon - Sector 1",
+    "description": "You are in a medieval dungeon. The architecture is ancient and imposing.",
     "exits": {
-      "west": {
-        "target_vnum": 6005
-      },
-      "up": {
-        "target_vnum": 6007
-      },
-      "down": {
-        "target_vnum": 6008
-      }
+      "west": 6005,
+      "east": 6007,
+      "south": 6015
     },
-    "interactables": [],
-    "initial_mobs": [
-      6002
-    ],
-    "initial_items": [
-      6005
-    ]
+    "mobs": [],
+    "initial_items": [],
+    "interactables": []
   },
   "6007": {
     "vnum": 6007,
     "zone": 6,
-    "name": "The Arena",
-    "description": "The roaring crowd is long gone. Only death remains.",
-    "flags": [],
+    "name": "Ancient Library - Sector 1",
+    "description": "You are in a ancient library. The architecture is ancient and imposing.",
     "exits": {
-      "down": {
-        "target_vnum": 6006
-      }
+      "west": 6006,
+      "east": 6008,
+      "south": 6016
     },
-    "interactables": [],
-    "initial_mobs": [
-      6004
+    "mobs": [
+      6007
     ],
-    "initial_items": []
+    "initial_items": [],
+    "interactables": []
   },
   "6008": {
     "vnum": 6008,
     "zone": 6,
-    "name": "Catacombs Entrance",
-    "description": "Dark tunnels beneath the arena.",
-    "flags": [],
+    "name": "Catacombs - Sector 1",
+    "description": "You are in a catacombs. The architecture is ancient and imposing.",
     "exits": {
-      "up": {
-        "target_vnum": 6006
-      },
-      "north": {
-        "target_vnum": 6009
-      }
+      "west": 6007,
+      "east": 6009,
+      "south": 6017
     },
-    "interactables": [],
-    "initial_mobs": [
-      6003
-    ],
-    "initial_items": []
-  },
-  "6009": {
-    "vnum": 6009,
-    "zone": 6,
-    "name": "Catacombs Junction",
-    "description": "The tunnels split in three directions.",
-    "flags": [],
-    "exits": {
-      "south": {
-        "target_vnum": 6008
-      },
-      "east": {
-        "target_vnum": 6010
-      },
-      "west": {
-        "target_vnum": 6011
-      },
-      "north": {
-        "target_vnum": 6012
-      }
-    },
-    "interactables": [],
-    "initial_mobs": [],
-    "initial_items": []
-  },
-  "6010": {
-    "vnum": 6010,
-    "zone": 6,
-    "name": "East Crypt",
-    "description": "Bones line the walls.",
-    "flags": [],
-    "exits": {
-      "west": {
-        "target_vnum": 6009
-      }
-    },
-    "interactables": [],
-    "initial_mobs": [
-      6002
-    ],
-    "initial_items": []
-  },
-  "6011": {
-    "vnum": 6011,
-    "zone": 6,
-    "name": "West Crypt",
-    "description": "Bones line the walls.",
-    "flags": [],
-    "exits": {
-      "east": {
-        "target_vnum": 6009
-      }
-    },
-    "interactables": [],
-    "initial_mobs": [
-      6002
-    ],
-    "initial_items": []
-  },
-  "6012": {
-    "vnum": 6012,
-    "zone": 6,
-    "name": "North Crypt",
-    "description": "A dead end with a strange mechanism.",
-    "flags": [],
-    "exits": {
-      "south": {
-        "target_vnum": 6009
-      },
-      "down": {
-        "target_vnum": 6013,
-        "door": {
-          "is_door": true,
-          "state": "locked",
-          "key_vnum": 6003
-        }
-      }
-    },
+    "mobs": [],
+    "initial_items": [],
     "interactables": [
       {
         "keyword": [
           "mechanism",
-          "wall"
+          "slot"
         ],
-        "description": "A stone relief of a lion. It seems to be missing an eye.",
-        "action": "use_gem"
+        "description": "A strange mechanism with a lion-shaped indentation.",
+        "action": "insert lion's eye gem"
       }
+    ]
+  },
+  "6009": {
+    "vnum": 6009,
+    "zone": 6,
+    "name": "Aqueducts - Sector 1",
+    "description": "You are in a aqueducts. The architecture is ancient and imposing.",
+    "exits": {
+      "west": 6008,
+      "south": 6018
+    },
+    "mobs": [
+      6009
     ],
-    "initial_mobs": [
-      6003
+    "initial_items": [],
+    "interactables": []
+  },
+  "6010": {
+    "vnum": 6010,
+    "zone": 6,
+    "name": "Roman Forum - Sector 2",
+    "description": "You are in a roman forum. The architecture is ancient and imposing. There are circular grooves on the floor, as if a perfect sphere rolled through here.",
+    "exits": {
+      "east": 6011,
+      "north": 6001,
+      "south": 6019
+    },
+    "mobs": [
+      6006
     ],
-    "initial_items": []
+    "initial_items": [],
+    "interactables": []
+  },
+  "6011": {
+    "vnum": 6011,
+    "zone": 6,
+    "name": "Gladiator Arena - Sector 2",
+    "description": "You are in a gladiator arena. The architecture is ancient and imposing.",
+    "exits": {
+      "west": 6010,
+      "east": 6012,
+      "north": 6002,
+      "south": 6020
+    },
+    "mobs": [
+      6011
+    ],
+    "initial_items": [],
+    "interactables": []
+  },
+  "6012": {
+    "vnum": 6012,
+    "zone": 6,
+    "name": "Egyptian Tomb - Sector 2",
+    "description": "You are in a egyptian tomb. The architecture is ancient and imposing.",
+    "exits": {
+      "west": 6011,
+      "east": 6013,
+      "north": 6003,
+      "south": 6021
+    },
+    "mobs": [],
+    "initial_items": [],
+    "interactables": []
   },
   "6013": {
     "vnum": 6013,
     "zone": 6,
-    "name": "Secret Passage",
-    "description": "A hidden tunnel leading deeper.",
-    "flags": [],
+    "name": "Viking Longhouse - Sector 2",
+    "description": "You are in a viking longhouse. The architecture is ancient and imposing.",
     "exits": {
-      "up": {
-        "target_vnum": 6012
-      },
-      "north": {
-        "target_vnum": 6014
-      }
+      "west": 6012,
+      "east": 6014,
+      "north": 6004,
+      "south": 6022
     },
-    "interactables": [],
-    "initial_mobs": [
-      6001
+    "mobs": [
+      6013
     ],
-    "initial_items": []
+    "initial_items": [],
+    "interactables": []
   },
   "6014": {
     "vnum": 6014,
     "zone": 6,
-    "name": "Imperial Vault",
-    "description": "Treasures of the empire.",
-    "flags": [],
+    "name": "Greek Temple - Sector 2",
+    "description": "You are in a greek temple. The architecture is ancient and imposing.",
     "exits": {
-      "south": {
-        "target_vnum": 6013
-      },
-      "north": {
-        "target_vnum": 6015,
-        "door": {
-          "is_door": true,
-          "state": "locked",
-          "key_vnum": 6004
-        }
-      }
+      "west": 6013,
+      "east": 6015,
+      "north": 6005,
+      "south": 6023
     },
-    "interactables": [],
-    "initial_mobs": [
-      6004
-    ],
-    "initial_items": []
+    "mobs": [],
+    "initial_items": [],
+    "interactables": []
   },
   "6015": {
     "vnum": 6015,
     "zone": 6,
-    "name": "Emperor's Tomb",
-    "description": "The final resting place of a tyrant. The sarcophagus lid has a perfect circular hole punched straight through the marble. The marble was here.",
-    "flags": [],
+    "name": "Medieval Dungeon - Sector 2",
+    "description": "You are in a medieval dungeon. The architecture is ancient and imposing.",
     "exits": {
-      "south": {
-        "target_vnum": 6014
-      }
+      "west": 6014,
+      "east": 6016,
+      "north": 6006,
+      "south": 6024
     },
-    "interactables": [],
-    "initial_mobs": [
-      6005
+    "mobs": [
+      6015
     ],
-    "initial_items": [
+    "initial_items": [],
+    "interactables": []
+  },
+  "6016": {
+    "vnum": 6016,
+    "zone": 6,
+    "name": "Ancient Library - Sector 2",
+    "description": "You are in a ancient library. The architecture is ancient and imposing.",
+    "exits": {
+      "west": 6015,
+      "east": 6017,
+      "north": 6007,
+      "south": 6025
+    },
+    "mobs": [
       6006
+    ],
+    "initial_items": [],
+    "interactables": []
+  },
+  "6017": {
+    "vnum": 6017,
+    "zone": 6,
+    "name": "Catacombs - Sector 2",
+    "description": "You are in a catacombs. The architecture is ancient and imposing.",
+    "exits": {
+      "west": 6016,
+      "east": 6018,
+      "north": 6008,
+      "south": 6026
+    },
+    "mobs": [
+      6017
+    ],
+    "initial_items": [],
+    "interactables": [
+      {
+        "keyword": [
+          "mechanism",
+          "slot"
+        ],
+        "description": "A strange mechanism with a lion-shaped indentation.",
+        "action": "insert lion's eye gem"
+      }
     ]
+  },
+  "6018": {
+    "vnum": 6018,
+    "zone": 6,
+    "name": "Aqueducts - Sector 2",
+    "description": "You are in a aqueducts. The architecture is ancient and imposing.",
+    "exits": {
+      "west": 6017,
+      "north": 6009,
+      "south": 6027
+    },
+    "mobs": [],
+    "initial_items": [],
+    "interactables": []
+  },
+  "6019": {
+    "vnum": 6019,
+    "zone": 6,
+    "name": "Roman Forum - Sector 3",
+    "description": "You are in a roman forum. The architecture is ancient and imposing.",
+    "exits": {
+      "east": 6020,
+      "north": 6010,
+      "south": 6028
+    },
+    "mobs": [
+      6019
+    ],
+    "initial_items": [],
+    "interactables": []
+  },
+  "6020": {
+    "vnum": 6020,
+    "zone": 6,
+    "name": "Gladiator Arena - Sector 3",
+    "description": "You are in a gladiator arena. The architecture is ancient and imposing.",
+    "exits": {
+      "west": 6019,
+      "east": 6021,
+      "north": 6011,
+      "south": 6029
+    },
+    "mobs": [],
+    "initial_items": [],
+    "interactables": []
+  },
+  "6021": {
+    "vnum": 6021,
+    "zone": 6,
+    "name": "Egyptian Tomb - Sector 3",
+    "description": "You are in a egyptian tomb. The architecture is ancient and imposing.",
+    "exits": {
+      "west": 6020,
+      "east": 6022,
+      "north": 6012,
+      "south": 6030
+    },
+    "mobs": [
+      6021
+    ],
+    "initial_items": [],
+    "interactables": []
+  },
+  "6022": {
+    "vnum": 6022,
+    "zone": 6,
+    "name": "Viking Longhouse - Sector 3",
+    "description": "You are in a viking longhouse. The architecture is ancient and imposing.",
+    "exits": {
+      "west": 6021,
+      "east": 6023,
+      "north": 6013,
+      "south": 6031
+    },
+    "mobs": [
+      6006
+    ],
+    "initial_items": [],
+    "interactables": []
+  },
+  "6023": {
+    "vnum": 6023,
+    "zone": 6,
+    "name": "Greek Temple - Sector 3",
+    "description": "You are in a greek temple. The architecture is ancient and imposing.",
+    "exits": {
+      "west": 6022,
+      "east": 6024,
+      "north": 6014,
+      "south": 6032
+    },
+    "mobs": [
+      6023
+    ],
+    "initial_items": [],
+    "interactables": []
+  },
+  "6024": {
+    "vnum": 6024,
+    "zone": 6,
+    "name": "Medieval Dungeon - Sector 3",
+    "description": "You are in a medieval dungeon. The architecture is ancient and imposing.",
+    "exits": {
+      "west": 6023,
+      "east": 6025,
+      "north": 6015,
+      "south": 6033
+    },
+    "mobs": [],
+    "initial_items": [],
+    "interactables": []
+  },
+  "6025": {
+    "vnum": 6025,
+    "zone": 6,
+    "name": "Ancient Library - Sector 3",
+    "description": "You are in a ancient library. The architecture is ancient and imposing.",
+    "exits": {
+      "west": 6024,
+      "east": 6026,
+      "north": 6016,
+      "south": 6034
+    },
+    "mobs": [
+      6006
+    ],
+    "initial_items": [],
+    "interactables": []
+  },
+  "6026": {
+    "vnum": 6026,
+    "zone": 6,
+    "name": "Catacombs - Sector 3",
+    "description": "You are in a catacombs. The architecture is ancient and imposing.",
+    "exits": {
+      "west": 6025,
+      "east": 6027,
+      "north": 6017,
+      "south": 6035
+    },
+    "mobs": [],
+    "initial_items": [],
+    "interactables": [
+      {
+        "keyword": [
+          "mechanism",
+          "slot"
+        ],
+        "description": "A strange mechanism with a lion-shaped indentation.",
+        "action": "insert lion's eye gem"
+      }
+    ]
+  },
+  "6027": {
+    "vnum": 6027,
+    "zone": 6,
+    "name": "Aqueducts - Sector 3",
+    "description": "You are in a aqueducts. The architecture is ancient and imposing.",
+    "exits": {
+      "west": 6026,
+      "north": 6018,
+      "south": 6036
+    },
+    "mobs": [],
+    "initial_items": [],
+    "interactables": []
+  },
+  "6028": {
+    "vnum": 6028,
+    "zone": 6,
+    "name": "Roman Forum - Sector 4",
+    "description": "You are in a roman forum. The architecture is ancient and imposing.",
+    "exits": {
+      "east": 6029,
+      "north": 6019,
+      "south": 6037
+    },
+    "mobs": [
+      6006
+    ],
+    "initial_items": [],
+    "interactables": []
+  },
+  "6029": {
+    "vnum": 6029,
+    "zone": 6,
+    "name": "Gladiator Arena - Sector 4",
+    "description": "You are in a gladiator arena. The architecture is ancient and imposing.",
+    "exits": {
+      "west": 6028,
+      "east": 6030,
+      "north": 6020,
+      "south": 6038
+    },
+    "mobs": [],
+    "initial_items": [],
+    "interactables": []
+  },
+  "6030": {
+    "vnum": 6030,
+    "zone": 6,
+    "name": "Egyptian Tomb - Sector 4",
+    "description": "You are in a egyptian tomb. The architecture is ancient and imposing.",
+    "exits": {
+      "west": 6029,
+      "east": 6031,
+      "north": 6021,
+      "south": 6039
+    },
+    "mobs": [],
+    "initial_items": [],
+    "interactables": []
+  },
+  "6031": {
+    "vnum": 6031,
+    "zone": 6,
+    "name": "Viking Longhouse - Sector 4",
+    "description": "You are in a viking longhouse. The architecture is ancient and imposing.",
+    "exits": {
+      "west": 6030,
+      "east": 6032,
+      "north": 6022,
+      "south": 6040
+    },
+    "mobs": [
+      6006
+    ],
+    "initial_items": [],
+    "interactables": []
+  },
+  "6032": {
+    "vnum": 6032,
+    "zone": 6,
+    "name": "Greek Temple - Sector 4",
+    "description": "You are in a greek temple. The architecture is ancient and imposing.",
+    "exits": {
+      "west": 6031,
+      "east": 6033,
+      "north": 6023,
+      "south": 6041
+    },
+    "mobs": [],
+    "initial_items": [],
+    "interactables": []
+  },
+  "6033": {
+    "vnum": 6033,
+    "zone": 6,
+    "name": "Medieval Dungeon - Sector 4",
+    "description": "You are in a medieval dungeon. The architecture is ancient and imposing.",
+    "exits": {
+      "west": 6032,
+      "east": 6034,
+      "north": 6024,
+      "south": 6042
+    },
+    "mobs": [],
+    "initial_items": [],
+    "interactables": []
+  },
+  "6034": {
+    "vnum": 6034,
+    "zone": 6,
+    "name": "Ancient Library - Sector 4",
+    "description": "You are in a ancient library. The architecture is ancient and imposing.",
+    "exits": {
+      "west": 6033,
+      "east": 6035,
+      "north": 6025,
+      "south": 6043
+    },
+    "mobs": [
+      6006
+    ],
+    "initial_items": [],
+    "interactables": []
+  },
+  "6035": {
+    "vnum": 6035,
+    "zone": 6,
+    "name": "Catacombs - Sector 4",
+    "description": "You are in a catacombs. The architecture is ancient and imposing.",
+    "exits": {
+      "west": 6034,
+      "east": 6036,
+      "north": 6026,
+      "south": 6044
+    },
+    "mobs": [],
+    "initial_items": [],
+    "interactables": [
+      {
+        "keyword": [
+          "mechanism",
+          "slot"
+        ],
+        "description": "A strange mechanism with a lion-shaped indentation.",
+        "action": "insert lion's eye gem"
+      }
+    ]
+  },
+  "6036": {
+    "vnum": 6036,
+    "zone": 6,
+    "name": "Aqueducts - Sector 4",
+    "description": "You are in a aqueducts. The architecture is ancient and imposing.",
+    "exits": {
+      "west": 6035,
+      "north": 6027,
+      "south": 6045
+    },
+    "mobs": [],
+    "initial_items": [],
+    "interactables": []
+  },
+  "6037": {
+    "vnum": 6037,
+    "zone": 6,
+    "name": "Roman Forum - Sector 5",
+    "description": "You are in a roman forum. The architecture is ancient and imposing.",
+    "exits": {
+      "east": 6038,
+      "north": 6028
+    },
+    "mobs": [
+      6006
+    ],
+    "initial_items": [],
+    "interactables": []
+  },
+  "6038": {
+    "vnum": 6038,
+    "zone": 6,
+    "name": "Gladiator Arena - Sector 5",
+    "description": "You are in a gladiator arena. The architecture is ancient and imposing.",
+    "exits": {
+      "west": 6037,
+      "east": 6039,
+      "north": 6029
+    },
+    "mobs": [],
+    "initial_items": [],
+    "interactables": []
+  },
+  "6039": {
+    "vnum": 6039,
+    "zone": 6,
+    "name": "Egyptian Tomb - Sector 5",
+    "description": "You are in a egyptian tomb. The architecture is ancient and imposing.",
+    "exits": {
+      "west": 6038,
+      "east": 6040,
+      "north": 6030
+    },
+    "mobs": [],
+    "initial_items": [],
+    "interactables": []
+  },
+  "6040": {
+    "vnum": 6040,
+    "zone": 6,
+    "name": "Viking Longhouse - Sector 5",
+    "description": "You are in a viking longhouse. The architecture is ancient and imposing.",
+    "exits": {
+      "west": 6039,
+      "east": 6041,
+      "north": 6031
+    },
+    "mobs": [
+      6006
+    ],
+    "initial_items": [],
+    "interactables": []
+  },
+  "6041": {
+    "vnum": 6041,
+    "zone": 6,
+    "name": "Greek Temple - Sector 5",
+    "description": "You are in a greek temple. The architecture is ancient and imposing.",
+    "exits": {
+      "west": 6040,
+      "east": 6042,
+      "north": 6032
+    },
+    "mobs": [],
+    "initial_items": [],
+    "interactables": []
+  },
+  "6042": {
+    "vnum": 6042,
+    "zone": 6,
+    "name": "Medieval Dungeon - Sector 5",
+    "description": "You are in a medieval dungeon. The architecture is ancient and imposing.",
+    "exits": {
+      "west": 6041,
+      "east": 6043,
+      "north": 6033
+    },
+    "mobs": [],
+    "initial_items": [],
+    "interactables": []
+  },
+  "6043": {
+    "vnum": 6043,
+    "zone": 6,
+    "name": "Ancient Library - Sector 5",
+    "description": "You are in a ancient library. The architecture is ancient and imposing.",
+    "exits": {
+      "west": 6042,
+      "east": 6044,
+      "north": 6034
+    },
+    "mobs": [
+      6006
+    ],
+    "initial_items": [],
+    "interactables": []
+  },
+  "6044": {
+    "vnum": 6044,
+    "zone": 6,
+    "name": "Catacombs - Sector 5",
+    "description": "You are in a catacombs. The architecture is ancient and imposing.",
+    "exits": {
+      "west": 6043,
+      "east": 6045,
+      "north": 6035
+    },
+    "mobs": [],
+    "initial_items": [],
+    "interactables": [
+      {
+        "keyword": [
+          "mechanism",
+          "slot"
+        ],
+        "description": "A strange mechanism with a lion-shaped indentation.",
+        "action": "insert lion's eye gem"
+      }
+    ]
+  },
+  "6045": {
+    "vnum": 6045,
+    "zone": 6,
+    "name": "Caesar's Treasury",
+    "description": "An empty room. A note on the wall says 'Already looted.'",
+    "exits": {
+      "west": 6044,
+      "north": 6036
+    },
+    "mobs": [],
+    "initial_items": [
+      6008
+    ],
+    "interactables": []
   }
 }
