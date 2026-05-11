@@ -37,10 +37,11 @@
     write: 'write', note: 'write',
     combine: 'combine', merge: 'combine', craft: 'combine',
     rotate: 'rotate', turn: 'rotate', spin: 'rotate',
-    train: 'train', learn: 'train', meditate: 'train',
+    train: 'train', learn: 'train',
     abilities: 'abilities', skills: 'abilities', spells: 'abilities',
-    cast: 'cast', invoke: 'cast',
-    echoes: 'echoes', echo: 'echoes', progress: 'echoes'
+    status: 'status', stats: 'status', power: 'status', score: 'status',
+    buy: 'buy', purchase: 'buy',
+    respec: 'respec'
   };
 
   /**
@@ -122,16 +123,19 @@
         inventory: [],
         equipped: {},
         gold: 0,
+        power: 0,
+        questPoints: 0,
         visitedRooms: [],
         worldFlags: {},
         activeQuests: [],
         completedQuests: [],
+        questCompletionCounts: {},
         killCounts: {},
         baseClass: null,
         specialization: null,
+        specName: null,
         abilities: [],
         abilityCooldowns: {},
-        genreEchoes: { fantasy: 0, scifi: 0, noir: 0, action: 0, anime: 0, historical: 0 },
         focusCostModifier: 0
       };
     }
@@ -149,7 +153,10 @@
     function execute(input) {
       const { verb, target } = parse(input);
 
+      // If no recognized verb, check if the full input matches an ability name
       if (!verb) {
+        const abilityResult = tryUseAbilityByName(input.trim().toLowerCase());
+        if (abilityResult) return abilityResult;
         return [{ type: 'error', text: "I don't understand that. Type 'help' for commands." }];
       }
 
@@ -171,8 +178,9 @@
         case 'quest': return doQuest(target);
         case 'train': return doTrain(target);
         case 'abilities': return doAbilities();
-        case 'cast': return doCast(target);
-        case 'echoes': return doEchoes();
+        case 'status': return doStatus();
+        case 'buy': return doBuy(target);
+        case 'respec': return doRespec(target);
         case 'help': return doHelp();
         case 'say': return [{ type: 'info', text: `You say: "${target}"` }];
         case 'write': return [{ type: 'info', text: '[Notes system requires server connection]' }];
@@ -683,10 +691,12 @@
         { type: 'info', text: '  talk <npc>           — Speak to an NPC' },
         { type: 'info', text: '  attack [target]      — Start combat' },
         { type: 'info', text: '  flee                 — Attempt to escape combat' },
-        { type: 'info', text: '  cast <ability>       — Use an ability in combat' },
+        { type: 'info', text: '  <ability name>       — Use an ability in combat' },
         { type: 'info', text: '  abilities            — List your abilities' },
-        { type: 'info', text: '  echoes               — View Genre Echo progress' },
-        { type: 'info', text: '  train [ability]      — Learn abilities (Training Hall)' },
+        { type: 'info', text: '  status               — View power, QP, and stats' },
+        { type: 'info', text: '  train                — See purchasable abilities (Training Hall)' },
+        { type: 'info', text: '  buy <name>           — Purchase an ability with QP' },
+        { type: 'info', text: '  respec               — Change specialization (30 QP)' },
         { type: 'info', text: '  quest [name]         — View quest log or accept/complete' },
         { type: 'info', text: '  help                 — Show this list' },
         { type: 'info', text: '─── Shortcuts ───' },
@@ -700,21 +710,64 @@
     // ─── Ability System ────────────────────────────────────────────────────────
 
     /**
-     * Show the player's current Genre Echo totals.
+     * Calculate creature power from its stats (hp + attack*3 + defense*2).
+     * Used for the power-gain formula.
      */
-    function doEchoes() {
-      const output = [{ type: 'info', text: '─── Genre Echoes ───' }];
-      for (const [type, count] of Object.entries(player.genreEchoes)) {
-        if (count > 0) {
-          output.push({ type: 'info', text: `  ${type}: ${count}` });
-        }
+    function getCreaturePower(mob) {
+      if (!mob || !mob.stats) return 10;
+      return (mob.stats.hp || 0) + (mob.stats.attack || 0) * 3 + (mob.stats.defense || 0) * 2;
+    }
+
+    /**
+     * Calculate power gained from a fight.
+     * - Kill: 10% of creature power (base), modified by relative strength
+     * - Death: 2% of creature power
+     * - If creature is 10%+ weaker than you: only 2%
+     * - If creature is 10%+ stronger: +1% per 5% beyond the 10% threshold
+     */
+    function calcPowerGain(creaturePower, playerPower, killed) {
+      if (!killed) return Math.max(1, Math.floor(creaturePower * 0.02));
+
+      const ratio = playerPower > 0 ? (creaturePower / playerPower) : 2;
+      const threshold = 0.10;
+
+      // Creature is 10%+ weaker → only 2%
+      if (ratio < (1 - threshold)) {
+        return Math.max(1, Math.floor(creaturePower * 0.02));
       }
-      const total = Object.values(player.genreEchoes).reduce((a, b) => a + b, 0);
-      if (total === 0) {
-        output.push({ type: 'info', text: '  None yet. Defeat enemies in themed zones to earn echoes.' });
+
+      // Creature is within ±10% → standard 10%
+      if (ratio <= (1 + threshold)) {
+        return Math.max(1, Math.floor(creaturePower * 0.10));
       }
-      output.push({ type: 'info', text: `  Focus: ${player.focus}/${player.maxFocus}` });
-      return output;
+
+      // Creature is 10%+ stronger → 10% + 1% per 5% beyond threshold
+      const excessPercent = (ratio - (1 + threshold)) * 100; // e.g. 40 for 50% stronger
+      const bonusPercent = Math.floor(excessPercent / 5);
+      const totalPercent = 10 + bonusPercent;
+      return Math.max(1, Math.floor(creaturePower * totalPercent / 100));
+    }
+
+    /**
+     * Show player status: power, QP, spec, focus.
+     */
+    function doStatus() {
+      const spec = window.MudAbilities?.getSpec(player.baseClass, player.specialization);
+      const tiers = window.MudAbilities?.POWER_TIERS || [10, 25, 50, 100];
+      const currentTier = tiers.filter(t => player.power >= t).length;
+      const nextTier = tiers[currentTier] || 'MAX';
+
+      return [
+        { type: 'info', text: '─── Status ───' },
+        { type: 'info', text: `  Path:         ${spec?.name || player.specName || 'None'}` },
+        { type: 'info', text: `  Power:        ${player.power}${nextTier !== 'MAX' ? ` (next tier at ${nextTier})` : ' (MAX TIER)'}` },
+        { type: 'info', text: `  Quest Points: ${player.questPoints}` },
+        { type: 'info', text: `  Focus:        ${player.focus}/${player.maxFocus}` },
+        { type: 'info', text: `  HP:           ${player.hp}/${player.maxHp}` },
+        { type: 'info', text: `  Attack:       ${player.attackPower}` },
+        { type: 'info', text: `  Defense:      ${player.defense}` },
+        { type: 'info', text: `  Gold:         ${player.gold}` }
+      ];
     }
 
     /**
@@ -722,133 +775,218 @@
      */
     function doAbilities() {
       if (player.abilities.length === 0) {
-        return [{ type: 'info', text: 'You have no abilities. Choose a class during character creation.' }];
+        return [{ type: 'info', text: 'You have no abilities yet.' }];
       }
       const output = [{ type: 'info', text: '─── Abilities ───' }];
       for (const abilityId of player.abilities) {
-        const def = window.MudAbilities?.getAbilityById(abilityId)
-          || window.MudAbilities?.getStartingAbility(abilityId);
+        const def = window.MudAbilities?.getAbilityById(abilityId);
         if (!def) continue;
         const cd = player.abilityCooldowns[abilityId] || 0;
         const cdText = cd > 0 ? ` [CD: ${cd} rounds]` : ' [READY]';
         output.push({ type: 'info', text: `  ${def.name} — ${def.desc}${cdText}` });
       }
+      output.push({ type: 'info', text: '' });
       output.push({ type: 'info', text: `  Focus: ${player.focus}/${player.maxFocus}` });
-      output.push({ type: 'info', text: "  Use 'cast <ability>' in combat to activate." });
+      output.push({ type: 'info', text: '  Type the ability name to use it in combat.' });
       return output;
     }
 
     /**
-     * Train a new ability at the Training Hall (hub room 8).
-     * Requires sufficient Genre Echoes and being in the correct room.
+     * Show purchasable abilities at Training Hall (room 8).
+     * Requires power threshold met + costs QP.
      */
     function doTrain(target) {
-      // Training Hall is room 8 (Instructor Vex)
       const TRAINING_ROOM = 8;
       if (player.currentRoom !== TRAINING_ROOM) {
         return [{ type: 'error', text: 'You must be in the Training Hall to learn new abilities.' }];
       }
-      if (!player.baseClass) {
-        return [{ type: 'error', text: 'You have no class. Something went wrong with character creation.' }];
+      if (!player.baseClass || !player.specialization) {
+        return [{ type: 'error', text: 'You have no specialization. Something went wrong.' }];
       }
 
-      const trainable = window.MudAbilities?.getTrainableAbilities(
-        player.baseClass, player.genreEchoes, player.abilities
+      const purchasable = window.MudAbilities?.getPurchasableAbilities(
+        player.baseClass, player.specialization, player.power, player.abilities
       ) || [];
 
-      // No target — show available training options
       if (!target || target === 'list') {
-        if (trainable.length === 0) {
+        if (purchasable.length === 0) {
           return [
             { type: 'info', text: 'Instructor Vex studies you carefully.' },
-            { type: 'info', text: '"You have nothing new to learn right now. Gather more echoes from the zones."' },
-            { type: 'info', text: '' },
-            { type: 'info', text: "Type 'echoes' to see your current totals." }
+            { type: 'info', text: '"You\'ve learned all you can at your current power level."' },
+            { type: 'info', text: `  Your power: ${player.power}. Next tier unlocks more abilities.` }
           ];
         }
         const output = [
           { type: 'info', text: 'Instructor Vex nods. "I can teach you these:"' },
           { type: 'info', text: '' }
         ];
-        trainable.forEach((entry, i) => {
-          output.push({ type: 'items', text: `  ${i + 1}. ${entry.ability.name} (${entry.specName}) — ${entry.ability.desc}` });
-          output.push({ type: 'info', text: `     Requires: ${entry.threshold} ${entry.echoType} echoes [you have ${player.genreEchoes[entry.echoType] || 0}]` });
+        purchasable.forEach((a, i) => {
+          const cost = window.MudAbilities?.getAbilityCost(a.tier) || 5;
+          output.push({ type: 'items', text: `  ${i + 1}. ${a.name} — ${a.desc}` });
+          output.push({ type: 'info', text: `     Cost: ${cost} QP [you have ${player.questPoints}]` });
         });
         output.push({ type: 'info', text: '' });
-        output.push({ type: 'success', text: "Type 'train <number>' or 'train <name>' to learn." });
+        output.push({ type: 'success', text: "Type 'buy <number>' or 'buy <name>' to purchase." });
         return output;
       }
 
-      // Find the ability to train by number or name
+      // Redirect to buy
+      return doBuy(target);
+    }
+
+    /**
+     * Purchase an ability with Quest Points.
+     */
+    function doBuy(target) {
+      if (!target) return [{ type: 'info', text: "Type 'train' to see what's available, then 'buy <name or number>'." }];
+
+      const TRAINING_ROOM = 8;
+      if (player.currentRoom !== TRAINING_ROOM) {
+        return [{ type: 'error', text: 'You must be in the Training Hall to purchase abilities.' }];
+      }
+
+      const purchasable = window.MudAbilities?.getPurchasableAbilities(
+        player.baseClass, player.specialization, player.power, player.abilities
+      ) || [];
+
+      if (purchasable.length === 0) {
+        return [{ type: 'error', text: 'Nothing available to purchase right now.' }];
+      }
+
       let chosen = null;
       const idx = parseInt(target, 10);
-      if (idx >= 1 && idx <= trainable.length) {
-        chosen = trainable[idx - 1];
+      if (idx >= 1 && idx <= purchasable.length) {
+        chosen = purchasable[idx - 1];
       } else {
-        chosen = trainable.find(e =>
-          e.ability.name.toLowerCase().includes(target) ||
-          e.ability.id.toLowerCase().includes(target)
+        chosen = purchasable.find(a =>
+          a.name.toLowerCase().includes(target) || a.id.includes(target)
         );
       }
 
       if (!chosen) {
-        return [{ type: 'error', text: `No trainable ability matches '${target}'. Type 'train' to see options.` }];
+        return [{ type: 'error', text: `No ability matches '${target}'. Type 'train' to see options.` }];
       }
 
-      // Unlock the ability
-      player.abilities.push(chosen.ability.id);
-
-      // Set specialization if this is the player's first ability from a zone
-      if (!player.specialization) {
-        player.specialization = chosen.specName;
+      const cost = window.MudAbilities?.getAbilityCost(chosen.tier) || 5;
+      if (player.questPoints < cost) {
+        return [{ type: 'error', text: `Not enough QP. Need ${cost}, have ${player.questPoints}.` }];
       }
+
+      player.questPoints -= cost;
+      player.abilities.push(chosen.id);
 
       return [
-        { type: 'success', text: `Instructor Vex guides you through the technique...` },
-        { type: 'success', text: '' },
-        { type: 'room-name', text: `─── ABILITY LEARNED: ${chosen.ability.name} ───` },
-        { type: 'info', text: `  ${chosen.ability.desc}` },
-        { type: 'info', text: `  Specialization path: ${chosen.specName}` },
-        { type: 'info', text: '' },
+        { type: 'success', text: 'Instructor Vex guides you through the technique...' },
+        { type: 'room-name', text: `─── ABILITY LEARNED: ${chosen.name} ───` },
+        { type: 'info', text: `  ${chosen.desc}` },
+        { type: 'info', text: `  QP remaining: ${player.questPoints}` },
         { type: 'success', text: "Type 'abilities' to see your full list." }
       ];
     }
 
     /**
-     * Cast/use an ability during combat. Costs focus and applies effects.
+     * Change specialization for 30 QP. Keeps old abilities.
      */
-    function doCast(target) {
-      if (!target) return [{ type: 'error', text: "Cast what? Type 'abilities' to see your list." }];
+    function doRespec(target) {
+      const TRAINING_ROOM = 8;
+      if (player.currentRoom !== TRAINING_ROOM) {
+        return [{ type: 'error', text: 'You must be in the Training Hall to change your path.' }];
+      }
+
+      const respecCost = window.MudAbilities?.RESPEC_COST || 30;
+      const allSpecs = window.MudAbilities?.getSpecsForClass(player.baseClass) || {};
+      const available = Object.entries(allSpecs).filter(([id]) => id !== player.specialization);
+
+      if (!target || target === 'list') {
+        const output = [
+          { type: 'info', text: `Instructor Vex says: "Changing your path costs ${respecCost} QP."` },
+          { type: 'info', text: `  You have ${player.questPoints} QP. Current path: ${player.specName || player.specialization}` },
+          { type: 'info', text: '' },
+          { type: 'info', text: '  Available paths:' }
+        ];
+        available.forEach(([id, spec], i) => {
+          output.push({ type: 'items', text: `  ${i + 1}. ${spec.name}` });
+        });
+        output.push({ type: 'info', text: '' });
+        output.push({ type: 'success', text: "Type 'respec <number>' or 'respec <name>' to switch." });
+        return output;
+      }
+
+      if (player.questPoints < respecCost) {
+        return [{ type: 'error', text: `Not enough QP. Need ${respecCost}, have ${player.questPoints}.` }];
+      }
+
+      let chosen = null;
+      const idx = parseInt(target, 10);
+      if (idx >= 1 && idx <= available.length) {
+        chosen = available[idx - 1];
+      } else {
+        chosen = available.find(([id, spec]) =>
+          spec.name.toLowerCase().includes(target) || id.includes(target)
+        );
+      }
+
+      if (!chosen) {
+        return [{ type: 'error', text: `No path matches '${target}'. Type 'respec' to see options.` }];
+      }
+
+      player.questPoints -= respecCost;
+      player.specialization = chosen[0];
+      player.specName = chosen[1].name;
+
+      return [
+        { type: 'success', text: `Instructor Vex nods solemnly. "Your path has changed."` },
+        { type: 'room-name', text: `─── NEW PATH: ${chosen[1].name} ───` },
+        { type: 'info', text: '  Your old abilities remain, but new ones will come from this tree.' },
+        { type: 'info', text: `  QP remaining: ${player.questPoints}` }
+      ];
+    }
+
+    /**
+     * Try to use an ability by typing its name directly.
+     * Returns output array if matched, or null if no match.
+     */
+    function tryUseAbilityByName(input) {
+      if (!combatState) return null; // Only works in combat
+
+      // Check if input matches any owned ability name
+      const abilityId = player.abilities.find(id => {
+        const def = window.MudAbilities?.getAbilityById(id);
+        if (!def) return false;
+        return def.name.toLowerCase() === input || id === input;
+      });
+      // Partial match fallback
+      const partialId = !abilityId ? player.abilities.find(id => {
+        const def = window.MudAbilities?.getAbilityById(id);
+        if (!def) return false;
+        return def.name.toLowerCase().includes(input);
+      }) : null;
+
+      const matchedId = abilityId || partialId;
+      if (!matchedId) return null;
+
+      return executeAbility(matchedId);
+    }
+
+    /**
+     * Execute an ability by ID. Handles focus cost, cooldown, and effects.
+     */
+    function executeAbility(abilityId) {
+      const def = window.MudAbilities?.getAbilityById(abilityId);
+      if (!def) return [{ type: 'error', text: 'Ability data not found.' }];
 
       if (!combatState) {
         return [{ type: 'error', text: 'You can only use abilities in combat.' }];
       }
-
-      // Find the ability
-      const abilityId = player.abilities.find(id => {
-        const def = window.MudAbilities?.getAbilityById(id)
-          || window.MudAbilities?.getStartingAbility(id);
-        if (!def) return false;
-        return def.name.toLowerCase().includes(target) || id.includes(target);
-      });
-
-      if (!abilityId) {
-        return [{ type: 'error', text: `You don't know an ability called '${target}'.` }];
-      }
-
-      const def = window.MudAbilities?.getAbilityById(abilityId)
-        || window.MudAbilities?.getStartingAbility(abilityId);
-      if (!def) return [{ type: 'error', text: 'Ability data not found.' }];
 
       // Check cooldown
       if ((player.abilityCooldowns[abilityId] || 0) > 0) {
         return [{ type: 'error', text: `${def.name} is on cooldown (${player.abilityCooldowns[abilityId]} rounds remaining).` }];
       }
 
-      // Calculate focus cost (tier-based: 5/10/15/20 + modifier)
+      // Calculate focus cost (tier-based + modifier)
       const tierCosts = [5, 10, 15, 20];
-      const tier = def.tier != null ? def.tier : 0;
-      const baseCost = tierCosts[tier] || 5;
+      const baseCost = tierCosts[def.tier || 0] || 5;
       const cost = Math.max(0, baseCost + (player.focusCostModifier || 0));
 
       if (player.focus < cost) {
@@ -867,15 +1005,12 @@
         case 'attack': {
           const mult = def.multiplier || 1.5;
           let dmg = Math.max(1, Math.floor(player.attackPower * mult));
-          if (def.ignoresDef) {
-            // Full damage, no defense reduction
-          } else {
+          if (!def.ignoresDef) {
             dmg = Math.max(1, dmg - Math.floor((mob?.stats?.defense || 0) / 2));
           }
           combatState.mobHp -= dmg;
           output.push({ type: 'combat', text: `You use ${def.name}! ${dmg} damage! [Mob HP: ${Math.max(0, combatState.mobHp)}/${combatState.mobMaxHp}]` });
 
-          // Some attacks also heal
           if (def.healPercent) {
             const heal = Math.floor(player.maxHp * def.healPercent);
             player.hp = Math.min(player.maxHp, player.hp + heal);
@@ -884,53 +1019,66 @@
 
           // Check if mob dies from ability
           if (combatState.mobHp <= 0) {
-            output.push({ type: 'combat', text: `${mob.name} has been defeated!` });
-            markMobDefeated(combatState.mobVnum);
-            player.killCounts[combatState.mobVnum] = (player.killCounts[combatState.mobVnum] || 0) + 1;
-            const echoReward = window.MudAbilities?.getEchoReward(player.currentRoom);
-            if (echoReward) {
-              player.genreEchoes[echoReward.type] = (player.genreEchoes[echoReward.type] || 0) + echoReward.amount;
-              output.push({ type: 'success', text: `+${echoReward.amount} ${echoReward.type} echo (total: ${player.genreEchoes[echoReward.type]})` });
-            }
-            player.focus = Math.min(player.maxFocus, player.focus + 5);
-            if (mob.loot_table?.length > 0) {
-              for (const lootVnum of mob.loot_table) {
-                if (player.inventory.length < 99) {
-                  player.inventory.push(lootVnum);
-                  output.push({ type: 'success', text: `You loot: ${getItemName(lootVnum)}` });
-                }
-              }
-            }
-            combatState = null;
-            combatTimer = 0;
+            output.push(...handleMobKill(mob));
           }
           break;
         }
         case 'heal': {
-          const pct = def.healPercent || 0.3;
-          const heal = Math.floor(player.maxHp * pct);
+          const heal = Math.floor(player.maxHp * (def.healPercent || 0.3));
           player.hp = Math.min(player.maxHp, player.hp + heal);
           output.push({ type: 'success', text: `You use ${def.name}. Restored ${heal} HP. [HP: ${player.hp}/${player.maxHp}]` });
           break;
         }
         case 'buff': {
-          // Store active buff in worldFlags (simple approach)
-          const buffKey = `buff_${abilityId}`;
-          player.worldFlags[buffKey] = def.duration || 2;
+          player.worldFlags[`buff_${abilityId}`] = def.duration || 2;
           output.push({ type: 'success', text: `You use ${def.name}. Active for ${def.duration || 2} rounds.` });
           break;
         }
         case 'debuff': {
-          const debuffKey = `debuff_${abilityId}`;
-          player.worldFlags[debuffKey] = def.duration || 2;
+          player.worldFlags[`debuff_${abilityId}`] = def.duration || 2;
           output.push({ type: 'success', text: `You use ${def.name}. Enemy weakened for ${def.duration || 2} rounds.` });
           break;
         }
         default:
-          output.push({ type: 'info', text: `You use ${def.name}. [Focus: ${player.focus}/${player.maxFocus}]` });
+          output.push({ type: 'info', text: `You use ${def.name}.` });
       }
 
       output.push({ type: 'info', text: `[Focus: ${player.focus}/${player.maxFocus}]` });
+      return output;
+    }
+
+    /**
+     * Handle mob death: award power, loot, focus regen.
+     * Shared between auto-attack kills and ability kills.
+     */
+    function handleMobKill(mob) {
+      const output = [];
+      output.push({ type: 'combat', text: `${mob.name} has been defeated!` });
+      markMobDefeated(combatState.mobVnum);
+      player.killCounts[combatState.mobVnum] = (player.killCounts[combatState.mobVnum] || 0) + 1;
+
+      // Award power based on relative strength
+      const creaturePower = getCreaturePower(mob);
+      const gained = calcPowerGain(creaturePower, player.power, true);
+      player.power += gained;
+      output.push({ type: 'success', text: `+${gained} power (total: ${player.power})` });
+
+      // Restore focus on kill
+      player.focus = Math.min(player.maxFocus, player.focus + 5);
+
+      // Loot
+      const lootList = mob.loot_table || mob.loot;
+      if (lootList && lootList.length > 0) {
+        for (const lootVnum of lootList) {
+          if (player.inventory.length < 99) {
+            player.inventory.push(lootVnum);
+            output.push({ type: 'success', text: `You loot: ${getItemName(lootVnum)}` });
+          }
+        }
+      }
+
+      combatState = null;
+      combatTimer = 0;
       return output;
     }
 
@@ -949,11 +1097,12 @@
       }
       // Accept or complete by partial name match
       const questId = findQuestByName(target);
-      if (questId && !player.activeQuests.includes(questId) && !player.completedQuests.includes(questId)) {
-        return acceptQuest(questId);
-      }
       if (questId && player.activeQuests.includes(questId)) {
         return tryCompleteQuest(questId);
+      }
+      if (questId && !player.activeQuests.includes(questId)) {
+        // Allow re-accepting completed quests (repeatable)
+        return acceptQuest(questId);
       }
       return [{ type: 'info', text: "Type 'quest' to see your log, or 'quest available' to see what's offered nearby." }];
     }
@@ -988,9 +1137,9 @@
     function showAvailableQuests() {
       const room = currentRoom();
       const roomMobVnums = getAliveMobsInRoom(room);
+      // All quests from NPCs in this room that aren't currently active
       const available = Object.values(quests).filter(q => {
         if (player.activeQuests.includes(q.id)) return false;
-        if (player.completedQuests.includes(q.id)) return false;
         return roomMobVnums.includes(q.giver_vnum);
       });
       if (available.length === 0) {
@@ -999,7 +1148,8 @@
       const output = [{ type: 'info', text: '─── Available Quests ───' }];
       for (const q of available) {
         const giver = mobs[q.giver_vnum];
-        output.push({ type: 'quest', text: `  ${q.name} (from ${giver?.name || 'Unknown'})` });
+        const repeat = player.completedQuests.includes(q.id) ? ' [REPEATABLE]' : '';
+        output.push({ type: 'quest', text: `  ${q.name}${repeat} (from ${giver?.name || 'Unknown'})` });
         output.push({ type: 'info', text: `    ${q.description}` });
       }
       output.push({ type: 'info', text: "  Talk to the NPC to accept, or type 'quest <name>' to accept." });
@@ -1049,10 +1199,22 @@
 
       // Complete the quest
       player.activeQuests = player.activeQuests.filter(id => id !== questId);
-      player.completedQuests.push(questId);
+      if (!player.completedQuests.includes(questId)) {
+        player.completedQuests.push(questId);
+      }
       player.worldFlags[`quest_${questId}_done`] = true;
 
+      // Track completion count for QP calculation
+      player.questCompletionCounts[questId] = (player.questCompletionCounts[questId] || 0) + 1;
+      const timesCompleted = player.questCompletionCounts[questId];
+      const isFirstTime = timesCompleted === 1;
+
       const output = [{ type: 'quest', text: `─── Quest Complete: ${q.name} ───` }];
+
+      // Award Quest Points: 5 first time, 3 on repeats
+      const qpReward = isFirstTime ? 5 : 3;
+      player.questPoints += qpReward;
+      output.push({ type: 'success', text: `+${qpReward} Quest Points${isFirstTime ? '' : ' (repeat)'}. (Total: ${player.questPoints} QP)` });
 
       // Apply rewards
       if (q.rewards) {
@@ -1064,18 +1226,21 @@
           player.inventory.push(q.rewards.item);
           output.push({ type: 'success', text: `Received: ${getItemName(q.rewards.item)}` });
         }
-        if (q.rewards.attack_bonus) {
-          player.attackPower += q.rewards.attack_bonus;
-          output.push({ type: 'success', text: `Attack power increased by ${q.rewards.attack_bonus}!` });
-        }
-        if (q.rewards.defense_bonus) {
-          player.defense += q.rewards.defense_bonus;
-          output.push({ type: 'success', text: `Defense increased by ${q.rewards.defense_bonus}!` });
-        }
-        if (q.rewards.heal_bonus) {
-          player.maxHp += q.rewards.heal_bonus;
-          player.hp += q.rewards.heal_bonus;
-          output.push({ type: 'success', text: `Max HP increased by ${q.rewards.heal_bonus}!` });
+        // Stat bonuses only on first completion
+        if (isFirstTime) {
+          if (q.rewards.attack_bonus) {
+            player.attackPower += q.rewards.attack_bonus;
+            output.push({ type: 'success', text: `Attack power increased by ${q.rewards.attack_bonus}!` });
+          }
+          if (q.rewards.defense_bonus) {
+            player.defense += q.rewards.defense_bonus;
+            output.push({ type: 'success', text: `Defense increased by ${q.rewards.defense_bonus}!` });
+          }
+          if (q.rewards.heal_bonus) {
+            player.maxHp += q.rewards.heal_bonus;
+            player.hp += q.rewards.heal_bonus;
+            output.push({ type: 'success', text: `Max HP increased by ${q.rewards.heal_bonus}!` });
+          }
         }
         if (q.rewards.message) {
           output.push({ type: 'dialogue', text: q.rewards.message });
@@ -1174,34 +1339,7 @@
 
       // Check mob death
       if (combatState.mobHp <= 0) {
-        output.push({ type: 'combat', text: `${mob.name} has been defeated!` });
-        markMobDefeated(combatState.mobVnum);
-
-        // Track kill count for quests
-        player.killCounts[combatState.mobVnum] = (player.killCounts[combatState.mobVnum] || 0) + 1;
-
-        // Award Genre Echoes based on zone
-        const echoReward = window.MudAbilities?.getEchoReward(player.currentRoom);
-        if (echoReward) {
-          player.genreEchoes[echoReward.type] = (player.genreEchoes[echoReward.type] || 0) + echoReward.amount;
-          output.push({ type: 'success', text: `+${echoReward.amount} ${echoReward.type} echo (total: ${player.genreEchoes[echoReward.type]})` });
-        }
-
-        // Restore a small amount of focus on kill
-        player.focus = Math.min(player.maxFocus, player.focus + 5);
-
-        // Loot
-        if (mob.loot_table && mob.loot_table.length > 0) {
-          for (const lootVnum of mob.loot_table) {
-            if (player.inventory.length < 99) {
-              player.inventory.push(lootVnum);
-              output.push({ type: 'success', text: `You loot: ${getItemName(lootVnum)}` });
-            }
-          }
-        }
-
-        combatState = null;
-        combatTimer = 0;
+        output.push(...handleMobKill(mob));
         pushCombatOutput(output);
         return;
       }
@@ -1220,6 +1358,10 @@
       // Check player death
       if (player.hp <= 0) {
         output.push({ type: 'combat', text: 'You have been defeated...' });
+        // Award small power on death (2% of creature power)
+        const deathPower = calcPowerGain(getCreaturePower(mob), player.power, false);
+        player.power += deathPower;
+        output.push({ type: 'info', text: `+${deathPower} power from the struggle. (total: ${player.power})` });
         output.push({ type: 'info', text: 'You awaken back at the Nexus.' });
         player.hp = player.maxHp;
         combatState = null;
@@ -1611,6 +1753,8 @@
         maxHp: player.maxHp,
         focus: player.focus,
         maxFocus: player.maxFocus,
+        power: player.power,
+        questPoints: player.questPoints,
         abilities: player.abilities,
         roomMobs: hostiles.map(getMobName),
         roomNpcs: npcs.map(getMobName),
