@@ -8,8 +8,10 @@
   const MAX_LOG_LINES = 500;
   const MAX_HISTORY = 50;
 
-  function create({ root, engine, onCommand }) {
+  function create({ root, engine, onCommand: initialOnCommand }) {
     if (!root) throw new Error('MudUI requires a root element.');
+
+    let onCommand = initialOnCommand;
 
     let commandHistory = [];
     let historyIndex = -1;
@@ -47,10 +49,12 @@
       // Attach input handler
       inputEl.addEventListener('keydown', handleKeyDown);
 
-      // Initial room display
-      const result = engine.execute('look');
-      appendOutput(result);
-      updateContext(engine.getContext());
+      // Initial room display (skip if engine not yet available, e.g. during chargen)
+      if (engine) {
+        const result = engine.execute('look');
+        appendOutput(result);
+        updateContext(engine.getContext());
+      }
     }
 
     /**
@@ -216,11 +220,19 @@
      * Poll for combat output from the engine (called by scene update loop).
      */
     function pollCombatOutput() {
+      if (!engine) return;
       const lines = engine.flushCombatOutput();
       if (lines.length > 0) {
         appendOutput(lines);
         updateContext(engine.getContext());
       }
+    }
+
+    /**
+     * Replace the command handler (used when transitioning from chargen to engine).
+     */
+    function setCommandHandler(handler) {
+      onCommand = handler;
     }
 
     return {
@@ -229,7 +241,8 @@
       updateContext,
       focus,
       blur,
-      pollCombatOutput
+      pollCombatOutput,
+      setCommandHandler
     };
   }
 

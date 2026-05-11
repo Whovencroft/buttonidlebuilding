@@ -36,7 +36,11 @@
     quest: 'quest', quests: 'quest', journal: 'quest', log: 'quest',
     write: 'write', note: 'write',
     combine: 'combine', merge: 'combine', craft: 'combine',
-    rotate: 'rotate', turn: 'rotate', spin: 'rotate'
+    rotate: 'rotate', turn: 'rotate', spin: 'rotate',
+    train: 'train', learn: 'train', meditate: 'train',
+    abilities: 'abilities', skills: 'abilities', spells: 'abilities',
+    cast: 'cast', invoke: 'cast',
+    echoes: 'echoes', echo: 'echoes', progress: 'echoes'
   };
 
   /**
@@ -111,6 +115,8 @@
         currentRoom: 0,
         hp: 100,
         maxHp: 100,
+        focus: 50,
+        maxFocus: 50,
         attackPower: 10,
         defense: 5,
         inventory: [],
@@ -124,7 +130,9 @@
         baseClass: null,
         specialization: null,
         abilities: [],
-        genreEchoes: {}
+        abilityCooldowns: {},
+        genreEchoes: { fantasy: 0, scifi: 0, noir: 0, action: 0, anime: 0, historical: 0 },
+        focusCostModifier: 0
       };
     }
 
@@ -161,6 +169,10 @@
         case 'combine': return doCombine(target);
         case 'rotate': return doRotate(target);
         case 'quest': return doQuest(target);
+        case 'train': return doTrain(target);
+        case 'abilities': return doAbilities();
+        case 'cast': return doCast(target);
+        case 'echoes': return doEchoes();
         case 'help': return doHelp();
         case 'say': return [{ type: 'info', text: `You say: "${target}"` }];
         case 'write': return [{ type: 'info', text: '[Notes system requires server connection]' }];
@@ -671,6 +683,10 @@
         { type: 'info', text: '  talk <npc>           — Speak to an NPC' },
         { type: 'info', text: '  attack [target]      — Start combat' },
         { type: 'info', text: '  flee                 — Attempt to escape combat' },
+        { type: 'info', text: '  cast <ability>       — Use an ability in combat' },
+        { type: 'info', text: '  abilities            — List your abilities' },
+        { type: 'info', text: '  echoes               — View Genre Echo progress' },
+        { type: 'info', text: '  train [ability]      — Learn abilities (Training Hall)' },
         { type: 'info', text: '  quest [name]         — View quest log or accept/complete' },
         { type: 'info', text: '  help                 — Show this list' },
         { type: 'info', text: '─── Shortcuts ───' },
@@ -679,6 +695,243 @@
         { type: 'info', text: '  i                    — Inventory' },
         { type: 'info', text: '  eq                   — Equipment' }
       ];
+    }
+
+    // ─── Ability System ────────────────────────────────────────────────────────
+
+    /**
+     * Show the player's current Genre Echo totals.
+     */
+    function doEchoes() {
+      const output = [{ type: 'info', text: '─── Genre Echoes ───' }];
+      for (const [type, count] of Object.entries(player.genreEchoes)) {
+        if (count > 0) {
+          output.push({ type: 'info', text: `  ${type}: ${count}` });
+        }
+      }
+      const total = Object.values(player.genreEchoes).reduce((a, b) => a + b, 0);
+      if (total === 0) {
+        output.push({ type: 'info', text: '  None yet. Defeat enemies in themed zones to earn echoes.' });
+      }
+      output.push({ type: 'info', text: `  Focus: ${player.focus}/${player.maxFocus}` });
+      return output;
+    }
+
+    /**
+     * List the player's unlocked abilities and their cooldown status.
+     */
+    function doAbilities() {
+      if (player.abilities.length === 0) {
+        return [{ type: 'info', text: 'You have no abilities. Choose a class during character creation.' }];
+      }
+      const output = [{ type: 'info', text: '─── Abilities ───' }];
+      for (const abilityId of player.abilities) {
+        const def = window.MudAbilities?.getAbilityById(abilityId)
+          || window.MudAbilities?.getStartingAbility(abilityId);
+        if (!def) continue;
+        const cd = player.abilityCooldowns[abilityId] || 0;
+        const cdText = cd > 0 ? ` [CD: ${cd} rounds]` : ' [READY]';
+        output.push({ type: 'info', text: `  ${def.name} — ${def.desc}${cdText}` });
+      }
+      output.push({ type: 'info', text: `  Focus: ${player.focus}/${player.maxFocus}` });
+      output.push({ type: 'info', text: "  Use 'cast <ability>' in combat to activate." });
+      return output;
+    }
+
+    /**
+     * Train a new ability at the Training Hall (hub room 8).
+     * Requires sufficient Genre Echoes and being in the correct room.
+     */
+    function doTrain(target) {
+      // Training Hall is room 8 (Instructor Vex)
+      const TRAINING_ROOM = 8;
+      if (player.currentRoom !== TRAINING_ROOM) {
+        return [{ type: 'error', text: 'You must be in the Training Hall to learn new abilities.' }];
+      }
+      if (!player.baseClass) {
+        return [{ type: 'error', text: 'You have no class. Something went wrong with character creation.' }];
+      }
+
+      const trainable = window.MudAbilities?.getTrainableAbilities(
+        player.baseClass, player.genreEchoes, player.abilities
+      ) || [];
+
+      // No target — show available training options
+      if (!target || target === 'list') {
+        if (trainable.length === 0) {
+          return [
+            { type: 'info', text: 'Instructor Vex studies you carefully.' },
+            { type: 'info', text: '"You have nothing new to learn right now. Gather more echoes from the zones."' },
+            { type: 'info', text: '' },
+            { type: 'info', text: "Type 'echoes' to see your current totals." }
+          ];
+        }
+        const output = [
+          { type: 'info', text: 'Instructor Vex nods. "I can teach you these:"' },
+          { type: 'info', text: '' }
+        ];
+        trainable.forEach((entry, i) => {
+          output.push({ type: 'items', text: `  ${i + 1}. ${entry.ability.name} (${entry.specName}) — ${entry.ability.desc}` });
+          output.push({ type: 'info', text: `     Requires: ${entry.threshold} ${entry.echoType} echoes [you have ${player.genreEchoes[entry.echoType] || 0}]` });
+        });
+        output.push({ type: 'info', text: '' });
+        output.push({ type: 'success', text: "Type 'train <number>' or 'train <name>' to learn." });
+        return output;
+      }
+
+      // Find the ability to train by number or name
+      let chosen = null;
+      const idx = parseInt(target, 10);
+      if (idx >= 1 && idx <= trainable.length) {
+        chosen = trainable[idx - 1];
+      } else {
+        chosen = trainable.find(e =>
+          e.ability.name.toLowerCase().includes(target) ||
+          e.ability.id.toLowerCase().includes(target)
+        );
+      }
+
+      if (!chosen) {
+        return [{ type: 'error', text: `No trainable ability matches '${target}'. Type 'train' to see options.` }];
+      }
+
+      // Unlock the ability
+      player.abilities.push(chosen.ability.id);
+
+      // Set specialization if this is the player's first ability from a zone
+      if (!player.specialization) {
+        player.specialization = chosen.specName;
+      }
+
+      return [
+        { type: 'success', text: `Instructor Vex guides you through the technique...` },
+        { type: 'success', text: '' },
+        { type: 'room-name', text: `─── ABILITY LEARNED: ${chosen.ability.name} ───` },
+        { type: 'info', text: `  ${chosen.ability.desc}` },
+        { type: 'info', text: `  Specialization path: ${chosen.specName}` },
+        { type: 'info', text: '' },
+        { type: 'success', text: "Type 'abilities' to see your full list." }
+      ];
+    }
+
+    /**
+     * Cast/use an ability during combat. Costs focus and applies effects.
+     */
+    function doCast(target) {
+      if (!target) return [{ type: 'error', text: "Cast what? Type 'abilities' to see your list." }];
+
+      if (!combatState) {
+        return [{ type: 'error', text: 'You can only use abilities in combat.' }];
+      }
+
+      // Find the ability
+      const abilityId = player.abilities.find(id => {
+        const def = window.MudAbilities?.getAbilityById(id)
+          || window.MudAbilities?.getStartingAbility(id);
+        if (!def) return false;
+        return def.name.toLowerCase().includes(target) || id.includes(target);
+      });
+
+      if (!abilityId) {
+        return [{ type: 'error', text: `You don't know an ability called '${target}'.` }];
+      }
+
+      const def = window.MudAbilities?.getAbilityById(abilityId)
+        || window.MudAbilities?.getStartingAbility(abilityId);
+      if (!def) return [{ type: 'error', text: 'Ability data not found.' }];
+
+      // Check cooldown
+      if ((player.abilityCooldowns[abilityId] || 0) > 0) {
+        return [{ type: 'error', text: `${def.name} is on cooldown (${player.abilityCooldowns[abilityId]} rounds remaining).` }];
+      }
+
+      // Calculate focus cost (tier-based: 5/10/15/20 + modifier)
+      const tierCosts = [5, 10, 15, 20];
+      const tier = def.tier != null ? def.tier : 0;
+      const baseCost = tierCosts[tier] || 5;
+      const cost = Math.max(0, baseCost + (player.focusCostModifier || 0));
+
+      if (player.focus < cost) {
+        return [{ type: 'error', text: `Not enough focus. Need ${cost}, have ${player.focus}.` }];
+      }
+
+      // Spend focus and set cooldown
+      player.focus -= cost;
+      player.abilityCooldowns[abilityId] = def.cooldown || 3;
+
+      const mob = mobs[combatState.mobVnum];
+      const output = [];
+
+      // Apply ability effects based on type
+      switch (def.type || 'attack') {
+        case 'attack': {
+          const mult = def.multiplier || 1.5;
+          let dmg = Math.max(1, Math.floor(player.attackPower * mult));
+          if (def.ignoresDef) {
+            // Full damage, no defense reduction
+          } else {
+            dmg = Math.max(1, dmg - Math.floor((mob?.stats?.defense || 0) / 2));
+          }
+          combatState.mobHp -= dmg;
+          output.push({ type: 'combat', text: `You use ${def.name}! ${dmg} damage! [Mob HP: ${Math.max(0, combatState.mobHp)}/${combatState.mobMaxHp}]` });
+
+          // Some attacks also heal
+          if (def.healPercent) {
+            const heal = Math.floor(player.maxHp * def.healPercent);
+            player.hp = Math.min(player.maxHp, player.hp + heal);
+            output.push({ type: 'success', text: `You recover ${heal} HP. [HP: ${player.hp}/${player.maxHp}]` });
+          }
+
+          // Check if mob dies from ability
+          if (combatState.mobHp <= 0) {
+            output.push({ type: 'combat', text: `${mob.name} has been defeated!` });
+            markMobDefeated(combatState.mobVnum);
+            player.killCounts[combatState.mobVnum] = (player.killCounts[combatState.mobVnum] || 0) + 1;
+            const echoReward = window.MudAbilities?.getEchoReward(player.currentRoom);
+            if (echoReward) {
+              player.genreEchoes[echoReward.type] = (player.genreEchoes[echoReward.type] || 0) + echoReward.amount;
+              output.push({ type: 'success', text: `+${echoReward.amount} ${echoReward.type} echo (total: ${player.genreEchoes[echoReward.type]})` });
+            }
+            player.focus = Math.min(player.maxFocus, player.focus + 5);
+            if (mob.loot_table?.length > 0) {
+              for (const lootVnum of mob.loot_table) {
+                if (player.inventory.length < 99) {
+                  player.inventory.push(lootVnum);
+                  output.push({ type: 'success', text: `You loot: ${getItemName(lootVnum)}` });
+                }
+              }
+            }
+            combatState = null;
+            combatTimer = 0;
+          }
+          break;
+        }
+        case 'heal': {
+          const pct = def.healPercent || 0.3;
+          const heal = Math.floor(player.maxHp * pct);
+          player.hp = Math.min(player.maxHp, player.hp + heal);
+          output.push({ type: 'success', text: `You use ${def.name}. Restored ${heal} HP. [HP: ${player.hp}/${player.maxHp}]` });
+          break;
+        }
+        case 'buff': {
+          // Store active buff in worldFlags (simple approach)
+          const buffKey = `buff_${abilityId}`;
+          player.worldFlags[buffKey] = def.duration || 2;
+          output.push({ type: 'success', text: `You use ${def.name}. Active for ${def.duration || 2} rounds.` });
+          break;
+        }
+        case 'debuff': {
+          const debuffKey = `debuff_${abilityId}`;
+          player.worldFlags[debuffKey] = def.duration || 2;
+          output.push({ type: 'success', text: `You use ${def.name}. Enemy weakened for ${def.duration || 2} rounds.` });
+          break;
+        }
+        default:
+          output.push({ type: 'info', text: `You use ${def.name}. [Focus: ${player.focus}/${player.maxFocus}]` });
+      }
+
+      output.push({ type: 'info', text: `[Focus: ${player.focus}/${player.maxFocus}]` });
+      return output;
     }
 
     // ─── Quest System ─────────────────────────────────────────────────────────
@@ -927,6 +1180,16 @@
         // Track kill count for quests
         player.killCounts[combatState.mobVnum] = (player.killCounts[combatState.mobVnum] || 0) + 1;
 
+        // Award Genre Echoes based on zone
+        const echoReward = window.MudAbilities?.getEchoReward(player.currentRoom);
+        if (echoReward) {
+          player.genreEchoes[echoReward.type] = (player.genreEchoes[echoReward.type] || 0) + echoReward.amount;
+          output.push({ type: 'success', text: `+${echoReward.amount} ${echoReward.type} echo (total: ${player.genreEchoes[echoReward.type]})` });
+        }
+
+        // Restore a small amount of focus on kill
+        player.focus = Math.min(player.maxFocus, player.focus + 5);
+
         // Loot
         if (mob.loot_table && mob.loot_table.length > 0) {
           for (const lootVnum of mob.loot_table) {
@@ -941,6 +1204,11 @@
         combatTimer = 0;
         pushCombatOutput(output);
         return;
+      }
+
+      // Tick down ability cooldowns each combat round
+      for (const key of Object.keys(player.abilityCooldowns)) {
+        player.abilityCooldowns[key] = Math.max(0, player.abilityCooldowns[key] - 1);
       }
 
       // Mob attacks player
@@ -1341,6 +1609,9 @@
         combatTarget: combatState ? getMobName(combatState.mobVnum) : null,
         hp: player.hp,
         maxHp: player.maxHp,
+        focus: player.focus,
+        maxFocus: player.maxFocus,
+        abilities: player.abilities,
         roomMobs: hostiles.map(getMobName),
         roomNpcs: npcs.map(getMobName),
         roomItems: (room?.initial_items || []).filter(v => !isItemTaken(room, v)).map(getItemName),
