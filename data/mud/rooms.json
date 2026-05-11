@@ -2,8 +2,8 @@
   "1": {
     "vnum": 1,
     "zone": 0,
-    "name": "The Nexus of Echoes — Central Chamber",
-    "description": "A vast circular chamber of polished obsidian. Six archways radiate outward, each shimmering with a different colored light. The ceiling is lost in darkness above, but faint stars seem to drift there. A groove in the floor spirals inward — something round passed through here recently.",
+    "name": "The Nexus of Echoes \u2014 Central Chamber",
+    "description": "A vast circular chamber of polished obsidian. Six archways radiate outward, each shimmering with a different colored light. The ceiling is lost in darkness above, but faint stars seem to drift there. A groove in the floor spirals inward \u2014 something round passed through here recently.",
     "exits": {
       "north": 2,
       "south": 3,
@@ -26,8 +26,8 @@
   "2": {
     "vnum": 2,
     "zone": 0,
-    "name": "Gateway Chamber — North",
-    "description": "The northern archway pulses with golden light. Beyond it, you glimpse rolling green hills and castle spires. A sign reads: 'The Shattered Crown — Realm of Sword and Sorcery.'",
+    "name": "Gateway Chamber \u2014 North",
+    "description": "The northern archway pulses with golden light. Beyond it, you glimpse rolling green hills and castle spires. A sign reads: 'The Shattered Crown \u2014 Realm of Sword and Sorcery.'",
     "exits": {
       "south": 1,
       "north": {
@@ -49,8 +49,8 @@
   "3": {
     "vnum": 3,
     "zone": 0,
-    "name": "Gateway Chamber — South",
-    "description": "The southern archway crackles with blue-white electricity. Neon signs and holographic advertisements flicker beyond. A sign reads: 'Neon Grid — The Digital Frontier.'",
+    "name": "Gateway Chamber \u2014 South",
+    "description": "The southern archway crackles with blue-white electricity. Neon signs and holographic advertisements flicker beyond. A sign reads: 'Neon Grid \u2014 The Digital Frontier.'",
     "exits": {
       "north": 1,
       "south": {
@@ -72,8 +72,8 @@
   "4": {
     "vnum": 4,
     "zone": 0,
-    "name": "Gateway Chamber — East",
-    "description": "The eastern archway drips with perpetual rain. Street lamps and saxophone music drift through. A sign reads: 'Midnight Rain — Where Shadows Have Secrets.'",
+    "name": "Gateway Chamber \u2014 East",
+    "description": "The eastern archway drips with perpetual rain. Street lamps and saxophone music drift through. A sign reads: 'Midnight Rain \u2014 Where Shadows Have Secrets.'",
     "exits": {
       "west": 1,
       "east": {
@@ -95,8 +95,8 @@
   "5": {
     "vnum": 5,
     "zone": 0,
-    "name": "Gateway Chamber — West",
-    "description": "The western archway glows with orange firelight. Explosions and gunfire echo faintly. A sign reads: 'Blood & Chrome — No Pain, No Gain.'",
+    "name": "Gateway Chamber \u2014 West",
+    "description": "The western archway glows with orange firelight. Explosions and gunfire echo faintly. A sign reads: 'Blood & Chrome \u2014 No Pain, No Gain.'",
     "exits": {
       "east": 1,
       "west": {
@@ -118,8 +118,8 @@
   "6": {
     "vnum": 6,
     "zone": 0,
-    "name": "Gateway Chamber — Upper",
-    "description": "The upward archway floats impossibly overhead, reached by crystalline steps that materialize as you approach. Cherry blossoms drift through. A sign reads: 'The Floating Shards — Path of the Ascendant.'",
+    "name": "Gateway Chamber \u2014 Upper",
+    "description": "The upward archway floats impossibly overhead, reached by crystalline steps that materialize as you approach. Cherry blossoms drift through. A sign reads: 'The Floating Shards \u2014 Path of the Ascendant.'",
     "exits": {
       "down": 1,
       "up": {
@@ -141,8 +141,8 @@
   "7": {
     "vnum": 7,
     "zone": 0,
-    "name": "Gateway Chamber — Northeast",
-    "description": "The northeastern archway is carved from ancient stone, torchlit and echoing with distant crowds. A sign reads: 'The Forgotten Epoch — Where History Lives.'",
+    "name": "Gateway Chamber \u2014 Northeast",
+    "description": "The northeastern archway is carved from ancient stone, torchlit and echoing with distant crowds. A sign reads: 'The Forgotten Epoch \u2014 Where History Lives.'",
     "exits": {
       "southwest": 1,
       "northeast": {
@@ -187,7 +187,7 @@
           "rack",
           "weapons"
         ],
-        "description": "A rack of basic training weapons — wooden swords, blunt daggers, practice staves.",
+        "description": "A rack of basic training weapons \u2014 wooden swords, blunt daggers, practice staves.",
         "action": null
       }
     ]
@@ -212,7 +212,7 @@
           "board",
           "notice"
         ],
-        "description": "The notice board is covered in player-posted notes and trade requests. [Server feature — coming soon]",
+        "description": "The notice board is covered in player-posted notes and trade requests. [Server feature \u2014 coming soon]",
         "action": null
       }
     ]
@@ -351,7 +351,7 @@
     "vnum": 16,
     "zone": 0,
     "name": "The Bounty Board",
-    "description": "A large wooden board covered in pinned notices. Each one describes a task that needs doing — creatures to slay, items to retrieve, messages to deliver.",
+    "description": "A large wooden board covered in pinned notices. Each one describes a task that needs doing \u2014 creatures to slay, items to retrieve, messages to deliver.",
     "exits": {
       "south": 14,
       "east": 17
@@ -435,7 +435,7 @@
           "cards",
           "table"
         ],
-        "description": "The cards have strange symbols on them — not any suit you recognize. The figure seems to be waiting for someone to play.",
+        "description": "The cards have strange symbols on them \u2014 not any suit you recognize. The figure seems to be waiting for someone to play.",
         "action": null
       }
     ]
@@ -495,7 +495,7 @@
           "vault",
           "storage"
         ],
-        "description": "Your personal storage. [Feature coming soon — store items between sessions]",
+        "description": "Your personal storage. [Feature coming soon \u2014 store items between sessions]",
         "action": null
       }
     ]
@@ -515,7 +515,7 @@
           "wall",
           "notice"
         ],
-        "description": "You read a few notes: 'Beware the third statue.' 'The safe code is a year.' 'Don't trust the cards.' [Player notes — server feature]",
+        "description": "You read a few notes: 'Beware the third statue.' 'The safe code is a year.' 'Don't trust the cards.' [Player notes \u2014 server feature]",
         "action": null
       }
     ]
@@ -545,7 +545,7 @@
     "vnum": 25,
     "zone": 0,
     "name": "The Observatory",
-    "description": "A domed room with a massive telescope pointed at the ceiling — which appears to be open sky despite being underground. Stars wheel overhead in patterns that don't match any known constellation.",
+    "description": "A domed room with a massive telescope pointed at the ceiling \u2014 which appears to be open sky despite being underground. Stars wheel overhead in patterns that don't match any known constellation.",
     "exits": {
       "west": 24
     },
@@ -564,7 +564,7 @@
   "1001": {
     "vnum": 1001,
     "zone": 1,
-    "name": "King's Road — Southern Gate",
+    "name": "King's Road \u2014 Southern Gate",
     "description": "A crumbling stone archway marks the entrance to the realm of the Shattered Crown. The road stretches north through rolling green hills dotted with wildflowers. A faded signpost points in several directions. The air smells of grass and distant smoke.",
     "exits": {
       "north": 1002,
@@ -583,7 +583,7 @@
           "signpost",
           "sign"
         ],
-        "description": "The signpost reads: North — Thornhold Village. East — Farmer's Fields. West — The Old Forest. The paint is peeling.",
+        "description": "The signpost reads: North \u2014 Thornhold Village. East \u2014 Farmer's Fields. West \u2014 The Old Forest. The paint is peeling.",
         "action": null
       }
     ]
@@ -591,7 +591,7 @@
   "1002": {
     "vnum": 1002,
     "zone": 1,
-    "name": "King's Road — Rolling Hills",
+    "name": "King's Road \u2014 Rolling Hills",
     "description": "The road winds between grassy hills. Wildflowers sway in a gentle breeze. To the east, you can see farmland. To the west, the treeline of a dark forest looms.",
     "exits": {
       "north": 1003,
@@ -608,7 +608,7 @@
   "1003": {
     "vnum": 1003,
     "zone": 1,
-    "name": "King's Road — Crossroads",
+    "name": "King's Road \u2014 Crossroads",
     "description": "A stone marker stands at the intersection of several paths. The main road continues north toward a village. A narrower path leads east toward distant mountains, and another west into dense forest.",
     "exits": {
       "north": 1004,
@@ -634,7 +634,7 @@
   "1004": {
     "vnum": 1004,
     "zone": 1,
-    "name": "Thornhold Village — South End",
+    "name": "Thornhold Village \u2014 South End",
     "description": "The village of Thornhold begins here. Thatched-roof cottages line a muddy street. A blacksmith's hammer rings from the east. Villagers eye you with cautious curiosity.",
     "exits": {
       "north": 1005,
@@ -651,7 +651,7 @@
   "1005": {
     "vnum": 1005,
     "zone": 1,
-    "name": "Thornhold Village — Square",
+    "name": "Thornhold Village \u2014 Square",
     "description": "The village square is dominated by a dry fountain and a notice board. A tavern sits to the west, and the road continues north toward the castle ruins.",
     "exits": {
       "north": 1030,
@@ -675,7 +675,7 @@
           "board",
           "notice"
         ],
-        "description": "Bounties posted: 'Wolf Pack — 3 wolves terrorizing farms. Reward: 30 coin.' 'Missing Herbs — Herbalist seeks Moonpetal flowers.'",
+        "description": "Bounties posted: 'Wolf Pack \u2014 3 wolves terrorizing farms. Reward: 30 coin.' 'Missing Herbs \u2014 Herbalist seeks Moonpetal flowers.'",
         "action": null
       }
     ]
@@ -683,8 +683,8 @@
   "1006": {
     "vnum": 1006,
     "zone": 1,
-    "name": "Farmer's Fields — West Pasture",
-    "description": "A fenced pasture where sheep graze nervously. The fence has been broken in several places — something has been getting in at night.",
+    "name": "Farmer's Fields \u2014 West Pasture",
+    "description": "A fenced pasture where sheep graze nervously. The fence has been broken in several places \u2014 something has been getting in at night.",
     "exits": {
       "west": 1001,
       "north": 1007,
@@ -709,7 +709,7 @@
   "1007": {
     "vnum": 1007,
     "zone": 1,
-    "name": "Farmer's Fields — East Pasture",
+    "name": "Farmer's Fields \u2014 East Pasture",
     "description": "More farmland stretches east. Old Farmer Giles tends his remaining sheep here, looking haggard and worried.",
     "exits": {
       "south": 1008,
@@ -725,7 +725,7 @@
   "1008": {
     "vnum": 1008,
     "zone": 1,
-    "name": "Farmer's Fields — Barn",
+    "name": "Farmer's Fields \u2014 Barn",
     "description": "A large red barn with a sagging roof. Hay bales are stacked inside, and the smell of livestock is strong. Something rustles in the loft above.",
     "exits": {
       "west": 1006,
@@ -751,8 +751,8 @@
   "1009": {
     "vnum": 1009,
     "zone": 1,
-    "name": "Farmer's Fields — Orchard",
-    "description": "Rows of apple trees stretch in neat lines. Some have been knocked over — something large barreled through here. A trail of crushed apples leads north.",
+    "name": "Farmer's Fields \u2014 Orchard",
+    "description": "Rows of apple trees stretch in neat lines. Some have been knocked over \u2014 something large barreled through here. A trail of crushed apples leads north.",
     "exits": {
       "south": 1007,
       "west": 1008
@@ -776,7 +776,7 @@
   "1010": {
     "vnum": 1010,
     "zone": 1,
-    "name": "The Old Forest — Edge",
+    "name": "The Old Forest \u2014 Edge",
     "description": "Ancient oaks tower overhead, their canopy blocking most sunlight. The air is cool and damp. A narrow path leads deeper into the gloom.",
     "exits": {
       "east": 1001,
@@ -792,8 +792,8 @@
   "1011": {
     "vnum": 1011,
     "zone": 1,
-    "name": "The Old Forest — Mossy Path",
-    "description": "Thick moss covers everything — the ground, the trees, even the air feels green. The path splits ahead.",
+    "name": "The Old Forest \u2014 Mossy Path",
+    "description": "Thick moss covers everything \u2014 the ground, the trees, even the air feels green. The path splits ahead.",
     "exits": {
       "south": 1010,
       "north": 1013,
@@ -810,7 +810,7 @@
   "1012": {
     "vnum": 1012,
     "zone": 1,
-    "name": "The Old Forest — Hollow",
+    "name": "The Old Forest \u2014 Hollow",
     "description": "A massive hollow tree dominates this clearing. Its interior is large enough to shelter in. Strange mushrooms grow in a ring around it.",
     "exits": {
       "east": 1010,
@@ -827,7 +827,7 @@
           "hollow",
           "mushrooms"
         ],
-        "description": "The mushrooms glow faintly blue. The hollow tree smells of earth and age. Something lived here once — something large.",
+        "description": "The mushrooms glow faintly blue. The hollow tree smells of earth and age. Something lived here once \u2014 something large.",
         "action": null
       }
     ]
@@ -835,7 +835,7 @@
   "1013": {
     "vnum": 1013,
     "zone": 1,
-    "name": "The Old Forest — Deep Woods",
+    "name": "The Old Forest \u2014 Deep Woods",
     "description": "The trees press close here, branches interlocking overhead like skeletal fingers. Visibility drops to a few meters. You hear things moving in the undergrowth.",
     "exits": {
       "south": 1011,
@@ -853,7 +853,7 @@
   "1014": {
     "vnum": 1014,
     "zone": 1,
-    "name": "The Old Forest — Stream Crossing",
+    "name": "The Old Forest \u2014 Stream Crossing",
     "description": "A shallow stream cuts through the forest floor. Stepping stones provide a path across. The water is clear but moves with unnatural speed.",
     "exits": {
       "west": 1002,
@@ -869,7 +869,7 @@
   "1015": {
     "vnum": 1015,
     "zone": 1,
-    "name": "The Old Forest — Witch's Clearing",
+    "name": "The Old Forest \u2014 Witch's Clearing",
     "description": "A small clearing with a ruined cottage. Herbs hang drying from the eaves and a cauldron sits cold over an unlit fire. The wandering herbalist works here.",
     "exits": {
       "east": 1003,
@@ -887,8 +887,8 @@
   "1016": {
     "vnum": 1016,
     "zone": 1,
-    "name": "The Old Forest — Spider Nest",
-    "description": "Thick webs coat every surface. Cocooned shapes hang from branches — some disturbingly humanoid in size. The air vibrates with the movement of many legs.",
+    "name": "The Old Forest \u2014 Spider Nest",
+    "description": "Thick webs coat every surface. Cocooned shapes hang from branches \u2014 some disturbingly humanoid in size. The air vibrates with the movement of many legs.",
     "exits": {
       "south": 1013,
       "east": 1017
@@ -905,7 +905,7 @@
   "1017": {
     "vnum": 1017,
     "zone": 1,
-    "name": "The Old Forest — Waterfall Grotto",
+    "name": "The Old Forest \u2014 Waterfall Grotto",
     "description": "The stream ends at a small waterfall cascading into a crystal-clear pool. Behind the waterfall, you can see the dark mouth of a cave.",
     "exits": {
       "south": 1014,
@@ -929,8 +929,8 @@
   "1018": {
     "vnum": 1018,
     "zone": 1,
-    "name": "The Old Forest — Hidden Cave",
-    "description": "A damp cave behind the waterfall. Glowing crystals provide dim light. In the back, a stone chest sits undisturbed — covered in dust but for a single circular track across its lid.",
+    "name": "The Old Forest \u2014 Hidden Cave",
+    "description": "A damp cave behind the waterfall. Glowing crystals provide dim light. In the back, a stone chest sits undisturbed \u2014 covered in dust but for a single circular track across its lid.",
     "exits": {
       "west": 1017
     },
@@ -953,7 +953,7 @@
   "1019": {
     "vnum": 1019,
     "zone": 1,
-    "name": "The Old Forest — Treant Grove",
+    "name": "The Old Forest \u2014 Treant Grove",
     "description": "The trees here are impossibly old and impossibly large. Some of them move. Slowly, but they move. Dark sap weeps from twisted bark.",
     "exits": {
       "south": 1016,
@@ -969,7 +969,7 @@
   "1020": {
     "vnum": 1020,
     "zone": 1,
-    "name": "Mountain Path — Foothills",
+    "name": "Mountain Path \u2014 Foothills",
     "description": "The terrain rises sharply as the road climbs toward distant peaks. Loose stones make the footing treacherous. The air thins slightly.",
     "exits": {
       "west": 1003,
@@ -985,8 +985,8 @@
   "1021": {
     "vnum": 1021,
     "zone": 1,
-    "name": "Mountain Path — Switchback",
-    "description": "The path zigzags up the mountainside. Each turn reveals a broader view of the kingdom below — or what remains of it.",
+    "name": "Mountain Path \u2014 Switchback",
+    "description": "The path zigzags up the mountainside. Each turn reveals a broader view of the kingdom below \u2014 or what remains of it.",
     "exits": {
       "south": 1020,
       "north": 1023
@@ -1001,7 +1001,7 @@
   "1022": {
     "vnum": 1022,
     "zone": 1,
-    "name": "Mountain Path — Goblin Camp",
+    "name": "Mountain Path \u2014 Goblin Camp",
     "description": "A crude camp of hide tents and smoldering cookfires. Goblin scouts patrol the perimeter. They've been raiding travelers on this road.",
     "exits": {
       "west": 1020,
@@ -1021,7 +1021,7 @@
   "1023": {
     "vnum": 1023,
     "zone": 1,
-    "name": "Mountain Path — Cliff Face",
+    "name": "Mountain Path \u2014 Cliff Face",
     "description": "The path narrows to a ledge along a sheer cliff. Wind howls past, threatening to push you off. Far below, the forest is a green carpet.",
     "exits": {
       "south": 1021,
@@ -1037,7 +1037,7 @@
   "1024": {
     "vnum": 1024,
     "zone": 1,
-    "name": "Mountain Path — Cave Entrance",
+    "name": "Mountain Path \u2014 Cave Entrance",
     "description": "A large cave mouth yawns in the mountainside. The smell of rot and the sound of heavy breathing drift from within.",
     "exits": {
       "south": 1022,
@@ -1054,7 +1054,7 @@
           "cave",
           "entrance"
         ],
-        "description": "The cave is dark and the breathing is rhythmic. Something large sleeps within — or pretends to.",
+        "description": "The cave is dark and the breathing is rhythmic. Something large sleeps within \u2014 or pretends to.",
         "action": null
       }
     ]
@@ -1062,7 +1062,7 @@
   "1025": {
     "vnum": 1025,
     "zone": 1,
-    "name": "Thornhold — Blacksmith",
+    "name": "Thornhold \u2014 Blacksmith",
     "description": "Heat radiates from the forge. Blacksmith Hanna works tirelessly, her hammer striking sparks from glowing metal. Weapons and armor hang on display.",
     "exits": {
       "west": 1004
@@ -1076,8 +1076,8 @@
   "1026": {
     "vnum": 1026,
     "zone": 1,
-    "name": "Thornhold — Chapel",
-    "description": "A small stone chapel with stained glass windows depicting a crowned figure. The pews are dusty — few pray here anymore. A donation box sits by the door.",
+    "name": "Thornhold \u2014 Chapel",
+    "description": "A small stone chapel with stained glass windows depicting a crowned figure. The pews are dusty \u2014 few pray here anymore. A donation box sits by the door.",
     "exits": {
       "east": 1004
     },
@@ -1106,7 +1106,7 @@
   "1027": {
     "vnum": 1027,
     "zone": 1,
-    "name": "Thornhold — Tavern",
+    "name": "Thornhold \u2014 Tavern",
     "description": "The Broken Crown tavern is warm and smoky. A few locals nurse their drinks in silence. The barkeep polishes a glass that will never be clean.",
     "exits": {
       "east": 1005
@@ -1129,8 +1129,8 @@
   "1028": {
     "vnum": 1028,
     "zone": 1,
-    "name": "Thornhold — Market Stalls",
-    "description": "A row of market stalls selling basic goods — bread, rope, torches, and the occasional questionable potion. A shady merchant beckons from the corner.",
+    "name": "Thornhold \u2014 Market Stalls",
+    "description": "A row of market stalls selling basic goods \u2014 bread, rope, torches, and the occasional questionable potion. A shady merchant beckons from the corner.",
     "exits": {
       "west": 1005,
       "north": 1029
@@ -1144,7 +1144,7 @@
   "1029": {
     "vnum": 1029,
     "zone": 1,
-    "name": "Thornhold — Back Alley",
+    "name": "Thornhold \u2014 Back Alley",
     "description": "A narrow alley behind the market stalls. Rats scurry in the shadows. A locked door leads to what might be a smuggler's den.",
     "exits": {
       "south": 1028,
@@ -1169,7 +1169,7 @@
     "vnum": 1030,
     "zone": 1,
     "name": "Castle Approach",
-    "description": "The road ends at the ruins of a once-magnificent castle. Towers have crumbled, walls have fallen, but the main keep still stands — barely. The gates hang open.",
+    "description": "The road ends at the ruins of a once-magnificent castle. Towers have crumbled, walls have fallen, but the main keep still stands \u2014 barely. The gates hang open.",
     "exits": {
       "south": 1005,
       "north": 1031,
@@ -1185,7 +1185,7 @@
   "1031": {
     "vnum": 1031,
     "zone": 1,
-    "name": "Castle — Outer Courtyard",
+    "name": "Castle \u2014 Outer Courtyard",
     "description": "A courtyard choked with weeds and rubble. A dry moat surrounds the inner keep. A drawbridge, half-rotted, spans the gap.",
     "exits": {
       "south": 1030,
@@ -1211,7 +1211,7 @@
   "1032": {
     "vnum": 1032,
     "zone": 1,
-    "name": "Castle — Inner Courtyard",
+    "name": "Castle \u2014 Inner Courtyard",
     "description": "Beyond the drawbridge, the inner courtyard is eerily quiet. Four stone statues stand at compass points around a central pedestal. The keep entrance looms to the north.",
     "exits": {
       "south": 1031,
@@ -1227,7 +1227,7 @@
           "statues",
           "pedestal"
         ],
-        "description": "Four statues of knights, each facing a different direction. The pedestal in the center has a circular groove — something rested here once. The statues can be rotated.",
+        "description": "Four statues of knights, each facing a different direction. The pedestal in the center has a circular groove \u2014 something rested here once. The statues can be rotated.",
         "action": "rotate_statue_1"
       },
       {
@@ -1243,7 +1243,7 @@
   "1033": {
     "vnum": 1033,
     "zone": 1,
-    "name": "Castle — Great Hall",
+    "name": "Castle \u2014 Great Hall",
     "description": "The keep's great hall is vast and cold. Tattered banners hang from the ceiling. At the far end, a massive throne sits on a raised dais. Dust motes drift in shafts of light from broken windows.",
     "exits": {
       "south": 1032,
@@ -1268,7 +1268,7 @@
   "1034": {
     "vnum": 1034,
     "zone": 1,
-    "name": "Castle — East Tower Base",
+    "name": "Castle \u2014 East Tower Base",
     "description": "The base of the eastern tower. A spiral staircase leads up, though several steps are missing. Gargoyles perch on the walls above.",
     "exits": {
       "west": 1031,
@@ -1283,7 +1283,7 @@
   "1035": {
     "vnum": 1035,
     "zone": 1,
-    "name": "Castle — West Tower Base",
+    "name": "Castle \u2014 West Tower Base",
     "description": "The western tower's base is flooded knee-deep. Something glints beneath the murky water. The stairs up are intact but slippery.",
     "exits": {
       "east": 1031,
@@ -1307,7 +1307,7 @@
   "1036": {
     "vnum": 1036,
     "zone": 1,
-    "name": "Castle — Armory",
+    "name": "Castle \u2014 Armory",
     "description": "The castle's old armory. Most weapons have rusted to nothing, but a few pieces remain serviceable. Weapon racks line the walls.",
     "exits": {
       "west": 1032
@@ -1324,7 +1324,7 @@
   "1037": {
     "vnum": 1037,
     "zone": 1,
-    "name": "Castle — Library",
+    "name": "Castle \u2014 Library",
     "description": "Shelves of rotting books fill this room. Most are illegible, but a few tomes remain intact. A reading desk holds an open journal.",
     "exits": {
       "east": 1032
@@ -1346,8 +1346,8 @@
   "1038": {
     "vnum": 1038,
     "zone": 1,
-    "name": "Castle — Throne Secret Passage",
-    "description": "Behind the shifted throne, a narrow passage descends into darkness. The walls are smooth — unnaturally so. A circular groove runs along the floor, leading down.",
+    "name": "Castle \u2014 Throne Secret Passage",
+    "description": "Behind the shifted throne, a narrow passage descends into darkness. The walls are smooth \u2014 unnaturally so. A circular groove runs along the floor, leading down.",
     "exits": {
       "south": 1033
     },
@@ -1368,7 +1368,7 @@
   "1039": {
     "vnum": 1039,
     "zone": 1,
-    "name": "Castle — Dungeon",
+    "name": "Castle \u2014 Dungeon",
     "description": "Below the great hall, damp cells line a corridor. Most are empty, but one contains a skeleton still chained to the wall. It clutches something in its bony hand.",
     "exits": {
       "west": 1033,
@@ -1396,8 +1396,8 @@
   "1040": {
     "vnum": 1040,
     "zone": 1,
-    "name": "Castle — East Tower Top",
-    "description": "The top of the eastern tower offers a panoramic view. You can see all six zones from here — shimmering portals in the distance. A telescope is mounted on a tripod.",
+    "name": "Castle \u2014 East Tower Top",
+    "description": "The top of the eastern tower offers a panoramic view. You can see all six zones from here \u2014 shimmering portals in the distance. A telescope is mounted on a tripod.",
     "exits": {
       "down": 1034
     },
@@ -1417,7 +1417,7 @@
   "1041": {
     "vnum": 1041,
     "zone": 1,
-    "name": "Castle — West Tower Top",
+    "name": "Castle \u2014 West Tower Top",
     "description": "The western tower's peak is a rookery. Ravens nest here, watching with intelligent eyes. One has a small scroll tied to its leg.",
     "exits": {
       "down": 1035
@@ -1441,7 +1441,7 @@
   "1042": {
     "vnum": 1042,
     "zone": 1,
-    "name": "Castle — Crypt Entrance",
+    "name": "Castle \u2014 Crypt Entrance",
     "description": "Stone steps descend into a crypt beneath the castle. The air is thick with the smell of old death. Torches on the walls flicker with unnatural blue flame.",
     "exits": {
       "north": 1039,
@@ -1457,7 +1457,7 @@
   "1043": {
     "vnum": 1043,
     "zone": 1,
-    "name": "Castle — Crypt",
+    "name": "Castle \u2014 Crypt",
     "description": "Stone sarcophagi line the walls of this underground chamber. Names of forgotten kings are carved into each one. The far wall has collapsed, revealing a natural cavern beyond.",
     "exits": {
       "north": 1042,
@@ -1475,7 +1475,7 @@
           "names",
           "kings"
         ],
-        "description": "The names are too worn to read clearly. One sarcophagus has been opened — it's empty inside, with a circular indentation in the velvet lining.",
+        "description": "The names are too worn to read clearly. One sarcophagus has been opened \u2014 it's empty inside, with a circular indentation in the velvet lining.",
         "action": null
       }
     ]
@@ -1483,7 +1483,7 @@
   "1044": {
     "vnum": 1044,
     "zone": 1,
-    "name": "Castle — Hidden Cavern",
+    "name": "Castle \u2014 Hidden Cavern",
     "description": "A natural cavern connected to the crypt. Stalactites drip mineral water. In the center, a natural stone bridge spans a bottomless chasm. On the far side, something glows.",
     "exits": {
       "west": 1043,
@@ -1500,7 +1500,7 @@
           "chasm",
           "glow"
         ],
-        "description": "The bridge is narrow but solid. The glow on the far side pulses rhythmically — like a heartbeat.",
+        "description": "The bridge is narrow but solid. The glow on the far side pulses rhythmically \u2014 like a heartbeat.",
         "action": null
       }
     ]
@@ -1508,8 +1508,8 @@
   "1045": {
     "vnum": 1045,
     "zone": 1,
-    "name": "Castle — The Marble's Rest",
-    "description": "A small chamber at the end of the cavern. A stone pedestal sits in the center with a perfectly spherical indentation. The marble was here — recently. A faint warmth lingers. A note is pinned to the wall.",
+    "name": "Castle \u2014 The Marble's Rest",
+    "description": "A small chamber at the end of the cavern. A stone pedestal sits in the center with a perfectly spherical indentation. The marble was here \u2014 recently. A faint warmth lingers. A note is pinned to the wall.",
     "exits": {
       "west": 1044
     },
@@ -1529,7 +1529,7 @@
           "note",
           "wall"
         ],
-        "description": "The note reads: 'You're getting closer. But I have five more places to be. — M'",
+        "description": "The note reads: 'You're getting closer. But I have five more places to be. \u2014 M'",
         "action": null
       }
     ]
@@ -1691,7 +1691,7 @@
     "vnum": 2011,
     "zone": 2,
     "name": "Doc Splice's Clinic",
-    "description": "A sterile-smelling room filled with surgical tools and cybernetic parts.",
+    "description": "Flickering holo-signs sputter above a narrow door smeared with grease and cracked synthglass. Within, the sterile scent of antiseptic mingles with the faint hum of cybernetic implants being calibrated under harsh fluorescents. Shadows of augmented hands twitch on rusted metal trays, while the clinic's pervasive chill seeps into the marrow.",
     "exits": {
       "east": 2012,
       "west": 2010,
@@ -2011,7 +2011,7 @@
     "vnum": 2031,
     "zone": 2,
     "name": "Hacker Den",
-    "description": "A dark room lit only by the glow of dozens of monitors.",
+    "description": "Walls of tangled cables pulse with the rhythm of stolen data streams as neon codes cascade like rain on cracked concrete. The acrid scent of burnt circuits hangs heavy, punctuated by the soft glow of augmented eyes scanning encrypted feeds. A low buzz vibrates through the cramped space where whispers of digital rebellion weave between shadows.",
     "exits": {
       "east": 2032,
       "west": 2030,
@@ -2171,7 +2171,7 @@
     "vnum": 2041,
     "zone": 2,
     "name": "Fixer's Corner",
-    "description": "A relatively quiet alleyway where shady deals go down.",
+    "description": "A flickering holo-ad advertises discreet services in a language of sharp angles and shifting glyphs, while the stale odor of synth-spice and oil clings to the alley's damp bricks. The murmur of clandestine deals slips from behind shuttered windows, as augmented fixers trade in secrets beneath the ever-watchful glare of corporate monoliths. Neon puddles mirror their coded smiles, fractured by the city's incessant drizzle.",
     "exits": {
       "east": 2042,
       "west": 2040,
@@ -2270,7 +2270,7 @@
     "vnum": 3002,
     "zone": 3,
     "name": "Dark Alleyway",
-    "description": "A narrow alley filled with trash cans and the smell of decay.",
+    "description": "A sliver of shadow wedged between brick and fire escape, slick with yesterday\u2019s rain. Cigarette butts smolder in puddles, and the tinny wail of a jazz saxophone snakes from somewhere deeper in the dark.",
     "exits": {
       "west": 3001,
       "north": 3003,
@@ -2315,7 +2315,7 @@
     "vnum": 3004,
     "zone": 3,
     "name": "Neon-Lit Street",
-    "description": "Neon signs reflect in the puddles. The sound of jazz drifts from a nearby club.",
+    "description": "Neon buzzes through the mist, painting slick sidewalks in garish blues and reds. The buzz of distant horns and murmured deals hangs heavy in the air, mingling with the sharp tang of cigarette smoke and cheap perfume.",
     "exits": {
       "west": 3002,
       "east": 3005,
@@ -2360,7 +2360,7 @@
     "vnum": 3007,
     "zone": 3,
     "name": "Mama Rosa's Diner",
-    "description": "A cozy diner with red vinyl booths and a checkered floor.",
+    "description": "The warm glow of neon spills through rain-streaked windows, illuminating checkered floors and faded diner booths. Mama Rosa\u2019s old-school jazz hums low, while the scent of strong coffee and sizzling bacon fights the damp chill outside.",
     "exits": {
       "west": 3006
     },
@@ -2376,7 +2376,7 @@
     "vnum": 3008,
     "zone": 3,
     "name": "Abandoned Warehouse District",
-    "description": "Large, empty warehouses loom in the darkness. The rain seems even colder here.",
+    "description": "Rusting cranes creak like old bones under a sky smeared with grime and drizzle. Empty crates and tangled chains form a labyrinth where shadows flirt with danger and whispered secrets crawl on every cracked wall.",
     "exits": {
       "north": 3006,
       "east": 3009,
@@ -2392,7 +2392,7 @@
     "vnum": 3009,
     "zone": 3,
     "name": "Warehouse 13",
-    "description": "Dusty crates are stacked high. Shadows dance on the walls.",
+    "description": "Warehouse 13 stands like a hulking beast, its cracked windows flickering with the ghost of a broken bulb. Damp air smells of oil and rot, while the distant drip of water keeps rhythm with the pulse of stolen dreams.",
     "exits": {
       "west": 3008
     },
@@ -2406,7 +2406,7 @@
     "vnum": 3010,
     "zone": 3,
     "name": "The Docks",
-    "description": "The smell of salt and dead fish. Waves crash against the wooden pilings.",
+    "description": "Fog rolls in thick over the docks, where rain stains the wooden planks and lanterns flicker weakly against the dark. The briny scent of salt and diesel blends with the distant scrape of ropes and the occasional clink of hidden cargo.",
     "exits": {
       "north": 3008,
       "east": 3011,
@@ -2422,7 +2422,7 @@
     "vnum": 3011,
     "zone": 3,
     "name": "Smuggler's Cove",
-    "description": "A hidden section of the docks where illicit goods are unloaded.",
+    "description": "Tucked behind a veil of mist and rusting chains, Smuggler\u2019s Cove breathes danger in whispered tides. Slick stones glisten under scarce lamplight as the murmur of clandestine deals slips into the night\u2019s wet hush.",
     "exits": {
       "west": 3010
     },
@@ -2436,7 +2436,7 @@
     "vnum": 3012,
     "zone": 3,
     "name": "Sewer Entrance",
-    "description": "A foul-smelling grate leading down into the city's underbelly.",
+    "description": "A rusted grate yawns at the curb, steam curling from the city\u2019s veins below. The sour stench of decay and damp leather bleeds upward, promising secrets best left undisturbed beneath the rain-soaked streets.",
     "exits": {
       "north": 3010,
       "down": 3013
@@ -2449,7 +2449,7 @@
     "vnum": 3013,
     "zone": 3,
     "name": "Sewer Tunnels",
-    "description": "Damp, echoing tunnels filled with murky water.",
+    "description": "Narrow tunnels coil like sinew beneath the city\u2019s bones, dripping walls echoing a steady, hollow drip. Faint flickers of light catch on scurrying shadows, framing the damp quiet with unease and something waiting just out of sight.",
     "exits": {
       "up": 3012,
       "east": 3014
@@ -2464,7 +2464,7 @@
     "vnum": 3014,
     "zone": 3,
     "name": "Deep Sewers",
-    "description": "The water is deeper here, and the smell is unbearable.",
+    "description": "The sewers plunge deeper, where the air thickens with choking mist and stale rot. Water pools black and silent, swallowing footsteps as unseen eyes track every careful step in this forgotten underworld.",
     "exits": {
       "west": 3013,
       "east": 3015
@@ -2479,7 +2479,7 @@
     "vnum": 3015,
     "zone": 3,
     "name": "Hidden Speakeasy Entrance",
-    "description": "A heavy iron door in the sewers. A sliding peephole is visible.",
+    "description": "Behind a loose brick and under the hum of a flickering street lamp, a narrow door waits, slick with rain and secrets. A faint jazz riff slips through the cracks, beckoning into the city\u2019s hidden pulse beneath the surface.",
     "exits": {
       "west": 3014,
       "east": 3016
@@ -2492,7 +2492,7 @@
     "vnum": 3016,
     "zone": 3,
     "name": "The Blind Tiger Speakeasy",
-    "description": "A lavish underground bar. People are drinking and gambling.",
+    "description": "Smoke curls like dark lace under dim amber bulbs, where whiskey flows and the low thrum of a piano bleeds into the haze. Faces blur behind cigarette smoke and whispered promises, wrapped tight in the city\u2019s cloak of sin and velvet temptation.",
     "exits": {
       "west": 3015,
       "north": 3017
@@ -2507,7 +2507,7 @@
     "vnum": 3017,
     "zone": 3,
     "name": "Back Room Casino",
-    "description": "High-stakes poker games are in progress. The air is thick with cigar smoke.",
+    "description": "Faint clinks of chips and muted laughter seep from velvet curtains, where high-stakes smoke thickens the air. The scent of gin and desperation hangs heavy, and every glance is a gamble in the backroom\u2019s shadowed haze.",
     "exits": {
       "south": 3016,
       "east": 3018
@@ -2522,7 +2522,7 @@
     "vnum": 3018,
     "zone": 3,
     "name": "The Vault",
-    "description": "A secure vault room. The heavy door is slightly ajar.",
+    "description": "Behind steel doors that click with finality, the vault holds its breath beneath layers of cold concrete. The faint chill of hidden truths and forbidden ledgers rests heavy, whispering of fortunes lost and sins never confessed.",
     "exits": {
       "west": 3017
     },
@@ -2536,7 +2536,7 @@
     "vnum": 3019,
     "zone": 3,
     "name": "Police Station Steps",
-    "description": "Imposing stone steps leading up to the precinct.",
+    "description": "Stone steps slick with rain lead up to a towering fa\u00e7ade of flickering lights and framed badges. The low murmur of tired officers and a distant siren carve a restless edge into the night\u2019s thick, smoky gloom.",
     "exits": {
       "north": 3020,
       "south": 3004
@@ -2549,7 +2549,7 @@
     "vnum": 3020,
     "zone": 3,
     "name": "Precinct Lobby",
-    "description": "A busy lobby with ringing phones and shouting officers.",
+    "description": "Fluorescent lights hum over worn linoleum, where tired clerks shuffle papers beneath a haze of cigarette smoke. The lobby\u2019s bland fa\u00e7ade cracks under the weight of whispered rumors and the quiet desperation of those who seek answers.",
     "exits": {
       "south": 3019,
       "east": 3021,
@@ -2565,7 +2565,7 @@
     "vnum": 3021,
     "zone": 3,
     "name": "Interrogation Room",
-    "description": "A stark room with a single table and a bright light.",
+    "description": "A single bare bulb swings in the stale air, casting harsh shadows across a scarred table and two battered chairs. The metallic scent of sweat and fear hangs thick, as words are weighed and truths twisted under the interrogator\u2019s cold gaze.",
     "exits": {
       "west": 3020
     },
@@ -2579,7 +2579,7 @@
     "vnum": 3022,
     "zone": 3,
     "name": "Evidence Room",
-    "description": "Shelves filled with tagged items. It looks like some things are missing.",
+    "description": "Rows of dusty shelves groan under sealed boxes, evidence wrapped tight in paper and silence. The faint scent of mildew and inked tags marries with the hum of the city\u2019s darkest puzzles locked away behind guarded doors.",
     "exits": {
       "south": 3020,
       "east": 3023
@@ -2592,7 +2592,7 @@
     "vnum": 3023,
     "zone": 3,
     "name": "Captain's Office",
-    "description": "A plush office. The captain is nowhere to be seen.",
+    "description": "Heavy oak and leather-worn chairs crowd a room thick with cigar smoke and the stale scent of old whiskey. Framed photographs glare from the walls, each one a reminder of power wielded in shadow and the cost of keeping the city\u2019s lies intact.",
     "exits": {
       "west": 3022,
       "east": 3024
@@ -2607,7 +2607,7 @@
     "vnum": 3024,
     "zone": 3,
     "name": "City Street 1",
-    "description": "Another rain-slicked street in the sprawling city.",
+    "description": "Rain coats cracked asphalt and flickering streetlights, turning the street into a mirror of blurred neon and drifting smoke. Figures pass in shadowed doorways, their intentions as murky as the puddles at their feet.",
     "exits": {
       "west": 3023,
       "east": 3025
@@ -2620,7 +2620,7 @@
     "vnum": 3025,
     "zone": 3,
     "name": "City Street 2",
-    "description": "Another rain-slicked street in the sprawling city.",
+    "description": "Street lamps buzz weakly through the haze, casting long shadows over slick pavement and peeling posters. A stray cat scatters trash, while the distant wail of a saxophone bleeds from a forgotten corner of the city.",
     "exits": {
       "west": 3024,
       "east": 3026
@@ -2636,7 +2636,7 @@
     "vnum": 3026,
     "zone": 3,
     "name": "City Street 3",
-    "description": "Another rain-slicked street in the sprawling city.",
+    "description": "The glass of rain-streaked windows catches glimmers from flickering streetlights, framing cracked sidewalks thick with cigarette butts. The scent of damp concrete and lost promises rides the night air, heavy and unyielding.",
     "exits": {
       "west": 3025,
       "east": 3027
@@ -2653,7 +2653,7 @@
     "vnum": 3027,
     "zone": 3,
     "name": "City Street 4",
-    "description": "Another rain-slicked street in the sprawling city.",
+    "description": "Steam hisses from vents beneath rusted fire escapes, coating the cold brick in a slick sheen. The faint clatter of heels on wet pavement and whispered deals mix with the distant, mournful cry of a saxophone.",
     "exits": {
       "west": 3026,
       "east": 3028
@@ -2666,7 +2666,7 @@
     "vnum": 3028,
     "zone": 3,
     "name": "City Street 5",
-    "description": "Another rain-slicked street in the sprawling city.",
+    "description": "Neon signs flicker and sputter over puddled alleys, casting twisted shadows over cracked sidewalks. The air hangs thick with the scent of cheap perfume and stale smoke, where every glance flickers with unspoken threats.",
     "exits": {
       "west": 3027,
       "east": 3029
@@ -2681,7 +2681,7 @@
     "vnum": 3029,
     "zone": 3,
     "name": "City Street 6",
-    "description": "Another rain-slicked street in the sprawling city.",
+    "description": "Rain-crusted cars line the street, their chrome dull beneath the dull glow of flickering streetlights. Sidewalks glisten with wet asphalt, and the distant hum of the city never quite lets up, even in the dead of night.",
     "exits": {
       "west": 3028,
       "east": 3030
@@ -2696,7 +2696,7 @@
     "vnum": 3030,
     "zone": 3,
     "name": "City Street 7",
-    "description": "Another rain-slicked street in the sprawling city.",
+    "description": "A thin fog curls low over the rain-soaked road, swallowing sound and light in equal measure. Closed storefronts wear peeling paint like scars, while the faint clink of broken glass punctuates the restless silence.",
     "exits": {
       "west": 3029,
       "east": 3031
@@ -2709,7 +2709,7 @@
     "vnum": 3031,
     "zone": 3,
     "name": "City Street 8",
-    "description": "Another rain-slicked street in the sprawling city.",
+    "description": "Streetlamps cast fractured pools of yellow light over soaked pavement, reflecting shards of neon from shuttered windows. The distant shuffle of footsteps and muted jazz pulses faint beneath the city\u2019s unyielding drizzle.",
     "exits": {
       "west": 3030,
       "east": 3032
@@ -2725,7 +2725,7 @@
     "vnum": 3032,
     "zone": 3,
     "name": "City Street 9",
-    "description": "Another rain-slicked street in the sprawling city.",
+    "description": "Cracked sidewalks frame the edges of dark storefronts, their windows smeared and fogged by the unrelenting rain. The smell of damp concrete and discarded cigarette butts clings heavy, blending with the faint echo of a distant siren.",
     "exits": {
       "west": 3031,
       "east": 3033
@@ -2738,7 +2738,7 @@
     "vnum": 3033,
     "zone": 3,
     "name": "City Street 10",
-    "description": "Another rain-slicked street in the sprawling city.",
+    "description": "Flickering neon signs buzz against a backdrop of shadowed buildings, casting a patchwork glow on rain-slicked streets. The muted murmur of footsteps and whispered deals weave through the stagnant night air.",
     "exits": {
       "west": 3032,
       "east": 3034
@@ -2753,7 +2753,7 @@
     "vnum": 3034,
     "zone": 3,
     "name": "City Street 11",
-    "description": "Another rain-slicked street in the sprawling city.",
+    "description": "The hum of distant traffic mixes with the soft patter of steady rain on cracked pavement. Scattered puddles catch the fractured glow of streetlights, while shadows linger thick beneath awnings and fire escapes.",
     "exits": {
       "west": 3033,
       "east": 3035
@@ -2768,7 +2768,7 @@
     "vnum": 3035,
     "zone": 3,
     "name": "City Street 12",
-    "description": "Another rain-slicked street in the sprawling city.",
+    "description": "A lit cigarette burns low in a cracked ashtray outside a shuttered doorway, smoke twisting in the damp night air. Faint jazz drifts from a distant bar, knitting the street into a tapestry of silence and secrets.",
     "exits": {
       "west": 3034,
       "east": 3036
@@ -2781,7 +2781,7 @@
     "vnum": 3036,
     "zone": 3,
     "name": "City Street 13",
-    "description": "Another rain-slicked street in the sprawling city.",
+    "description": "Slick pavement reflects the fractured glow of neon signs, puddles catching flickers of shadowed figures slipping past closed doors. The damp air tastes of rain, smoke, and the unspoken promises of the city\u2019s restless heart.",
     "exits": {
       "west": 3035,
       "east": 3037
@@ -2796,7 +2796,7 @@
     "vnum": 3037,
     "zone": 3,
     "name": "City Street 14",
-    "description": "Another rain-slicked street in the sprawling city.",
+    "description": "Old bricks weep under the weight of rain, slick fire escapes tracing skeletons against the night sky. The faint echo of footsteps blends with distant jazz, a symphony of loneliness and waiting beneath flickering streetlights.",
     "exits": {
       "west": 3036,
       "east": 3038
@@ -2812,7 +2812,7 @@
     "vnum": 3038,
     "zone": 3,
     "name": "City Street 15",
-    "description": "Another rain-slicked street in the sprawling city.",
+    "description": "Rain hisses against cracked windows and rusted metal, a steady drum beneath the city's murmur of hushed voices and distant sirens. Shadows stretch long and thin, twisting the quiet street into a maze of half-truths and hidden dangers.",
     "exits": {
       "west": 3037,
       "east": 3039
@@ -2825,7 +2825,7 @@
     "vnum": 3039,
     "zone": 3,
     "name": "City Street 16",
-    "description": "Another rain-slicked street in the sprawling city.",
+    "description": "The street hums low with the pulse of neon and a restless drizzle that never quits. Steam rises from manhole covers, wrapping lamplight in mist as figures dart through the wet maze of alleys and whispered debts.",
     "exits": {
       "west": 3038,
       "east": 3040
@@ -2838,7 +2838,7 @@
     "vnum": 3040,
     "zone": 3,
     "name": "City Street 17",
-    "description": "Another rain-slicked street in the sprawling city.",
+    "description": "A cold wind stirs the rain, scattering litter and damp cigarette butts along cracked pavement. The glow of flickering signs spills over deserted storefronts, where the city\u2019s secrets linger just beyond the glint of streetlight.",
     "exits": {
       "west": 3039,
       "east": 3041
@@ -2853,7 +2853,7 @@
     "vnum": 3041,
     "zone": 3,
     "name": "City Street 18",
-    "description": "Another rain-slicked street in the sprawling city.",
+    "description": "Under the stain of relentless rain, the street flickers with fractured neon and blurred shadows. The distant wail of a siren slices the night\u2019s thick haze, threading tension through the cold, damp air.",
     "exits": {
       "west": 3040,
       "east": 3042
@@ -2869,7 +2869,7 @@
     "vnum": 3042,
     "zone": 3,
     "name": "City Street 19",
-    "description": "Another rain-slicked street in the sprawling city.",
+    "description": "A lone streetlight buzzes overhead, its flicker casting stuttering shadows on rain-slicked asphalt. The scent of smoke and spilled whiskey clings to the night, where every step echoes with quiet menace.",
     "exits": {
       "west": 3041,
       "east": 3043
@@ -2882,7 +2882,7 @@
     "vnum": 3043,
     "zone": 3,
     "name": "City Street 20",
-    "description": "Another rain-slicked street in the sprawling city.",
+    "description": "Cracked pavement stretches beneath a veil of steady rain, neon reflections bleeding like bruises into the dark. Faint jazz threads through the drizzle, wrapping the street in a smoky haze of longing and regret.",
     "exits": {
       "west": 3042,
       "east": 3044
@@ -2897,7 +2897,7 @@
     "vnum": 3044,
     "zone": 3,
     "name": "City Street 21",
-    "description": "Another rain-slicked street in the sprawling city.",
+    "description": "The hum of a distant train mingles with the persistent tap of rain on cracked sidewalks. Faded posters peel from walls slick with moisture, whispering forgotten stories into the night\u2019s thick cloak of smoke.",
     "exits": {
       "west": 3043,
       "east": 3045
@@ -2910,7 +2910,7 @@
     "vnum": 3045,
     "zone": 3,
     "name": "City Street 22",
-    "description": "Another rain-slicked street in the sprawling city.",
+    "description": "Rain-blurred streetlamps flicker weakly against a backdrop of cracked pavement and shuttered storefronts. The scent of damp concrete and stale smoke hangs dense, weaving a tapestry of shadowed promises and silent threats.",
     "exits": {
       "west": 3044
     },
@@ -2924,7 +2924,7 @@
     "vnum": 4001,
     "zone": 4,
     "name": "Jungle Edge",
-    "description": "You are in the Jungle Edge. The air is thick with humidity and the smell of gunpowder.",
+    "description": "The jungle swells here, a dense wall of twisted vines and damp leaves that hums with unseen insects. Faint echoes of gunfire ripple from deeper within, as humid air clings like a wet blanket. Shadows shift beneath towering trees, hinting at dangers lurking just beyond sight.",
     "exits": {
       "east": 5
     },
@@ -2947,7 +2947,7 @@
     "vnum": 4002,
     "zone": 4,
     "name": "Perimeter Fence",
-    "description": "You are in the Perimeter Fence. The air is thick with humidity and the smell of gunpowder.",
+    "description": "Rusted barbed wire coils stretch taut, barely visible through the thick undergrowth choking the perimeter. Every step crunches over broken twigs and damp earth, while distant voices crackle faintly over radios. The sharp scent of oil and sweat mingles with the heavy jungle heat.",
     "exits": {
       "west": 4001,
       "east": 4003
@@ -2969,7 +2969,7 @@
     "vnum": 4003,
     "zone": 4,
     "name": "Guard Post Alpha",
-    "description": "You are in the Guard Post Alpha. The air is thick with humidity and the smell of gunpowder.",
+    "description": "A weathered guard post perches on cracked wooden stilts, overlooking the dense green expanse. Sandbags piled high and a mounted rifle point outward, eyes scanning with relentless vigilance. The oppressive humidity presses close, broken only by the distant staccato of automatic fire.",
     "exits": {
       "west": 4002,
       "east": 4004
@@ -2994,7 +2994,7 @@
     "vnum": 4004,
     "zone": 4,
     "name": "Muddy Trail",
-    "description": "You are in the Muddy Trail. The air is thick with humidity and the smell of gunpowder.",
+    "description": "A slick, mud-churned trail winds crookedly through thickets dripping with moisture and shadow. Footprints sink deep into the earth, and broken branches snap under the weight of unseen movements. The buzz of insects masks whispers of distant struggle and survival.",
     "exits": {
       "west": 4003,
       "east": 4005
@@ -3016,7 +3016,7 @@
     "vnum": 4005,
     "zone": 4,
     "name": "Barracks Exterior",
-    "description": "You are in the Barracks Exterior. The air is thick with humidity and the smell of gunpowder.",
+    "description": "Beneath a canopy dripping with sweat-heavy leaves, the barracks rise in battered rows of corrugated steel and faded camouflage netting. Sweat stains and grime mark every surface, while the hum of restless soldiers pulses through the thick air. In the distance, the sharp bark of orders cuts through the jungle\u2019s drone.",
     "exits": {
       "west": 4004,
       "east": 4006
@@ -3040,7 +3040,7 @@
     "vnum": 4006,
     "zone": 4,
     "name": "Barracks Interior",
-    "description": "You are in the Barracks Interior. The air is thick with humidity and the smell of gunpowder.",
+    "description": "Cramped and oppressive, the barracks interior reeks of damp uniforms and stale sweat. Mosquito nets hang limply over cots, while flickering fluorescent lights struggle to penetrate the thick haze. The tense silence is broken only by low murmurs and the ever-present drip of condensation.",
     "exits": {
       "west": 4005,
       "east": 4007
@@ -3064,7 +3064,7 @@
     "vnum": 4007,
     "zone": 4,
     "name": "Mess Hall",
-    "description": "You are in the Mess Hall. The air is thick with humidity and the smell of gunpowder.",
+    "description": "Long tables scarred by years of hurried meals stretch beneath a sagging tin roof, the air thick with the mingled scents of ration packs and gun oil. The hum of tired conversations blends with the distant thud of helicopter blades. Sweat trickles unbidden as eyes dart nervously toward the jungle\u2019s edge.",
     "exits": {
       "west": 4006,
       "east": 4008
@@ -3088,7 +3088,7 @@
     "vnum": 4008,
     "zone": 4,
     "name": "Armory",
-    "description": "You are in the Armory. The air is thick with humidity and the smell of gunpowder.",
+    "description": "Racks of worn rifles and crates of ammunition line the cramped armory, metal gleaming dully under flickering lights. The cold bite of steel contrasts with the sticky jungle sweat clinging to skin. Every clink and shuffle echoes ominously, as if danger lurks just beyond the heavy door.",
     "exits": {
       "west": 4007,
       "east": 4009
@@ -3114,7 +3114,7 @@
     "vnum": 4009,
     "zone": 4,
     "name": "Motor Pool",
-    "description": "You are in the Motor Pool. The air is thick with humidity and the smell of gunpowder.",
+    "description": "The motor pool sprawls with mud-caked jeeps and armored trucks, their engines silent but ready beneath peeling paint and grime. Oil stains seep into cracked concrete, mingling with the scent of wet earth and fuel. The air vibrates faintly with distant machine-gun fire and strained radio static.",
     "exits": {
       "west": 4008,
       "east": 4010
@@ -3138,7 +3138,7 @@
     "vnum": 4010,
     "zone": 4,
     "name": "Vehicle Maintenance",
-    "description": "You are in the Vehicle Maintenance. The air is thick with humidity and the smell of gunpowder.",
+    "description": "Mechanics crouch over engines, grease-slick hands working swiftly under the oppressive canopy of heat and humidity. Tools clatter and motors groan, fighting back the jungle\u2019s encroachment. Sweat drips unrelenting, mixing with oil and dirt in a thick, suffocating haze.",
     "exits": {
       "west": 4009,
       "east": 4011
@@ -3160,7 +3160,7 @@
     "vnum": 4011,
     "zone": 4,
     "name": "Helipad Approach",
-    "description": "You are in the Helipad Approach. The air is thick with humidity and the smell of gunpowder.",
+    "description": "The helipad approach is marked by flattened grass and scuffed earth, fringed by towering jungle encroachments that seem to tighten with every step. The sharp scent of burning fuel hangs heavy, mingling with the distant echo of rotors. Eyes flick constantly toward the treeline, wary of unseen watchers.",
     "exits": {
       "west": 4010,
       "east": 4012
@@ -3184,7 +3184,7 @@
     "vnum": 4012,
     "zone": 4,
     "name": "Helipad",
-    "description": "You are in the Helipad. The air is thick with humidity and the smell of gunpowder.",
+    "description": "Concrete pads scarred by rotor wash sit amid the wild tangles of jungle growth, a metal chopper idling restlessly. Heat and humidity waver visibly in the air, carrying the faintest trace of gunpowder and sweat. The taste of tension is heavy, as if the jungle itself is holding its breath.",
     "exits": {
       "west": 4011,
       "east": 4013
@@ -3208,7 +3208,7 @@
     "vnum": 4013,
     "zone": 4,
     "name": "Command Tent",
-    "description": "You are in the Command Tent. The air is thick with humidity and the smell of gunpowder.",
+    "description": "A tattered canvas command tent shudders under the weight of the damp, dense air inside. Maps and radios clutter every surface, while the sharp crackle of urgent voice comms punctuates the thick, smoky haze. The heavy scent of sweat and strategy hangs in the cramped space like a shroud.",
     "exits": {
       "west": 4012,
       "east": 4014
@@ -3232,7 +3232,7 @@
     "vnum": 4014,
     "zone": 4,
     "name": "Communications Center",
-    "description": "You are in the Communications Center. The air is thick with humidity and the smell of gunpowder.",
+    "description": "Banks of flickering monitors and tangled wires hum under flickering lights, casting long shadows across sweat-streaked faces. The buzz of radio static blends with the distant thump of gunfire, wires tangling like the jungle just beyond the windows. Every beep and crackle seems to echo the compound\u2019s relentless tension.",
     "exits": {
       "west": 4013,
       "east": 4015
@@ -3256,7 +3256,7 @@
     "vnum": 4015,
     "zone": 4,
     "name": "Interrogation Room",
-    "description": "You are in the Interrogation Room. The air is thick with humidity and the smell of gunpowder.",
+    "description": "A harsh bare room glints under a single swinging bulb, walls streaked with grime and faded blood. The air is thick with the coppery scent of fear, and distant voices echo through steel doors. Shadows shift unnervingly, as whispered confessions and threats mingle with the ever-present hum of jungle life.",
     "exits": {
       "west": 4014,
       "east": 4016
@@ -3280,7 +3280,7 @@
     "vnum": 4016,
     "zone": 4,
     "name": "Holding Cells",
-    "description": "You are in the Holding Cells. The air is thick with humidity and the smell of gunpowder.",
+    "description": "Rows of steel bars trap restless figures whose muffled curses and shuffling feet echo through the stale, oppressive air. The faint drip of water and distant jungle noises underscore the claustrophobic tension. Every breath tastes of damp metal and desperation, as shadows cling to the peeling walls.",
     "exits": {
       "west": 4015,
       "east": 4017
@@ -3304,7 +3304,7 @@
     "vnum": 4017,
     "zone": 4,
     "name": "Jungle Path",
-    "description": "You are in the Jungle Path. The air is thick with humidity and the smell of gunpowder.",
+    "description": "A narrow path snakes through choking undergrowth, the dense canopy above stifling light and hope alike. Every rustle could herald friend or foe, each step muffled by moss and rotting leaves. The jungle\u2019s oppressive chorus settles into the bones, driving nerves taut and eyes sharp.",
     "exits": {
       "west": 4016,
       "east": 4018
@@ -3328,7 +3328,7 @@
     "vnum": 4018,
     "zone": 4,
     "name": "Hidden Cache",
-    "description": "You are in the Hidden Cache. The air is thick with humidity and the smell of gunpowder.",
+    "description": "Hidden beneath a tangle of leaves and twisted roots lies a camouflaged crate, its dull metal edges stained with rust and moss. The air here is unnervingly still, broken only by the faint drip of condensation and distant gunfire. Secrets seem to press close, as if the jungle itself guards this cache jealously.",
     "exits": {
       "west": 4017,
       "east": 4019
@@ -3350,7 +3350,7 @@
     "vnum": 4019,
     "zone": 4,
     "name": "Minefield Edge",
-    "description": "You are in the Minefield Edge. The air is thick with humidity and the smell of gunpowder.",
+    "description": "Sharp markers and warning signs scrape the thick air, marking the jagged edge where jungle meets deadly wire and buried metal teeth. The ground is scarred with shallow craters and faded footprints, a grim testament to lives lost. Tension crackles in the heavy humidity, making every breath feel like a gamble.",
     "exits": {
       "west": 4018,
       "east": 4020
@@ -3374,7 +3374,7 @@
     "vnum": 4020,
     "zone": 4,
     "name": "Minefield Center",
-    "description": "You are in the Minefield Center. The air is thick with humidity and the smell of gunpowder.",
+    "description": "Amidst twisted wire and patchy grass, the center of the minefield lies eerily silent except for the faint hum of distant insects. Sunlight fractures through the canopy, glinting off hidden dangers lurking just beneath the cracked earth. Each step here is weighted with deadly potential, every breath a bargaining chip with fate.",
     "exits": {
       "west": 4019,
       "east": 4021
@@ -3396,7 +3396,7 @@
     "vnum": 4021,
     "zone": 4,
     "name": "Sniper Tower",
-    "description": "You are in the Sniper Tower. The air is thick with humidity and the smell of gunpowder.",
+    "description": "High above, the sniper tower looms like a silent sentinel, its skeletal frame creaking under the thick jungle heat. The air up here is thin with suspicion, every rustle and flicker a potential threat. From this vantage, the entire compound feels like a fragile heartbeat beneath the vast, watchful canopy.",
     "exits": {
       "west": 4020,
       "east": 4022
@@ -3418,7 +3418,7 @@
     "vnum": 4022,
     "zone": 4,
     "name": "Trench Line",
-    "description": "You are in the Trench Line. The air is thick with humidity and the smell of gunpowder.",
+    "description": "A muddy trench snakes through the earth, its sides slick with damp and smeared with grime. The stale smell of sweat and gunpowder lingers heavily as muffled voices and distant shots ripple through the humid air. The jungle presses close, a living threat waiting just beyond the sandbags.",
     "exits": {
       "west": 4021,
       "east": 4023
@@ -3440,7 +3440,7 @@
     "vnum": 4023,
     "zone": 4,
     "name": "Bunker Entrance",
-    "description": "You are in the Bunker Entrance. The air is thick with humidity and the smell of gunpowder.",
+    "description": "Heavily reinforced steel doors mark the bunker\u2019s entrance, smeared with dirt and rust from years of jungle siege. The air is thick with the scent of oil and damp concrete, shadows pooling around the cold threshold. Every breath hangs heavy, as though the earth itself holds its breath beyond the heavy door.",
     "exits": {
       "west": 4022,
       "east": 4024
@@ -3462,7 +3462,7 @@
     "vnum": 4024,
     "zone": 4,
     "name": "Bunker Hallway",
-    "description": "You are in the Bunker Hallway. The air is thick with humidity and the smell of gunpowder.",
+    "description": "Dim fluorescent lights flicker over damp concrete walls, the narrow bunker hallway echoing with distant footfalls and whispered commands. Moisture clings to every surface, the stale air mingling with faint electrical hums. Shadows twist unnervingly at the edges, as tension coils unseen beneath the surface.",
     "exits": {
       "west": 4023,
       "east": 4025
@@ -3484,7 +3484,7 @@
     "vnum": 4025,
     "zone": 4,
     "name": "Bunker Control Room",
-    "description": "You are in the Bunker Control Room. The air is thick with humidity and the smell of gunpowder. A round object triggered a tripwire but was too fast for the explosion to catch. There are circular grooves on the floor.",
+    "description": "A cramped control room pulses with the low buzz of monitors and blinking consoles, faces grim and sweat-slicked beneath dripping pipes. The stale, recycled air tastes metallic, mixing with the faint scent of spent cartridges and cold coffee. Outside, the jungle\u2019s distant roar is a constant reminder of the battle beyond these walls.",
     "exits": {
       "west": 4024,
       "east": 4026
@@ -3508,7 +3508,7 @@
     "vnum": 4026,
     "zone": 4,
     "name": "Missile Silo Surface",
-    "description": "You are in the Missile Silo Surface. The air is thick with humidity and the smell of gunpowder.",
+    "description": "The missile silo surface is a cracked expanse of concrete stained with rust and moss, ringed by tall perimeter fences and warning signs. The thick jungle hums just beyond, a wild contrast to the cold machinery that rests silent and deadly. The air buzzes faintly with latent power and the weight of unseen threats.",
     "exits": {
       "west": 4025,
       "east": 4027
@@ -3530,7 +3530,7 @@
     "vnum": 4027,
     "zone": 4,
     "name": "Silo Elevator",
-    "description": "You are in the Silo Elevator. The air is thick with humidity and the smell of gunpowder.",
+    "description": "A narrow elevator shaft descends into darkness, metal walls slick with condensation and grime. The claustrophobic space hums faintly with mechanical life, every creak and drip magnified in the stale air. The jungle\u2019s oppressive heat feels worlds away as the elevator plunges deeper into shadow.",
     "exits": {
       "west": 4026,
       "east": 4028
@@ -3552,7 +3552,7 @@
     "vnum": 4028,
     "zone": 4,
     "name": "Silo Level 1",
-    "description": "You are in the Silo Level 1. The air is thick with humidity and the smell of gunpowder.",
+    "description": "Level one of the silo is a cavernous chamber of steel and shadow, pipes groaning under the weight of years in silence. Faint emergency lights flicker, casting long, jittering shadows across control panels and maintenance walkways. The stale, recycled air is thick with the scent of rust and forgotten menace.",
     "exits": {
       "west": 4027,
       "east": 4029
@@ -3574,7 +3574,7 @@
     "vnum": 4029,
     "zone": 4,
     "name": "Silo Level 2",
-    "description": "You are in the Silo Level 2. The air is thick with humidity and the smell of gunpowder.",
+    "description": "A labyrinth of catwalks and heavy machinery fills the second silo level, the oppressive hum of latent energy vibrating through the walls. Sweat-slick hands clutch railings as the stale air wraps thick and heavy, every echo magnified in the concrete depths. Somewhere distant, a faint metallic drip underscores the endless tension.",
     "exits": {
       "west": 4028,
       "east": 4030
@@ -3596,7 +3596,7 @@
     "vnum": 4030,
     "zone": 4,
     "name": "Silo Level 3",
-    "description": "You are in the Silo Level 3. The air is thick with humidity and the smell of gunpowder.",
+    "description": "The third silo level pulses with raw power, cables and conduits sprawling like veins beneath flickering red lights. The relentless jungle heat is replaced by cold metal and the scent of ozone, as control switches wait silently for a command. A low mechanical groan suggests the weight of weapons poised on a deadly precipice.",
     "exits": {
       "west": 4029,
       "east": 4031
@@ -3618,7 +3618,7 @@
     "vnum": 4031,
     "zone": 4,
     "name": "Launch Control",
-    "description": "You are in the Launch Control. The air is thick with humidity and the smell of gunpowder.",
+    "description": "Launch control is a cramped nerve center, screens flickering with targeting data and countdown timers. The air buzzes with electricity and anxiety, every breath caught between readiness and dread. Outside the reinforced windows, the jungle\u2019s muted roar feels impossibly distant and fragile.",
     "exits": {
       "west": 4030,
       "east": 4032
@@ -3642,7 +3642,7 @@
     "vnum": 4032,
     "zone": 4,
     "name": "Generator Room",
-    "description": "You are in the Generator Room. The air is thick with humidity and the smell of gunpowder.",
+    "description": "The generator room vibrates with the relentless thrum of diesel engines, thick fumes mingling with the stale heat. Pipes pulse rhythmically, sweat beads on every surface, and the air is heavy with the scent of fuel and exhaustion. In this claustrophobic chamber, survival seems to hang on thin mechanical threads.",
     "exits": {
       "west": 4031,
       "east": 4033
@@ -3664,7 +3664,7 @@
     "vnum": 4033,
     "zone": 4,
     "name": "Chemical Storage",
-    "description": "You are in the Chemical Storage. The air is thick with humidity and the smell of gunpowder.",
+    "description": "Steel barrels and warning placards crowd the chemical storage, the air tinged with acrid fumes and damp concrete. Leaking seals hiss softly amid the oppressive humidity, mixing uneasily with the jungle scents beyond reinforced walls. The faint hum of ventilation barely masks the tension in the stale atmosphere.",
     "exits": {
       "west": 4032,
       "east": 4034
@@ -3686,7 +3686,7 @@
     "vnum": 4034,
     "zone": 4,
     "name": "Laboratory",
-    "description": "You are in the Laboratory. The air is thick with humidity and the smell of gunpowder.",
+    "description": "A cluttered laboratory hums faintly beneath flickering fluorescent lights, glass vials and chemical stains scattered across rusted metal tables. The stale air is thick with antiseptic and unknown compounds, mingling uneasily with the distant jungle\u2019s wild scent. Every shadow feels charged with hidden danger and cold calculation.",
     "exits": {
       "west": 4033,
       "east": 4035
@@ -3708,7 +3708,7 @@
     "vnum": 4035,
     "zone": 4,
     "name": "Testing Grounds",
-    "description": "You are in the Testing Grounds. The air is thick with humidity and the smell of gunpowder.",
+    "description": "Open grounds scarred by recent explosions stretch beneath a restless canopy, spent shell casings littered amidst churned earth and broken branches. The sharp tang of cordite mingles with the jungle\u2019s damp decay, while distant voices call out orders through the thick air. Paranoia lurks beneath every rustle and broken twig.",
     "exits": {
       "west": 4034,
       "east": 4036
@@ -3730,7 +3730,7 @@
     "vnum": 4036,
     "zone": 4,
     "name": "Training Course",
-    "description": "You are in the Training Course. The air is thick with humidity and the smell of gunpowder.",
+    "description": "A grueling training course weaves through tangled vines and muddy ditches, sweat and grime coating every battered obstacle. The jungle presses in relentlessly, each breath weighted with exhaustion and silent threat. Echoes of shouted commands and strained grunts punctuate the oppressive heat.",
     "exits": {
       "west": 4035,
       "east": 4037
@@ -3752,7 +3752,7 @@
     "vnum": 4037,
     "zone": 4,
     "name": "Obstacle Course",
-    "description": "You are in the Obstacle Course. The air is thick with humidity and the smell of gunpowder.",
+    "description": "Ropes, walls, and crawling nets rise from the mud in a chaotic jumble, each obstacle slick with mud and jungle moisture. The heavy air carries the scent of sweat and determination, as bodies strain under the endless sun. Around you, the jungle watches silently, a relentless observer of every faltering step.",
     "exits": {
       "west": 4036,
       "east": 4038
@@ -3774,7 +3774,7 @@
     "vnum": 4038,
     "zone": 4,
     "name": "Firing Range",
-    "description": "You are in the Firing Range. The air is thick with humidity and the smell of gunpowder.",
+    "description": "Rows of targets stand battered and splintered beneath a sweltering canopy, spent rounds pinging faintly off metal and twisted wood. The smell of gunpowder hangs thick, mingling with the ever-present humidity and jungle decay. Each shot pulls taut nerves even tighter, the air alive with quiet menace.",
     "exits": {
       "west": 4037,
       "east": 4039
@@ -3796,7 +3796,7 @@
     "vnum": 4039,
     "zone": 4,
     "name": "Officers' Quarters",
-    "description": "You are in the Officers' Quarters. The air is thick with humidity and the smell of gunpowder.",
+    "description": "Faded camouflage curtains and peeling paint mark the officers\u2019 quarters, sweat-stained uniforms draped over battered furniture. The air is thick with whispered schemes and the lingering scent of stale tobacco and cheap liquor. Outside, the jungle\u2019s restless pulse beats against fragile walls of authority.",
     "exits": {
       "west": 4038,
       "east": 4040
@@ -3818,7 +3818,7 @@
     "vnum": 4040,
     "zone": 4,
     "name": "General's Office",
-    "description": "You are in the General's Office. The air is thick with humidity and the smell of gunpowder.",
+    "description": "The general\u2019s office is cramped and cluttered, maps pinned haphazardly beneath fading fluorescent lights. Cigarette smoke curls in the heavy air, mingling with the faint metallic tang of sweat and stress. Every glance at the jungle view feels like a calculated risk, the weight of command pressing down like the humid air.",
     "exits": {
       "west": 4039,
       "east": 4041
@@ -3842,7 +3842,7 @@
     "vnum": 4041,
     "zone": 4,
     "name": "Secret Tunnel",
-    "description": "You are in the Secret Tunnel. The air is thick with humidity and the smell of gunpowder.",
+    "description": "A narrow tunnel, slick with moisture and half-hidden by tangled roots, disappears into the earth beneath the compound. The stale, damp air carries whispers of secrets long buried and fears running deep. The jungle\u2019s distant sounds seem muted here, swallowed by cold stone and shadow.",
     "exits": {
       "west": 4040,
       "east": 4042
@@ -3864,7 +3864,7 @@
     "vnum": 4042,
     "zone": 4,
     "name": "Underground River",
-    "description": "You are in the Underground River. The air is thick with humidity and the smell of gunpowder.",
+    "description": "An underground river murmurs softly against jagged rock walls, water slick and cold beneath heavy roots hanging from above. Dripping echoes fill the humid darkness, mixing with distant jungle calls muffled by earth and stone. The air tastes sharp with damp and ancient, hidden currents.",
     "exits": {
       "west": 4041,
       "east": 4043
@@ -3886,7 +3886,7 @@
     "vnum": 4043,
     "zone": 4,
     "name": "Cave System",
-    "description": "You are in the Cave System. The air is thick with humidity and the smell of gunpowder.",
+    "description": "Shadowed caves twist unpredictably, walls slick with moisture and stained by time. The faint glimmer of bioluminescent fungi casts eerie patterns, while distant drips punctuate the oppressive silence. Every step feels watched, the jungle\u2019s heartbeat replaced by cold stone whispers.",
     "exits": {
       "west": 4042,
       "east": 4044
@@ -3908,7 +3908,7 @@
     "vnum": 4044,
     "zone": 4,
     "name": "Jungle Waterfall",
-    "description": "You are in the Jungle Waterfall. The air is thick with humidity and the smell of gunpowder.",
+    "description": "Water cascades thunderously over moss-covered rocks, mist rising to blend with the oppressive jungle heat. The roar drowns out all but the most determined sounds, blanketing the area in a steamy haze. Leaves glisten wet, and the air tastes of earth and endless rain.",
     "exits": {
       "west": 4043,
       "east": 4045
@@ -3930,7 +3930,7 @@
     "vnum": 4045,
     "zone": 4,
     "name": "Extraction Point",
-    "description": "You are in the Extraction Point. The air is thick with humidity and the smell of gunpowder.",
+    "description": "The extraction point buzzes with hurried activity beneath a low-hanging canopy, choppers circling as voices shout over the drone of rotors. The thick humidity clings, sweat and tension mingling in every breath. Eyes dart toward the jungle edge, where unseen threats seem poised to strike at any moment.",
     "exits": {
       "west": 4044
     },
@@ -3951,7 +3951,7 @@
     "vnum": 5001,
     "zone": 5,
     "name": "Gateway Upper",
-    "description": "The entrance to the Floating Shards. A magical portal leads down to the hub.",
+    "description": "Mist coils like silken threads around towering bamboo, parting to reveal a crystalline archway humming with quiet power. Soft petals drift through the air, carried by a breeze that whispers of journeys yet to come.",
     "exits": {
       "east": 5002,
       "down": 6
@@ -3975,7 +3975,7 @@
     "vnum": 5002,
     "zone": 5,
     "name": "Floating Shard 2",
-    "description": "You are standing on a floating island in the sky. Bamboo sways in the wind, and cherry blossoms drift through the air.",
+    "description": "Emerald grasses ripple beneath an endless sky, punctuated by jagged stones that hum faintly with spiritual energy. A solitary waterfall spills into the void, its mist catching light like scattered stars.",
     "exits": {
       "west": 5001,
       "east": 5003
@@ -3988,7 +3988,7 @@
     "vnum": 5003,
     "zone": 5,
     "name": "Floating Shard 3",
-    "description": "You are standing on a floating island in the sky. Bamboo sways in the wind, and cherry blossoms drift through the air.",
+    "description": "Clouds swirl lazily around ancient cedars, their twisted branches adorned with glowing lanterns that pulse in time with the heartbeat of the land. The scent of wild plum blossoms lingers, sweet and elusive.",
     "exits": {
       "west": 5002,
       "east": 5004
@@ -4001,7 +4001,7 @@
     "vnum": 5004,
     "zone": 5,
     "name": "Floating Shard 4",
-    "description": "You are standing on a floating island in the sky. Bamboo sways in the wind, and cherry blossoms drift through the air.",
+    "description": "Windswept cliffs rise sharply, crowned by a grove of crimson-leafed trees whose roots clutch the rocky earth like silent guardians. The sky bleeds into hues of lavender and gold, as distant echoes hum like forgotten incantations.",
     "exits": {
       "west": 5003,
       "east": 5005
@@ -4016,7 +4016,7 @@
     "vnum": 5005,
     "zone": 5,
     "name": "Floating Shard 5",
-    "description": "You are standing on a floating island in the sky. Bamboo sways in the wind, and cherry blossoms drift through the air.",
+    "description": "A tranquil pond mirrors the heavens, broken only by the ripple of koi weaving beneath floating lotus blossoms. Bamboo stalks lean close, their leaves rustling secrets meant for the clouds alone.",
     "exits": {
       "west": 5004,
       "east": 5006
@@ -4029,7 +4029,7 @@
     "vnum": 5006,
     "zone": 5,
     "name": "Floating Shard 6",
-    "description": "You are standing on a floating island in the sky. Bamboo sways in the wind, and cherry blossoms drift through the air. A sphere of perfect clarity bounced between the floating shards, leaving ripples in the clouds.",
+    "description": "Ancient stone steps spiral through a canopy of cherry blossoms, petals drifting like soft rain to the mossy ground below. The air vibrates faintly with the hum of unseen spirits watching from shadowed corners.",
     "exits": {
       "west": 5005,
       "east": 5007
@@ -4051,7 +4051,7 @@
     "vnum": 5007,
     "zone": 5,
     "name": "Floating Shard 7",
-    "description": "You are standing on a floating island in the sky. Bamboo sways in the wind, and cherry blossoms drift through the air.",
+    "description": "A garden of glowing fungi and iridescent flowers spills light onto winding paths where dragonflies with shimmering wings dance. The melody of distant bells weaves through the thick, fragrant air.",
     "exits": {
       "west": 5006,
       "east": 5008
@@ -4066,7 +4066,7 @@
     "vnum": 5008,
     "zone": 5,
     "name": "Floating Shard 8",
-    "description": "You are standing on a floating island in the sky. Bamboo sways in the wind, and cherry blossoms drift through the air.",
+    "description": "Jagged rocks rise abruptly from a sea of swirling mist, their surfaces etched with runes that flicker like starfire. A lone crane perches silently, feathers ruffling in the whispering wind.",
     "exits": {
       "west": 5007,
       "east": 5009
@@ -4079,7 +4079,7 @@
     "vnum": 5009,
     "zone": 5,
     "name": "Floating Shard 9",
-    "description": "You are standing on a floating island in the sky. Bamboo sways in the wind, and cherry blossoms drift through the air.",
+    "description": "The scent of incense curls upward from a distant temple nestled among terraced orchards, where fruit ripens under a sky awash with soft pink light. Cloud tendrils drift lazily, framing a scene of serene stillness.",
     "exits": {
       "west": 5008,
       "east": 5010
@@ -4092,7 +4092,7 @@
     "vnum": 5010,
     "zone": 5,
     "name": "Floating Shard 10",
-    "description": "You are standing on a floating island in the sky. Bamboo sways in the wind, and cherry blossoms drift through the air.",
+    "description": "Wind carries the echo of ancient songs over a field of waving silver grass, each blade catching the light like scattered shards of moon. A narrow path, lined with flickering lanterns, beckons toward unseen mysteries.",
     "exits": {
       "west": 5009,
       "east": 5011
@@ -4107,7 +4107,7 @@
     "vnum": 5011,
     "zone": 5,
     "name": "West Pavilion",
-    "description": "An ancient pavilion resting on a cloud. The Flame of the Masters is kept here.",
+    "description": "Graceful pillars entwined with blooming wisteria frame a pavilion perched on a ledge, offering views of endless skies and drifting islands. The air hums with the quiet energy of whispered vows and timeless promises.",
     "exits": {
       "west": 5010,
       "east": 5012
@@ -4124,7 +4124,7 @@
     "vnum": 5012,
     "zone": 5,
     "name": "Floating Shard 12",
-    "description": "You are standing on a floating island in the sky. Bamboo sways in the wind, and cherry blossoms drift through the air.",
+    "description": "A crystalline lake reflects the dancing auroras above, its surface broken only by ripples from darting fish that glow faintly beneath the water. Bamboo groves sway in rhythm with a gentle, unseen pulse.",
     "exits": {
       "west": 5011,
       "east": 5013
@@ -4137,7 +4137,7 @@
     "vnum": 5013,
     "zone": 5,
     "name": "Floating Shard 13",
-    "description": "You are standing on a floating island in the sky. Bamboo sways in the wind, and cherry blossoms drift through the air.",
+    "description": "Moss-covered stones form a winding labyrinth beneath towering pines, where shafts of golden light pierce the emerald canopy. The air hums with a soft, ethereal chorus, as if nature itself is breathing in harmony.",
     "exits": {
       "west": 5012,
       "east": 5014
@@ -4152,7 +4152,7 @@
     "vnum": 5014,
     "zone": 5,
     "name": "Floating Shard 14",
-    "description": "You are standing on a floating island in the sky. Bamboo sways in the wind, and cherry blossoms drift through the air.",
+    "description": "The ruins of a forgotten temple rise through a sea of cherry blossoms, petals carpeting broken steps like spilled silk. Faint murmurs of ancient prayers drift on the breeze, mingling with the scent of rain and earth.",
     "exits": {
       "west": 5013,
       "east": 5015
@@ -4165,7 +4165,7 @@
     "vnum": 5015,
     "zone": 5,
     "name": "Floating Shard 15",
-    "description": "You are standing on a floating island in the sky. Bamboo sways in the wind, and cherry blossoms drift through the air.",
+    "description": "Clouds part to reveal a narrow bridge of shimmering jade spanning a chasm that echoes with distant thunder. Lanterns float serenely along the path, casting shimmering pools of light on the mist below.",
     "exits": {
       "west": 5014,
       "east": 5016
@@ -4178,7 +4178,7 @@
     "vnum": 5016,
     "zone": 5,
     "name": "Brazier Courtyard",
-    "description": "A courtyard with unlit braziers. A large gate blocks the way north.",
+    "description": "A circle of blackened braziers flickers with ghostly blue flames, casting dancing shadows onto the surrounding stone courtyard. The scent of sandalwood mingles with the sharp tang of cooled ash, breathing life into silent memories.",
     "exits": {
       "west": 5015,
       "east": 5017,
@@ -4206,7 +4206,7 @@
     "vnum": 5017,
     "zone": 5,
     "name": "Floating Shard 17",
-    "description": "You are standing on a floating island in the sky. Bamboo sways in the wind, and cherry blossoms drift through the air.",
+    "description": "Golden grasses sway beside a tranquil brook whose waters sing soft lullabies to the listening stones. The horizon melts into a wash of pastel hues, where sky and earth embrace without end.",
     "exits": {
       "west": 5016,
       "east": 5018
@@ -4219,7 +4219,7 @@
     "vnum": 5018,
     "zone": 5,
     "name": "Floating Shard 18",
-    "description": "You are standing on a floating island in the sky. Bamboo sways in the wind, and cherry blossoms drift through the air.",
+    "description": "Ancient bamboo groves form a vaulted cathedral of green, sunlight filtering through leaves to paint the ground in shifting patterns. The distant clang of a warrior\u2019s blade rings out, a sharp note in the peaceful symphony.",
     "exits": {
       "west": 5017,
       "east": 5019
@@ -4232,7 +4232,7 @@
     "vnum": 5019,
     "zone": 5,
     "name": "Floating Shard 19",
-    "description": "You are standing on a floating island in the sky. Bamboo sways in the wind, and cherry blossoms drift through the air.",
+    "description": "Smoke spirals lazily from a distant forge nestled under a canopy of cherry trees, where the air vibrates with the pulse of creation. Nearby, stone lanterns flicker to life as dusk falls, casting warm pools of light.",
     "exits": {
       "west": 5018,
       "east": 5020
@@ -4247,7 +4247,7 @@
     "vnum": 5020,
     "zone": 5,
     "name": "Floating Shard 20",
-    "description": "You are standing on a floating island in the sky. Bamboo sways in the wind, and cherry blossoms drift through the air.",
+    "description": "A windswept plateau crowned with stunted pines overlooks an endless sea of clouds, where the scent of pine resin blends with the crisp chill of altitude. The sky itself seems to hum, wrapped in silence before the coming storm.",
     "exits": {
       "west": 5019,
       "east": 5021
@@ -4260,7 +4260,7 @@
     "vnum": 5021,
     "zone": 5,
     "name": "Cherry Blossom Tea House",
-    "description": "A peaceful tea house surrounded by blooming cherry trees.",
+    "description": "Petals drift like soft rain around a quaint tea house, its open windows spilling warm light and the gentle clink of porcelain onto the stone path. The air is heady with the scent of jasmine and whispered conversations.",
     "exits": {
       "west": 5020,
       "east": 5022
@@ -4277,7 +4277,7 @@
     "vnum": 5022,
     "zone": 5,
     "name": "Floating Shard 22",
-    "description": "You are standing on a floating island in the sky. Bamboo sways in the wind, and cherry blossoms drift through the air.",
+    "description": "A narrow path winds through twisted bonsai and delicate orchids, each leaf shimmering with dew that glows faintly in the moonlight. The sky pulses with distant starfire, casting a dreamlike glow on the tranquil scene.",
     "exits": {
       "west": 5021,
       "east": 5023
@@ -4292,7 +4292,7 @@
     "vnum": 5023,
     "zone": 5,
     "name": "Floating Shard 23",
-    "description": "You are standing on a floating island in the sky. Bamboo sways in the wind, and cherry blossoms drift through the air.",
+    "description": "Rugged cliffs give way to terraces of blooming azaleas, their vibrant colors spilling over stone railings like molten fire. The breeze carries the scent of earth and blossom, mingling with the distant murmur of cascading waters.",
     "exits": {
       "west": 5022,
       "east": 5024
@@ -4305,7 +4305,7 @@
     "vnum": 5024,
     "zone": 5,
     "name": "Floating Shard 24",
-    "description": "You are standing on a floating island in the sky. Bamboo sways in the wind, and cherry blossoms drift through the air.",
+    "description": "A small shrine rests beneath a weeping willow, its lanterns swaying gently in the soft breath of the wind. The quiet crackle of a nearby fire melds with the rustle of leaves, weaving a cocoon of serene stillness.",
     "exits": {
       "west": 5023,
       "east": 5025
@@ -4318,7 +4318,7 @@
     "vnum": 5025,
     "zone": 5,
     "name": "Floating Shard 25",
-    "description": "You are standing on a floating island in the sky. Bamboo sways in the wind, and cherry blossoms drift through the air.",
+    "description": "Clouds gather in swirling patterns around jagged spires of obsidian, each peak catching glimmers of light like shards of broken dreams. The air is thick with the hum of latent power, as if the land itself is holding its breath.",
     "exits": {
       "west": 5024,
       "east": 5026
@@ -4333,7 +4333,7 @@
     "vnum": 5026,
     "zone": 5,
     "name": "Floating Shard 26",
-    "description": "You are standing on a floating island in the sky. Bamboo sways in the wind, and cherry blossoms drift through the air.",
+    "description": "Sunlight dances across a crystalline waterfall that spills into an iridescent pool, where koi weave through currents kissed by petals. Bamboo stalks lean in reverence, their shadows rippling softly on the water\u2019s surface.",
     "exits": {
       "west": 5025,
       "east": 5027
@@ -4346,7 +4346,7 @@
     "vnum": 5027,
     "zone": 5,
     "name": "Floating Shard 27",
-    "description": "You are standing on a floating island in the sky. Bamboo sways in the wind, and cherry blossoms drift through the air.",
+    "description": "A maze of narrow pathways threads through towering stalks of golden grass, their tips glowing faintly against the encroaching twilight. Soft whispers ride the wind, carrying tales of distant wanderers and forgotten realms.",
     "exits": {
       "west": 5026,
       "east": 5028
@@ -4359,7 +4359,7 @@
     "vnum": 5028,
     "zone": 5,
     "name": "Floating Shard 28",
-    "description": "You are standing on a floating island in the sky. Bamboo sways in the wind, and cherry blossoms drift through the air.",
+    "description": "An ancient stone bridge arches gracefully over a chasm veiled in mist, its carved dragons seeming to watch with knowing eyes. The scent of moss and old rain fills the air, blending with the distant song of a lone flute.",
     "exits": {
       "west": 5027,
       "east": 5029
@@ -4374,7 +4374,7 @@
     "vnum": 5029,
     "zone": 5,
     "name": "Floating Shard 29",
-    "description": "You are standing on a floating island in the sky. Bamboo sways in the wind, and cherry blossoms drift through the air.",
+    "description": "A grove of towering cherry trees frames a serene pond where lotus bloom in radiant hues beneath a sky swirling with twilight colors. Flickering will-o\u2019-the-wisps dance just above the water, weaving between petals and reflection alike.",
     "exits": {
       "west": 5028,
       "east": 5030
@@ -4387,7 +4387,7 @@
     "vnum": 5030,
     "zone": 5,
     "name": "Floating Shard 30",
-    "description": "You are standing on a floating island in the sky. Bamboo sways in the wind, and cherry blossoms drift through the air.",
+    "description": "Jagged outcrops jut defiantly from the cloud sea, their surfaces scorched and scarred by forgotten battles. The wind carries the faint echo of clashing steel, mingling with the distant call of soaring falcons.",
     "exits": {
       "west": 5029,
       "east": 5031
@@ -4400,7 +4400,7 @@
     "vnum": 5031,
     "zone": 5,
     "name": "Ronin's Camp",
-    "description": "A makeshift camp on a rocky shard.",
+    "description": "A circle of low tents surrounds a crackling fire, its warmth battling the chill of the high winds that whip through the encampment. Scattered blades and worn armor hint at weary travelers resting beneath a canopy of stars.",
     "exits": {
       "west": 5030,
       "east": 5032
@@ -4415,7 +4415,7 @@
     "vnum": 5032,
     "zone": 5,
     "name": "Floating Shard 32",
-    "description": "You are standing on a floating island in the sky. Bamboo sways in the wind, and cherry blossoms drift through the air.",
+    "description": "Lush ferns cloak ancient ruins half-swallowed by time, their leaves trembling with the breath of unseen spirits. Shafts of sunlight pierce the canopy, illuminating motes that shimmer like scattered stardust.",
     "exits": {
       "west": 5031,
       "east": 5033
@@ -4428,7 +4428,7 @@
     "vnum": 5033,
     "zone": 5,
     "name": "Floating Shard 33",
-    "description": "You are standing on a floating island in the sky. Bamboo sways in the wind, and cherry blossoms drift through the air.",
+    "description": "A narrow valley opens between twin peaks, where cascading streams weave silver ribbons through emerald meadows. The air thrums softly with the energy of hidden forces, alive in the rustle of grass and fluttering wings.",
     "exits": {
       "west": 5032,
       "east": 5034
@@ -4441,7 +4441,7 @@
     "vnum": 5034,
     "zone": 5,
     "name": "Floating Shard 34",
-    "description": "You are standing on a floating island in the sky. Bamboo sways in the wind, and cherry blossoms drift through the air.",
+    "description": "Floating lanterns drift lazily across a mirrored lake, their gentle glow reflected in waters as still as glass. The surrounding forest hums with quiet magic, the scent of pine and moss thick upon the breeze.",
     "exits": {
       "west": 5033,
       "east": 5035
@@ -4456,7 +4456,7 @@
     "vnum": 5035,
     "zone": 5,
     "name": "Floating Shard 35",
-    "description": "You are standing on a floating island in the sky. Bamboo sways in the wind, and cherry blossoms drift through the air.",
+    "description": "Crimson leaves carpet a winding path that disappears beneath towering maples, their branches tangled like ancient hands. The distant murmur of chanting monks rises and falls like waves, lost among the whispering trees.",
     "exits": {
       "west": 5034,
       "east": 5036
@@ -4469,7 +4469,7 @@
     "vnum": 5036,
     "zone": 5,
     "name": "Floating Shard 36",
-    "description": "You are standing on a floating island in the sky. Bamboo sways in the wind, and cherry blossoms drift through the air.",
+    "description": "A spiraling tower of jade and ivory rises from the center of a mist-cloaked island, its windows aglow with ethereal light. Swirling clouds drift lazily beneath its peak, hinting at secrets held beyond mortal reach.",
     "exits": {
       "west": 5035,
       "east": 5037
@@ -4482,7 +4482,7 @@
     "vnum": 5037,
     "zone": 5,
     "name": "Floating Shard 37",
-    "description": "You are standing on a floating island in the sky. Bamboo sways in the wind, and cherry blossoms drift through the air.",
+    "description": "A grove of silver-barked trees shimmers beneath a twilight sky, their leaves catching starlight like tiny mirrors. The air vibrates softly with the pulse of unseen wings and whispered prayers carried on the wind.",
     "exits": {
       "west": 5036,
       "east": 5038
@@ -4497,7 +4497,7 @@
     "vnum": 5038,
     "zone": 5,
     "name": "Floating Shard 38",
-    "description": "You are standing on a floating island in the sky. Bamboo sways in the wind, and cherry blossoms drift through the air.",
+    "description": "Sunset bleeds through towering pines, casting long shadows across a tranquil glade where wildflowers bloom in riotous color. The scent of earth and rain lingers, mingling with the faint melody of a bamboo flute.",
     "exits": {
       "west": 5037,
       "east": 5039
@@ -4510,7 +4510,7 @@
     "vnum": 5039,
     "zone": 5,
     "name": "Floating Shard 39",
-    "description": "You are standing on a floating island in the sky. Bamboo sways in the wind, and cherry blossoms drift through the air.",
+    "description": "A weathered stone statue watches silently over a garden where iridescent butterflies flutter among blossoming lilies. The air is thick with the fragrance of frankincense and the quiet promise of dreams unspoken.",
     "exits": {
       "west": 5038,
       "east": 5040
@@ -4523,7 +4523,7 @@
     "vnum": 5040,
     "zone": 5,
     "name": "Floating Shard 40",
-    "description": "You are standing on a floating island in the sky. Bamboo sways in the wind, and cherry blossoms drift through the air.",
+    "description": "A crystalline spire pierces the sky from a rocky promontory, catching the fading light and fracturing it into shimmering rainbows. The roar of distant waterfalls echoes through the air, mingling with the song of soaring hawks.",
     "exits": {
       "west": 5039,
       "east": 5041
@@ -4538,7 +4538,7 @@
     "vnum": 5041,
     "zone": 5,
     "name": "Demon's Lair",
-    "description": "A dark, corrupted island where the Demon General resides.",
+    "description": "Darkness coils among jagged obsidian shards, where twisted roots clutch ancient bones beneath a sky crackling with violet lightning. The air thrums with malevolent energy, thick and suffocating like a waking nightmare.",
     "exits": {
       "west": 5040,
       "east": 5042
@@ -4553,7 +4553,7 @@
     "vnum": 5042,
     "zone": 5,
     "name": "Floating Shard 42",
-    "description": "You are standing on a floating island in the sky. Bamboo sways in the wind, and cherry blossoms drift through the air.",
+    "description": "A mist-cloaked grove hums softly with the glow of fireflies, their light weaving delicate patterns among the gnarled branches. The scent of damp earth and blooming nightflowers lingers, carried on a breathless breeze.",
     "exits": {
       "west": 5041,
       "east": 5043
@@ -4566,7 +4566,7 @@
     "vnum": 5043,
     "zone": 5,
     "name": "Floating Shard 43",
-    "description": "You are standing on a floating island in the sky. Bamboo sways in the wind, and cherry blossoms drift through the air.",
+    "description": "Clouds drift beneath a temple whose stone pillars rise like ancient sentinels, veined with shimmering crystal. The delicate chime of windbells mingles with the distant call of a lone heron taking flight.",
     "exits": {
       "west": 5042,
       "east": 5044
@@ -4581,7 +4581,7 @@
     "vnum": 5044,
     "zone": 5,
     "name": "Floating Shard 44",
-    "description": "You are standing on a floating island in the sky. Bamboo sways in the wind, and cherry blossoms drift through the air.",
+    "description": "A sun-dappled meadow bursts with wildflowers in every hue, where butterflies flicker like living jewels above the grass. Gentle breezes carry the faint murmur of a distant waterfall and the soft rustle of hidden creatures.",
     "exits": {
       "west": 5043,
       "east": 5045
@@ -4594,7 +4594,7 @@
     "vnum": 5045,
     "zone": 5,
     "name": "Hidden Shrine",
-    "description": "A secluded shrine holding a secret scroll.",
+    "description": "Nestled beneath towering pines, a hidden shrine glows faintly with the light of countless lanterns, their flames dancing in quiet reverence. Stone steps, worn smooth by years of prayer, lead into the heart of whispered blessings and sacred silence.",
     "exits": {
       "west": 5044
     },
@@ -4624,7 +4624,7 @@
     "vnum": 6002,
     "zone": 6,
     "name": "Gladiator Arena - Sector 1",
-    "description": "You are in a gladiator arena. The architecture is ancient and imposing.",
+    "description": "Sunlight scorches the cracked stone sands of the arena, where blood and glory have long been traded beneath towering arches worn by countless seasons. The roar of unseen crowds seems to echo from the distant past, draping the stands in shadows of ancient valor.",
     "exits": {
       "west": 6001,
       "east": 6003,
@@ -4638,7 +4638,7 @@
     "vnum": 6003,
     "zone": 6,
     "name": "Egyptian Tomb - Sector 1",
-    "description": "You are in a egyptian tomb. The architecture is ancient and imposing.",
+    "description": "Hieroglyphs crawl along the heavy limestone walls, their secrets whispering under the heavy silence of this tomb. Flickering torchlight casts elongated shadows over sarcophagi sealed with the weight of millennia, while the scent of resin and dust lingers thick in the air.",
     "exits": {
       "west": 6002,
       "east": 6004,
@@ -4654,7 +4654,7 @@
     "vnum": 6004,
     "zone": 6,
     "name": "Viking Longhouse - Sector 1",
-    "description": "You are in a viking longhouse. The architecture is ancient and imposing.",
+    "description": "Smoke curls from a central hearth, mingling with the scent of pine and salted meat within the longhouse\u2019s stout timber walls. Furs hang from pegs alongside shields carved with swirling runes, the murmurs of old skalds seeming to ripple through the night air.",
     "exits": {
       "west": 6003,
       "east": 6005,
@@ -4670,7 +4670,7 @@
     "vnum": 6005,
     "zone": 6,
     "name": "Greek Temple - Sector 1",
-    "description": "You are in a greek temple. The architecture is ancient and imposing.",
+    "description": "White marble columns rise in solemn symmetry, their fluted surfaces catching the bright blue sky beyond the temple\u2019s open portico. The scent of burning olive oil and fresh laurel fills the air, as the heavy stone floor bears the faintest impressions of pilgrim feet.",
     "exits": {
       "west": 6004,
       "east": 6006,
@@ -4686,7 +4686,7 @@
     "vnum": 6006,
     "zone": 6,
     "name": "Medieval Dungeon - Sector 1",
-    "description": "You are in a medieval dungeon. The architecture is ancient and imposing.",
+    "description": "Damp stone walls enclose a labyrinth of shadowed cells, their iron bars groaning with ancient rust. The faint drip of water echoes endlessly, while tattered chains and faded scorch marks hint at long-forgotten torments.",
     "exits": {
       "west": 6005,
       "east": 6007,
@@ -4700,7 +4700,7 @@
     "vnum": 6007,
     "zone": 6,
     "name": "Ancient Library - Sector 1",
-    "description": "You are in a ancient library. The architecture is ancient and imposing.",
+    "description": "Endless rows of dark wooden shelves groan beneath the weight of dusty vellum scrolls and leather-bound tomes. Shafts of light pierce the vaulted chamber, revealing dust motes swirling in the heavy, ink-scented air rich with ancient knowledge.",
     "exits": {
       "west": 6006,
       "east": 6008,
@@ -4716,7 +4716,7 @@
     "vnum": 6008,
     "zone": 6,
     "name": "Catacombs - Sector 1",
-    "description": "You are in a catacombs. The architecture is ancient and imposing.",
+    "description": "Narrow tunnels wind beneath the earth, their walls slick with the chill damp of forgotten bones stacked in precise, grim order. The oppressive silence is broken only by the soft crackle of settling stone and the faint, mournful sighs of long-departed souls.",
     "exits": {
       "west": 6007,
       "east": 6009,
@@ -4739,7 +4739,7 @@
     "vnum": 6009,
     "zone": 6,
     "name": "Aqueducts - Sector 1",
-    "description": "You are in a aqueducts. The architecture is ancient and imposing.",
+    "description": "Arched stone aqueducts stretch above a rushing stream, their weathered surfaces slick with moss and time. Below, water murmurs relentlessly, carrying the lifeblood of ancient cities through the skeletal framework of forgotten engineering.",
     "exits": {
       "west": 6008,
       "south": 6018
@@ -4754,7 +4754,7 @@
     "vnum": 6010,
     "zone": 6,
     "name": "Roman Forum - Sector 2",
-    "description": "You are in a roman forum. The architecture is ancient and imposing. There are circular grooves on the floor, as if a perfect sphere rolled through here.",
+    "description": "A sprawling plaza unfolds beneath towering columns and crumbling statues, where the pulse of a thousand voices once mingled in debate and decree. Cracks in the polished marble bear silent witness to the rise and fall of empires long sealed in dust.",
     "exits": {
       "east": 6011,
       "north": 6001,
@@ -4770,7 +4770,7 @@
     "vnum": 6011,
     "zone": 6,
     "name": "Gladiator Arena - Sector 2",
-    "description": "You are in a gladiator arena. The architecture is ancient and imposing.",
+    "description": "The sun beats down on cracked stone steps that circle the bloodstained sands, where echoes of clashing steel and roaring crowds haunt the restless air. Banners torn by age flutter silently above the worn gates, bearing scars of countless gladiatorial contests.",
     "exits": {
       "west": 6010,
       "east": 6012,
@@ -4787,7 +4787,7 @@
     "vnum": 6012,
     "zone": 6,
     "name": "Egyptian Tomb - Sector 2",
-    "description": "You are in a egyptian tomb. The architecture is ancient and imposing.",
+    "description": "The air hangs thick with incense as flickering flames reveal walls carved with solemn eyes and gods in eternal watch. Heavy stone slabs close off chambers where ancient riches and curses intertwine beneath a ceiling painted with starry constellations.",
     "exits": {
       "west": 6011,
       "east": 6013,
@@ -4802,7 +4802,7 @@
     "vnum": 6013,
     "zone": 6,
     "name": "Viking Longhouse - Sector 2",
-    "description": "You are in a viking longhouse. The architecture is ancient and imposing.",
+    "description": "Rough-hewn timber walls lean into the bitter wind, embers glowing faintly in the hearth\u2019s dying fire. Animal pelts and carved bone talismans decorate the space, filling the longhouse with the enduring spirit of northern kinship and battle.",
     "exits": {
       "west": 6012,
       "east": 6014,
@@ -4819,7 +4819,7 @@
     "vnum": 6014,
     "zone": 6,
     "name": "Greek Temple - Sector 2",
-    "description": "You are in a greek temple. The architecture is ancient and imposing.",
+    "description": "Columns rise in perfect harmony under a sky streaked with afternoon sun, their capitals adorned with delicate acanthus leaves. The smell of blooming oleander mingles with the distant clang of bronze bells, echoing prayers and offerings to gods long revered.",
     "exits": {
       "west": 6013,
       "east": 6015,
@@ -4834,7 +4834,7 @@
     "vnum": 6015,
     "zone": 6,
     "name": "Medieval Dungeon - Sector 2",
-    "description": "You are in a medieval dungeon. The architecture is ancient and imposing.",
+    "description": "Cold stone corridors wind beneath the fortress like veins of dark despair, where echoes of clanking chains mingle with desperate whispers. Rusted iron fixtures and cruel implements of punishment rest in grim silence, soaking in the weight of centuries.",
     "exits": {
       "west": 6014,
       "east": 6016,
@@ -4851,7 +4851,7 @@
     "vnum": 6016,
     "zone": 6,
     "name": "Ancient Library - Sector 2",
-    "description": "You are in a ancient library. The architecture is ancient and imposing.",
+    "description": "Rows of ancient scrolls and fragile manuscripts line towering shelves, their ink faded but still resonant with lost wisdom. The quiet murmur of turning pages seems to linger, even where no reader treads, in this sanctuary of forgotten lore.",
     "exits": {
       "west": 6015,
       "east": 6017,
@@ -4868,7 +4868,7 @@
     "vnum": 6017,
     "zone": 6,
     "name": "Catacombs - Sector 2",
-    "description": "You are in a catacombs. The architecture is ancient and imposing.",
+    "description": "Bone-strewn tunnels spiral deeper into cold earth, the air stale with the breath of centuries. Flickers of torchlight catch the glint of skulls and rusted relics, hinting at untold stories carved into the very marrow of these catacombs.",
     "exits": {
       "west": 6016,
       "east": 6018,
@@ -4894,7 +4894,7 @@
     "vnum": 6018,
     "zone": 6,
     "name": "Aqueducts - Sector 2",
-    "description": "You are in a aqueducts. The architecture is ancient and imposing.",
+    "description": "Ancient aqueduct arches stretch across moss-carved stone, dripping cool water into shadowed pools below. The persistent murmur of flowing streams fills the air, a lifeline from distant hills to city ruins steeped in forgotten grandeur.",
     "exits": {
       "west": 6017,
       "north": 6009,
@@ -4908,7 +4908,7 @@
     "vnum": 6019,
     "zone": 6,
     "name": "Roman Forum - Sector 3",
-    "description": "You are in a roman forum. The architecture is ancient and imposing.",
+    "description": "Marble steps lead into a vast forum scattered with the fractured remains of statues and fallen pillars. The echo of orators\u2019 voices seems to hang in the dusty breeze, entwining with the scent of crushed laurel and worn leather scrolls.",
     "exits": {
       "east": 6020,
       "north": 6010,
@@ -4924,7 +4924,7 @@
     "vnum": 6020,
     "zone": 6,
     "name": "Gladiator Arena - Sector 3",
-    "description": "You are in a gladiator arena. The architecture is ancient and imposing.",
+    "description": "The fierce glare of midday sun shines upon blood-caked sands framed by towering arcades, where the clash of iron and cries of triumph once reverberated. Ancient inscriptions etched in stone bear silent witness to countless battles for honor and survival.",
     "exits": {
       "west": 6019,
       "east": 6021,
@@ -4939,7 +4939,7 @@
     "vnum": 6021,
     "zone": 6,
     "name": "Egyptian Tomb - Sector 3",
-    "description": "You are in a egyptian tomb. The architecture is ancient and imposing.",
+    "description": "The cool air of the tomb carries the faint odor of myrrh and forgotten offerings, as shadowed reliefs trace the stories of gods and kings. Faint light filters through narrow shafts, casting elongated hieroglyphs like ghostly sentinels on cracked walls.",
     "exits": {
       "west": 6020,
       "east": 6022,
@@ -4956,7 +4956,7 @@
     "vnum": 6022,
     "zone": 6,
     "name": "Viking Longhouse - Sector 3",
-    "description": "You are in a viking longhouse. The architecture is ancient and imposing.",
+    "description": "A low hum of distant waves blends with the crackle of flames from the hearth, where crude wooden beams are scarred by centuries of storms and celebration. Shields and swords lean against rough walls, telling tales of conquest and kinship beneath the northern stars.",
     "exits": {
       "west": 6021,
       "east": 6023,
@@ -4973,7 +4973,7 @@
     "vnum": 6023,
     "zone": 6,
     "name": "Greek Temple - Sector 3",
-    "description": "You are in a greek temple. The architecture is ancient and imposing.",
+    "description": "Sunlight spills through the temple\u2019s open colonnade, illuminating finely sculpted friezes that dance with mythic gods and heroes. The air carries the faint scent of crushed olive leaves and the promise of whispered ritual beneath timeless stone.",
     "exits": {
       "west": 6022,
       "east": 6024,
@@ -4990,7 +4990,7 @@
     "vnum": 6024,
     "zone": 6,
     "name": "Medieval Dungeon - Sector 3",
-    "description": "You are in a medieval dungeon. The architecture is ancient and imposing.",
+    "description": "Heavy iron shackles hang from cold, soot-darkened walls, while the faint drip of water echoes through barred corridors. The scent of mold and despair permeates the air, a stark reminder of the countless souls condemned to these depths.",
     "exits": {
       "west": 6023,
       "east": 6025,
@@ -5005,7 +5005,7 @@
     "vnum": 6025,
     "zone": 6,
     "name": "Ancient Library - Sector 3",
-    "description": "You are in a ancient library. The architecture is ancient and imposing.",
+    "description": "Dust motes drift lazily in shafts of light, where shelves groan under the weight of leather-bound scrolls and brittle papyrus. The silence here is thick, broken only by the soft rustling of pages long untouched, preserving secrets older than memory.",
     "exits": {
       "west": 6024,
       "east": 6026,
@@ -5022,7 +5022,7 @@
     "vnum": 6026,
     "zone": 6,
     "name": "Catacombs - Sector 3",
-    "description": "You are in a catacombs. The architecture is ancient and imposing.",
+    "description": "Dark passages stretch endlessly beneath the earth, where bones are stacked with somber reverence in endless crypts. The faint flicker of torchlight reveals carvings worn smooth by time, each step an echo into the shadowed embrace of death.",
     "exits": {
       "west": 6025,
       "east": 6027,
@@ -5046,7 +5046,7 @@
     "vnum": 6027,
     "zone": 6,
     "name": "Aqueducts - Sector 3",
-    "description": "You are in a aqueducts. The architecture is ancient and imposing.",
+    "description": "Water courses steadily through moss-draped aqueducts, the ancient stone murmuring beneath its flow. The chilled air tastes of mineral and history, where veins of life once pulsed beneath a bustling empire\u2019s feet.",
     "exits": {
       "west": 6026,
       "north": 6018,
@@ -5060,7 +5060,7 @@
     "vnum": 6028,
     "zone": 6,
     "name": "Roman Forum - Sector 4",
-    "description": "You are in a roman forum. The architecture is ancient and imposing.",
+    "description": "Sun-bleached stone columns and shattered statues frame a wide expanse where voices once stirred the air with politics and power. Vines creep over marble steps, reclaiming the forum\u2019s grandeur with gentle persistence amid the still silence.",
     "exits": {
       "east": 6029,
       "north": 6019,
@@ -5076,7 +5076,7 @@
     "vnum": 6029,
     "zone": 6,
     "name": "Gladiator Arena - Sector 4",
-    "description": "You are in a gladiator arena. The architecture is ancient and imposing.",
+    "description": "The arena\u2019s dust swirls in the fading light, stained by echoes of battle cries and the clash of gladiators\u2019 blades. Weathered stone seats rise like a silent amphitheater, bearing witness to both valor and sacrifice beneath a setting sun.",
     "exits": {
       "west": 6028,
       "east": 6030,
@@ -5091,7 +5091,7 @@
     "vnum": 6030,
     "zone": 6,
     "name": "Egyptian Tomb - Sector 4",
-    "description": "You are in a egyptian tomb. The architecture is ancient and imposing.",
+    "description": "The heavy scent of lotus and cedar clings to the air as faded murals depict pharaohs journeying toward eternity. Cracked stone sarcophagi rest in shadowed niches, their ancient seals whispering dark promises beyond mortal grasp.",
     "exits": {
       "west": 6029,
       "east": 6031,
@@ -5106,7 +5106,7 @@
     "vnum": 6031,
     "zone": 6,
     "name": "Viking Longhouse - Sector 4",
-    "description": "You are in a viking longhouse. The architecture is ancient and imposing.",
+    "description": "The longhouse creaks under the weight of falling snow, its hearth embers glowing faintly against the encroaching cold. Carved runes shimmer faintly on shields hung like silent guardians along frost-chilled walls.",
     "exits": {
       "west": 6030,
       "east": 6032,
@@ -5123,7 +5123,7 @@
     "vnum": 6032,
     "zone": 6,
     "name": "Greek Temple - Sector 4",
-    "description": "You are in a greek temple. The architecture is ancient and imposing.",
+    "description": "Columns crowned with ivy rise beside the tranquil altar where offerings once burned bright. The scent of thyme and olive mingles with the cool breeze, carrying faint echoes of hymn and prayer through the sacred halls.",
     "exits": {
       "west": 6031,
       "east": 6033,
@@ -5138,7 +5138,7 @@
     "vnum": 6033,
     "zone": 6,
     "name": "Medieval Dungeon - Sector 4",
-    "description": "You are in a medieval dungeon. The architecture is ancient and imposing.",
+    "description": "Chains scrape softly against cold stone as a distant moan travels down damp corridors, thick with the chill of neglect. Rusted implements hang like grotesque trophies, shadows twisting beneath flickering torchlight.",
     "exits": {
       "west": 6032,
       "east": 6034,
@@ -5153,7 +5153,7 @@
     "vnum": 6034,
     "zone": 6,
     "name": "Ancient Library - Sector 4",
-    "description": "You are in a ancient library. The architecture is ancient and imposing.",
+    "description": "Vaulted ceilings soar above endless rows of brittle scrolls and cracked leather bindings, the weight of ages settled into every corner. The scent of aged parchment lingers, a palpable presence guarding forgotten truths.",
     "exits": {
       "west": 6033,
       "east": 6035,
@@ -5170,7 +5170,7 @@
     "vnum": 6035,
     "zone": 6,
     "name": "Catacombs - Sector 4",
-    "description": "You are in a catacombs. The architecture is ancient and imposing.",
+    "description": "A labyrinth of bone-lined tunnels stretches into darkness, every curve heavy with the silence of eternal vigil. Flickering torchlight reveals cryptic etchings and relics cradled by the earth\u2019s cold embrace.",
     "exits": {
       "west": 6034,
       "east": 6036,
@@ -5194,7 +5194,7 @@
     "vnum": 6036,
     "zone": 6,
     "name": "Aqueducts - Sector 4",
-    "description": "You are in a aqueducts. The architecture is ancient and imposing.",
+    "description": "Moss-cloaked aqueduct arches span a mist-shrouded ravine, water murmuring like a forgotten lullaby beneath ancient keystones. The chill air carries the scent of damp stone and timeless endurance.",
     "exits": {
       "west": 6035,
       "north": 6027,
@@ -5208,7 +5208,7 @@
     "vnum": 6037,
     "zone": 6,
     "name": "Roman Forum - Sector 5",
-    "description": "You are in a roman forum. The architecture is ancient and imposing.",
+    "description": "Broken columns and shattered statues crowd the sun-dappled forum, where echoes of debate and decree linger like ghosts. The tangled roots of ivy clutch the marble in a slow reclamation of forgotten power.",
     "exits": {
       "east": 6038,
       "north": 6028
@@ -5223,7 +5223,7 @@
     "vnum": 6038,
     "zone": 6,
     "name": "Gladiator Arena - Sector 5",
-    "description": "You are in a gladiator arena. The architecture is ancient and imposing.",
+    "description": "Dust dances in slanting rays through the arena\u2019s empty stands, where scars of countless duels mar the sunbaked earth. Silent banners, ragged and faded, flutter in a wind that carries the distant roar of history.",
     "exits": {
       "west": 6037,
       "east": 6039,
@@ -5237,7 +5237,7 @@
     "vnum": 6039,
     "zone": 6,
     "name": "Egyptian Tomb - Sector 5",
-    "description": "You are in a egyptian tomb. The architecture is ancient and imposing.",
+    "description": "The tomb\u2019s cool shadows hold the scent of frankincense and ancient secrets, walls painted with faded hieroglyphs that speak of gods watching eternally. Stone chambers sealed tight hold treasures forgotten by time's relentless march.",
     "exits": {
       "west": 6038,
       "east": 6040,
@@ -5251,7 +5251,7 @@
     "vnum": 6040,
     "zone": 6,
     "name": "Viking Longhouse - Sector 5",
-    "description": "You are in a viking longhouse. The architecture is ancient and imposing.",
+    "description": "The longhouse stands sturdy beneath heavy clouds, its timber walls warmed by a flickering hearth and the murmur of ancestral tales. Carved shields and furs hang like silent witnesses to seasons of raids and revelry.",
     "exits": {
       "west": 6039,
       "east": 6041,
@@ -5267,7 +5267,7 @@
     "vnum": 6041,
     "zone": 6,
     "name": "Greek Temple - Sector 5",
-    "description": "You are in a greek temple. The architecture is ancient and imposing.",
+    "description": "Sunlight filters softly through olive branches as marble columns rise to meet a cloud-streaked sky. The quiet hum of prayers seems woven into the very stones, where myth and worship intertwine beneath sculpted gods.",
     "exits": {
       "west": 6040,
       "east": 6042,
@@ -5281,7 +5281,7 @@
     "vnum": 6042,
     "zone": 6,
     "name": "Medieval Dungeon - Sector 5",
-    "description": "You are in a medieval dungeon. The architecture is ancient and imposing.",
+    "description": "The scent of damp earth and rust lingers in the dungeon\u2019s narrow cells, where iron rings mark the walls with silent testimony. Shadows pool in the corners, thick with despair and the weight of forgotten punishments.",
     "exits": {
       "west": 6041,
       "east": 6043,
@@ -5295,7 +5295,7 @@
     "vnum": 6043,
     "zone": 6,
     "name": "Ancient Library - Sector 5",
-    "description": "You are in a ancient library. The architecture is ancient and imposing.",
+    "description": "A cathedral of knowledge, shelves stacked high with brittle scrolls and faded tomes, stretch beneath stone vaults etched with cryptic symbols. The whisper of pages turning seems alive here, carrying the breath of scholars long gone.",
     "exits": {
       "west": 6042,
       "east": 6044,
@@ -5311,7 +5311,7 @@
     "vnum": 6044,
     "zone": 6,
     "name": "Catacombs - Sector 5",
-    "description": "You are in a catacombs. The architecture is ancient and imposing.",
+    "description": "The catacombs wind endlessly, bone and stone intertwined in a cold embrace beneath the earth. Faint glimmers of torchlight reveal skulls set like grim mosaics, tracing silent stories in the darkness.",
     "exits": {
       "west": 6043,
       "east": 6045,
@@ -5334,7 +5334,7 @@
     "vnum": 6045,
     "zone": 6,
     "name": "Caesar's Treasury",
-    "description": "An empty room. A note on the wall says 'Already looted.'",
+    "description": "Gilded chests and heavy gold coins lie scattered amidst shadowed columns, the glint of treasure dimmed by age and neglect. The air smells of dust and ancient wealth, where the legacy of emperors lingers beneath vaulted stone.",
     "exits": {
       "west": 6044,
       "north": 6036

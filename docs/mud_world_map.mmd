@@ -1,0 +1,27 @@
+%%{ init: { 'theme': 'dark' } }%%
+graph TD
+    HUB["The Nexus of Echoes - Central Hub"]
+
+    Z1["The Shattered Crown - Fantasy - 45 rooms"]
+    Z2["The Neon Grid - Cyberpunk - 45 rooms"]
+    Z3["Midnight Rain - Noir - 45 rooms"]
+    Z4["Blood and Chrome - Action/War - 45 rooms"]
+    Z5["The Floating Shards - Anime - 45 rooms"]
+    Z6["The Forgotten Epoch - Historical - 45 rooms"]
+
+    TRAIN["Training Hall"]
+    BAZAAR["Global Bazaar"]
+    ARMORY["The Armory"]
+    ARCHIVE["The Archive"]
+
+    HUB -->|"North"| Z1
+    HUB -->|"South"| Z2
+    HUB -->|"East"| Z3
+    HUB -->|"West"| Z4
+    HUB -->|"Upper"| Z5
+    HUB -->|"Northeast"| Z6
+
+    HUB --- TRAIN
+    HUB --- BAZAAR
+    HUB --- ARMORY
+    HUB --- ARCHIVE
