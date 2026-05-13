@@ -1,5 +1,17 @@
 /* ─── MUD Full-Screen Mode ───────────────────────────────────────────────── */
-/* Take over the entire viewport, same pattern as marble-mode. */
+/* Mirror marble-mode exactly: collapse the app grid, hide chrome, fill viewport. */
+
+.app.app-mud-mode {
+  grid-template-rows: 1fr;
+  padding: 0;
+  gap: 0;
+}
+
+.app.app-mud-mode > .topbar,
+.app.app-mud-mode > .tabs,
+.app.app-mud-mode > .statusbar {
+  display: none;
+}
 
 .app.app-mud-mode .content,
 .app.app-mud-mode .tab-panel.active,
@@ -8,16 +20,18 @@
 .app.app-mud-mode .panel-body,
 .app.app-mud-mode .scene-host,
 .app.app-mud-mode .scene-root {
-  height: 100vh !important;
-  height: 100dvh !important;
-  max-height: 100vh !important;
-  max-height: 100dvh !important;
-  min-height: 0 !important;
-  overflow: hidden !important;
+  height: 100vh;
+  height: 100dvh;
+  min-height: 100vh;
+  min-height: 100dvh;
 }
 
 .app.app-mud-mode .content {
-  grid-template-columns: 1fr !important;
+  grid-template-columns: 1fr;
+}
+
+.app.app-mud-mode .game-grid {
+  grid-template-columns: 1fr;
 }
 
 .app.app-mud-mode .panel {
@@ -29,17 +43,17 @@
 }
 
 .app.app-mud-mode .panel-header {
-  display: none !important;
+  display: none;
 }
 
 .app.app-mud-mode .panel-body {
-  padding: 0 !important;
-  overflow: hidden !important;
+  padding: 0;
+  overflow: hidden;
 }
 
 .app.app-mud-mode .scene-root.active {
-  display: flex !important;
-  flex-direction: column !important;
+  display: flex;
+  flex-direction: column;
 }
 
 .app.app-mud-mode .scene-root-dom {
@@ -64,7 +78,6 @@
 }
 
 /* ─── Log Area ────────────────────────────────────────────────────────────── */
-/* Takes all remaining space. overflow-y: scroll gives a permanent scrollbar. */
 
 .mud-log {
   flex: 1 1 0;
