@@ -3,12 +3,15 @@
  *
  * Flow:
  *  1. Pick race (12 options)
- *  2. Ultima-style dilemma quiz (4 questions, each weights specializations)
+ *  2. Ultima-style tournament quiz (7 questions, 8 traits in bracket elimination)
+ *     - Round 1: 4 questions (each trait appears once) → 4 eliminated
+ *     - Round 2: 2 questions (remaining 4 traits, each appears once) → 2 eliminated
+ *     - Round 3: 1 final question between last 2 traits → winner determined
  *  3. Pick specialization from top 6 scoring results
  *  4. Confirm — race + specialization. Base class derived from spec.
  *
- * Specialization determines the ability tree. Base class (fighter/mage/rogue/cleric)
- * is implicit and used only for stat calculations.
+ * 28 unique dilemma questions cover every possible trait pairing (8 choose 2).
+ * Brackets are shuffled each playthrough for variety.
  */
 (() => {
   'use strict';
@@ -63,28 +66,24 @@
   /* ─── Specialization Flavor Text ────────────────────────────────────────── */
 
   const SPEC_FLAVOR = {
-    // Fighter specs
     knight:      'Holy warrior. Heavy armor, radiant strikes, defensive mastery.',
     commando:    'Tactical soldier. Burst fire, stim packs, orbital support.',
     enforcer:    'Street bruiser. Dirty fighting, intimidation, execution.',
     mechpilot:   'Armored pilot. Rocket fists, missile salvos, overdrive.',
     samurai:     'Blade master. Lightning draws, honor guard, one perfect strike.',
     gladiator:   'Arena champion. Roman steel, crowd fury, relentless endurance.',
-    // Mage specs
     sorcerer:    'Classic wizard. Fireballs, chain lightning, meteor storms.',
     hacker:      'Digital intruder. Data spikes, firewalls, zero-day exploits.',
     occultist:   'Dark mystic. Hex bolts, soul drain, void rifts.',
     demolitions: 'Explosives expert. C4, napalm, tactical nukes.',
     elementalist:'Spirit channeler. Ki waves, dragon breath, ultimate transformation.',
     oracle:      'Divine seer. Prophecy, plagues, apocalyptic wrath.',
-    // Rogue specs
     assassin:    'Shadow killer. Poison blades, vanish, death marks.',
     cyberthief:  'High-tech burglar. EMP darts, cloaking, quantum blades.',
     detective:   'Noir investigator. Sucker punches, cold cases, perfect crimes.',
     infiltrator: 'Covert operative. Wire trips, silenced shots, ghost protocol.',
     ninja:       'Silent warrior. Shuriken storms, shadow clones, forbidden seals.',
     scavenger:   'Wasteland survivor. Jury rigs, ambushes, impossible luck.',
-    // Cleric specs
     paladin:     'Holy defender. Smite, divine shields, resurrection.',
     fieldmedic:  'Sci-fi healer. Nano-injection, energy barriers, full restore.',
     grifter:     'Con artist healer. Snake oil, double crosses, insurance fraud.',
@@ -93,68 +92,171 @@
     priest:      'Temple guardian. Blessings, sanctuary, miracles.'
   };
 
-  /* ─── Dilemma Quiz ──────────────────────────────────────────────────────── */
-
-  /**
-   * Each question has 4 answers. Each answer weights multiple specs.
-   * Weights are additive across all 4 questions. Top 6 specs are shown.
-   *
-   * Weight keys: specId → points (typically 2-3 per answer)
+  /* ─── 8 Traits (Ultima-style virtues) ──────────────────────────────────── */
+  /*
+   * Each trait maps to 3 specializations. The tournament bracket eliminates
+   * traits; the winning trait's 3 specs + runner-up's 3 specs = 6 choices.
    */
-  const QUIZ = [
-    {
-      text: 'A stranger collapses at your feet, clutching a sealed letter. Behind you, armed pursuers close in. What do you do?',
-      answers: [
-        { text: 'Stand between them and the stranger. No one passes.',
-          weights: { knight: 3, paladin: 3, gladiator: 2, samurai: 2, combatmedic: 1 } },
-        { text: 'Grab the letter and vanish before anyone notices.',
-          weights: { assassin: 3, ninja: 3, cyberthief: 2, detective: 2, infiltrator: 1 } },
-        { text: 'Analyze the situation — who sent them, and why?',
-          weights: { hacker: 3, oracle: 2, occultist: 2, detective: 2, sorcerer: 1 } },
-        { text: 'Tend to the stranger first. The rest can wait.',
-          weights: { fieldmedic: 3, priest: 3, monk: 2, grifter: 1, paladin: 1 } }
-      ]
-    },
-    {
-      text: 'You discover a weapon of terrible power locked behind a puzzle. What draws you to it?',
-      answers: [
-        { text: 'The thrill of wielding something unstoppable.',
-          weights: { commando: 3, mechpilot: 3, demolitions: 2, enforcer: 2, gladiator: 1 } },
-        { text: 'Understanding how it works — knowledge is the real weapon.',
-          weights: { sorcerer: 3, hacker: 3, oracle: 2, elementalist: 2, occultist: 1 } },
-        { text: 'Ensuring no one else can use it against the innocent.',
-          weights: { paladin: 3, knight: 2, priest: 2, combatmedic: 2, monk: 1 } },
-        { text: 'Selling it to the highest bidder — or keeping it as leverage.',
-          weights: { grifter: 3, scavenger: 3, cyberthief: 2, infiltrator: 2, detective: 1 } }
-      ]
-    },
-    {
-      text: 'Your team is pinned down and outnumbered. The mission is failing. What\'s your move?',
-      answers: [
-        { text: 'Charge headfirst. Overwhelm them with sheer force.',
-          weights: { gladiator: 3, enforcer: 3, samurai: 2, commando: 2, mechpilot: 1 } },
-        { text: 'Find a way around. Hit them where they don\'t expect.',
-          weights: { ninja: 3, infiltrator: 3, assassin: 2, cyberthief: 2, scavenger: 1 } },
-        { text: 'Unleash something devastating. End it in one stroke.',
-          weights: { demolitions: 3, sorcerer: 2, elementalist: 3, oracle: 2, hacker: 1 } },
-        { text: 'Keep everyone alive. We regroup and try again.',
-          weights: { combatmedic: 3, fieldmedic: 3, monk: 2, priest: 2, paladin: 1 } }
-      ]
-    },
-    {
-      text: 'In a quiet moment, what occupies your thoughts?',
-      answers: [
-        { text: 'Legends of old — heroes, honor, and the weight of duty.',
-          weights: { knight: 3, samurai: 3, gladiator: 2, paladin: 2, priest: 1 } },
-        { text: 'The future — what we could build, hack, or become.',
-          weights: { hacker: 3, commando: 2, fieldmedic: 2, mechpilot: 3, cyberthief: 1 } },
-        { text: 'The shadows between — what people hide, and why.',
-          weights: { detective: 3, occultist: 3, enforcer: 2, grifter: 2, ninja: 1 } },
-        { text: 'The raw chaos of the world — surviving, adapting, thriving.',
-          weights: { scavenger: 3, demolitions: 2, elementalist: 2, infiltrator: 2, monk: 2 } }
-      ]
-    }
+
+  const TRAITS = [
+    { id: 'valor',    name: 'Valor',    specs: ['knight', 'gladiator', 'samurai'] },
+    { id: 'cunning',  name: 'Cunning',  specs: ['detective', 'cyberthief', 'infiltrator'] },
+    { id: 'wisdom',   name: 'Wisdom',   specs: ['sorcerer', 'oracle', 'elementalist'] },
+    { id: 'mercy',    name: 'Mercy',    specs: ['paladin', 'fieldmedic', 'priest'] },
+    { id: 'fury',     name: 'Fury',     specs: ['mechpilot', 'demolitions', 'enforcer'] },
+    { id: 'shadow',   name: 'Shadow',   specs: ['ninja', 'assassin', 'scavenger'] },
+    { id: 'devotion', name: 'Devotion', specs: ['monk', 'combatmedic', 'commando'] },
+    { id: 'guile',    name: 'Guile',    specs: ['hacker', 'grifter', 'occultist'] }
   ];
+
+  /* ─── 28 Dilemma Questions (every trait pairing) ───────────────────────── */
+  /*
+   * Key format: "traitA_vs_traitB" (alphabetical order).
+   * Answer A favors the first trait, Answer B favors the second.
+   */
+
+  const DILEMMAS = {
+    cunning_valor: {
+      text: 'A warlord offers you a duel for safe passage. Do you face him blade to blade, or find the hidden path his scouts missed?',
+      a: 'Meet his challenge head-on. Strength earns respect.',
+      b: 'Slip past unseen. The clever survive longer than the brave.'
+    },
+    valor_wisdom: {
+      text: 'An ancient library burns. Soldiers guard the only exit. Do you fight through them or search for knowledge worth saving?',
+      a: 'Cut a path through. Action saves more than hesitation.',
+      b: 'Salvage what knowledge you can. Swords rust; wisdom endures.'
+    },
+    mercy_valor: {
+      text: 'A wounded enemy begs for mercy on the battlefield. Your allies urge you to finish it.',
+      a: 'End the fight cleanly. A warrior finishes what they start.',
+      b: 'Spare them. Compassion is the hardest kind of strength.'
+    },
+    fury_valor: {
+      text: 'Your fortress is surrounded. Do you lead a disciplined defense or unleash everything in a devastating counterattack?',
+      a: 'Hold the line. Discipline wins wars.',
+      b: 'Unleash hell. Overwhelming force breaks any siege.'
+    },
+    shadow_valor: {
+      text: 'A tyrant sleeps in his tower. You could challenge him at dawn or end it tonight in silence.',
+      a: 'Challenge him openly. Let the people see him fall.',
+      b: 'Strike from the dark. The result matters more than the method.'
+    },
+    devotion_valor: {
+      text: 'Your squad is pinned down. Do you charge to draw fire, or stay and keep the wounded alive?',
+      a: 'Charge. One life risked to save many.',
+      b: 'Stay. The ones already hurt need you most.'
+    },
+    guile_valor: {
+      text: 'A rival challenges you to a contest of arms. You know his weakness but exploiting it would be dishonorable.',
+      a: 'Fight fair. Victory means nothing if it is stolen.',
+      b: 'Use every advantage. Honor is a luxury the dead cannot afford.'
+    },
+    cunning_wisdom: {
+      text: 'You intercept a coded message that could prevent a war. Do you study it carefully or act on what you can guess?',
+      a: 'Act now with what you know. Speed saves lives.',
+      b: 'Decode it fully. A wrong guess could start the very war you fear.'
+    },
+    cunning_mercy: {
+      text: 'A thief stole medicine meant for plague victims. You have tracked them to their hideout.',
+      a: 'Recover the medicine by any means necessary.',
+      b: 'Discover why they stole it. Perhaps they need it too.'
+    },
+    cunning_fury: {
+      text: 'An enemy convoy carries weapons through a narrow pass. You have a small team.',
+      a: 'Set an ambush. Precision and timing over brute force.',
+      b: 'Blow the pass and bury them. Overkill is underrated.'
+    },
+    cunning_shadow: {
+      text: 'Two rival gangs control the district. You need something from both of them.',
+      a: 'Play them against each other. Let them weaken themselves.',
+      b: 'Rob them both in the same night. Leave no trail.'
+    },
+    cunning_devotion: {
+      text: 'Your informant is in danger. Saving them exposes your network. Leaving them preserves it.',
+      a: 'Preserve the network. One person cannot outweigh the mission.',
+      b: 'Save them. Loyalty to your people comes first.'
+    },
+    cunning_guile: {
+      text: 'A merchant offers you a deal that seems too good. Your gut says trap; your mind says opportunity.',
+      a: 'Investigate quietly. Trust your instincts but verify.',
+      b: 'Take the deal but prepare a counter-trap. Turn their scheme against them.'
+    },
+    mercy_wisdom: {
+      text: 'A dangerous prisoner holds the key to an ancient mystery. They will only speak if released.',
+      a: 'Seek the knowledge another way. Some prices are too high.',
+      b: 'Release them under guard. Understanding is worth the risk.'
+    },
+    fury_wisdom: {
+      text: 'You have discovered a weapon of terrible power. It could end the war in a day or poison the land for centuries.',
+      a: 'Study it. Knowledge of its nature may reveal a safer path.',
+      b: 'Use it. The war has already poisoned enough lives.'
+    },
+    shadow_wisdom: {
+      text: 'A sage offers forbidden knowledge, but only if you steal a sacred relic from a temple.',
+      a: 'Refuse. Some knowledge is not worth the cost of obtaining it.',
+      b: 'Take the relic. The temple hoards what should be shared.'
+    },
+    devotion_wisdom: {
+      text: 'Your mentor asks you to abandon your research and tend to the wounded. Lives hang in the balance either way.',
+      a: 'The research could save thousands. Stay the course.',
+      b: 'The wounded need help now. Theory can wait.'
+    },
+    guile_wisdom: {
+      text: 'A rival scholar publishes your stolen research. You can expose them or use their fame to advance your true work.',
+      a: 'Expose the fraud. Truth must be defended.',
+      b: 'Let them have the spotlight. Use their visibility to mask your real project.'
+    },
+    fury_mercy: {
+      text: 'A village harbors the soldiers who burned your home. The villagers claim ignorance.',
+      a: 'Show mercy. Vengeance would make you no different from them.',
+      b: 'Burn it down. They chose their side when they sheltered your enemies.'
+    },
+    mercy_shadow: {
+      text: 'An assassin who once spared your life is now your target. Your employer demands proof of the kill.',
+      a: 'Repay the debt. Help them disappear.',
+      b: 'Complete the contract. Sentiment is a liability in this work.'
+    },
+    devotion_mercy: {
+      text: 'A plague ship approaches port. The sick aboard will die without help, but docking risks the city.',
+      a: 'Let them dock. We do not abandon the suffering.',
+      b: 'Send supplies by boat but keep the port sealed. Protect the many.'
+    },
+    guile_mercy: {
+      text: 'A con artist has been swindling the poor. You catch them, but they offer to split the take if you look away.',
+      a: 'Turn them in. The victims deserve justice.',
+      b: 'Take the deal and use the money to help the victims yourself.'
+    },
+    fury_shadow: {
+      text: 'Your enemy hides behind hostages. A direct assault risks them all.',
+      a: 'Strike hard and fast. Hesitation kills more than action.',
+      b: 'Infiltrate silently. Free the hostages before they know you are there.'
+    },
+    devotion_fury: {
+      text: 'Your commander orders a scorched-earth retreat. Your wounded cannot be moved.',
+      a: 'Defy orders. Stay with the wounded.',
+      b: 'Follow orders. The retreat saves the army; the wounded would want that.'
+    },
+    fury_guile: {
+      text: 'An arms dealer offers you prototype weapons. Powerful, but they come with strings attached.',
+      a: 'Take the weapons. Power now, consequences later.',
+      b: 'Negotiate. Find out what the strings are and cut the ones you do not like.'
+    },
+    devotion_shadow: {
+      text: 'Your closest friend has been secretly working for the enemy. They beg you to keep their secret.',
+      a: 'Keep the secret. Loyalty runs deeper than politics.',
+      b: 'Report them. The mission is bigger than any friendship.'
+    },
+    guile_shadow: {
+      text: 'You discover a hidden passage into the enemy stronghold. Do you sell the information or use it yourself?',
+      a: 'Sell it to the highest bidder. Information is currency.',
+      b: 'Use it yourself. The best secrets are the ones nobody else knows.'
+    },
+    devotion_guile: {
+      text: 'Your order asks you to deceive an ally for the greater good. The deception would save lives but destroy trust.',
+      a: 'Refuse. Trust, once broken, cannot be rebuilt.',
+      b: 'Do it. The lives saved are worth more than one relationship.'
+    }
+  };
 
   /* ─── Spec-to-Class Mapping ─────────────────────────────────────────────── */
 
@@ -170,24 +272,111 @@
     }
   })();
 
-  /** Fallback if MudAbilities not loaded yet */
+  /** Fallback if MudAbilities not loaded yet. */
   function getClassForSpec(specId) {
     if (SPEC_TO_CLASS[specId]) return SPEC_TO_CLASS[specId];
-    // Hardcoded fallback
     const fighters = ['knight','commando','enforcer','mechpilot','samurai','gladiator'];
     const mages = ['sorcerer','hacker','occultist','demolitions','elementalist','oracle'];
     const rogues = ['assassin','cyberthief','detective','infiltrator','ninja','scavenger'];
-    const clerics = ['paladin','fieldmedic','grifter','combatmedic','monk','priest'];
     if (fighters.includes(specId)) return 'fighter';
     if (mages.includes(specId)) return 'mage';
     if (rogues.includes(specId)) return 'rogue';
-    if (clerics.includes(specId)) return 'cleric';
-    return 'fighter';
+    return 'cleric';
+  }
+
+  /* ─── Tournament Bracket Logic ─────────────────────────────────────────── */
+
+  /**
+   * Build a shuffled bracket of 8 traits for a 7-question elimination tournament.
+   * Returns an object tracking the bracket state.
+   */
+  function createBracket() {
+    const shuffled = [...TRAITS].sort(() => Math.random() - 0.5);
+    return {
+      round: 1,
+      /** Round 1: 4 matchups of 2 traits each */
+      matchups: [
+        [shuffled[0], shuffled[1]],
+        [shuffled[2], shuffled[3]],
+        [shuffled[4], shuffled[5]],
+        [shuffled[6], shuffled[7]]
+      ],
+      matchIndex: 0,
+      survivors: [],    // traits that won their round
+      eliminated: [],   // traits that lost
+      questionNum: 0    // total questions asked (0-6)
+    };
+  }
+
+  /**
+   * Get the dilemma question for a given trait matchup.
+   * Returns { text, a, b, traitA, traitB }.
+   */
+  function getDilemma(traitA, traitB) {
+    // Key is alphabetical
+    const ids = [traitA.id, traitB.id].sort();
+    const key = `${ids[0]}_${ids[1]}`;
+    const d = DILEMMAS[key];
+    if (!d) return null;
+
+    // If traitA is alphabetically first, A answer = traitA wins
+    // Otherwise swap so the answer labels match correctly
+    const aIsFirst = traitA.id === ids[0];
+    return {
+      text: d.text,
+      a: aIsFirst ? d.a : d.b,
+      b: aIsFirst ? d.b : d.a,
+      traitA,
+      traitB
+    };
+  }
+
+  /**
+   * Advance the bracket after a choice. Returns the next dilemma or null if done.
+   * choice: 'a' or 'b' (which answer the player picked)
+   */
+  function advanceBracket(bracket, choice) {
+    const matchup = bracket.matchups[bracket.matchIndex];
+    const winner = choice === 'a' ? matchup[0] : matchup[1];
+    const loser = choice === 'a' ? matchup[1] : matchup[0];
+
+    bracket.survivors.push(winner);
+    bracket.eliminated.push(loser);
+    bracket.matchIndex++;
+    bracket.questionNum++;
+
+    // Check if current round is complete
+    if (bracket.matchIndex >= bracket.matchups.length) {
+      if (bracket.round === 1) {
+        // Round 1 done (4 survivors). Set up round 2 (2 matchups).
+        bracket.round = 2;
+        bracket.matchups = [
+          [bracket.survivors[0], bracket.survivors[1]],
+          [bracket.survivors[2], bracket.survivors[3]]
+        ];
+        bracket.matchIndex = 0;
+        bracket.survivors = [];
+      } else if (bracket.round === 2) {
+        // Round 2 done (2 survivors). Set up final.
+        bracket.round = 3;
+        bracket.matchups = [
+          [bracket.survivors[0], bracket.survivors[1]]
+        ];
+        bracket.matchIndex = 0;
+        bracket.survivors = [];
+      } else {
+        // Final done. Winner is the sole survivor.
+        bracket.round = 0; // signals completion
+        return null;
+      }
+    }
+
+    // Return next dilemma
+    const next = bracket.matchups[bracket.matchIndex];
+    return getDilemma(next[0], next[1]);
   }
 
   /* ─── Chargen Steps ─────────────────────────────────────────────────────── */
-
-  const STEPS = ['welcome', 'race', 'quiz', 'spec', 'confirm'];
 
   /**
    * Create a character generation session.
@@ -197,15 +386,16 @@
   function create({ onComplete, onOutput }) {
     let step = 'welcome';
     let choices = { race: null, spec: null };
-    let quizIndex = 0;
-    let specScores = {}; // specId → cumulative score
+    let bracket = null;
+    let currentDilemma = null;
+    let topSpecs = [];  // the 6 spec ids presented to the player
 
-    /** Emit lines to the UI */
+    /** Emit lines to the UI. */
     function emit(lines) {
       if (onOutput) onOutput(lines);
     }
 
-    /** Get the welcome/intro text */
+    /** Get the welcome/intro text. */
     function getIntro() {
       return [
         { type: 'room-name', text: '═══ CHARACTER CREATION ═══' },
@@ -218,7 +408,7 @@
       ];
     }
 
-    /** Show race selection */
+    /** Show race selection. */
     function showRaces() {
       const lines = [
         { type: 'room-name', text: '─── Choose Your Race ───' },
@@ -232,53 +422,57 @@
       return lines;
     }
 
-    /** Show the current quiz question */
-    function showQuizQuestion() {
-      const q = QUIZ[quizIndex];
-      const lines = [
-        { type: 'room-name', text: `─── Question ${quizIndex + 1} of ${QUIZ.length} ───` },
+    /** Show the current tournament dilemma. */
+    function showDilemma() {
+      if (!currentDilemma) return [];
+      const roundLabel = bracket.round === 1 ? 'I' : bracket.round === 2 ? 'II' : 'Final';
+      return [
+        { type: 'room-name', text: `─── Round ${roundLabel} — Question ${bracket.questionNum + 1} of 7 ───` },
         { type: 'info', text: '' },
-        { type: 'info', text: q.text },
-        { type: 'info', text: '' }
+        { type: 'info', text: currentDilemma.text },
+        { type: 'info', text: '' },
+        { type: 'items', text: `  A. ${currentDilemma.a}` },
+        { type: 'items', text: `  B. ${currentDilemma.b}` },
+        { type: 'info', text: '' },
+        { type: 'success', text: 'Type A or B.' }
       ];
-      q.answers.forEach((a, i) => {
-        lines.push({ type: 'items', text: `  ${i + 1}. ${a.text}` });
-      });
-      lines.push({ type: 'info', text: '' });
-      lines.push({ type: 'success', text: 'Type the number of your answer.' });
-      return lines;
     }
 
-    /** Calculate top 6 specs from scores and show selection */
-    function showSpecChoices() {
-      const sorted = Object.entries(specScores)
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 6);
+    /** Calculate the top 6 specs from the tournament results. */
+    function calculateTopSpecs() {
+      // Winner's 3 specs + runner-up's 3 specs = 6
+      const winner = bracket.survivors[0];
+      const runnerUp = bracket.eliminated[bracket.eliminated.length - 1];
+      // Winner specs first, then runner-up
+      return [...winner.specs, ...runnerUp.specs];
+    }
 
+    /** Show specialization choices. */
+    function showSpecChoices() {
       const lines = [
         { type: 'room-name', text: '─── Choose Your Path ───' },
         { type: 'info', text: '' },
-        { type: 'info', text: 'Based on your answers, these paths call to you:' },
+        { type: 'info', text: 'The trials have revealed your nature. These paths call to you:' },
         { type: 'info', text: '' }
       ];
-      sorted.forEach(([specId], i) => {
+      topSpecs.forEach((specId, i) => {
         const spec = window.MudAbilities?.getSpec(getClassForSpec(specId), specId);
-        const name = spec?.name || specId;
+        const name = spec?.name || specId.charAt(0).toUpperCase() + specId.slice(1);
         const flavor = SPEC_FLAVOR[specId] || '';
         lines.push({ type: 'items', text: `  ${i + 1}. ${name} — ${flavor}` });
       });
       lines.push({ type: 'info', text: '' });
-      lines.push({ type: 'success', text: 'Type the number of your choice.' });
+      lines.push({ type: 'success', text: 'Type the number or name of your choice.' });
       return lines;
     }
 
-    /** Show confirmation */
+    /** Show confirmation. */
     function showConfirm() {
       const race = RACES.find(r => r.id === choices.race);
       const specId = choices.spec;
       const cls = getClassForSpec(specId);
       const spec = window.MudAbilities?.getSpec(cls, specId);
-      const specName = spec?.name || specId;
+      const specName = spec?.name || specId.charAt(0).toUpperCase() + specId.slice(1);
 
       return [
         { type: 'room-name', text: '─── Confirm Your Character ───' },
@@ -291,7 +485,7 @@
       ];
     }
 
-    /** Build the final player data object */
+    /** Build the final player data object. */
     function buildPlayer() {
       const race = RACES.find(r => r.id === choices.race);
       const specId = choices.spec;
@@ -323,7 +517,7 @@
         abilityCooldowns: {},
         inventory: [],
         equipped: {},
-        currentRoom: 0,
+        currentRoom: 1,
         visitedRooms: [],
         worldFlags: {},
         activeQuests: [],
@@ -331,14 +525,6 @@
         questCompletionCounts: {},
         killCounts: {}
       };
-    }
-
-    /** Get the sorted top 6 spec IDs (for input matching) */
-    function getTop6() {
-      return Object.entries(specScores)
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 6)
-        .map(e => e[0]);
     }
 
     /**
@@ -350,7 +536,7 @@
 
       switch (step) {
         case 'welcome':
-          if (input === 'begin' || input === 'start' || input === 'yes') {
+          if (['begin','start','yes','y','go','ready','ok','okay','create','new'].includes(input)) {
             step = 'race';
             emit(showRaces());
           } else {
@@ -371,51 +557,77 @@
             return true;
           }
           choices.race = race.id;
-          emit([{ type: 'success', text: `You chose: ${race.name}` }]);
+          emit([
+            { type: 'success', text: `You chose: ${race.name}` },
+            { type: 'info', text: '' },
+            { type: 'info', text: 'Before you stands a gypsy at a crossroads.' },
+            { type: 'info', text: 'She deals no cards, reads no palms — only asks questions.' },
+            { type: 'info', text: '"Answer honestly," she says. "There are no wrong answers."' },
+            { type: 'info', text: '' }
+          ]);
+          // Initialize the tournament bracket
+          bracket = createBracket();
+          currentDilemma = getDilemma(bracket.matchups[0][0], bracket.matchups[0][1]);
           step = 'quiz';
-          quizIndex = 0;
-          specScores = {};
-          emit(showQuizQuestion());
+          emit(showDilemma());
           return true;
         }
 
         case 'quiz': {
-          const q = QUIZ[quizIndex];
-          const idx = parseInt(input, 10);
-          if (idx < 1 || idx > q.answers.length) {
-            emit([{ type: 'error', text: `Pick a number from 1-${q.answers.length}.` }]);
+          // Accept A/B, 1/2, or the first word of the answer text
+          let choice = null;
+          if (input === 'a' || input === '1') {
+            choice = 'a';
+          } else if (input === 'b' || input === '2') {
+            choice = 'b';
+          } else {
+            // Try matching the beginning of the answer text
+            const aStart = currentDilemma.a.toLowerCase().split(/\s+/)[0];
+            const bStart = currentDilemma.b.toLowerCase().split(/\s+/)[0];
+            if (input.startsWith(aStart)) choice = 'a';
+            else if (input.startsWith(bStart)) choice = 'b';
+          }
+
+          if (!choice) {
+            emit([{ type: 'error', text: 'Type A or B to choose your answer.' }]);
             return true;
           }
-          // Apply weights from chosen answer
-          const answer = q.answers[idx - 1];
-          for (const [specId, weight] of Object.entries(answer.weights)) {
-            specScores[specId] = (specScores[specId] || 0) + weight;
-          }
-          quizIndex++;
-          if (quizIndex < QUIZ.length) {
-            emit(showQuizQuestion());
-          } else {
+
+          const nextDilemma = advanceBracket(bracket, choice);
+
+          if (bracket.round === 0) {
+            // Tournament complete
+            topSpecs = calculateTopSpecs();
             step = 'spec';
+            emit([
+              { type: 'info', text: '' },
+              { type: 'info', text: 'The gypsy nods slowly, gathering her things.' },
+              { type: 'info', text: '"I see your path clearly now," she whispers.' },
+              { type: 'info', text: '' }
+            ]);
             emit(showSpecChoices());
+          } else {
+            currentDilemma = nextDilemma;
+            emit(showDilemma());
           }
           return true;
         }
 
         case 'spec': {
-          const top6 = getTop6();
           const idx = parseInt(input, 10);
           let specId = null;
-          if (idx >= 1 && idx <= 6) {
-            specId = top6[idx - 1];
+          if (idx >= 1 && idx <= topSpecs.length) {
+            specId = topSpecs[idx - 1];
           } else {
-            // Try matching by name
-            specId = top6.find(s => {
+            // Try matching by spec name or id
+            specId = topSpecs.find(s => {
               const spec = window.MudAbilities?.getSpec(getClassForSpec(s), s);
-              return spec?.name?.toLowerCase() === input || s === input;
+              const name = spec?.name?.toLowerCase() || '';
+              return s === input || name === input || name.startsWith(input);
             });
           }
           if (!specId) {
-            emit([{ type: 'error', text: 'Invalid choice. Pick 1-6 or type the path name.' }]);
+            emit([{ type: 'error', text: `Invalid choice. Pick 1-${topSpecs.length} or type the path name.` }]);
             return true;
           }
           choices.spec = specId;
@@ -427,14 +639,15 @@
         }
 
         case 'confirm':
-          if (input === 'yes' || input === 'y' || input === 'confirm') {
+          if (['yes','y','confirm','ok','okay','accept','sure','yep','yeah'].includes(input)) {
             const playerData = buildPlayer();
             onComplete(playerData);
-            return false; // chargen done
-          } else if (input === 'restart' || input === 'no' || input === 'n') {
+            return false;
+          } else if (['restart','no','n','nope','redo','back','reset','start over'].includes(input)) {
             choices = { race: null, spec: null };
-            quizIndex = 0;
-            specScores = {};
+            bracket = null;
+            currentDilemma = null;
+            topSpecs = [];
             step = 'race';
             emit(showRaces());
             return true;
@@ -452,5 +665,5 @@
   }
 
   // Expose globally
-  window.MudChargen = { create, RACES, CLASS_STATS, SPEC_FLAVOR };
+  window.MudChargen = { create, RACES, CLASS_STATS, SPEC_FLAVOR, TRAITS };
 })();

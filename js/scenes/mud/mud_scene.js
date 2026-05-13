@@ -46,7 +46,7 @@
       miniInput.focus();
     }
 
-    /** Append lines to the mini terminal. */
+    /** Append lines to the mini terminal and auto-scroll to bottom. */
     function miniOutput(lines) {
       if (!miniLog || !Array.isArray(lines)) return;
       for (const line of lines) {
@@ -55,7 +55,10 @@
         div.textContent = line.text;
         miniLog.appendChild(div);
       }
-      miniLog.scrollTop = miniLog.scrollHeight;
+      // Defer scroll to after DOM repaint so the browser has measured new content
+      requestAnimationFrame(() => {
+        miniLog.scrollTop = miniLog.scrollHeight;
+      });
     }
 
     /** Handle Enter key in the mini terminal. */
@@ -107,17 +110,17 @@
 
       switch (authStep) {
         case 'prompt':
-          if (input === '1' || input === 'login') {
+          if (input === '1' || input === 'login' || input === 'log in' || input === 'signin' || input === 'sign in') {
             authStep = 'login_user';
             miniOutput([{ type: 'info', text: 'Username:' }]);
-          } else if (input === '2' || input === 'register') {
+          } else if (input === '2' || input === 'register' || input === 'signup' || input === 'sign up' || input === 'create' || input === 'new') {
             authStep = 'reg_user';
             miniOutput([{ type: 'info', text: 'Choose a username (3-32 characters):' }]);
-          } else if (input === '3' || input === 'guest') {
+          } else if (input === '3' || input === 'guest' || input === 'skip' || input === 'play') {
             miniOutput([{ type: 'info', text: 'Playing as guest. Progress will not be saved to the server.' }]);
             startChargenOrPlay(null);
           } else {
-            miniOutput([{ type: 'error', text: 'Type 1 (login), 2 (register), or 3 (guest).' }]);
+            miniOutput([{ type: 'error', text: 'Type login, register, or guest (or 1, 2, 3).' }]);
           }
           break;
 
@@ -286,6 +289,11 @@
       ui.render();
       ui.focus();
       initialized = true;
+
+      // Immediate save so new characters persist right away
+      if (window.MudAPI?.isLoggedIn()) {
+        window.MudAPI.storeSave(engine.getSaveSlice()).catch(() => {});
+      }
     }
 
     /** Process a player command through the engine. */
@@ -309,6 +317,18 @@
 
       // First entry — start the auth flow
       renderMiniTerminal();
+
+      // Atmospheric intro — first thing every player sees
+      miniOutput([
+        { type: 'room-name', text: 'You are nowhere.' },
+        { type: 'info', text: '' },
+        { type: 'info', text: 'Something is very wrong.' },
+        { type: 'info', text: '' },
+        { type: 'info', text: 'There is no ground beneath your feet, no sky above.' },
+        { type: 'info', text: 'Just an endless, formless dark — and the faintest pull,' },
+        { type: 'info', text: 'like a thread tugging at the center of your chest.' },
+        { type: 'info', text: '' }
+      ]);
 
       if (window.MudAPI?.isLoggedIn()) {
         // Already logged in (token in localStorage) — try loading save

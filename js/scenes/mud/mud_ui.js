@@ -108,7 +108,10 @@
         logEl.removeChild(logEl.firstChild);
       }
 
-      logEl.scrollTop = logEl.scrollHeight;
+      // Defer scroll to after DOM repaint so the browser has measured new content
+      requestAnimationFrame(() => {
+        logEl.scrollTop = logEl.scrollHeight;
+      });
     }
 
     /**

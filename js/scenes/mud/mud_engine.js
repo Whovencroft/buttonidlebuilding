@@ -114,7 +114,7 @@
 
     function createDefaultPlayer() {
       return {
-        currentRoom: 0,
+        currentRoom: 1,
         hp: 100,
         maxHp: 100,
         focus: 50,
