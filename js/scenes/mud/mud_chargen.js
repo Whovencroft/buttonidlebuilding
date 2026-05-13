@@ -491,7 +491,10 @@
       const specId = choices.spec;
       const baseClass = getClassForSpec(specId);
       const cStats = CLASS_STATS[baseClass];
-      const startAbility = CLASS_STARTING_ABILITY[baseClass];
+      // Get the tier 0 ability from the player's actual specialization
+      const specAbilities = window.MudAbilities?.getSpecAbilities(baseClass, specId, 0) || [];
+      const tier0 = specAbilities.find(a => a.tier === 0);
+      const startAbility = tier0 ? tier0.id : null;
 
       const baseHp = 100;
       const baseAtk = 5;

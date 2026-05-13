@@ -40,7 +40,7 @@
     rotate: 'rotate', turn: 'rotate', spin: 'rotate',
     train: 'train', learn: 'train',
     abilities: 'abilities', skills: 'abilities', spells: 'abilities',
-    status: 'status', stats: 'status', power: 'status', score: 'status',
+    status: 'status', stat: 'status', stats: 'status', power: 'status', score: 'status',
     buy: 'buy', purchase: 'buy',
     respec: 'respec',
     recall: 'recall', warp: 'recall', home: 'recall',
@@ -1506,7 +1506,7 @@
      */
     function update(dt) {
       // Auto-save timer (runs even outside combat)
-      autoSaveTimer += dt / 1000;
+      autoSaveTimer += dt;  // dt is already in seconds from host frame loop
       if (autoSaveTimer >= AUTO_SAVE_INTERVAL) {
         autoSaveTimer = 0;
         autoSave();
@@ -1514,7 +1514,7 @@
 
       if (!combatState) return;
 
-      combatTimer += dt / 1000; // dt is in ms
+      combatTimer += dt;  // dt is already in seconds from host frame loop
       if (combatTimer < COMBAT_TICK_INTERVAL) return;
       combatTimer -= COMBAT_TICK_INTERVAL;
 
@@ -1557,7 +1557,7 @@
         player.hp = player.maxHp;
         combatState = null;
         combatTimer = 0;
-        player.currentRoom = 0;
+        player.currentRoom = player.recallPoint || 1;
         pushCombatOutput(output);
         return;
       }
