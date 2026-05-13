@@ -248,7 +248,7 @@
   let marbleScene = null;
   let frameHandle = null;
   let saveHandle = null;
-  const TEST_SCENE_SEQUENCE = ['button_idle', 'marble'];
+  const TEST_SCENE_SEQUENCE = ['button_idle', 'marble', 'mud'];
 
   // ─── Debug command registry ─────────────────────────────────────────────────
   // Type any registered keyword while not focused on an input to trigger it.
