@@ -44,7 +44,21 @@
     buy: 'buy', purchase: 'buy',
     respec: 'respec',
     recall: 'recall', warp: 'recall', home: 'recall',
-    setrecall: 'setrecall', bind: 'setrecall', sethome: 'setrecall'
+    setrecall: 'setrecall', bind: 'setrecall', sethome: 'setrecall',
+    // New system commands (handled by mud_systems_integration.js)
+    sense: 'sense', scan: 'sense',
+    rest: 'rest', sleep: 'sleep', wake: 'wake', stand: 'wake',
+    stance: 'stance', stances: 'stance',
+    suppress: 'suppress',
+    transform: 'transform', henshin: 'transform', bankai: 'transform', ascend: 'transform',
+    detransform: 'detransform', revert: 'detransform', powerdown: 'detransform',
+    class: 'class',
+    mission: 'mission', missions: 'mission', bounty: 'mission', bounties: 'mission',
+    echo: 'echo', echoes: 'echo',
+    release: 'release',
+    cancel: 'cancel',
+    proficiency: 'proficiency', prof: 'proficiency',
+    title: 'title', titles: 'title'
   };
 
   /**
@@ -754,6 +768,19 @@
         { type: 'info', text: '  notes                — Read notes left by other players' },
         { type: 'info', text: '  shop                 — Browse the marketplace' },
         { type: 'info', text: '  help                 — Show this list' },
+        { type: 'info', text: '─── New Systems ───' },
+        { type: 'info', text: '  sense [target]       — Gauge creature strength' },
+        { type: 'info', text: '  rest / sleep         — Recover HP and Focus' },
+        { type: 'info', text: '  wake                 — Stand up from rest' },
+        { type: 'info', text: '  stance [name]        — View or change combat stance' },
+        { type: 'info', text: '  suppress <percent>   — Suppress power for training' },
+        { type: 'info', text: '  transform            — Activate transformation (secret class)' },
+        { type: 'info', text: '  detransform          — Revert transformation' },
+        { type: 'info', text: '  class                — View secret class info' },
+        { type: 'info', text: '  mission              — View bounty board' },
+        { type: 'info', text: '  echo                 — Interact with death echoes' },
+        { type: 'info', text: '  proficiency          — View ability mastery levels' },
+        { type: 'info', text: '  title                — View your current title' },
         { type: 'info', text: '─── Shortcuts ───' },
         { type: 'info', text: '  n/s/e/w/u/d          — Move in that direction' },
         { type: 'info', text: '  l                    — Look around' },
