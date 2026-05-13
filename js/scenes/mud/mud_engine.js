@@ -42,7 +42,9 @@
     abilities: 'abilities', skills: 'abilities', spells: 'abilities',
     status: 'status', stats: 'status', power: 'status', score: 'status',
     buy: 'buy', purchase: 'buy',
-    respec: 'respec'
+    respec: 'respec',
+    recall: 'recall', warp: 'recall', home: 'recall',
+    setrecall: 'setrecall', bind: 'setrecall', sethome: 'setrecall'
   };
 
   /**
@@ -137,7 +139,8 @@
         specName: null,
         abilities: [],
         abilityCooldowns: {},
-        focusCostModifier: 0
+        focusCostModifier: 0,
+        recallPoint: 1
       };
     }
 
@@ -182,6 +185,8 @@
         case 'status': return doStatus();
         case 'buy': return doBuy(target);
         case 'respec': return doRespec(target);
+        case 'recall': return doRecall();
+        case 'setrecall': return doSetRecall();
         case 'help': return doHelp();
         case 'say': return [{ type: 'info', text: `You say: "${target}"` }];
         case 'write': return doWrite(target);
@@ -205,35 +210,35 @@
       if (!direction) return [{ type: 'error', text: 'Go where? Specify a direction.' }];
 
       const exit = room.exits?.[direction];
-      if (!exit) {
+      if (exit == null) {
         return [{ type: 'error', text: `There is no exit to the ${direction}.` }];
       }
 
-      // Check for locked doors
-      if (exit.door && exit.door.state === 'locked') {
+      // Exits can be plain vnums (int) or objects { target_vnum, door }
+      const targetVnum = typeof exit === 'object' ? exit.target_vnum : exit;
+
+      // Check for locked doors (only object-style exits have doors)
+      if (typeof exit === 'object' && exit.door && exit.door.state === 'locked') {
         const keyVnum = exit.door.key_vnum;
         if (keyVnum && player.inventory.includes(keyVnum)) {
-          // Unlock permanently via world flag
           player.worldFlags[`door_${room.vnum}_${direction}`] = 'unlocked';
           return [
             { type: 'success', text: `You unlock the door with your key.` },
-            ...moveToRoom(exit.target_vnum)
+            ...moveToRoom(targetVnum)
           ];
         }
-        // Check if already unlocked via world flag
         if (player.worldFlags[`door_${room.vnum}_${direction}`] === 'unlocked') {
-          return moveToRoom(exit.target_vnum);
+          return moveToRoom(targetVnum);
         }
         return [{ type: 'error', text: 'The way is locked.' }];
       }
 
-      return moveToRoom(exit.target_vnum);
+      return moveToRoom(targetVnum);
     }
 
     function moveToRoom(vnum) {
       // Validate the target room exists before committing the move
-      const targetRoom = rooms.find(r => r.vnum === vnum);
-      if (!targetRoom) {
+      if (!rooms[vnum]) {
         return [{ type: 'error', text: 'An impassable barrier blocks your way.' }];
       }
 
@@ -254,8 +259,9 @@
 
       // List exits (only show directions that lead to valid rooms)
       const exits = Object.keys(room.exits || {}).filter(dir => {
-        const target = room.exits[dir]?.target_vnum;
-        return target && rooms.find(r => r.vnum === target);
+        const ex = room.exits[dir];
+        const target = typeof ex === 'object' ? ex.target_vnum : ex;
+        return target != null && rooms[target];
       });
       if (exits.length > 0) {
         output.push({ type: 'exits', text: `Exits: ${exits.join(', ')}` });
@@ -673,20 +679,49 @@
       // 50% chance to flee
       if (Math.random() < 0.5) {
         const room = currentRoom();
-        const exits = Object.keys(room?.exits || {});
-        if (exits.length > 0) {
-          const dir = exits[Math.floor(Math.random() * exits.length)];
+        const validExits = Object.keys(room?.exits || {}).filter(dir => {
+          const ex = room.exits[dir];
+          const target = typeof ex === 'object' ? ex.target_vnum : ex;
+          return target != null && rooms[target];
+        });
+        if (validExits.length > 0) {
+          const dir = validExits[Math.floor(Math.random() * validExits.length)];
           combatState = null;
           combatTimer = 0;
-          const exit = room.exits[dir];
+          const ex = room.exits[dir];
+          const targetVnum = typeof ex === 'object' ? ex.target_vnum : ex;
           return [
             { type: 'combat', text: `You flee to the ${dir}!` },
-            ...moveToRoom(exit.target_vnum)
+            ...moveToRoom(targetVnum)
           ];
         }
       }
 
       return [{ type: 'combat', text: 'You fail to escape!' }];
+    }
+
+    /** Warp back to the player's recall point (default: room 1). */
+    function doRecall() {
+      if (combatState) {
+        return [{ type: 'error', text: "You can't recall while in combat!" }];
+      }
+      const dest = player.recallPoint || 1;
+      if (player.currentRoom === dest) {
+        return [{ type: 'info', text: 'You are already at your recall point.' }];
+      }
+      return [
+        { type: 'info', text: 'The world blurs around you...' },
+        ...moveToRoom(dest)
+      ];
+    }
+
+    /** Set the current room as the player's recall point. */
+    function doSetRecall() {
+      const room = currentRoom();
+      if (!room) return [{ type: 'error', text: 'You are nowhere. Cannot set recall.' }];
+      player.recallPoint = room.vnum;
+      autoSave();
+      return [{ type: 'success', text: `Recall point set to: ${room.name}` }];
     }
 
     function doHelp() {
@@ -706,6 +741,8 @@
         { type: 'info', text: '  talk <npc>           — Speak to an NPC' },
         { type: 'info', text: '  attack [target]      — Start combat' },
         { type: 'info', text: '  flee                 — Attempt to escape combat' },
+        { type: 'info', text: '  recall               — Warp to your save point' },
+        { type: 'info', text: '  setrecall            — Set current room as save point' },
         { type: 'info', text: '  <ability name>       — Use an ability in combat' },
         { type: 'info', text: '  abilities            — List your abilities' },
         { type: 'info', text: '  status               — View power, QP, and stats' },
@@ -1901,8 +1938,9 @@
       return {
         roomName: room?.name || 'Unknown',
         exits: Object.keys(room?.exits || {}).filter(dir => {
-          const target = room.exits[dir]?.target_vnum;
-          return target && rooms.find(r => r.vnum === target);
+          const ex = room.exits[dir];
+          const target = typeof ex === 'object' ? ex.target_vnum : ex;
+          return target != null && rooms[target];
         }),
         inCombat: !!combatState,
         combatTarget: combatState ? getMobName(combatState.mobVnum) : null,
