@@ -560,7 +560,7 @@
           emit([
             { type: 'success', text: `You chose: ${race.name}` },
             { type: 'info', text: '' },
-            { type: 'info', text: 'Before you stands a gypsy at a crossroads.' },
+            { type: 'info', text: 'Before you stands a weathered woman at a crossroads.' },
             { type: 'info', text: 'She deals no cards, reads no palms — only asks questions.' },
             { type: 'info', text: '"Answer honestly," she says. "There are no wrong answers."' },
             { type: 'info', text: '' }
@@ -601,7 +601,7 @@
             step = 'spec';
             emit([
               { type: 'info', text: '' },
-              { type: 'info', text: 'The gypsy nods slowly, gathering her things.' },
+              { type: 'info', text: 'The woman nods slowly, gathering her things.' },
               { type: 'info', text: '"I see your path clearly now," she whispers.' },
               { type: 'info', text: '' }
             ]);

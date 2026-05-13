@@ -1,9 +1,50 @@
+/* ─── MUD Full-Screen Mode ───────────────────────────────────────────────── */
+/* Mirror the marble-mode pattern: force the entire layout chain to fill the
+   viewport so the terminal's flex layout can properly constrain the log. */
+
+.app.app-mud-mode .content,
+.app.app-mud-mode .tab-panel.active,
+.app.app-mud-mode .game-grid,
+.app.app-mud-mode .panel,
+.app.app-mud-mode .panel-body,
+.app.app-mud-mode .scene-host,
+.app.app-mud-mode .scene-root {
+  height: 100vh;
+  height: 100dvh;
+  min-height: 0;
+  max-height: 100vh;
+  max-height: 100dvh;
+}
+
+.app.app-mud-mode .content {
+  grid-template-columns: 1fr;
+}
+
+.app.app-mud-mode .panel {
+  background: #0a0a0a;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+.app.app-mud-mode .panel-header {
+  display: none;
+}
+
+.app.app-mud-mode .panel-body {
+  padding: 0;
+  overflow: hidden;
+}
+
 /* ─── MUD Terminal Styles ─────────────────────────────────────────────────── */
 
 .mud-terminal {
   display: flex;
   flex-direction: column;
   height: 100%;
+  max-height: 100vh;
+  max-height: 100dvh;
   background: #0a0a0a;
   color: #e0e0e0;
   font-family: 'Courier New', Courier, monospace;
@@ -13,10 +54,14 @@
 }
 
 /* ─── Log Area ────────────────────────────────────────────────────────────── */
+/* flex: 1 + min-height: 0 ensures the log shrinks to fit available space
+   instead of pushing siblings off-screen. overflow-y: scroll always shows
+   the scrollbar so players know they can scroll back. */
 
 .mud-log {
-  flex: 1;
-  overflow-y: auto;
+  flex: 1 1 0;
+  min-height: 0;
+  overflow-y: scroll;
   padding: 12px;
   scroll-behavior: smooth;
 }
@@ -84,6 +129,7 @@
 /* ─── Status Bar ──────────────────────────────────────────────────────────── */
 
 .mud-status-bar {
+  flex: 0 0 auto;
   display: flex;
   justify-content: space-between;
   padding: 4px 12px;
@@ -106,6 +152,7 @@
 /* ─── Quick Action Buttons ────────────────────────────────────────────────── */
 
 .mud-actions {
+  flex: 0 0 auto;
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -143,8 +190,10 @@
 }
 
 /* ─── Input Row ───────────────────────────────────────────────────────────── */
+/* flex: 0 0 auto keeps the input pinned to the bottom, never scrolling away. */
 
 .mud-input-row {
+  flex: 0 0 auto;
   display: flex;
   align-items: center;
   padding: 8px 12px;

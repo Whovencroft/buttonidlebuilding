@@ -231,6 +231,12 @@
     }
 
     function moveToRoom(vnum) {
+      // Validate the target room exists before committing the move
+      const targetRoom = rooms.find(r => r.vnum === vnum);
+      if (!targetRoom) {
+        return [{ type: 'error', text: 'An impassable barrier blocks your way.' }];
+      }
+
       player.currentRoom = vnum;
       if (!player.visitedRooms.includes(vnum)) {
         player.visitedRooms.push(vnum);
@@ -241,14 +247,16 @@
       autoSave();
 
       const room = currentRoom();
-      if (!room) return [{ type: 'error', text: 'You step into the void...' }];
 
       const output = [];
       output.push({ type: 'room-name', text: room.name });
       output.push({ type: 'room-desc', text: room.description });
 
-      // List exits
-      const exits = Object.keys(room.exits || {});
+      // List exits (only show directions that lead to valid rooms)
+      const exits = Object.keys(room.exits || {}).filter(dir => {
+        const target = room.exits[dir]?.target_vnum;
+        return target && rooms.find(r => r.vnum === target);
+      });
       if (exits.length > 0) {
         output.push({ type: 'exits', text: `Exits: ${exits.join(', ')}` });
       }
@@ -1892,7 +1900,10 @@
 
       return {
         roomName: room?.name || 'Unknown',
-        exits: Object.keys(room?.exits || {}),
+        exits: Object.keys(room?.exits || {}).filter(dir => {
+          const target = room.exits[dir]?.target_vnum;
+          return target && rooms.find(r => r.vnum === target);
+        }),
         inCombat: !!combatState,
         combatTarget: combatState ? getMobName(combatState.mobVnum) : null,
         hp: player.hp,

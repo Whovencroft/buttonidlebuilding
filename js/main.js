@@ -408,9 +408,12 @@
     elements.switchMarbleSceneBtn.disabled = !marbleUnlocked;
     elements.switchMarbleSceneBtn.textContent = marbleUnlocked ? 'Marble Game' : 'Marble Locked';
 
+    const isMud = activeSceneId === 'mud';
+
     if (elements.appRoot) {
       elements.appRoot.classList.toggle('app-marble-mode', isMarble);
       elements.appRoot.classList.toggle('app-title-mode', isTitle);
+      elements.appRoot.classList.toggle('app-mud-mode', isMud);
     }
   }
 
