@@ -34,7 +34,8 @@
     talk: 'talk', ask: 'talk', chat: 'talk',
     help: 'help', '?': 'help', commands: 'help',
     quest: 'quest', quests: 'quest', journal: 'quest', log: 'quest',
-    write: 'write', note: 'write',
+    write: 'write', note: 'write', notes: 'readnotes',
+    shop: 'shop', market: 'shop', marketplace: 'shop',
     combine: 'combine', merge: 'combine', craft: 'combine',
     rotate: 'rotate', turn: 'rotate', spin: 'rotate',
     train: 'train', learn: 'train',
@@ -183,7 +184,9 @@
         case 'respec': return doRespec(target);
         case 'help': return doHelp();
         case 'say': return [{ type: 'info', text: `You say: "${target}"` }];
-        case 'write': return [{ type: 'info', text: '[Notes system requires server connection]' }];
+        case 'write': return doWrite(target);
+        case 'readnotes': return doReadNotes();
+        case 'shop': return doShop(target);
         default:
           return [{ type: 'error', text: `Unknown command: '${verb}'. Type 'help' for a list.` }];
       }
@@ -232,6 +235,10 @@
       if (!player.visitedRooms.includes(vnum)) {
         player.visitedRooms.push(vnum);
       }
+
+      // Record ghost and auto-save on room change
+      recordGhost('move', String(vnum));
+      autoSave();
 
       const room = currentRoom();
       if (!room) return [{ type: 'error', text: 'You step into the void...' }];
@@ -698,6 +705,9 @@
         { type: 'info', text: '  buy <name>           — Purchase an ability with QP' },
         { type: 'info', text: '  respec               — Change specialization (30 QP)' },
         { type: 'info', text: '  quest [name]         — View quest log or accept/complete' },
+        { type: 'info', text: '  write <message>      — Leave a note in this room' },
+        { type: 'info', text: '  notes                — Read notes left by other players' },
+        { type: 'info', text: '  shop                 — Browse the marketplace' },
         { type: 'info', text: '  help                 — Show this list' },
         { type: 'info', text: '─── Shortcuts ───' },
         { type: 'info', text: '  n/s/e/w/u/d          — Move in that direction' },
@@ -705,6 +715,130 @@
         { type: 'info', text: '  i                    — Inventory' },
         { type: 'info', text: '  eq                   — Equipment' }
       ];
+    }
+
+    // ─── Server-Backed Commands ──────────────────────────────────────────────
+
+    /** Auto-save interval tracker (saves every 60 seconds of play). */
+    let autoSaveTimer = 0;
+    const AUTO_SAVE_INTERVAL = 60;
+
+    /**
+     * Write a note in the current room (max 280 chars).
+     * Async — returns a pending message, then posts to server.
+     */
+    function doWrite(target) {
+      if (!target) return [{ type: 'error', text: 'Write what? Usage: write <message>' }];
+      if (!window.MudAPI?.isLoggedIn()) {
+        return [{ type: 'error', text: 'You must be logged in to leave notes.' }];
+      }
+      if (target.length > 280) {
+        return [{ type: 'error', text: 'Note too long (max 280 characters).' }];
+      }
+
+      const room = currentRoom();
+      // Filter the note content
+      if (window.MudFilter) {
+        const check = window.MudFilter.check(target);
+        if (check.blocked) {
+          return [{ type: 'error', text: 'Your note contains inappropriate language.' }];
+        }
+      }
+
+      // Fire and forget — post to server
+      window.MudAPI.postNote(room.vnum, target).catch(err => {
+        combatOutput.push({ type: 'error', text: `Note failed: ${err.message}` });
+      });
+
+      return [{ type: 'success', text: `You scratch a note into the wall: "${target}"` }];
+    }
+
+    /**
+     * Read notes left by other players in the current room.
+     * Async — returns a pending message, then fetches from server.
+     */
+    function doReadNotes() {
+      if (!window.MudAPI?.isLoggedIn()) {
+        return [{ type: 'info', text: 'You must be logged in to read notes.' }];
+      }
+
+      const room = currentRoom();
+      window.MudAPI.getNotes(room.vnum).then(result => {
+        if (!result.notes || result.notes.length === 0) {
+          combatOutput.push({ type: 'info', text: 'No notes have been left here.' });
+        } else {
+          combatOutput.push({ type: 'info', text: '─── Notes ───' });
+          for (const note of result.notes) {
+            combatOutput.push({ type: 'info', text: `  ${note.username}: "${note.content}"` });
+          }
+        }
+      }).catch(err => {
+        combatOutput.push({ type: 'error', text: `Could not read notes: ${err.message}` });
+      });
+
+      return [{ type: 'info', text: 'Reading notes...' }];
+    }
+
+    /**
+     * Browse the rotating marketplace.
+     * Async — fetches stock from server.
+     */
+    function doShop(target) {
+      if (!window.MudAPI?.isLoggedIn()) {
+        return [{ type: 'info', text: 'You must be logged in to use the marketplace.' }];
+      }
+
+      // If target is a number, try to buy that stock item
+      if (target && /^\d+$/.test(target)) {
+        const stockId = parseInt(target);
+        window.MudAPI.buyItem(stockId).then(result => {
+          combatOutput.push({ type: 'success', text: `Purchased! Gold remaining: ${result.gold}` });
+          player.gold = result.gold;
+          if (result.item_vnum) player.inventory.push(result.item_vnum);
+        }).catch(err => {
+          combatOutput.push({ type: 'error', text: `Purchase failed: ${err.message}` });
+        });
+        return [{ type: 'info', text: 'Purchasing...' }];
+      }
+
+      // Otherwise, show the shop
+      window.MudAPI.getMarketplace().then(result => {
+        if (!result.stock || result.stock.length === 0) {
+          combatOutput.push({ type: 'info', text: 'The marketplace has nothing for sale right now.' });
+        } else {
+          combatOutput.push({ type: 'info', text: '─── Marketplace ───' });
+          for (const s of result.stock) {
+            const name = getItemName(s.item_vnum);
+            combatOutput.push({ type: 'info', text: `  [${s.id}] ${name} — ${s.price} gold (qty: ${s.quantity})` });
+          }
+          combatOutput.push({ type: 'info', text: `  Type 'shop <id>' to purchase.` });
+          combatOutput.push({ type: 'info', text: `  Your gold: ${player.gold}` });
+        }
+      }).catch(err => {
+        combatOutput.push({ type: 'error', text: `Marketplace error: ${err.message}` });
+      });
+
+      return [{ type: 'info', text: 'Checking the marketplace...' }];
+    }
+
+    /**
+     * Record a ghost action to the server (fire and forget).
+     * Called on movement, combat, and other key actions.
+     */
+    function recordGhost(action, direction) {
+      if (!window.MudAPI?.isLoggedIn()) return;
+      const room = currentRoom();
+      if (!room) return;
+      window.MudAPI.recordGhost(room.vnum, action, direction || '').catch(() => {});
+    }
+
+    /**
+     * Auto-save the player's state to the server.
+     * Called periodically and on key events (room change, combat end, quest complete).
+     */
+    function autoSave() {
+      if (!window.MudAPI?.isLoggedIn()) return;
+      window.MudAPI.storeSave(getSaveSlice()).catch(() => {});
     }
 
     // ─── Ability System ────────────────────────────────────────────────────────
@@ -1079,6 +1213,11 @@
 
       combatState = null;
       combatTimer = 0;
+
+      // Record ghost and auto-save after combat
+      recordGhost('attack', String(mob.vnum));
+      autoSave();
+
       return output;
     }
 
@@ -1321,6 +1460,13 @@
      * Called each frame. Handles combat auto-attack ticks.
      */
     function update(dt) {
+      // Auto-save timer (runs even outside combat)
+      autoSaveTimer += dt / 1000;
+      if (autoSaveTimer >= AUTO_SAVE_INTERVAL) {
+        autoSaveTimer = 0;
+        autoSave();
+      }
+
       if (!combatState) return;
 
       combatTimer += dt / 1000; // dt is in ms
