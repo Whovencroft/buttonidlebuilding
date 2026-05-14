@@ -42,7 +42,9 @@
       trainingCounts: {},
       hasMultiAttackTraining: false,
       exhausted: false,
-      titleNotified: null
+      titleNotified: null,
+      invasionState: null,
+      coreStats: null
     };
 
     // ─── Non-persisted State ────────────────────────────────────────────
@@ -50,6 +52,8 @@
     let restTimer = 0;
     let trainingState = null;
     let trainingTimer = 0;
+    let ghostFetchCooldown = 0;
+    let lastRoomForGhosts = null;
 
     // ─── Helper Functions ───────────────────────────────────────────────
 
@@ -71,9 +75,125 @@
       restTimer = 0;
     }
 
+    /** Get or initialize invasion state from player data. */
+    function getInvasionState() {
+      const playerState = getPlayerFromSave();
+      if (!window.MudInvasions) return null;
+      return window.MudInvasions.loadInvasionState(playerState?.invasionState);
+    }
+
+    /** Persist invasion state changes. */
+    function saveInvasionState(state) {
+      setPlayerField('invasionState', state);
+    }
+
+    /**
+     * Fetch ghosts for the current room and potentially trigger an invasion.
+     * Called asynchronously on room entry (does not block movement).
+     */
+    function fetchGhostsAndCheckInvasion() {
+      if (!window.MudAPI?.isLoggedIn()) return;
+      if (!window.MudInvasions) return;
+
+      const playerState = getPlayerFromSave();
+      const roomVnum = playerState?.currentRoom;
+      if (!roomVnum) return;
+
+      // Avoid re-fetching for the same room
+      if (roomVnum === lastRoomForGhosts) return;
+      lastRoomForGhosts = roomVnum;
+
+      const invasionState = getInvasionState();
+      if (!invasionState) return;
+
+      // Check if player entered a safe zone — reset kill streak
+      const room = engine._internals.currentRoom();
+      if (window.MudInvasions.isSafeZone(room)) {
+        if (invasionState.killStreakSinceSafe > 0) {
+          invasionState.killStreakSinceSafe = 0;
+          saveInvasionState(invasionState);
+          engine._pendingSystemOutput = (engine._pendingSystemOutput || []).concat([
+            { type: 'info', text: 'You feel the tension ease as you enter safe ground.' }
+          ]);
+        }
+        return;
+      }
+
+      // Async fetch ghosts
+      window.MudAPI.getGhosts(roomVnum).then(ghosts => {
+        if (!ghosts || ghosts.length === 0) return;
+        const output = [];
+
+        // Display ghost flavor text (up to 3)
+        const displayed = ghosts.slice(0, 3);
+        for (const g of displayed) {
+          const actionText = {
+            move: 'passed through here',
+            attack: 'fought something here',
+            flee: 'fled from here',
+            train: 'trained here',
+            buy: 'traded here',
+            look: 'examined this place',
+            quest: 'completed a task here'
+          }[g.action] || 'lingered here';
+          output.push({ type: 'ghost', text: `  A faint shimmer... the ghost of ${g.username} ${actionText}.` });
+        }
+
+        // Roll for invasion on each ghost
+        const ctx = engine.getContext();
+        for (const ghost of ghosts) {
+          if (window.MudInvasions.shouldInvade({
+            invasionState,
+            room,
+            inCombat: ctx.inCombat,
+            isBossFight: false
+          })) {
+            // Trigger invasion!
+            output.push(...window.MudInvasions.getInvasionAnnouncement(ghost.username));
+
+            // Generate echo mob scaled to player
+            const echoMob = window.MudInvasions.generateEchoMob(ghost, playerState, null);
+
+            // Inject into the mobs registry so combat can find it
+            engine._internals.mobs[echoMob.vnum] = echoMob;
+
+            // Mark invasion time
+            invasionState.lastInvasionTime = Date.now();
+            saveInvasionState(invasionState);
+
+            // Try to load ghost player's save for spec abilities (async, best-effort)
+            // For now, initiate combat immediately with fallback stats
+            output.push(...engine._internals.initiateCombat(echoMob.vnum));
+            break; // Only one invasion per room entry
+          }
+        }
+
+        if (output.length > 0) {
+          engine._pendingSystemOutput = (engine._pendingSystemOutput || []).concat(output);
+        }
+      }).catch(() => {
+        // Ghost fetch failed silently — no invasion
+      });
+    }
+
     // ─── Register Commands ──────────────────────────────────────────────
 
     window.MudCommands.registerAll([
+      {
+        name: 'stats',
+        aliases: ['attributes', 'attr'],
+        category: 'Info',
+        help: 'View your core attributes and derived stats',
+        usage: 'stats',
+        handler: () => {
+          if (!window.MudStats) return [{ type: 'error', text: 'Stat system not available.' }];
+          const playerState = getPlayerFromSave();
+          if (!playerState.coreStats) {
+            return [{ type: 'info', text: 'Your attributes have not yet awakened.' }];
+          }
+          return window.MudStats.formatStatDisplay(playerState.coreStats, playerState.power || 0);
+        }
+      },
       {
         name: 'sense',
         aliases: ['scan'],
@@ -448,6 +568,86 @@
       return null;
     });
 
+    // ─── After-Middleware: Invasion Kill Streak & Karma ────────────────
+    window.MudCommands.after((parsed, context, result) => {
+      if (!window.MudInvasions) return;
+      if (parsed.verb !== 'attack') return;
+
+      // Check if the attack command resulted in a kill (look for defeat text)
+      const hasKill = result && result.some(msg =>
+        msg.text && msg.text.includes('has been defeated')
+      );
+      if (!hasKill) return;
+
+      const invasionState = getInvasionState();
+      if (!invasionState) return;
+
+      // Check if we killed an echo invasion mob
+      const isEchoKill = result.some(msg =>
+        msg.text && msg.text.includes('INVASION DEFEATED')
+      );
+
+      if (isEchoKill) {
+        // Echo invasion kill — rewards already handled by combat
+        invasionState.invasionKills += 1;
+        saveInvasionState(invasionState);
+        return;
+      }
+
+      // Check if we killed a friendly NPC (karma penalty)
+      const playerState = getPlayerFromSave();
+      const room = engine._internals.currentRoom();
+      const roomMobs = (room?.mob_spawns || room?.mobs || []);
+      // We can't easily tell which mob was killed from here,
+      // but the handleMobKill already ran. Track kill streak regardless.
+      window.MudInvasions.recordMobKill(invasionState);
+      saveInvasionState(invasionState);
+    });
+
+    // ─── NPC Kill Karma Hook ────────────────────────────────────────────
+    // Wrap handleMobKill to detect friendly NPC kills and apply karma.
+    const originalHandleMobKill = engine._internals.handleMobKill;
+    engine._internals.handleMobKill = function(mob) {
+      const output = originalHandleMobKill(mob);
+
+      if (window.MudInvasions && window.MudInvasions.isFriendlyNpc(mob)) {
+        const invasionState = getInvasionState();
+        if (invasionState) {
+          const karmaOutput = window.MudInvasions.recordNpcKill(invasionState);
+          saveInvasionState(invasionState);
+          output.push(...karmaOutput);
+        }
+      }
+
+      // Handle echo invasion kill rewards
+      if (mob.isEchoInvasion && window.MudInvasions) {
+        const playerState = getPlayerFromSave();
+        const rewards = window.MudInvasions.calculateInvasionRewards(mob, playerState);
+        output.push(...rewards.output);
+        setPlayerField('power', (playerState.power || 0) + rewards.powerGain);
+        if (rewards.itemDrop && playerState.inventory.length < 99) {
+          const inv = [...(playerState.inventory || []), rewards.itemDrop];
+          setPlayerField('inventory', inv);
+        }
+
+        // Create notification for the ghost player (stored locally for now)
+        const notification = window.MudInvasions.createInvasionNotification(
+          playerState.specName || 'Unknown',
+          false,
+          mob.echoUsername
+        );
+        // Store notification via API if available
+        if (window.MudAPI?.isLoggedIn()) {
+          window.MudAPI.recordGhost(playerState.currentRoom, 'invasion_defeat', mob.echoUsername).catch(() => {});
+        }
+
+        // Clean up temporary echo mob from registry
+        delete engine._internals.mobs[mob.vnum];
+      }
+
+      return output;
+    };
+
     // ─── Update Intercept (tick-based systems) ──────────────────────────
     const originalUpdate = engine.update.bind(engine);
 
@@ -466,6 +666,14 @@
               engine._pendingSystemOutput = (engine._pendingSystemOutput || []).concat(result);
             }
           }
+        }
+      }
+
+      // Ghost fetch and invasion check on room change
+      if (window.MudInvasions) {
+        const playerState = getPlayerFromSave();
+        if (playerState?.currentRoom !== lastRoomForGhosts) {
+          fetchGhostsAndCheckInvasion();
         }
       }
 
@@ -505,6 +713,21 @@
 
       if (window.MudTitles && playerState?.baseClass) {
         ctx.title = window.MudTitles.getTitle(playerState.baseClass, playerState.power || 0);
+      }
+
+      // Core stats context
+      if (window.MudStats && playerState?.coreStats) {
+        ctx.coreStats = playerState.coreStats;
+        ctx.derived = window.MudStats.computeDerived(playerState.coreStats, playerState.power || 0);
+      }
+
+      // Invasion context
+      if (window.MudInvasions) {
+        const invState = window.MudInvasions.loadInvasionState(playerState?.invasionState);
+        ctx.invasionChance = window.MudInvasions.getInvasionChanceText(invState);
+        ctx.killStreakSinceSafe = invState.killStreakSinceSafe;
+        ctx.karmaDebt = invState.karmaDebt;
+        ctx.invasionKills = invState.invasionKills;
       }
 
       return ctx;
@@ -547,6 +770,14 @@
     }
     if (needsResume) {
       engine.resume({ player: patch });
+    }
+
+    // Initialize core stats if MudStats is loaded and player has none
+    if (window.MudStats) {
+      const checkPlayer = engine.getSaveSlice().player;
+      if (!checkPlayer.coreStats) {
+        engine.resume({ player: { coreStats: window.MudStats.createDefaultStats() } });
+      }
     }
 
     return engine;

@@ -73,7 +73,8 @@
         abilities: [],
         abilityCooldowns: {},
         focusCostModifier: 0,
-        recallPoint: 1
+        recallPoint: 1,
+        coreStats: null
       };
     }
 
@@ -169,8 +170,20 @@
       }
 
       player.currentRoom = vnum;
-      if (!player.visitedRooms.includes(vnum)) {
+      const isNewRoom = !player.visitedRooms.includes(vnum);
+      if (isNewRoom) {
         player.visitedRooms.push(vnum);
+      }
+      // Instinct grows from exploring new rooms
+      if (isNewRoom && window.MudStats && player.coreStats) {
+        const iGrowth = window.MudStats.onRoomEntered(true);
+        if (iGrowth) {
+          const iResult = window.MudStats.applyGrowth(player.coreStats, iGrowth);
+          // Queue output for next flush since moveToRoom returns its own output
+          if (iResult.output.length > 0) {
+            engine._pendingSystemOutput = (engine._pendingSystemOutput || []).concat(iResult.output);
+          }
+        }
       }
 
       // Record ghost and auto-save on room change
@@ -896,7 +909,9 @@
           return [
             { type: 'info', text: 'Instructor Vex studies you carefully.' },
             { type: 'info', text: '"You\'ve learned all you can at your current power level."' },
-            { type: 'info', text: `  Your power: ${player.power}. Next tier unlocks more abilities.` }
+            { type: 'info', text: `  Your power: ${player.power}. Next tier unlocks more abilities.` },
+        // Show core stats if available
+        ...(window.MudStats && player.coreStats ? window.MudStats.formatStatDisplay(player.coreStats, player.power) : [])
           ];
         }
         const output = [
@@ -1091,8 +1106,25 @@
           if (!def.ignoresDef) {
             dmg = Math.max(1, dmg - Math.floor((mob?.stats?.defense || 0) / 2));
           }
+          // Apply Precision-based damage variance and crit to abilities
+          const aDerived = player._derived || {};
+          if (window.MudStats) {
+            dmg = window.MudStats.applyDamageVariance(dmg, aDerived);
+            const aCrit = window.MudStats.rollCrit(aDerived);
+            if (aCrit.isCrit) {
+              dmg = Math.floor(dmg * aCrit.multiplier);
+              output.push({ type: 'combat', text: 'CRITICAL HIT!' });
+            }
+          }
           combatState.mobHp -= dmg;
           output.push({ type: 'combat', text: `You use ${def.name}! ${dmg} damage! [Mob HP: ${Math.max(0, combatState.mobHp)}/${combatState.mobMaxHp}]` });
+          // Precision grows from ability use
+          if (window.MudStats && player.coreStats) {
+            const killed = combatState.mobHp <= 0;
+            const pGrowth = window.MudStats.onAbilityUsed(def.tier || 0, killed);
+            const pResult = window.MudStats.applyGrowth(player.coreStats, pGrowth);
+            if (pResult.output.length > 0) output.push(...pResult.output);
+          }
 
           if (def.healPercent) {
             const heal = Math.floor(player.maxHp * def.healPercent);
@@ -1427,10 +1459,32 @@
 
       const output = [];
 
-      // Player attacks mob
-      const playerDmg = Math.max(1, player.attackPower - Math.floor((mob.stats.defense || 0) / 2));
+      // Player attacks mob (with stat-derived variance, crit, initiative)
+      const derived = player._derived || {};
+      let rawPlayerDmg = Math.max(1, player.attackPower - Math.floor((mob.stats.defense || 0) / 2));
+      // Apply damage variance (Precision reduces randomness)
+      if (window.MudStats) {
+        rawPlayerDmg = window.MudStats.applyDamageVariance(rawPlayerDmg, derived);
+      }
+      // Roll for critical hit (Precision)
+      let playerCrit = false;
+      if (window.MudStats) {
+        const critRoll = window.MudStats.rollCrit(derived);
+        if (critRoll.isCrit) {
+          rawPlayerDmg = Math.floor(rawPlayerDmg * critRoll.multiplier);
+          playerCrit = true;
+        }
+      }
+      const playerDmg = rawPlayerDmg;
       combatState.mobHp -= playerDmg;
-      output.push({ type: 'combat', text: `You hit ${mob.name} for ${playerDmg} damage. [Mob HP: ${Math.max(0, combatState.mobHp)}/${combatState.mobMaxHp}]` });
+      const critTag = playerCrit ? ' CRITICAL!' : '';
+      output.push({ type: 'combat', text: `You hit ${mob.name} for ${playerDmg} damage.${critTag} [Mob HP: ${Math.max(0, combatState.mobHp)}/${combatState.mobMaxHp}]` });
+      // Precision grows from landing basic attacks
+      if (window.MudStats && player.coreStats) {
+        const growth = window.MudStats.onBasicAttackLanded();
+        const result = window.MudStats.applyGrowth(player.coreStats, growth);
+        if (result.output.length > 0) output.push(...result.output);
+      }
 
       // Check mob death
       if (combatState.mobHp <= 0) {
@@ -1444,11 +1498,40 @@
         player.abilityCooldowns[key] = Math.max(0, player.abilityCooldowns[key] - 1);
       }
 
-      // Mob attacks player
-      const mobAtk = mob.stats.attack || 10;
-      const mobDmg = Math.max(1, mobAtk - Math.floor(player.defense / 2));
-      player.hp -= mobDmg;
-      output.push({ type: 'combat', text: `${mob.name} hits you for ${mobDmg} damage. [HP: ${player.hp}/${player.maxHp}]` });
+      // Mob attacks player (with dodge, big-hit reduction, stat growth)
+      // Roll for dodge (Instinct)
+      if (window.MudStats && window.MudStats.rollDodge(derived)) {
+        output.push({ type: 'combat', text: `You dodge ${mob.name}'s attack!` });
+        // Instinct grows from dodging
+        if (player.coreStats) {
+          const growth = window.MudStats.onDodge();
+          const result = window.MudStats.applyGrowth(player.coreStats, growth);
+          if (result.output.length > 0) output.push(...result.output);
+        }
+      } else {
+        const mobAtk = mob.stats.attack || 10;
+        let mobDmg = Math.max(1, mobAtk - Math.floor(player.defense / 2));
+        // Apply big-hit reduction (Grit)
+        if (window.MudStats) {
+          mobDmg = window.MudStats.applyBigHitReduction(mobDmg, player.maxHp, derived);
+        }
+        player.hp -= mobDmg;
+        output.push({ type: 'combat', text: `${mob.name} hits you for ${mobDmg} damage. [HP: ${player.hp}/${player.maxHp}]` });
+        // Vigor grows from taking damage and surviving
+        if (window.MudStats && player.coreStats && player.hp > 0) {
+          const vGrowth = window.MudStats.onDamageTaken(mobDmg, player.maxHp, player.hp);
+          if (vGrowth) {
+            const vResult = window.MudStats.applyGrowth(player.coreStats, vGrowth);
+            if (vResult.output.length > 0) output.push(...vResult.output);
+          }
+        }
+        // Grit grows from being hit
+        if (window.MudStats && player.coreStats) {
+          const gGrowth = window.MudStats.onHitReceived(mobDmg, player.defense);
+          const gResult = window.MudStats.applyGrowth(player.coreStats, gGrowth);
+          if (gResult.output.length > 0) output.push(...gResult.output);
+        }
+      }
 
       // Check player death
       if (player.hp <= 0) {
@@ -1814,8 +1897,20 @@
         bonusAtk += item.stats?.attack || 0;
         bonusDef += item.stats?.defense || 0;
       }
-      player.attackPower = 10 + bonusAtk;
-      player.defense = 5 + bonusDef;
+      // Apply stat-derived bonuses if MudStats is loaded
+      const stats = player.coreStats;
+      if (stats && window.MudStats) {
+        const derived = window.MudStats.computeDerived(stats, player.power || 0);
+        player.attackPower = 10 + bonusAtk;
+        player.defense = 5 + bonusDef + (derived.bonusDefense || 0);
+        player.maxHp = 100 + (derived.bonusMaxHp || 0);
+        player.maxFocus = 50 + (derived.bonusMaxFocus || 0);
+        // Store derived stats on player for combat tick access
+        player._derived = derived;
+      } else {
+        player.attackPower = 10 + bonusAtk;
+        player.defense = 5 + bonusDef;
+      }
     }
 
     // ─── Public Interface ────────────────────────────────────────────────────
@@ -1895,7 +1990,13 @@
       currentRoom, findItemByKeyword, findMobByKeyword,
       getAliveMobsInRoom, matchKeyword, getItemName, getMobName,
       initiateCombat, executeAbility, handleMobKill, pushCombatOutput,
-      recalcStats, autoSave, recordGhost
+      recalcStats, autoSave, recordGhost,
+      /** Mutable mob registry — allows injecting temporary mobs (e.g. echo invasions). */
+      get mobs() { return mobs; },
+      /** Direct reference to combatState for invasion checks. */
+      get combatState() { return combatState; },
+      /** Direct reference to player for invasion stat reads. */
+      get player() { return player; }
     };
 
     return {
