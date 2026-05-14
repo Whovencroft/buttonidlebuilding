@@ -520,7 +520,7 @@
         abilityCooldowns: {},
         inventory: [],
         equipped: {},
-        currentRoom: 1,
+        currentRoom: 101,  // Training Tower — Ground Floor
         visitedRooms: [],
         worldFlags: {},
         activeQuests: [],

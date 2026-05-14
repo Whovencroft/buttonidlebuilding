@@ -158,7 +158,7 @@
     if (restState === 'rest') {
       if (REST_ALLOWED.has(verb)) return { allowed: true, message: null };
       // Movement and combat interrupt rest automatically
-      if (verb === 'go' || verb === 'attack') {
+      if (verb === 'go' || verb === 'enter' || verb === 'attack') {
         return { allowed: true, message: null }; // Engine should clear restState
       }
       return { allowed: false, message: "You are resting. Type 'wake' to stand, or just move to get up." };

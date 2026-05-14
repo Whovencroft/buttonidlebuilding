@@ -6412,11 +6412,16 @@
       "east": 2,
       "northeast": 6,
       "southeast": 1,
-      "southwest": 8
+      "southwest": 8,
+      "down": 150
     },
     "flags": [
       "safe"
-    ]
+    ],
+    "named_exits": {
+      "quest shop": 150,
+      "shop": 150
+    }
   },
   "2": {
     "vnum": 2,
@@ -6490,7 +6495,12 @@
     "flags": [
       "safe",
       "shop"
-    ]
+    ],
+    "named_exits": {
+      "armorer": 14,
+      "workshop": 14,
+      "armorer's workshop": 14
+    }
   },
   "5": {
     "vnum": 5,
@@ -6529,7 +6539,28 @@
     },
     "flags": [
       "safe"
-    ]
+    ],
+    "named_exits": {
+      "training hall": 10,
+      "training": 10,
+      "hall": 10,
+      "bazaar": 8,
+      "market": 8,
+      "shop": 8,
+      "bulletin board": 12,
+      "bulletin": 12,
+      "board": 12,
+      "healer": 11,
+      "sanctum": 11,
+      "gateway north": 2,
+      "gateway south": 3,
+      "gateway east": 4,
+      "gateway west": 5,
+      "gateway upper": 6,
+      "upper": 6,
+      "observatory": 15,
+      "undercity": 13
+    }
   },
   "4": {
     "vnum": 4,
@@ -6597,12 +6628,18 @@
       "northeast": 1,
       "northwest": 8,
       "southeast": 13,
-      "southwest": 21
+      "southwest": 21,
+      "up": 101
     },
     "flags": [
       "safe",
       "train"
-    ]
+    ],
+    "named_exits": {
+      "training tower": 101,
+      "tower": 101,
+      "training": 101
+    }
   },
   "3": {
     "vnum": 3,
@@ -9133,6 +9170,247 @@
       "west": 7026,
       "northeast": 7025,
       "northwest": 7023
+    }
+  },
+  "101": {
+    "vnum": 101,
+    "zone": 10,
+    "name": "Training Tower \u2014 Ground Floor",
+    "description": "A wide stone chamber lit by torches. A weathered sign reads:\n\n  'Welcome, newcomer. This tower will teach you to survive.'\n  'Type ATTACK to fight. Type FLEE to escape. Type LOOK to observe.'\n\nA straw training dummy stands in the corner. Stairs lead up.",
+    "exits": {
+      "down": 10,
+      "up": 102
+    },
+    "flags": [],
+    "mob_spawns": [
+      101
+    ]
+  },
+  "102": {
+    "vnum": 102,
+    "zone": 10,
+    "name": "Training Tower \u2014 Second Floor",
+    "description": "The room is slightly darker. Scratching sounds come from the shadows.\n\n  Tip: After defeating an enemy, check your STATUS to see your power grow.\n  Type STATUS to view your stats.",
+    "exits": {
+      "down": 101,
+      "up": 103
+    },
+    "flags": [],
+    "mob_spawns": [
+      102
+    ]
+  },
+  "103": {
+    "vnum": 103,
+    "zone": 10,
+    "name": "Training Tower \u2014 Third Floor",
+    "description": "Cobwebs stretch across the ceiling. Something skitters above.\n\n  Tip: You can TAKE items from rooms and USE consumables to heal.\n  Type INVENTORY to see what you're carrying.",
+    "exits": {
+      "down": 102,
+      "up": 104
+    },
+    "flags": [],
+    "mob_spawns": [
+      103
+    ]
+  },
+  "104": {
+    "vnum": 104,
+    "zone": 10,
+    "name": "Training Tower \u2014 Fourth Floor",
+    "description": "A small armory. Weapon racks line the walls, mostly empty.\n\n  Tip: WEAR equipment to boost your attack and defense.\n  Type EQUIPMENT to see what you have equipped.",
+    "exits": {
+      "down": 103,
+      "up": 105
+    },
+    "flags": [],
+    "mob_spawns": [],
+    "initial_items": [
+      110,
+      111
+    ]
+  },
+  "105": {
+    "vnum": 105,
+    "zone": 10,
+    "name": "Training Tower \u2014 Fifth Floor",
+    "description": "The air grows warmer. You hear growling from the shadows.\n\n  Tip: Your four core stats \u2014 Vigor, Precision, Grit, Instinct \u2014 grow\n  through combat. Take hits to build Grit. Land hits to build Precision.",
+    "exits": {
+      "down": 104,
+      "up": 106
+    },
+    "flags": [],
+    "mob_spawns": [
+      105
+    ]
+  },
+  "106": {
+    "vnum": 106,
+    "zone": 10,
+    "name": "Training Tower \u2014 Sixth Floor",
+    "description": "A rest alcove with a stone bench and a water basin.\n\n  Tip: Type REST to recover HP and Focus between fights.\n  Safe rooms (marked with a flag) prevent combat.",
+    "exits": {
+      "down": 105,
+      "up": 107
+    },
+    "flags": [
+      "safe"
+    ],
+    "mob_spawns": [],
+    "initial_items": [
+      104,
+      105
+    ]
+  },
+  "107": {
+    "vnum": 107,
+    "zone": 10,
+    "name": "Training Tower \u2014 Seventh Floor",
+    "description": "Bones litter the floor. The walls are scratched with claw marks.\n\n  Tip: Stronger enemies give more power. Fight things near your level\n  for the best growth.",
+    "exits": {
+      "down": 106,
+      "up": 108
+    },
+    "flags": [],
+    "mob_spawns": [
+      107
+    ]
+  },
+  "108": {
+    "vnum": 108,
+    "zone": 10,
+    "name": "Training Tower \u2014 Eighth Floor",
+    "description": "A narrow corridor with arrow slits in the walls. You feel watched.\n\n  Tip: Some enemies are AGGRESSIVE and attack on sight.\n  Others are passive \u2014 you choose when to fight them.",
+    "exits": {
+      "down": 107,
+      "up": 109
+    },
+    "flags": [],
+    "mob_spawns": [
+      108
+    ]
+  },
+  "109": {
+    "vnum": 109,
+    "zone": 10,
+    "name": "Training Tower \u2014 Ninth Floor",
+    "description": "A forge room. An anvil sits cold and unused, but the coals still glow faintly.\n\n  Tip: Visit MERCHANTS to buy and sell gear. Type SHOP near one.\n  The Bazaar in the Nexus has merchants.",
+    "exits": {
+      "down": 108,
+      "up": 110
+    },
+    "flags": [],
+    "mob_spawns": [],
+    "initial_items": [
+      114,
+      115
+    ]
+  },
+  "110": {
+    "vnum": 110,
+    "zone": 10,
+    "name": "Training Tower \u2014 Tenth Floor",
+    "description": "The stairwell widens into a dueling ring. Torches blaze on all sides.\n\n  Tip: As you gain power, you'll unlock ABILITIES \u2014 special attacks\n  that cost Focus. Type the ability name to use it in combat.",
+    "exits": {
+      "down": 109,
+      "up": 111
+    },
+    "flags": [],
+    "mob_spawns": [
+      110
+    ]
+  },
+  "111": {
+    "vnum": 111,
+    "zone": 10,
+    "name": "Training Tower \u2014 Eleventh Floor",
+    "description": "Wind howls through open windows. You can see the Nexus far below.\n\n  Tip: The BULLETIN BOARD in the Nexus offers quests.\n  Complete quests to earn Quest Points for the Quest Shop.",
+    "exits": {
+      "down": 110,
+      "up": 112
+    },
+    "flags": [],
+    "mob_spawns": [
+      111
+    ]
+  },
+  "112": {
+    "vnum": 112,
+    "zone": 10,
+    "name": "Training Tower \u2014 Twelfth Floor",
+    "description": "A library of sorts. Dusty tomes line crumbling shelves.\n\n  Tip: SAY things to NPCs \u2014 they respond to keywords like\n  'hello', 'quest', 'help', 'buy', and 'lore'.",
+    "exits": {
+      "down": 111,
+      "up": 113
+    },
+    "flags": [],
+    "mob_spawns": [
+      112
+    ]
+  },
+  "113": {
+    "vnum": 113,
+    "zone": 10,
+    "name": "Training Tower \u2014 Thirteenth Floor",
+    "description": "The walls pulse with a faint red glow. Something powerful waits above.\n\n  Tip: RECALL teleports you to your recall point (default: the Nexus).\n  Type SET RECALL in a safe room to change it.",
+    "exits": {
+      "down": 112,
+      "up": 114
+    },
+    "flags": [],
+    "mob_spawns": [
+      113
+    ]
+  },
+  "114": {
+    "vnum": 114,
+    "zone": 10,
+    "name": "Training Tower \u2014 Fourteenth Floor",
+    "description": "A meditation chamber. Incense burns in brass holders.\n\n  Tip: The world beyond the Nexus is divided into themed zones.\n  Each gateway leads to a different genre \u2014 fantasy, sci-fi, noir, and more.\n  Explore them all, but beware: some zones are dangerous for the unprepared.",
+    "exits": {
+      "down": 113,
+      "up": 115
+    },
+    "flags": [
+      "safe"
+    ],
+    "mob_spawns": [],
+    "initial_items": [
+      108,
+      109
+    ]
+  },
+  "115": {
+    "vnum": 115,
+    "zone": 10,
+    "name": "Training Tower \u2014 Summit",
+    "description": "You stand at the top of the tower. The entire Nexus spreads below you, its six gateways glowing with different colors. A grizzled instructor leans against the parapet.\n\n  'You've made it to the top. You're ready for the real world now.'\n  'Head back down and explore the gateways. Your marble is out there somewhere.'",
+    "exits": {
+      "down": 114
+    },
+    "flags": [],
+    "mob_spawns": [
+      115,
+      120
+    ]
+  },
+  "150": {
+    "vnum": 150,
+    "zone": 6,
+    "name": "The Quest Shop",
+    "description": "A cozy alcove beneath the Bulletin Board. Shelves line every wall, packed with useful gear, rare consumables, and mysterious trinkets \u2014 all available for Quest Points.\n\nA cheerful shopkeeper stands behind a counter cluttered with oddities.\n\n  Type QUEST SHOP to browse. Type QUEST BUY <number> to purchase.",
+    "exits": {
+      "up": 12
+    },
+    "flags": [
+      "safe"
+    ],
+    "mob_spawns": [
+      121
+    ],
+    "named_exits": {
+      "bulletin board": 12,
+      "board": 12
     }
   }
 }

@@ -50,7 +50,7 @@
 
     function createDefaultPlayer() {
       return {
-        currentRoom: 1,
+        currentRoom: 101,  // Training Tower — Ground Floor
         hp: 100,
         maxHp: 100,
         focus: 50,
@@ -2074,7 +2074,7 @@
 
     // ─── Expose internals for the command registry ─────────────────────────
     const _internals = {
-      doGo, doLook, doTake, doDrop, doInventory, doEquipment,
+      doGo, moveToRoom, doLook, doTake, doDrop, doInventory, doEquipment,
       doWear, doUnequip, doUse, doAttack, doFlee, doTalk,
       doCombine, doRotate, doQuest, doTrain, doAbilities,
       doStatus, doBuy, doRespec, doRecall, doSetRecall,

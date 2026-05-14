@@ -65,7 +65,7 @@
   "6": {
     "vnum": 6,
     "zone": 0,
-    "name": "Courier's Package — Crown",
+    "name": "Courier's Package \u2014 Crown",
     "description": "A sealed package addressed to someone in The Shattered Crown. Courier Dash will pay you for delivering it.",
     "type": "quest",
     "slot": null,
@@ -76,7 +76,7 @@
   "7": {
     "vnum": 7,
     "zone": 0,
-    "name": "Courier's Package — Grid",
+    "name": "Courier's Package \u2014 Grid",
     "description": "A sealed package addressed to someone in Neon Grid. Courier Dash will pay you for delivering it.",
     "type": "quest",
     "slot": null,
@@ -299,7 +299,7 @@
     "vnum": 1018,
     "zone": 1,
     "name": "Mysterious Compass",
-    "description": "A compass that doesn't point north. It seems to spin randomly... or does it? [RED HERRING — leads nowhere meaningful]",
+    "description": "A compass that doesn't point north. It seems to spin randomly... or does it? [RED HERRING \u2014 leads nowhere meaningful]",
     "type": "quest",
     "slot": null,
     "stats": {},
@@ -1530,5 +1530,834 @@
     "stats": {},
     "rarity": "common",
     "value": 1
+  },
+  "100": {
+    "vnum": 100,
+    "zone": 10,
+    "name": "Straw Bandage",
+    "description": "A crude bandage made from straw. Restores 10 HP.",
+    "type": "consumable",
+    "slot": null,
+    "stats": {
+      "heal": 10
+    },
+    "rarity": "common",
+    "value": 2
+  },
+  "101": {
+    "vnum": 101,
+    "zone": 10,
+    "name": "Rat Jerky",
+    "description": "Dried rat meat. Unappetizing but nourishing. Restores 15 HP.",
+    "type": "consumable",
+    "slot": null,
+    "stats": {
+      "heal": 15
+    },
+    "rarity": "common",
+    "value": 3
+  },
+  "102": {
+    "vnum": 102,
+    "zone": 10,
+    "name": "Spider Silk Thread",
+    "description": "A spool of strong spider silk. Useful for crafting.",
+    "type": "material",
+    "slot": null,
+    "stats": {},
+    "rarity": "common",
+    "value": 5
+  },
+  "103": {
+    "vnum": 103,
+    "zone": 10,
+    "name": "Hound Fang",
+    "description": "A sharp canine tooth. Could be fashioned into something.",
+    "type": "material",
+    "slot": null,
+    "stats": {},
+    "rarity": "common",
+    "value": 8
+  },
+  "104": {
+    "vnum": 104,
+    "zone": 10,
+    "name": "Minor Healing Potion",
+    "description": "A small red vial. Restores 20 HP.",
+    "type": "consumable",
+    "slot": null,
+    "stats": {
+      "heal": 20
+    },
+    "rarity": "common",
+    "value": 8
+  },
+  "105": {
+    "vnum": 105,
+    "zone": 10,
+    "name": "Focus Crystal Shard",
+    "description": "A tiny crystal fragment that hums with energy. Restores 10 Focus.",
+    "type": "consumable",
+    "slot": null,
+    "stats": {
+      "focus": 10
+    },
+    "rarity": "common",
+    "value": 10
+  },
+  "106": {
+    "vnum": 106,
+    "zone": 10,
+    "name": "Windstone",
+    "description": "A smooth stone that feels weightless. Restores 15 Focus.",
+    "type": "consumable",
+    "slot": null,
+    "stats": {
+      "focus": 15
+    },
+    "rarity": "uncommon",
+    "value": 15
+  },
+  "107": {
+    "vnum": 107,
+    "zone": 10,
+    "name": "Blood Vial",
+    "description": "A vial of crimson liquid. Restores 30 HP.",
+    "type": "consumable",
+    "slot": null,
+    "stats": {
+      "heal": 30
+    },
+    "rarity": "uncommon",
+    "value": 15
+  },
+  "108": {
+    "vnum": 108,
+    "zone": 10,
+    "name": "Meditation Incense",
+    "description": "Calming incense. Restores 25 Focus.",
+    "type": "consumable",
+    "slot": null,
+    "stats": {
+      "focus": 25
+    },
+    "rarity": "uncommon",
+    "value": 18
+  },
+  "109": {
+    "vnum": 109,
+    "zone": 10,
+    "name": "Tower Elixir",
+    "description": "A potent brew. Restores 40 HP.",
+    "type": "consumable",
+    "slot": null,
+    "stats": {
+      "heal": 40
+    },
+    "rarity": "uncommon",
+    "value": 20
+  },
+  "110": {
+    "vnum": 110,
+    "zone": 10,
+    "name": "Wooden Practice Sword",
+    "description": "A blunt wooden sword for training. Better than bare fists.",
+    "type": "weapon",
+    "slot": "weapon",
+    "stats": {
+      "attack": 2
+    },
+    "rarity": "common",
+    "value": 5
+  },
+  "111": {
+    "vnum": 111,
+    "zone": 10,
+    "name": "Padded Training Vest",
+    "description": "A quilted vest that absorbs some impact.",
+    "type": "armor",
+    "slot": "body",
+    "stats": {
+      "defense": 1
+    },
+    "rarity": "common",
+    "value": 5
+  },
+  "112": {
+    "vnum": 112,
+    "zone": 10,
+    "name": "Bone Club",
+    "description": "A crude weapon made from a large bone. Surprisingly effective.",
+    "type": "weapon",
+    "slot": "weapon",
+    "stats": {
+      "attack": 4
+    },
+    "rarity": "common",
+    "value": 12
+  },
+  "113": {
+    "vnum": 113,
+    "zone": 10,
+    "name": "Goblin Shortbow",
+    "description": "A small but functional bow taken from a goblin.",
+    "type": "weapon",
+    "slot": "weapon",
+    "stats": {
+      "attack": 5
+    },
+    "rarity": "common",
+    "value": 15
+  },
+  "114": {
+    "vnum": 114,
+    "zone": 10,
+    "name": "Iron Helm",
+    "description": "A simple iron helmet. Dented but protective.",
+    "type": "armor",
+    "slot": "head",
+    "stats": {
+      "defense": 2
+    },
+    "rarity": "common",
+    "value": 18
+  },
+  "115": {
+    "vnum": 115,
+    "zone": 10,
+    "name": "Chain Shirt",
+    "description": "A shirt of interlocking metal rings. Good protection for its weight.",
+    "type": "armor",
+    "slot": "body",
+    "stats": {
+      "defense": 3
+    },
+    "rarity": "common",
+    "value": 25
+  },
+  "116": {
+    "vnum": 116,
+    "zone": 10,
+    "name": "Guardian's Stone Shield",
+    "description": "A heavy stone shield taken from the Tower Guardian.",
+    "type": "armor",
+    "slot": "shield",
+    "stats": {
+      "defense": 4
+    },
+    "rarity": "uncommon",
+    "value": 30
+  },
+  "117": {
+    "vnum": 117,
+    "zone": 10,
+    "name": "Tome of Minor Focus",
+    "description": "Reading this tome sharpens your mind. +5 max Focus when held.",
+    "type": "armor",
+    "slot": "hold",
+    "stats": {
+      "defense": 0
+    },
+    "rarity": "uncommon",
+    "value": 25
+  },
+  "118": {
+    "vnum": 118,
+    "zone": 10,
+    "name": "Champion's Blade",
+    "description": "A well-forged steel sword. The Tower Champion's personal weapon.",
+    "type": "weapon",
+    "slot": "weapon",
+    "stats": {
+      "attack": 7
+    },
+    "rarity": "uncommon",
+    "value": 40
+  },
+  "119": {
+    "vnum": 119,
+    "zone": 10,
+    "name": "Champion's Signet Ring",
+    "description": "A ring bearing the tower's crest. Proof of completing the training.",
+    "type": "armor",
+    "slot": "neck",
+    "stats": {
+      "defense": 2
+    },
+    "rarity": "rare",
+    "value": 50
+  },
+  "200": {
+    "vnum": 200,
+    "zone": 1,
+    "name": "Rusty Longsword",
+    "description": "A pitted blade with a worn grip. Still sharp enough.",
+    "type": "weapon",
+    "slot": "weapon",
+    "stats": {
+      "attack": 5
+    },
+    "rarity": "common",
+    "value": 20
+  },
+  "201": {
+    "vnum": 201,
+    "zone": 1,
+    "name": "Hunting Spear",
+    "description": "A wooden shaft tipped with a keen iron point.",
+    "type": "weapon",
+    "slot": "weapon",
+    "stats": {
+      "attack": 6
+    },
+    "rarity": "common",
+    "value": 25
+  },
+  "202": {
+    "vnum": 202,
+    "zone": 1,
+    "name": "War Hammer",
+    "description": "A heavy hammer designed to crush armor.",
+    "type": "weapon",
+    "slot": "weapon",
+    "stats": {
+      "attack": 8
+    },
+    "rarity": "common",
+    "value": 35
+  },
+  "203": {
+    "vnum": 203,
+    "zone": 1,
+    "name": "Elven Longbow",
+    "description": "A graceful bow of pale wood. Accurate at long range.",
+    "type": "weapon",
+    "slot": "weapon",
+    "stats": {
+      "attack": 7
+    },
+    "rarity": "uncommon",
+    "value": 40
+  },
+  "204": {
+    "vnum": 204,
+    "zone": 1,
+    "name": "Dwarven Battleaxe",
+    "description": "A double-headed axe with runes etched into the blade.",
+    "type": "weapon",
+    "slot": "weapon",
+    "stats": {
+      "attack": 10
+    },
+    "rarity": "uncommon",
+    "value": 55
+  },
+  "205": {
+    "vnum": 205,
+    "zone": 2,
+    "name": "Plasma Cutter",
+    "description": "A handheld industrial tool repurposed for combat.",
+    "type": "weapon",
+    "slot": "weapon",
+    "stats": {
+      "attack": 12
+    },
+    "rarity": "uncommon",
+    "value": 70
+  },
+  "206": {
+    "vnum": 206,
+    "zone": 2,
+    "name": "Mono-Filament Whip",
+    "description": "A nearly invisible wire that cuts through anything.",
+    "type": "weapon",
+    "slot": "weapon",
+    "stats": {
+      "attack": 14
+    },
+    "rarity": "rare",
+    "value": 90
+  },
+  "207": {
+    "vnum": 207,
+    "zone": 3,
+    "name": "Detective's Revolver",
+    "description": "A well-oiled six-shooter. Reliable in a pinch.",
+    "type": "weapon",
+    "slot": "weapon",
+    "stats": {
+      "attack": 9
+    },
+    "rarity": "common",
+    "value": 45
+  },
+  "208": {
+    "vnum": 208,
+    "zone": 3,
+    "name": "Switchblade",
+    "description": "A concealed blade that springs open with a click.",
+    "type": "weapon",
+    "slot": "weapon",
+    "stats": {
+      "attack": 6
+    },
+    "rarity": "common",
+    "value": 20
+  },
+  "209": {
+    "vnum": 209,
+    "zone": 4,
+    "name": "Bayonet Rifle",
+    "description": "A bolt-action rifle with an attached bayonet.",
+    "type": "weapon",
+    "slot": "weapon",
+    "stats": {
+      "attack": 11
+    },
+    "rarity": "common",
+    "value": 60
+  },
+  "210": {
+    "vnum": 210,
+    "zone": 5,
+    "name": "Astral Staff",
+    "description": "A crystalline staff that channels cosmic energy.",
+    "type": "weapon",
+    "slot": "weapon",
+    "stats": {
+      "attack": 13
+    },
+    "rarity": "rare",
+    "value": 80
+  },
+  "211": {
+    "vnum": 211,
+    "zone": 5,
+    "name": "Void Dagger",
+    "description": "A blade forged from condensed darkness. It absorbs light.",
+    "type": "weapon",
+    "slot": "weapon",
+    "stats": {
+      "attack": 16
+    },
+    "rarity": "rare",
+    "value": 100
+  },
+  "212": {
+    "vnum": 212,
+    "zone": 7,
+    "name": "Clockwork Crossbow",
+    "description": "A self-loading crossbow powered by gears and springs.",
+    "type": "weapon",
+    "slot": "weapon",
+    "stats": {
+      "attack": 11
+    },
+    "rarity": "uncommon",
+    "value": 65
+  },
+  "213": {
+    "vnum": 213,
+    "zone": 8,
+    "name": "Bone Scythe",
+    "description": "A wicked curved blade made from a massive rib bone.",
+    "type": "weapon",
+    "slot": "weapon",
+    "stats": {
+      "attack": 9
+    },
+    "rarity": "common",
+    "value": 40
+  },
+  "214": {
+    "vnum": 214,
+    "zone": 9,
+    "name": "Thunder Gauntlet",
+    "description": "A metal gauntlet that crackles with stored lightning.",
+    "type": "weapon",
+    "slot": "weapon",
+    "stats": {
+      "attack": 15
+    },
+    "rarity": "rare",
+    "value": 95
+  },
+  "220": {
+    "vnum": 220,
+    "zone": 1,
+    "name": "Steel Helm",
+    "description": "A sturdy steel helmet with a nose guard.",
+    "type": "armor",
+    "slot": "head",
+    "stats": {
+      "defense": 3
+    },
+    "rarity": "common",
+    "value": 25
+  },
+  "221": {
+    "vnum": 221,
+    "zone": 2,
+    "name": "Neural Interface Visor",
+    "description": "A sleek visor that enhances perception.",
+    "type": "armor",
+    "slot": "head",
+    "stats": {
+      "defense": 4
+    },
+    "rarity": "uncommon",
+    "value": 50
+  },
+  "222": {
+    "vnum": 222,
+    "zone": 3,
+    "name": "Fedora",
+    "description": "A classic felt hat. Keeps the rain off and looks sharp.",
+    "type": "armor",
+    "slot": "head",
+    "stats": {
+      "defense": 1
+    },
+    "rarity": "common",
+    "value": 15
+  },
+  "223": {
+    "vnum": 223,
+    "zone": 5,
+    "name": "Starweave Hood",
+    "description": "A hood woven from threads of solidified starlight.",
+    "type": "armor",
+    "slot": "head",
+    "stats": {
+      "defense": 5
+    },
+    "rarity": "rare",
+    "value": 70
+  },
+  "230": {
+    "vnum": 230,
+    "zone": 1,
+    "name": "Brigandine Armor",
+    "description": "Layered plates riveted between cloth. Solid protection.",
+    "type": "armor",
+    "slot": "body",
+    "stats": {
+      "defense": 5
+    },
+    "rarity": "common",
+    "value": 40
+  },
+  "231": {
+    "vnum": 231,
+    "zone": 1,
+    "name": "Plate Mail",
+    "description": "Full plate armor. Heavy but nearly impenetrable.",
+    "type": "armor",
+    "slot": "body",
+    "stats": {
+      "defense": 8
+    },
+    "rarity": "uncommon",
+    "value": 80
+  },
+  "232": {
+    "vnum": 232,
+    "zone": 2,
+    "name": "Carbon Fiber Jacket",
+    "description": "Lightweight and strong. Standard issue for Grid runners.",
+    "type": "armor",
+    "slot": "body",
+    "stats": {
+      "defense": 6
+    },
+    "rarity": "uncommon",
+    "value": 60
+  },
+  "233": {
+    "vnum": 233,
+    "zone": 3,
+    "name": "Bulletproof Vest",
+    "description": "Concealed body armor. Stops most small-caliber rounds.",
+    "type": "armor",
+    "slot": "body",
+    "stats": {
+      "defense": 5
+    },
+    "rarity": "uncommon",
+    "value": 55
+  },
+  "234": {
+    "vnum": 234,
+    "zone": 5,
+    "name": "Nebula Robe",
+    "description": "A flowing robe that shimmers with cosmic patterns.",
+    "type": "armor",
+    "slot": "body",
+    "stats": {
+      "defense": 7
+    },
+    "rarity": "rare",
+    "value": 75
+  },
+  "240": {
+    "vnum": 240,
+    "zone": 1,
+    "name": "Wooden Buckler",
+    "description": "A small round shield. Light and easy to use.",
+    "type": "armor",
+    "slot": "shield",
+    "stats": {
+      "defense": 2
+    },
+    "rarity": "common",
+    "value": 15
+  },
+  "241": {
+    "vnum": 241,
+    "zone": 1,
+    "name": "Tower Shield",
+    "description": "A massive shield that covers most of your body.",
+    "type": "armor",
+    "slot": "shield",
+    "stats": {
+      "defense": 6
+    },
+    "rarity": "uncommon",
+    "value": 50
+  },
+  "242": {
+    "vnum": 242,
+    "zone": 2,
+    "name": "Energy Barrier Module",
+    "description": "A wrist-mounted device that projects a force field.",
+    "type": "armor",
+    "slot": "shield",
+    "stats": {
+      "defense": 5
+    },
+    "rarity": "uncommon",
+    "value": 65
+  },
+  "250": {
+    "vnum": 250,
+    "zone": 1,
+    "name": "Leather Boots",
+    "description": "Sturdy boots for long marches.",
+    "type": "armor",
+    "slot": "feet",
+    "stats": {
+      "defense": 1
+    },
+    "rarity": "common",
+    "value": 10
+  },
+  "251": {
+    "vnum": 251,
+    "zone": 1,
+    "name": "Iron-Shod Boots",
+    "description": "Heavy boots reinforced with iron plates.",
+    "type": "armor",
+    "slot": "feet",
+    "stats": {
+      "defense": 3
+    },
+    "rarity": "uncommon",
+    "value": 30
+  },
+  "252": {
+    "vnum": 252,
+    "zone": 2,
+    "name": "Mag-Boots",
+    "description": "Magnetic boots for zero-G environments. Surprisingly good armor.",
+    "type": "armor",
+    "slot": "feet",
+    "stats": {
+      "defense": 4
+    },
+    "rarity": "uncommon",
+    "value": 45
+  },
+  "260": {
+    "vnum": 260,
+    "zone": 1,
+    "name": "Leather Gloves",
+    "description": "Simple leather gloves. Better grip, slight protection.",
+    "type": "armor",
+    "slot": "hands",
+    "stats": {
+      "defense": 1
+    },
+    "rarity": "common",
+    "value": 8
+  },
+  "261": {
+    "vnum": 261,
+    "zone": 1,
+    "name": "Gauntlets of Iron",
+    "description": "Heavy iron gauntlets. Protect the hands and add punch.",
+    "type": "armor",
+    "slot": "hands",
+    "stats": {
+      "defense": 3
+    },
+    "rarity": "uncommon",
+    "value": 35
+  },
+  "262": {
+    "vnum": 262,
+    "zone": 2,
+    "name": "Cyber-Gloves",
+    "description": "Augmented gloves with haptic feedback and armored knuckles.",
+    "type": "armor",
+    "slot": "hands",
+    "stats": {
+      "defense": 4
+    },
+    "rarity": "uncommon",
+    "value": 50
+  },
+  "270": {
+    "vnum": 270,
+    "zone": 1,
+    "name": "Iron Amulet",
+    "description": "A simple iron pendant on a leather cord.",
+    "type": "armor",
+    "slot": "neck",
+    "stats": {
+      "defense": 1
+    },
+    "rarity": "common",
+    "value": 12
+  },
+  "271": {
+    "vnum": 271,
+    "zone": 5,
+    "name": "Starstone Pendant",
+    "description": "A glowing gem suspended in a silver setting.",
+    "type": "armor",
+    "slot": "neck",
+    "stats": {
+      "defense": 3
+    },
+    "rarity": "rare",
+    "value": 60
+  },
+  "272": {
+    "vnum": 272,
+    "zone": 3,
+    "name": "Dog Tags",
+    "description": "Military identification tags. Worn for luck.",
+    "type": "armor",
+    "slot": "neck",
+    "stats": {
+      "defense": 1
+    },
+    "rarity": "common",
+    "value": 5
+  },
+  "280": {
+    "vnum": 280,
+    "zone": 1,
+    "name": "Greater Healing Potion",
+    "description": "A large red vial. Restores 60 HP.",
+    "type": "consumable",
+    "slot": null,
+    "stats": {
+      "heal": 60
+    },
+    "rarity": "uncommon",
+    "value": 30
+  },
+  "281": {
+    "vnum": 281,
+    "zone": 1,
+    "name": "Superior Healing Potion",
+    "description": "A glowing crimson flask. Restores 100 HP.",
+    "type": "consumable",
+    "slot": null,
+    "stats": {
+      "heal": 100
+    },
+    "rarity": "rare",
+    "value": 50
+  },
+  "282": {
+    "vnum": 282,
+    "zone": 1,
+    "name": "Focus Draught",
+    "description": "A shimmering blue liquid. Restores 30 Focus.",
+    "type": "consumable",
+    "slot": null,
+    "stats": {
+      "focus": 30
+    },
+    "rarity": "uncommon",
+    "value": 25
+  },
+  "283": {
+    "vnum": 283,
+    "zone": 1,
+    "name": "Elixir of Clarity",
+    "description": "A crystal-clear potion. Restores 50 Focus.",
+    "type": "consumable",
+    "slot": null,
+    "stats": {
+      "focus": 50
+    },
+    "rarity": "rare",
+    "value": 45
+  },
+  "284": {
+    "vnum": 284,
+    "zone": 1,
+    "name": "Smoke Bomb",
+    "description": "Throw to create a smokescreen. Guarantees escape from combat.",
+    "type": "consumable",
+    "slot": null,
+    "stats": {
+      "flee": 1
+    },
+    "rarity": "uncommon",
+    "value": 20
+  },
+  "285": {
+    "vnum": 285,
+    "zone": 1,
+    "name": "Antidote Herb",
+    "description": "A bitter herb that cures poison.",
+    "type": "consumable",
+    "slot": null,
+    "stats": {
+      "cure": 1
+    },
+    "rarity": "common",
+    "value": 8
+  },
+  "286": {
+    "vnum": 286,
+    "zone": 2,
+    "name": "Nano-Repair Kit",
+    "description": "Microscopic robots that repair tissue. Restores 80 HP.",
+    "type": "consumable",
+    "slot": null,
+    "stats": {
+      "heal": 80
+    },
+    "rarity": "uncommon",
+    "value": 40
+  },
+  "287": {
+    "vnum": 287,
+    "zone": 5,
+    "name": "Astral Nectar",
+    "description": "Liquid harvested from cosmic flowers. Restores 50 HP and 25 Focus.",
+    "type": "consumable",
+    "slot": null,
+    "stats": {
+      "heal": 50,
+      "focus": 25
+    },
+    "rarity": "rare",
+    "value": 55
   }
 }

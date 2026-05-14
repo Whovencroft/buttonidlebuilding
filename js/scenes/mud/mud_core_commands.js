@@ -60,6 +60,42 @@
         help: 'Set current room as save point',
         usage: 'setrecall',
         handler: () => fn.doSetRecall()
+      },
+      {
+        name: 'enter',
+        aliases: ['goto', 'visit'],
+        category: 'Movement',
+        help: 'Enter a named location (e.g. enter training hall)',
+        usage: 'enter <place>',
+        requires: { noCombat: true },
+        handler: (parsed) => {
+          const target = (parsed.target || '').toLowerCase().trim();
+          if (!target) return [{ type: 'error', text: 'Enter where? Specify a place name.' }];
+          const room = engine._internals.rooms[engine._internals.player.currentRoom];
+          if (!room) return [{ type: 'error', text: 'You are nowhere.' }];
+          // Check named_exits on the current room
+          const named = room.named_exits || {};
+          const match = named[target];
+          if (match != null) return fn.moveToRoom(match);
+          // Fuzzy: check if target is a substring of any named_exit key
+          for (const [key, vnum] of Object.entries(named)) {
+            if (key.includes(target) || target.includes(key)) {
+              return fn.moveToRoom(vnum);
+            }
+          }
+          // Also check exit room names for a match
+          for (const [dir, exit] of Object.entries(room.exits || {})) {
+            const exitVnum = typeof exit === 'object' ? exit.target_vnum : exit;
+            const exitRoom = engine._internals.rooms[exitVnum];
+            if (exitRoom) {
+              const exitName = (exitRoom.name || '').toLowerCase();
+              if (exitName.includes(target) || target.includes(exitName.split('\u2014')[0].trim())) {
+                return fn.moveToRoom(exitVnum);
+              }
+            }
+          }
+          return [{ type: 'error', text: `There is no '${target}' to enter from here.` }];
+        }
       }
     ]);
 

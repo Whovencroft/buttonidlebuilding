@@ -1,254 +1,345 @@
 /**
- * mud_missions.js — Dynamic Mission Board System
+ * mud_missions.js — Bulletin Board Quest System
  *
- * Generates procedural kill/fetch quests from the existing mob pool.
- * The Bounty Board (room 16) displays 3 active missions that rotate
- * on completion or expiry. Missions scale to the player's power level.
+ * Generates procedural quests from the mob/item/room pools.
+ * The Bulletin Board (room 12) offers one quest at a time.
+ * Players must complete or quit their current quest before
+ * requesting a new one.
  *
- * Mission types:
- *   - Hunt: Kill N of a specific mob type
- *   - Retrieve: Kill a mob and collect a drop (simulated)
- *   - Challenge: Kill a specific mob that's stronger than average
+ * Quest types:
+ *   - Hunt:  Kill a specific mob (with a hint of where to find it)
+ *   - Fetch: Find a specific item (spawned somewhere in the world with a hint)
  *
- * Rewards: QP + gold, scaling with difficulty.
+ * Rewards: Quest Points + gold, scaling with difficulty.
  *
- * Exposes window.MudMissions for integration with mud_engine.js.
+ * Exposes window.MudMissions for integration with mud_systems_integration.js.
  */
 (() => {
   'use strict';
 
-  const BOUNTY_BOARD_VNUM = 16;
-  const MAX_ACTIVE_MISSIONS = 3;
-  const MISSION_EXPIRY_MINUTES = 15;
+  const BOARD_ROOM_VNUM = 12;
 
-  /** Mission name templates by type. */
-  const MISSION_NAMES = {
+  /* ─── Name / description templates ──────────────────────────────────────── */
+
+  const QUEST_NAMES = {
     hunt: [
       'Bounty: {mob}',
       'Eliminate {mob}',
-      'Clear Out {mob}',
-      'Hunt: {mob}'
+      'Hunt Down {mob}',
+      'Wanted: {mob}'
     ],
-    retrieve: [
-      'Salvage from {mob}',
-      'Recover Materials: {mob}',
-      'Scavenge: {mob}'
-    ],
-    challenge: [
-      'Challenge: {mob}',
-      'Prove Yourself: {mob}',
-      'Test of Strength: {mob}'
+    fetch: [
+      'Lost Artifact: {item}',
+      'Recover the {item}',
+      'Salvage Request: {item}',
+      'Retrieve: {item}'
     ]
   };
 
-  /** Description templates. */
-  const MISSION_DESCS = {
-    hunt: 'Defeat {count} {mob} and return to the Bounty Board.',
-    retrieve: 'Defeat {mob} and bring back proof of the kill.',
-    challenge: 'Seek out and defeat the powerful {mob}.'
+  const QUEST_DESCS = {
+    hunt: 'Track down and defeat {mob}. {hint} Return to the Bulletin Board when done.',
+    fetch: 'Find the lost {item}. {hint} Bring it back to the Bulletin Board.'
   };
 
+  /* ─── Zone / area hint helpers ──────────────────────────────────────────── */
+
   /**
-   * Generate a set of missions based on available mobs and player power.
-   * @param {object} mobs - All mob definitions (from MudData)
-   * @param {number} playerPower - Player's current power stat
-   * @param {Array} completedMissionIds - Previously completed mission IDs (avoid repeats)
-   * @returns {Array} Array of mission objects
+   * Build a human-readable hint for where a mob can be found.
+   * Checks the mob's zone field or scans rooms for its vnum.
+   * @param {number} mobVnum - The mob's vnum
+   * @param {object} rooms  - All room data (keyed by vnum)
+   * @param {object} mob    - The mob definition
+   * @returns {string} A hint sentence
    */
-  function generateMissions(mobs, playerPower, completedMissionIds = []) {
-    // Filter to hostile mobs within power range
-    const hostileMobs = Object.entries(mobs).filter(([vnum, mob]) => {
+  function buildMobHint(mobVnum, rooms, mob) {
+    // Try to find a room that spawns this mob
+    for (const [rvnum, room] of Object.entries(rooms)) {
+      const spawns = room.mob_spawns || room.mobs || [];
+      if (spawns.includes(mobVnum) || spawns.includes(Number(mobVnum))) {
+        const zone = room.zone_name || room.zone || '';
+        if (zone) return `Rumor has it they lurk in ${zone}.`;
+        return `They were last seen near ${room.name || 'an unknown area'}.`;
+      }
+    }
+    // Fallback: use mob's own zone tag if present
+    if (mob.zone) return `They are said to roam ${mob.zone}.`;
+    return 'Their whereabouts are uncertain — explore and ask around.';
+  }
+
+  /**
+   * Build a hint for a fetch-quest item placement.
+   * @param {string} zoneName - Zone the item was placed in
+   * @param {string} roomName - Room the item was placed in
+   * @returns {string}
+   */
+  function buildItemHint(zoneName, roomName) {
+    if (zoneName) return `It was last seen somewhere in ${zoneName}.`;
+    if (roomName) return `Try looking near ${roomName}.`;
+    return 'Search the world — it could be anywhere.';
+  }
+
+  /* ─── Quest generation ──────────────────────────────────────────────────── */
+
+  /**
+   * Generate a single quest scaled to the player.
+   * Type is randomly chosen between hunt and fetch.
+   * @param {object} mobs        - All mob definitions
+   * @param {object} rooms       - All room definitions
+   * @param {object} items       - All item definitions
+   * @param {number} playerPower - Player's current power
+   * @param {Array}  completedIds - Previously completed quest IDs
+   * @returns {object|null} A quest object, or null if nothing suitable
+   */
+  function generateQuest(mobs, rooms, items, playerPower, completedIds = []) {
+    const roll = Math.random();
+
+    if (roll < 0.55) {
+      return generateHuntQuest(mobs, rooms, playerPower, completedIds);
+    }
+    return generateFetchQuest(items, rooms, playerPower, completedIds);
+  }
+
+  /**
+   * Generate a hunt quest — kill a specific mob.
+   */
+  function generateHuntQuest(mobs, rooms, playerPower, completedIds) {
+    // Filter to hostile mobs within a reasonable power range
+    const candidates = Object.entries(mobs).filter(([vnum, mob]) => {
       if (!mob.hostile && !mob.stats) return false;
       if (!mob.stats) return false;
       const cp = (mob.stats.hp || 0) + (mob.stats.attack || 0) * 3 + (mob.stats.defense || 0) * 2;
-      // Within 25%–200% of player power
-      return cp >= playerPower * 0.25 && cp <= playerPower * 2.5;
+      return cp >= Math.max(1, playerPower * 0.2) && cp <= playerPower * 3;
     });
 
-    if (hostileMobs.length === 0) {
-      // Fallback: use any hostile mob
-      const anyHostile = Object.entries(mobs).filter(([, mob]) => mob.hostile || mob.stats?.hp > 0);
-      if (anyHostile.length === 0) return [];
-      hostileMobs.push(...anyHostile.slice(0, 5));
+    if (candidates.length === 0) {
+      // Fallback: any hostile mob
+      const any = Object.entries(mobs).filter(([, m]) => m.hostile || m.stats?.hp > 0);
+      if (any.length === 0) return null;
+      candidates.push(...any.slice(0, 10));
     }
 
-    const missions = [];
-    const usedMobs = new Set();
+    const [mobVnum, mob] = candidates[Math.floor(Math.random() * candidates.length)];
+    const cp = (mob.stats.hp || 0) + (mob.stats.attack || 0) * 3 + (mob.stats.defense || 0) * 2;
+    const ratio = playerPower > 0 ? cp / playerPower : 1;
+    const diffMod = Math.max(1, Math.floor(ratio * 2));
 
-    for (let i = 0; i < MAX_ACTIVE_MISSIONS && i < hostileMobs.length; i++) {
-      // Pick a random mob not yet used
-      let attempts = 0;
-      let pick;
-      do {
-        pick = hostileMobs[Math.floor(Math.random() * hostileMobs.length)];
-        attempts++;
-      } while (usedMobs.has(pick[0]) && attempts < 20);
+    const killCount = Math.floor(Math.random() * 3) + 1;
+    const hint = buildMobHint(Number(mobVnum), rooms, mob);
 
-      if (usedMobs.has(pick[0])) continue;
-      usedMobs.add(pick[0]);
+    const nameTemplates = QUEST_NAMES.hunt;
+    const name = nameTemplates[Math.floor(Math.random() * nameTemplates.length)]
+      .replace('{mob}', mob.name);
+    const desc = QUEST_DESCS.hunt
+      .replace('{mob}', mob.name)
+      .replace('{hint}', hint);
 
-      const [mobVnum, mob] = pick;
-      const cp = (mob.stats.hp || 0) + (mob.stats.attack || 0) * 3 + (mob.stats.defense || 0) * 2;
-      const ratio = playerPower > 0 ? cp / playerPower : 1;
-
-      // Determine mission type based on mob strength
-      let type;
-      if (ratio > 1.5) type = 'challenge';
-      else if (Math.random() < 0.4) type = 'retrieve';
-      else type = 'hunt';
-
-      const count = type === 'hunt' ? Math.floor(Math.random() * 3) + 2 : 1;
-
-      // Generate rewards (scale with difficulty)
-      const difficultyMod = Math.max(1, Math.floor(ratio * 2));
-      const qpReward = type === 'challenge' ? 4 + difficultyMod : 2 + difficultyMod;
-      const goldReward = (type === 'challenge' ? 30 : 15) * difficultyMod;
-
-      const missionId = `mission_${Date.now()}_${i}`;
-      const nameTemplates = MISSION_NAMES[type];
-      const name = nameTemplates[Math.floor(Math.random() * nameTemplates.length)]
-        .replace('{mob}', mob.name);
-      const desc = MISSION_DESCS[type]
-        .replace('{mob}', mob.name)
-        .replace('{count}', count);
-
-      missions.push({
-        id: missionId,
-        type,
-        name,
-        description: desc,
-        targetMobVnum: parseInt(mobVnum),
-        targetMobName: mob.name,
-        killsRequired: count,
-        killsProgress: 0,
-        rewards: { qp: qpReward, gold: goldReward },
-        createdAt: Date.now(),
-        expiresAt: Date.now() + (MISSION_EXPIRY_MINUTES * 60 * 1000)
-      });
-    }
-
-    return missions;
+    return {
+      id: `quest_hunt_${Date.now()}_${mobVnum}`,
+      type: 'hunt',
+      name,
+      description: desc,
+      targetMobVnum: Number(mobVnum),
+      targetMobName: mob.name,
+      killsRequired: killCount,
+      killsProgress: 0,
+      rewards: {
+        qp: 2 + diffMod + (killCount > 2 ? 1 : 0),
+        gold: 15 * diffMod
+      },
+      createdAt: Date.now()
+    };
   }
 
   /**
-   * Check if a kill progresses any active mission.
-   * @param {Array} activeMissions - Player's active missions
-   * @param {number} killedMobVnum - Vnum of the killed mob
-   * @returns {{ updated: boolean, completed: Array, messages: Array }}
+   * Generate a fetch quest — find a specific item placed in the world.
+   * Returns the quest object with a spawnRoomVnum for the engine to place the item.
    */
-  function progressMission(activeMissions, killedMobVnum) {
-    const messages = [];
-    const completed = [];
+  function generateFetchQuest(items, rooms, playerPower, completedIds) {
+    // Pick a random item from the expanded gear pool (vnums 100-299)
+    const candidates = Object.entries(items).filter(([vnum]) => {
+      const v = Number(vnum);
+      return v >= 100 && v < 300;
+    });
 
-    for (const mission of activeMissions) {
-      if (mission.targetMobVnum === killedMobVnum) {
-        mission.killsProgress += 1;
-        if (mission.killsProgress >= mission.killsRequired) {
-          completed.push(mission);
-          messages.push({ type: 'quest', text: `Mission Complete: ${mission.name}!` });
-          messages.push({ type: 'success', text: `  Return to the Bounty Board to claim your reward.` });
-        } else {
-          messages.push({ type: 'info', text: `  [Mission] ${mission.name}: ${mission.killsProgress}/${mission.killsRequired}` });
-        }
-      }
+    if (candidates.length === 0) {
+      // Fallback: any item
+      const any = Object.entries(items);
+      if (any.length === 0) return null;
+      candidates.push(...any.slice(0, 10));
     }
 
-    return { updated: messages.length > 0, completed, messages };
+    const [itemVnum, item] = candidates[Math.floor(Math.random() * candidates.length)];
+
+    // Pick a random room to place the item in (avoid training tower and special rooms)
+    const roomCandidates = Object.entries(rooms).filter(([rvnum]) => {
+      const v = Number(rvnum);
+      return v > 115 && v !== 150; // Not training tower or quest shop
+    });
+
+    if (roomCandidates.length === 0) return null;
+
+    const [roomVnum, room] = roomCandidates[Math.floor(Math.random() * roomCandidates.length)];
+    const hint = buildItemHint(room.zone_name || room.zone, room.name);
+
+    const nameTemplates = QUEST_NAMES.fetch;
+    const name = nameTemplates[Math.floor(Math.random() * nameTemplates.length)]
+      .replace('{item}', item.name);
+    const desc = QUEST_DESCS.fetch
+      .replace('{item}', item.name)
+      .replace('{hint}', hint);
+
+    return {
+      id: `quest_fetch_${Date.now()}_${itemVnum}`,
+      type: 'fetch',
+      name,
+      description: desc,
+      targetItemVnum: Number(itemVnum),
+      targetItemName: item.name,
+      spawnRoomVnum: Number(roomVnum),
+      collected: false,
+      rewards: {
+        qp: 3 + Math.floor(Math.random() * 3),
+        gold: 20 + Math.floor(Math.random() * 30)
+      },
+      createdAt: Date.now()
+    };
+  }
+
+  /* ─── Quest progression ─────────────────────────────────────────────────── */
+
+  /**
+   * Check if a mob kill progresses the active quest.
+   * @param {object|null} activeQuest - The player's current quest (or null)
+   * @param {number} killedMobVnum    - Vnum of the killed mob
+   * @returns {{ updated: boolean, completed: boolean, messages: Array }}
+   */
+  function progressHunt(activeQuest, killedMobVnum) {
+    if (!activeQuest || activeQuest.type !== 'hunt') {
+      return { updated: false, completed: false, messages: [] };
+    }
+    if (activeQuest.targetMobVnum !== killedMobVnum) {
+      return { updated: false, completed: false, messages: [] };
+    }
+
+    activeQuest.killsProgress += 1;
+    const messages = [];
+
+    if (activeQuest.killsProgress >= activeQuest.killsRequired) {
+      messages.push({ type: 'quest', text: `Quest Complete: ${activeQuest.name}!` });
+      messages.push({ type: 'success', text: "  Return to the Bulletin Board to claim your reward." });
+      return { updated: true, completed: true, messages };
+    }
+
+    messages.push({
+      type: 'info',
+      text: `  [Quest] ${activeQuest.name}: ${activeQuest.killsProgress}/${activeQuest.killsRequired}`
+    });
+    return { updated: true, completed: false, messages };
   }
 
   /**
-   * Claim rewards for a completed mission.
-   * @param {object} mission - The completed mission
-   * @param {object} player - Player state (mutated)
+   * Check if picking up an item progresses a fetch quest.
+   * @param {object|null} activeQuest - The player's current quest
+   * @param {number} pickedItemVnum   - Vnum of the picked-up item
+   * @returns {{ updated: boolean, completed: boolean, messages: Array }}
+   */
+  function progressFetch(activeQuest, pickedItemVnum) {
+    if (!activeQuest || activeQuest.type !== 'fetch') {
+      return { updated: false, completed: false, messages: [] };
+    }
+    if (activeQuest.targetItemVnum !== pickedItemVnum) {
+      return { updated: false, completed: false, messages: [] };
+    }
+
+    activeQuest.collected = true;
+    const messages = [
+      { type: 'quest', text: `Quest Item Found: ${activeQuest.targetItemName}!` },
+      { type: 'success', text: "  Return to the Bulletin Board to claim your reward." }
+    ];
+    return { updated: true, completed: true, messages };
+  }
+
+  /* ─── Reward claiming ───────────────────────────────────────────────────── */
+
+  /**
+   * Claim rewards for a completed quest.
+   * @param {object} quest  - The completed quest
+   * @param {object} player - Player state (mutated directly)
    * @returns {Array} Output messages
    */
-  function claimMission(mission, player) {
+  function claimQuest(quest, player) {
     const output = [];
-    output.push({ type: 'quest', text: `─── Bounty Claimed: ${mission.name} ───` });
+    output.push({ type: 'quest', text: `─── Quest Claimed: ${quest.name} ───` });
 
-    if (mission.rewards.qp) {
-      player.questPoints += mission.rewards.qp;
-      output.push({ type: 'success', text: `  +${mission.rewards.qp} Quest Points (total: ${player.questPoints})` });
+    if (quest.rewards.qp) {
+      player.questPoints = (player.questPoints || 0) + quest.rewards.qp;
+      output.push({ type: 'success', text: `  +${quest.rewards.qp} Quest Points (total: ${player.questPoints})` });
     }
-    if (mission.rewards.gold) {
-      player.gold += mission.rewards.gold;
-      output.push({ type: 'success', text: `  +${mission.rewards.gold} gold (total: ${player.gold})` });
+    if (quest.rewards.gold) {
+      player.gold = (player.gold || 0) + quest.rewards.gold;
+      output.push({ type: 'success', text: `  +${quest.rewards.gold} gold (total: ${player.gold})` });
     }
+
+    // Track completion count for repeat-reward scaling
+    if (!player.questCompletionCounts) player.questCompletionCounts = {};
+    const baseId = quest.type === 'hunt'
+      ? `hunt_${quest.targetMobVnum}`
+      : `fetch_${quest.targetItemVnum}`;
+    player.questCompletionCounts[baseId] = (player.questCompletionCounts[baseId] || 0) + 1;
 
     return output;
   }
 
-  /**
-   * Remove expired missions from the active list.
-   * @param {Array} activeMissions - Player's active missions
-   * @returns {{ remaining: Array, expired: Array, messages: Array }}
-   */
-  function pruneExpired(activeMissions) {
-    const now = Date.now();
-    const remaining = [];
-    const expired = [];
-    const messages = [];
-
-    for (const m of activeMissions) {
-      if (m.expiresAt && now > m.expiresAt) {
-        expired.push(m);
-        messages.push({ type: 'info', text: `Mission expired: ${m.name}` });
-      } else {
-        remaining.push(m);
-      }
-    }
-
-    return { remaining, expired, messages };
-  }
+  /* ─── Board display ─────────────────────────────────────────────────────── */
 
   /**
-   * Display the bounty board (called when player uses 'mission' or interacts with board).
-   * @param {Array} activeMissions - Player's active missions
-   * @param {Array} availableMissions - Generated missions available to accept
+   * Display the bulletin board status.
+   * @param {object|null} activeQuest - Current active quest (or null)
    * @returns {Array} Output lines
    */
-  function displayBoard(activeMissions, availableMissions) {
-    const output = [{ type: 'info', text: '─── Bounty Board ───' }];
+  function displayBoard(activeQuest) {
+    const output = [{ type: 'info', text: '═══ Bulletin Board ═══' }];
 
-    if (activeMissions.length > 0) {
-      output.push({ type: 'info', text: 'Active Missions:' });
-      for (const m of activeMissions) {
-        const progress = `${m.killsProgress}/${m.killsRequired}`;
-        const done = m.killsProgress >= m.killsRequired;
-        output.push({ type: done ? 'success' : 'quest', text: `  ${done ? '[COMPLETE]' : `[${progress}]`} ${m.name}` });
-        output.push({ type: 'info', text: `    ${m.description}` });
-        output.push({ type: 'info', text: `    Reward: ${m.rewards.qp} QP, ${m.rewards.gold} gold` });
-      }
-    }
+    if (activeQuest) {
+      const isHunt = activeQuest.type === 'hunt';
+      const isComplete = isHunt
+        ? (activeQuest.killsProgress >= activeQuest.killsRequired)
+        : activeQuest.collected;
 
-    if (availableMissions.length > 0) {
-      output.push({ type: 'info', text: '' });
-      output.push({ type: 'info', text: 'Available Bounties:' });
-      for (let i = 0; i < availableMissions.length; i++) {
-        const m = availableMissions[i];
-        output.push({ type: 'items', text: `  ${i + 1}. ${m.name}` });
-        output.push({ type: 'info', text: `     ${m.description}` });
-        output.push({ type: 'info', text: `     Reward: ${m.rewards.qp} QP, ${m.rewards.gold} gold` });
+      output.push({ type: 'info', text: 'Current Quest:' });
+      if (isComplete) {
+        output.push({ type: 'success', text: `  [COMPLETE] ${activeQuest.name}` });
+      } else if (isHunt) {
+        output.push({ type: 'quest', text: `  [${activeQuest.killsProgress}/${activeQuest.killsRequired}] ${activeQuest.name}` });
+      } else {
+        output.push({ type: 'quest', text: `  [In Progress] ${activeQuest.name}` });
       }
+      output.push({ type: 'info', text: `  ${activeQuest.description}` });
+      output.push({ type: 'info', text: `  Reward: ${activeQuest.rewards.qp} QP, ${activeQuest.rewards.gold} gold` });
       output.push({ type: 'info', text: '' });
-      output.push({ type: 'success', text: "Type 'mission accept <number>' to take a bounty." });
-      output.push({ type: 'success', text: "Type 'mission claim' to collect completed bounties." });
-    } else if (activeMissions.length === 0) {
-      output.push({ type: 'info', text: '  No bounties available. Check back later.' });
+
+      if (isComplete) {
+        output.push({ type: 'success', text: "Type 'board claim' to collect your reward." });
+      } else {
+        output.push({ type: 'info', text: "Type 'board quit' to abandon this quest." });
+      }
+    } else {
+      output.push({ type: 'info', text: '  No active quest.' });
+      output.push({ type: 'info', text: '' });
+      output.push({ type: 'success', text: "Type 'board quest' to request a new quest." });
     }
 
     return output;
   }
 
-  // ─── Public API ─────────────────────────────────────────────────────────
+  /* ─── Public API ────────────────────────────────────────────────────────── */
 
   window.MudMissions = {
-    BOUNTY_BOARD_VNUM,
-    MAX_ACTIVE_MISSIONS,
-    generateMissions,
-    progressMission,
-    claimMission,
-    pruneExpired,
+    BOARD_ROOM_VNUM,
+    generateQuest,
+    progressHunt,
+    progressFetch,
+    claimQuest,
     displayBoard
   };
 })();

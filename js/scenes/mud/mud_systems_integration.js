@@ -359,60 +359,103 @@
         }
       },
       {
-        name: 'mission',
-        aliases: ['missions', 'bounty', 'bounties'],
+        name: 'board',
+        aliases: ['mission', 'missions', 'bounty', 'bounties', 'bulletin'],
         category: 'Progression',
-        help: 'View bounty board',
-        usage: 'mission [accept|claim]',
+        help: 'Interact with the Bulletin Board',
+        usage: 'board [quest|claim|quit]',
         subcommands: {
-          accept: (parsed) => {
-            if (!window.MudMissions) return [{ type: 'error', text: 'Mission system not available.' }];
+          /** Request a new quest from the board. */
+          quest: () => {
+            if (!window.MudMissions) return [{ type: 'error', text: 'Quest system not available.' }];
             const playerState = getPlayerFromSave();
-            const num = parseInt(parsed.subTarget, 10);
-            const available = playerState?.availableMissions || [];
-            if (num >= 1 && num <= available.length) {
-              const mission = available[num - 1];
-              if (!playerState.activeMissions) playerState.activeMissions = [];
-              playerState.activeMissions.push(mission);
-              available.splice(num - 1, 1);
-              setPlayerField('activeMissions', playerState.activeMissions);
-              setPlayerField('availableMissions', available);
-              return [
-                { type: 'quest', text: `─── Mission Accepted: ${mission.name} ───` },
-                { type: 'info', text: `  ${mission.description}` },
-                { type: 'info', text: `  Reward: ${mission.rewards.qp} QP, ${mission.rewards.gold} gold` }
-              ];
+            if (playerState?.activeQuest) {
+              return [{ type: 'error', text: "You already have an active quest. Complete it or type 'board quit' first." }];
             }
-            return [{ type: 'error', text: "Invalid mission number. Type 'mission' to see available bounties." }];
+            const allMobs = window.MudData?.mobs || {};
+            const allRooms = window.MudData?.rooms || {};
+            const allItems = window.MudData?.items || {};
+            const quest = window.MudMissions.generateQuest(
+              allMobs, allRooms, allItems,
+              playerState?.power || 0,
+              Object.keys(playerState?.questCompletionCounts || {})
+            );
+            if (!quest) return [{ type: 'error', text: 'No suitable quests available right now. Try again later.' }];
+            setPlayerField('activeQuest', quest);
+            // For fetch quests, spawn the item in the target room
+            if (quest.type === 'fetch' && quest.spawnRoomVnum && quest.targetItemVnum) {
+              const room = allRooms[quest.spawnRoomVnum];
+              if (room) {
+                if (!room.initial_items) room.initial_items = [];
+                room.initial_items.push(quest.targetItemVnum);
+              }
+            }
+            return [
+              { type: 'quest', text: `─── Quest Accepted: ${quest.name} ───` },
+              { type: 'info', text: `  ${quest.description}` },
+              { type: 'info', text: `  Reward: ${quest.rewards.qp} QP, ${quest.rewards.gold} gold` }
+            ];
           },
+          /** Claim reward for a completed quest. */
           claim: () => {
-            if (!window.MudMissions) return [{ type: 'error', text: 'Mission system not available.' }];
+            if (!window.MudMissions) return [{ type: 'error', text: 'Quest system not available.' }];
             const playerState = getPlayerFromSave();
-            const active = playerState?.activeMissions || [];
-            const completed = active.filter(m => m.killsProgress >= m.killsRequired);
-            if (completed.length === 0) {
-              return [{ type: 'info', text: 'No completed missions to claim.' }];
-            }
-            const output = [];
-            for (const m of completed) {
-              output.push(...window.MudMissions.claimMission(m, playerState));
-            }
-            const remaining = active.filter(m => m.killsProgress < m.killsRequired);
-            setPlayerField('activeMissions', remaining);
+            const quest = playerState?.activeQuest;
+            if (!quest) return [{ type: 'info', text: 'You have no active quest to claim.' }];
+            const isComplete = quest.type === 'hunt'
+              ? (quest.killsProgress >= quest.killsRequired)
+              : quest.collected;
+            if (!isComplete) return [{ type: 'error', text: 'Your quest is not yet complete.' }];
+            const output = window.MudMissions.claimQuest(quest, playerState);
+            setPlayerField('activeQuest', null);
+            setPlayerField('questPoints', playerState.questPoints);
+            setPlayerField('gold', playerState.gold);
+            setPlayerField('questCompletionCounts', playerState.questCompletionCounts);
             return output;
+          },
+          /** Abandon the current quest. */
+          quit: () => {
+            const playerState = getPlayerFromSave();
+            if (!playerState?.activeQuest) {
+              return [{ type: 'info', text: 'You have no active quest to abandon.' }];
+            }
+            const name = playerState.activeQuest.name;
+            setPlayerField('activeQuest', null);
+            return [{ type: 'info', text: `Quest abandoned: ${name}. You can request a new one.` }];
           }
         },
-        handler: (parsed) => {
-          if (!window.MudMissions) return [{ type: 'error', text: 'Mission system not available.' }];
+        handler: () => {
+          if (!window.MudMissions) return [{ type: 'error', text: 'Quest system not available.' }];
           const playerState = getPlayerFromSave();
-          let available = playerState?.availableMissions || [];
-          if (available.length === 0 && window.MudData) {
-            const allMobs = window.MudData.mobs || {};
-            available = window.MudMissions.generateMissions(allMobs, playerState?.power || 0);
-            setPlayerField('availableMissions', available);
-          }
-          const active = playerState?.activeMissions || [];
-          return window.MudMissions.displayBoard(active, available);
+          return window.MudMissions.displayBoard(playerState?.activeQuest || null);
+        }
+      },
+      {
+        name: 'qshop',
+        aliases: ['questshop', 'qstore'],
+        category: 'Progression',
+        help: 'Browse the Quest Reward Depot',
+        usage: 'qshop',
+        handler: () => {
+          if (!window.MudQuestShop) return [{ type: 'error', text: 'Quest shop not available.' }];
+          const playerState = getPlayerFromSave();
+          return window.MudQuestShop.displayShop(playerState?.questPoints || 0);
+        }
+      },
+      {
+        name: 'qbuy',
+        aliases: ['questbuy'],
+        category: 'Progression',
+        help: 'Buy an item from the Quest Reward Depot',
+        usage: 'qbuy <name or number>',
+        handler: (parsed) => {
+          if (!window.MudQuestShop) return [{ type: 'error', text: 'Quest shop not available.' }];
+          const playerState = getPlayerFromSave();
+          const output = window.MudQuestShop.buyItem(parsed.target, playerState);
+          // Persist changes
+          setPlayerField('questPoints', playerState.questPoints);
+          setPlayerField('inventory', playerState.inventory);
+          return output;
         }
       },
       {
@@ -540,11 +583,11 @@
       // Allow rest-related commands through
       const allowed = ['wake', 'stand', 'rest', 'sleep', 'look', 'help', 'status',
                        'inventory', 'equipment', 'abilities', 'proficiency', 'title',
-                       'quest', 'mission', 'echo', 'sense', 'stance'];
+                       'quest', 'board', 'mission', 'qshop', 'qbuy', 'echo', 'sense', 'stance'];
       if (allowed.includes(parsed.verb)) return null;
 
       // Movement or combat interrupts rest
-      const interruptors = ['go', 'attack', 'flee'];
+      const interruptors = ['go', 'enter', 'attack', 'flee'];
       if (interruptors.includes(parsed.verb)) {
         clearRestState();
         return null; // Allow the command to proceed after clearing rest
@@ -619,6 +662,17 @@
         }
       }
 
+      // ─── Bulletin board quest progress (hunt quests) ───
+      if (window.MudMissions) {
+        const playerState = getPlayerFromSave();
+        const activeQuest = playerState?.activeQuest || null;
+        const result = window.MudMissions.progressHunt(activeQuest, mob.vnum);
+        if (result.updated) {
+          setPlayerField('activeQuest', activeQuest);
+          output.push(...result.messages);
+        }
+      }
+
       // Handle echo invasion kill rewards
       if (mob.isEchoInvasion && window.MudInvasions) {
         const playerState = getPlayerFromSave();
@@ -645,6 +699,28 @@
         delete engine._internals.mobs[mob.vnum];
       }
 
+      return output;
+    };
+
+    // ─── doTake wrapper — fetch quest progress ─────────────────────────
+    const originalDoTake = engine._internals.doTake;
+    engine._internals.doTake = function(target) {
+      const output = originalDoTake(target);
+      // If take succeeded, check fetch quest progress
+      if (window.MudMissions && output.length > 0 && output[0].type === 'success') {
+        const playerState = getPlayerFromSave();
+        const activeQuest = playerState?.activeQuest || null;
+        // Check last item added to inventory
+        const inv = playerState?.inventory || [];
+        if (inv.length > 0) {
+          const lastItem = inv[inv.length - 1];
+          const result = window.MudMissions.progressFetch(activeQuest, lastItem);
+          if (result.updated) {
+            setPlayerField('activeQuest', activeQuest);
+            output.push(...result.messages);
+          }
+        }
+      }
       return output;
     };
 

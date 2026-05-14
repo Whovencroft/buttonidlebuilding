@@ -10,7 +10,10 @@
       "attack": 12,
       "defense": 5
     },
-    "loot_table": [],
+    "loot_table": [
+      250,
+      260
+    ],
     "respawn": 60,
     "dialogue": [],
     "flags": [
@@ -28,7 +31,10 @@
       "attack": 15,
       "defense": 8
     },
-    "loot_table": [],
+    "loot_table": [
+      280,
+      250
+    ],
     "respawn": 45,
     "dialogue": [],
     "flags": [
@@ -46,7 +52,10 @@
       "attack": 18,
       "defense": 12
     },
-    "loot_table": [],
+    "loot_table": [
+      260,
+      280
+    ],
     "respawn": 60,
     "dialogue": [],
     "flags": [
@@ -64,7 +73,10 @@
       "attack": 14,
       "defense": 6
     },
-    "loot_table": [],
+    "loot_table": [
+      250,
+      280
+    ],
     "respawn": 45,
     "dialogue": [],
     "flags": [
@@ -82,7 +94,10 @@
       "attack": 22,
       "defense": 10
     },
-    "loot_table": [],
+    "loot_table": [
+      200,
+      280
+    ],
     "respawn": 90,
     "dialogue": [],
     "flags": [
@@ -100,7 +115,10 @@
       "attack": 30,
       "defense": 25
     },
-    "loot_table": [],
+    "loot_table": [
+      260,
+      280
+    ],
     "respawn": 120,
     "dialogue": [],
     "flags": [
@@ -118,7 +136,10 @@
       "attack": 35,
       "defense": 20
     },
-    "loot_table": [],
+    "loot_table": [
+      280,
+      220
+    ],
     "respawn": 120,
     "dialogue": [],
     "flags": [
@@ -136,7 +157,10 @@
       "attack": 40,
       "defense": 30
     },
-    "loot_table": [],
+    "loot_table": [
+      220,
+      270
+    ],
     "respawn": 180,
     "dialogue": [],
     "flags": [
@@ -154,7 +178,10 @@
       "attack": 3,
       "defense": 1
     },
-    "loot_table": [],
+    "loot_table": [
+      260,
+      200
+    ],
     "respawn": 20,
     "dialogue": [],
     "flags": [
@@ -172,7 +199,10 @@
       "attack": 5,
       "defense": 2
     },
-    "loot_table": [],
+    "loot_table": [
+      260,
+      220
+    ],
     "respawn": 20,
     "dialogue": [],
     "flags": [
@@ -190,7 +220,10 @@
       "attack": 16,
       "defense": 10
     },
-    "loot_table": [],
+    "loot_table": [
+      220,
+      280
+    ],
     "respawn": 50,
     "dialogue": [],
     "flags": [
@@ -208,7 +241,10 @@
       "attack": 18,
       "defense": 4
     },
-    "loot_table": [],
+    "loot_table": [
+      250,
+      200
+    ],
     "respawn": 60,
     "dialogue": [],
     "flags": [
@@ -226,7 +262,10 @@
       "attack": 24,
       "defense": 14
     },
-    "loot_table": [],
+    "loot_table": [
+      200,
+      280
+    ],
     "respawn": 90,
     "dialogue": [],
     "flags": [
@@ -244,7 +283,10 @@
       "attack": 20,
       "defense": 5
     },
-    "loot_table": [],
+    "loot_table": [
+      270,
+      250
+    ],
     "respawn": 60,
     "dialogue": [],
     "flags": [
@@ -262,7 +304,10 @@
       "attack": 22,
       "defense": 8
     },
-    "loot_table": [],
+    "loot_table": [
+      250,
+      280
+    ],
     "respawn": 60,
     "dialogue": [],
     "flags": [
@@ -280,7 +325,10 @@
       "attack": 22,
       "defense": 12
     },
-    "loot_table": [],
+    "loot_table": [
+      270,
+      260
+    ],
     "respawn": 75,
     "dialogue": [],
     "flags": [
@@ -298,7 +346,10 @@
       "attack": 12,
       "defense": 3
     },
-    "loot_table": [],
+    "loot_table": [
+      260,
+      270
+    ],
     "respawn": 30,
     "dialogue": [],
     "flags": [
@@ -316,7 +367,10 @@
       "attack": 16,
       "defense": 6
     },
-    "loot_table": [],
+    "loot_table": [
+      220,
+      270
+    ],
     "respawn": 45,
     "dialogue": [],
     "flags": [
@@ -334,7 +388,10 @@
       "attack": 20,
       "defense": 8
     },
-    "loot_table": [],
+    "loot_table": [
+      200,
+      270
+    ],
     "respawn": 60,
     "dialogue": [],
     "flags": [
@@ -352,7 +409,10 @@
       "attack": 25,
       "defense": 5
     },
-    "loot_table": [],
+    "loot_table": [
+      270,
+      200
+    ],
     "respawn": 75,
     "dialogue": [],
     "flags": [
@@ -370,7 +430,10 @@
       "attack": 15,
       "defense": 2
     },
-    "loot_table": [],
+    "loot_table": [
+      270,
+      280
+    ],
     "respawn": 45,
     "dialogue": [],
     "flags": [
@@ -388,7 +451,10 @@
       "attack": 28,
       "defense": 18
     },
-    "loot_table": [],
+    "loot_table": [
+      260,
+      270
+    ],
     "respawn": 90,
     "dialogue": [],
     "flags": [
@@ -406,7 +472,10 @@
       "attack": 25,
       "defense": 15
     },
-    "loot_table": [],
+    "loot_table": [
+      250,
+      280
+    ],
     "respawn": 90,
     "dialogue": [],
     "flags": [
@@ -424,7 +493,10 @@
       "attack": 30,
       "defense": 10
     },
-    "loot_table": [],
+    "loot_table": [
+      200,
+      250
+    ],
     "respawn": 90,
     "dialogue": [],
     "flags": [
@@ -442,7 +514,10 @@
       "attack": 22,
       "defense": 6
     },
-    "loot_table": [],
+    "loot_table": [
+      220,
+      250
+    ],
     "respawn": 60,
     "dialogue": [],
     "flags": [
@@ -460,7 +535,10 @@
       "attack": 32,
       "defense": 22
     },
-    "loot_table": [],
+    "loot_table": [
+      250,
+      200
+    ],
     "respawn": 120,
     "dialogue": [],
     "flags": [
@@ -478,7 +556,10 @@
       "attack": 38,
       "defense": 18
     },
-    "loot_table": [],
+    "loot_table": [
+      260,
+      220
+    ],
     "respawn": 150,
     "dialogue": [],
     "flags": [
@@ -496,7 +577,10 @@
       "attack": 42,
       "defense": 15
     },
-    "loot_table": [],
+    "loot_table": [
+      200,
+      270
+    ],
     "respawn": 150,
     "dialogue": [],
     "flags": [
@@ -514,7 +598,10 @@
       "attack": 20,
       "defense": 30
     },
-    "loot_table": [],
+    "loot_table": [
+      280,
+      260
+    ],
     "respawn": 90,
     "dialogue": [],
     "flags": [
@@ -636,7 +723,10 @@
       "attack": 8,
       "defense": 2
     },
-    "loot_table": [],
+    "loot_table": [
+      200,
+      270
+    ],
     "respawn": 25,
     "dialogue": [],
     "flags": [
@@ -654,7 +744,10 @@
       "attack": 6,
       "defense": 1
     },
-    "loot_table": [],
+    "loot_table": [
+      270,
+      260
+    ],
     "respawn": 20,
     "dialogue": [],
     "flags": [
@@ -672,7 +765,10 @@
       "attack": 18,
       "defense": 22
     },
-    "loot_table": [],
+    "loot_table": [
+      200,
+      280
+    ],
     "respawn": 90,
     "dialogue": [],
     "flags": [
@@ -690,7 +786,10 @@
       "attack": 30,
       "defense": 16
     },
-    "loot_table": [],
+    "loot_table": [
+      260,
+      270
+    ],
     "respawn": 120,
     "dialogue": [],
     "flags": [
@@ -708,7 +807,10 @@
       "attack": 22,
       "defense": 14
     },
-    "loot_table": [],
+    "loot_table": [
+      250,
+      270
+    ],
     "respawn": 75,
     "dialogue": [],
     "flags": [
@@ -726,7 +828,10 @@
       "attack": 10,
       "defense": 1
     },
-    "loot_table": [],
+    "loot_table": [
+      200,
+      260
+    ],
     "respawn": 30,
     "dialogue": [],
     "flags": [
@@ -744,7 +849,10 @@
       "attack": 28,
       "defense": 16
     },
-    "loot_table": [],
+    "loot_table": [
+      250,
+      220
+    ],
     "respawn": 90,
     "dialogue": [],
     "flags": [
@@ -762,7 +870,10 @@
       "attack": 13,
       "defense": 5
     },
-    "loot_table": [],
+    "loot_table": [
+      221,
+      286
+    ],
     "respawn": 60,
     "dialogue": [],
     "flags": [
@@ -780,7 +891,10 @@
       "attack": 16,
       "defense": 10
     },
-    "loot_table": [],
+    "loot_table": [
+      232,
+      242
+    ],
     "respawn": 45,
     "dialogue": [],
     "flags": [
@@ -798,7 +912,10 @@
       "attack": 20,
       "defense": 15
     },
-    "loot_table": [],
+    "loot_table": [
+      286,
+      221
+    ],
     "respawn": 60,
     "dialogue": [],
     "flags": [
@@ -816,7 +933,10 @@
       "attack": 18,
       "defense": 8
     },
-    "loot_table": [],
+    "loot_table": [
+      242,
+      262
+    ],
     "respawn": 45,
     "dialogue": [],
     "flags": [
@@ -834,7 +954,10 @@
       "attack": 25,
       "defense": 5
     },
-    "loot_table": [],
+    "loot_table": [
+      262,
+      242
+    ],
     "respawn": 90,
     "dialogue": [],
     "flags": [
@@ -852,7 +975,10 @@
       "attack": 38,
       "defense": 28
     },
-    "loot_table": [],
+    "loot_table": [
+      232,
+      242
+    ],
     "respawn": 120,
     "dialogue": [],
     "flags": [
@@ -870,7 +996,10 @@
       "attack": 42,
       "defense": 18
     },
-    "loot_table": [],
+    "loot_table": [
+      262,
+      286
+    ],
     "respawn": 120,
     "dialogue": [],
     "flags": [
@@ -888,7 +1017,10 @@
       "attack": 45,
       "defense": 35
     },
-    "loot_table": [],
+    "loot_table": [
+      205,
+      286
+    ],
     "respawn": 180,
     "dialogue": [],
     "flags": [
@@ -906,7 +1038,10 @@
       "attack": 4,
       "defense": 1
     },
-    "loot_table": [],
+    "loot_table": [
+      286,
+      252
+    ],
     "respawn": 20,
     "dialogue": [],
     "flags": [
@@ -924,7 +1059,10 @@
       "attack": 6,
       "defense": 3
     },
-    "loot_table": [],
+    "loot_table": [
+      205,
+      252
+    ],
     "respawn": 20,
     "dialogue": [],
     "flags": [
@@ -942,7 +1080,10 @@
       "attack": 8,
       "defense": 2
     },
-    "loot_table": [],
+    "loot_table": [
+      232,
+      262
+    ],
     "respawn": 25,
     "dialogue": [],
     "flags": [
@@ -960,7 +1101,10 @@
       "attack": 10,
       "defense": 3
     },
-    "loot_table": [],
+    "loot_table": [
+      286,
+      232
+    ],
     "respawn": 45,
     "dialogue": [],
     "flags": [
@@ -978,7 +1122,10 @@
       "attack": 16,
       "defense": 8
     },
-    "loot_table": [],
+    "loot_table": [
+      252,
+      242
+    ],
     "respawn": 60,
     "dialogue": [],
     "flags": [
@@ -996,7 +1143,10 @@
       "attack": 12,
       "defense": 4
     },
-    "loot_table": [],
+    "loot_table": [
+      232,
+      262
+    ],
     "respawn": 45,
     "dialogue": [],
     "flags": [
@@ -1014,7 +1164,10 @@
       "attack": 8,
       "defense": 6
     },
-    "loot_table": [],
+    "loot_table": [
+      242,
+      262
+    ],
     "respawn": 45,
     "dialogue": [],
     "flags": [
@@ -1032,7 +1185,10 @@
       "attack": 22,
       "defense": 20
     },
-    "loot_table": [],
+    "loot_table": [
+      252,
+      205
+    ],
     "respawn": 90,
     "dialogue": [],
     "flags": [
@@ -1050,7 +1206,10 @@
       "attack": 14,
       "defense": 12
     },
-    "loot_table": [],
+    "loot_table": [
+      205,
+      252
+    ],
     "respawn": 45,
     "dialogue": [],
     "flags": [
@@ -1068,7 +1227,10 @@
       "attack": 28,
       "defense": 3
     },
-    "loot_table": [],
+    "loot_table": [
+      252,
+      221
+    ],
     "respawn": 90,
     "dialogue": [],
     "flags": [
@@ -1086,7 +1248,10 @@
       "attack": 35,
       "defense": 12
     },
-    "loot_table": [],
+    "loot_table": [
+      286,
+      252
+    ],
     "respawn": 120,
     "dialogue": [],
     "flags": [
@@ -1104,7 +1269,10 @@
       "attack": 32,
       "defense": 25
     },
-    "loot_table": [],
+    "loot_table": [
+      232,
+      262
+    ],
     "respawn": 120,
     "dialogue": [],
     "flags": [
@@ -1122,7 +1290,10 @@
       "attack": 40,
       "defense": 10
     },
-    "loot_table": [],
+    "loot_table": [
+      205,
+      242
+    ],
     "respawn": 120,
     "dialogue": [],
     "flags": [
@@ -1140,7 +1311,10 @@
       "attack": 35,
       "defense": 8
     },
-    "loot_table": [],
+    "loot_table": [
+      252,
+      242
+    ],
     "respawn": 90,
     "dialogue": [],
     "flags": [
@@ -1158,7 +1332,10 @@
       "attack": 25,
       "defense": 30
     },
-    "loot_table": [],
+    "loot_table": [
+      262,
+      286
+    ],
     "respawn": 120,
     "dialogue": [],
     "flags": [
@@ -1284,7 +1461,10 @@
       "attack": 6,
       "defense": 1
     },
-    "loot_table": [],
+    "loot_table": [
+      205,
+      232
+    ],
     "respawn": 20,
     "dialogue": [],
     "flags": [
@@ -1302,7 +1482,10 @@
       "attack": 15,
       "defense": 2
     },
-    "loot_table": [],
+    "loot_table": [
+      221,
+      242
+    ],
     "respawn": 30,
     "dialogue": [],
     "flags": [
@@ -1320,7 +1503,10 @@
       "attack": 12,
       "defense": 1
     },
-    "loot_table": [],
+    "loot_table": [
+      252,
+      262
+    ],
     "respawn": 25,
     "dialogue": [],
     "flags": [
@@ -1338,7 +1524,10 @@
       "attack": 45,
       "defense": 30
     },
-    "loot_table": [],
+    "loot_table": [
+      242,
+      252
+    ],
     "respawn": 180,
     "dialogue": [],
     "flags": [
@@ -1356,7 +1545,10 @@
       "attack": 10,
       "defense": 4
     },
-    "loot_table": [],
+    "loot_table": [
+      233,
+      272
+    ],
     "respawn": 60,
     "dialogue": [],
     "flags": [
@@ -1374,7 +1566,10 @@
       "attack": 22,
       "defense": 15
     },
-    "loot_table": [],
+    "loot_table": [
+      233,
+      207
+    ],
     "respawn": 90,
     "dialogue": [],
     "flags": [
@@ -1392,7 +1587,10 @@
       "attack": 25,
       "defense": 18
     },
-    "loot_table": [],
+    "loot_table": [
+      222,
+      272
+    ],
     "respawn": 60,
     "dialogue": [],
     "flags": [
@@ -1410,7 +1608,10 @@
       "attack": 20,
       "defense": 8
     },
-    "loot_table": [],
+    "loot_table": [
+      233,
+      222
+    ],
     "respawn": 90,
     "dialogue": [],
     "flags": [
@@ -1428,7 +1629,10 @@
       "attack": 30,
       "defense": 20
     },
-    "loot_table": [],
+    "loot_table": [
+      208,
+      233
+    ],
     "respawn": 120,
     "dialogue": [],
     "flags": [
@@ -1446,7 +1650,10 @@
       "attack": 35,
       "defense": 12
     },
-    "loot_table": [],
+    "loot_table": [
+      233,
+      207
+    ],
     "respawn": 120,
     "dialogue": [],
     "flags": [
@@ -1464,7 +1671,10 @@
       "attack": 32,
       "defense": 25
     },
-    "loot_table": [],
+    "loot_table": [
+      272,
+      208
+    ],
     "respawn": 180,
     "dialogue": [],
     "flags": [
@@ -1482,7 +1692,10 @@
       "attack": 40,
       "defense": 30
     },
-    "loot_table": [],
+    "loot_table": [
+      233,
+      208
+    ],
     "respawn": 240,
     "dialogue": [],
     "flags": [
@@ -1500,7 +1713,10 @@
       "attack": 4,
       "defense": 1
     },
-    "loot_table": [],
+    "loot_table": [
+      233,
+      272
+    ],
     "respawn": 20,
     "dialogue": [],
     "flags": [
@@ -1518,7 +1734,10 @@
       "attack": 5,
       "defense": 2
     },
-    "loot_table": [],
+    "loot_table": [
+      208,
+      222
+    ],
     "respawn": 20,
     "dialogue": [],
     "flags": [
@@ -1536,7 +1755,10 @@
       "attack": 6,
       "defense": 1
     },
-    "loot_table": [],
+    "loot_table": [
+      208,
+      222
+    ],
     "respawn": 30,
     "dialogue": [],
     "flags": [
@@ -1554,7 +1776,10 @@
       "attack": 8,
       "defense": 3
     },
-    "loot_table": [],
+    "loot_table": [
+      272,
+      222
+    ],
     "respawn": 30,
     "dialogue": [],
     "flags": [
@@ -1572,7 +1797,10 @@
       "attack": 14,
       "defense": 8
     },
-    "loot_table": [],
+    "loot_table": [
+      272,
+      233
+    ],
     "respawn": 60,
     "dialogue": [],
     "flags": [
@@ -1590,7 +1818,10 @@
       "attack": 12,
       "defense": 5
     },
-    "loot_table": [],
+    "loot_table": [
+      233,
+      207
+    ],
     "respawn": 60,
     "dialogue": [],
     "flags": [
@@ -1608,7 +1839,10 @@
       "attack": 16,
       "defense": 10
     },
-    "loot_table": [],
+    "loot_table": [
+      233,
+      222
+    ],
     "respawn": 60,
     "dialogue": [],
     "flags": [
@@ -1626,7 +1860,10 @@
       "attack": 14,
       "defense": 6
     },
-    "loot_table": [],
+    "loot_table": [
+      208,
+      272
+    ],
     "respawn": 60,
     "dialogue": [],
     "flags": [
@@ -1644,7 +1881,10 @@
       "attack": 18,
       "defense": 8
     },
-    "loot_table": [],
+    "loot_table": [
+      272,
+      222
+    ],
     "respawn": 75,
     "dialogue": [],
     "flags": [
@@ -1662,7 +1902,10 @@
       "attack": 22,
       "defense": 16
     },
-    "loot_table": [],
+    "loot_table": [
+      222,
+      233
+    ],
     "respawn": 90,
     "dialogue": [],
     "flags": [
@@ -1788,7 +2031,10 @@
       "attack": 26,
       "defense": 14
     },
-    "loot_table": [],
+    "loot_table": [
+      233,
+      272
+    ],
     "respawn": 90,
     "dialogue": [],
     "flags": [
@@ -1806,7 +2052,10 @@
       "attack": 28,
       "defense": 12
     },
-    "loot_table": [],
+    "loot_table": [
+      233,
+      272
+    ],
     "respawn": 90,
     "dialogue": [],
     "flags": [
@@ -1824,7 +2073,10 @@
       "attack": 18,
       "defense": 5
     },
-    "loot_table": [],
+    "loot_table": [
+      272,
+      208
+    ],
     "respawn": 120,
     "dialogue": [],
     "flags": [
@@ -1842,7 +2094,10 @@
       "attack": 24,
       "defense": 10
     },
-    "loot_table": [],
+    "loot_table": [
+      233,
+      207
+    ],
     "respawn": 90,
     "dialogue": [],
     "flags": [
@@ -1860,7 +2115,10 @@
       "attack": 26,
       "defense": 20
     },
-    "loot_table": [],
+    "loot_table": [
+      208,
+      222
+    ],
     "respawn": 120,
     "dialogue": [],
     "flags": [
@@ -1878,7 +2136,10 @@
       "attack": 30,
       "defense": 15
     },
-    "loot_table": [],
+    "loot_table": [
+      208,
+      233
+    ],
     "respawn": 120,
     "dialogue": [],
     "flags": [
@@ -1896,7 +2157,10 @@
       "attack": 28,
       "defense": 18
     },
-    "loot_table": [],
+    "loot_table": [
+      233,
+      272
+    ],
     "respawn": 120,
     "dialogue": [],
     "flags": [
@@ -1937,7 +2201,10 @@
       "attack": 8,
       "defense": 3
     },
-    "loot_table": [],
+    "loot_table": [
+      261,
+      209
+    ],
     "respawn": 30,
     "dialogue": [],
     "flags": [
@@ -1955,7 +2222,10 @@
       "attack": 15,
       "defense": 8
     },
-    "loot_table": [],
+    "loot_table": [
+      209,
+      251
+    ],
     "respawn": 45,
     "dialogue": [],
     "flags": [
@@ -1973,7 +2243,10 @@
       "attack": 18,
       "defense": 12
     },
-    "loot_table": [],
+    "loot_table": [
+      251,
+      230
+    ],
     "respawn": 60,
     "dialogue": [],
     "flags": [
@@ -1991,7 +2264,10 @@
       "attack": 30,
       "defense": 2
     },
-    "loot_table": [],
+    "loot_table": [
+      209,
+      261
+    ],
     "respawn": 90,
     "dialogue": [],
     "flags": [
@@ -2009,7 +2285,10 @@
       "attack": 40,
       "defense": 5
     },
-    "loot_table": [],
+    "loot_table": [
+      261,
+      209
+    ],
     "respawn": 120,
     "dialogue": [],
     "flags": [
@@ -2027,7 +2306,10 @@
       "attack": 35,
       "defense": 30
     },
-    "loot_table": [],
+    "loot_table": [
+      230,
+      251
+    ],
     "respawn": 180,
     "dialogue": [],
     "flags": [
@@ -2045,7 +2327,10 @@
       "attack": 38,
       "defense": 25
     },
-    "loot_table": [],
+    "loot_table": [
+      209,
+      251
+    ],
     "respawn": 120,
     "dialogue": [],
     "flags": [
@@ -2063,7 +2348,10 @@
       "attack": 50,
       "defense": 40
     },
-    "loot_table": [],
+    "loot_table": [
+      261,
+      230
+    ],
     "respawn": 240,
     "dialogue": [],
     "flags": [
@@ -2081,7 +2369,10 @@
       "attack": 6,
       "defense": 2
     },
-    "loot_table": [],
+    "loot_table": [
+      209,
+      251
+    ],
     "respawn": 20,
     "dialogue": [],
     "flags": [
@@ -2099,7 +2390,10 @@
       "attack": 8,
       "defense": 3
     },
-    "loot_table": [],
+    "loot_table": [
+      251,
+      230
+    ],
     "respawn": 25,
     "dialogue": [],
     "flags": [
@@ -2117,7 +2411,10 @@
       "attack": 4,
       "defense": 4
     },
-    "loot_table": [],
+    "loot_table": [
+      209,
+      251
+    ],
     "respawn": 15,
     "dialogue": [],
     "flags": [
@@ -2135,7 +2432,10 @@
       "attack": 10,
       "defense": 4
     },
-    "loot_table": [],
+    "loot_table": [
+      261,
+      209
+    ],
     "respawn": 30,
     "dialogue": [],
     "flags": [
@@ -2153,7 +2453,10 @@
       "attack": 22,
       "defense": 6
     },
-    "loot_table": [],
+    "loot_table": [
+      261,
+      230
+    ],
     "respawn": 60,
     "dialogue": [],
     "flags": [
@@ -2171,7 +2474,10 @@
       "attack": 25,
       "defense": 5
     },
-    "loot_table": [],
+    "loot_table": [
+      230,
+      251
+    ],
     "respawn": 60,
     "dialogue": [],
     "flags": [
@@ -2189,7 +2495,10 @@
       "attack": 22,
       "defense": 15
     },
-    "loot_table": [],
+    "loot_table": [
+      261,
+      251
+    ],
     "respawn": 75,
     "dialogue": [],
     "flags": [
@@ -2207,7 +2516,10 @@
       "attack": 18,
       "defense": 12
     },
-    "loot_table": [],
+    "loot_table": [
+      209,
+      251
+    ],
     "respawn": 60,
     "dialogue": [],
     "flags": [
@@ -2225,7 +2537,10 @@
       "attack": 20,
       "defense": 5
     },
-    "loot_table": [],
+    "loot_table": [
+      251,
+      261
+    ],
     "respawn": 60,
     "dialogue": [],
     "flags": [
@@ -2243,7 +2558,10 @@
       "attack": 14,
       "defense": 8
     },
-    "loot_table": [],
+    "loot_table": [
+      209,
+      230
+    ],
     "respawn": 45,
     "dialogue": [],
     "flags": [
@@ -2261,7 +2579,10 @@
       "attack": 16,
       "defense": 10
     },
-    "loot_table": [],
+    "loot_table": [
+      209,
+      261
+    ],
     "respawn": 45,
     "dialogue": [],
     "flags": [
@@ -2279,7 +2600,10 @@
       "attack": 35,
       "defense": 35
     },
-    "loot_table": [],
+    "loot_table": [
+      261,
+      230
+    ],
     "respawn": 180,
     "dialogue": [],
     "flags": [
@@ -2297,7 +2621,10 @@
       "attack": 30,
       "defense": 12
     },
-    "loot_table": [],
+    "loot_table": [
+      209,
+      251
+    ],
     "respawn": 90,
     "dialogue": [],
     "flags": [
@@ -2315,7 +2642,10 @@
       "attack": 20,
       "defense": 8
     },
-    "loot_table": [],
+    "loot_table": [
+      230,
+      261
+    ],
     "respawn": 60,
     "dialogue": [],
     "flags": [
@@ -2333,7 +2663,10 @@
       "attack": 28,
       "defense": 2
     },
-    "loot_table": [],
+    "loot_table": [
+      261,
+      230
+    ],
     "respawn": 90,
     "dialogue": [],
     "flags": [
@@ -2351,7 +2684,10 @@
       "attack": 40,
       "defense": 15
     },
-    "loot_table": [],
+    "loot_table": [
+      209,
+      230
+    ],
     "respawn": 120,
     "dialogue": [],
     "flags": [
@@ -2369,7 +2705,10 @@
       "attack": 32,
       "defense": 22
     },
-    "loot_table": [],
+    "loot_table": [
+      251,
+      209
+    ],
     "respawn": 120,
     "dialogue": [],
     "flags": [
@@ -2495,7 +2834,10 @@
       "attack": 6,
       "defense": 1
     },
-    "loot_table": [],
+    "loot_table": [
+      251,
+      261
+    ],
     "respawn": 15,
     "dialogue": [],
     "flags": [
@@ -2513,7 +2855,10 @@
       "attack": 10,
       "defense": 6
     },
-    "loot_table": [],
+    "loot_table": [
+      230,
+      261
+    ],
     "respawn": 25,
     "dialogue": [],
     "flags": [
@@ -2531,7 +2876,10 @@
       "attack": 12,
       "defense": 2
     },
-    "loot_table": [],
+    "loot_table": [
+      287,
+      211
+    ],
     "respawn": 30,
     "dialogue": [],
     "flags": [
@@ -2549,7 +2897,10 @@
       "attack": 20,
       "defense": 20
     },
-    "loot_table": [],
+    "loot_table": [
+      211,
+      271
+    ],
     "respawn": 60,
     "dialogue": [],
     "flags": [
@@ -2567,7 +2918,10 @@
       "attack": 25,
       "defense": 10
     },
-    "loot_table": [],
+    "loot_table": [
+      234,
+      211
+    ],
     "respawn": 60,
     "dialogue": [],
     "flags": [
@@ -2585,7 +2939,10 @@
       "attack": 18,
       "defense": 8
     },
-    "loot_table": [],
+    "loot_table": [
+      234,
+      271
+    ],
     "respawn": 45,
     "dialogue": [],
     "flags": [
@@ -2603,7 +2960,10 @@
       "attack": 30,
       "defense": 30
     },
-    "loot_table": [],
+    "loot_table": [
+      210,
+      287
+    ],
     "respawn": 120,
     "dialogue": [],
     "flags": [
@@ -2621,7 +2981,10 @@
       "attack": 40,
       "defense": 20
     },
-    "loot_table": [],
+    "loot_table": [
+      211,
+      234
+    ],
     "respawn": 120,
     "dialogue": [],
     "flags": [
@@ -2639,7 +3002,10 @@
       "attack": 45,
       "defense": 35
     },
-    "loot_table": [],
+    "loot_table": [
+      210,
+      234
+    ],
     "respawn": 180,
     "dialogue": [],
     "flags": [
@@ -2657,7 +3023,10 @@
       "attack": 50,
       "defense": 15
     },
-    "loot_table": [],
+    "loot_table": [
+      223,
+      271
+    ],
     "respawn": 240,
     "dialogue": [],
     "flags": [
@@ -2675,7 +3044,10 @@
       "attack": 3,
       "defense": 1
     },
-    "loot_table": [],
+    "loot_table": [
+      223,
+      211
+    ],
     "respawn": 15,
     "dialogue": [],
     "flags": [
@@ -2693,7 +3065,10 @@
       "attack": 5,
       "defense": 1
     },
-    "loot_table": [],
+    "loot_table": [
+      234,
+      287
+    ],
     "respawn": 15,
     "dialogue": [],
     "flags": [
@@ -2711,7 +3086,10 @@
       "attack": 10,
       "defense": 3
     },
-    "loot_table": [],
+    "loot_table": [
+      211,
+      234
+    ],
     "respawn": 30,
     "dialogue": [],
     "flags": [
@@ -2729,7 +3107,10 @@
       "attack": 14,
       "defense": 8
     },
-    "loot_table": [],
+    "loot_table": [
+      234,
+      271
+    ],
     "respawn": 45,
     "dialogue": [],
     "flags": [
@@ -2747,7 +3128,10 @@
       "attack": 20,
       "defense": 2
     },
-    "loot_table": [],
+    "loot_table": [
+      271,
+      223
+    ],
     "respawn": 45,
     "dialogue": [],
     "flags": [
@@ -2765,7 +3149,10 @@
       "attack": 18,
       "defense": 10
     },
-    "loot_table": [],
+    "loot_table": [
+      210,
+      211
+    ],
     "respawn": 60,
     "dialogue": [],
     "flags": [
@@ -2783,7 +3170,10 @@
       "attack": 12,
       "defense": 5
     },
-    "loot_table": [],
+    "loot_table": [
+      287,
+      223
+    ],
     "respawn": 30,
     "dialogue": [],
     "flags": [
@@ -2801,7 +3191,10 @@
       "attack": 30,
       "defense": 12
     },
-    "loot_table": [],
+    "loot_table": [
+      211,
+      210
+    ],
     "respawn": 90,
     "dialogue": [],
     "flags": [
@@ -2819,7 +3212,10 @@
       "attack": 16,
       "defense": 6
     },
-    "loot_table": [],
+    "loot_table": [
+      234,
+      287
+    ],
     "respawn": 60,
     "dialogue": [],
     "flags": [
@@ -2837,7 +3233,10 @@
       "attack": 22,
       "defense": 15
     },
-    "loot_table": [],
+    "loot_table": [
+      211,
+      234
+    ],
     "respawn": 75,
     "dialogue": [],
     "flags": [
@@ -2855,7 +3254,10 @@
       "attack": 28,
       "defense": 8
     },
-    "loot_table": [],
+    "loot_table": [
+      211,
+      223
+    ],
     "respawn": 90,
     "dialogue": [],
     "flags": [
@@ -2873,7 +3275,10 @@
       "attack": 35,
       "defense": 1
     },
-    "loot_table": [],
+    "loot_table": [
+      234,
+      211
+    ],
     "respawn": 60,
     "dialogue": [],
     "flags": [
@@ -2891,7 +3296,10 @@
       "attack": 32,
       "defense": 28
     },
-    "loot_table": [],
+    "loot_table": [
+      210,
+      223
+    ],
     "respawn": 120,
     "dialogue": [],
     "flags": [
@@ -2909,7 +3317,10 @@
       "attack": 42,
       "defense": 30
     },
-    "loot_table": [],
+    "loot_table": [
+      271,
+      211
+    ],
     "respawn": 180,
     "dialogue": [],
     "flags": [
@@ -4592,6 +5003,285 @@
       },
       {
         "text": "Rest here. Even spirits need rest.",
+        "conditions": []
+      }
+    ],
+    "flags": [
+      "npc"
+    ]
+  },
+  "101": {
+    "vnum": 101,
+    "name": "Straw Dummy",
+    "description": "A crude training dummy stuffed with straw. It doesn't fight back much.",
+    "hostile": false,
+    "stats": {
+      "hp": 20,
+      "max_hp": 20,
+      "attack": 1,
+      "defense": 0
+    },
+    "loot_table": [
+      100
+    ],
+    "respawn": 30,
+    "dialogue": [],
+    "flags": []
+  },
+  "102": {
+    "vnum": 102,
+    "name": "Tower Rat",
+    "description": "A large grey rat with beady red eyes. It hisses at your approach.",
+    "hostile": true,
+    "stats": {
+      "hp": 30,
+      "max_hp": 30,
+      "attack": 3,
+      "defense": 1
+    },
+    "loot_table": [
+      101
+    ],
+    "respawn": 30,
+    "dialogue": [],
+    "flags": [
+      "aggressive"
+    ]
+  },
+  "103": {
+    "vnum": 103,
+    "name": "Cave Spider",
+    "description": "A palm-sized spider with venomous-looking fangs.",
+    "hostile": true,
+    "stats": {
+      "hp": 35,
+      "max_hp": 35,
+      "attack": 5,
+      "defense": 2
+    },
+    "loot_table": [
+      102
+    ],
+    "respawn": 30,
+    "dialogue": [],
+    "flags": [
+      "aggressive"
+    ]
+  },
+  "105": {
+    "vnum": 105,
+    "name": "Feral Hound",
+    "description": "A scarred dog gone wild. It bares its teeth and circles you.",
+    "hostile": true,
+    "stats": {
+      "hp": 50,
+      "max_hp": 50,
+      "attack": 7,
+      "defense": 3
+    },
+    "loot_table": [
+      103
+    ],
+    "respawn": 30,
+    "dialogue": [],
+    "flags": [
+      "aggressive"
+    ]
+  },
+  "107": {
+    "vnum": 107,
+    "name": "Skeleton Sentry",
+    "description": "A reanimated skeleton clutching a rusted sword. It moves with jerky purpose.",
+    "hostile": true,
+    "stats": {
+      "hp": 60,
+      "max_hp": 60,
+      "attack": 9,
+      "defense": 5
+    },
+    "loot_table": [
+      112
+    ],
+    "respawn": 30,
+    "dialogue": [],
+    "flags": [
+      "aggressive"
+    ]
+  },
+  "108": {
+    "vnum": 108,
+    "name": "Goblin Archer",
+    "description": "A small green creature perched on a ledge, bow drawn.",
+    "hostile": true,
+    "stats": {
+      "hp": 45,
+      "max_hp": 45,
+      "attack": 12,
+      "defense": 3
+    },
+    "loot_table": [
+      113
+    ],
+    "respawn": 30,
+    "dialogue": [],
+    "flags": [
+      "aggressive"
+    ]
+  },
+  "110": {
+    "vnum": 110,
+    "name": "Tower Guardian",
+    "description": "A stone golem animated by faint magic. It blocks the stairs upward.",
+    "hostile": true,
+    "stats": {
+      "hp": 80,
+      "max_hp": 80,
+      "attack": 10,
+      "defense": 8
+    },
+    "loot_table": [
+      116
+    ],
+    "respawn": 30,
+    "dialogue": [],
+    "flags": [
+      "aggressive"
+    ]
+  },
+  "111": {
+    "vnum": 111,
+    "name": "Wind Wraith",
+    "description": "A translucent figure made of swirling air. It moans softly.",
+    "hostile": true,
+    "stats": {
+      "hp": 70,
+      "max_hp": 70,
+      "attack": 14,
+      "defense": 4
+    },
+    "loot_table": [
+      106
+    ],
+    "respawn": 30,
+    "dialogue": [],
+    "flags": [
+      "aggressive"
+    ]
+  },
+  "112": {
+    "vnum": 112,
+    "name": "Animated Tome",
+    "description": "A thick book that floats in the air, its pages fluttering with malice.",
+    "hostile": true,
+    "stats": {
+      "hp": 55,
+      "max_hp": 55,
+      "attack": 16,
+      "defense": 6
+    },
+    "loot_table": [
+      117
+    ],
+    "respawn": 30,
+    "dialogue": [],
+    "flags": [
+      "aggressive"
+    ]
+  },
+  "113": {
+    "vnum": 113,
+    "name": "Blood Slime",
+    "description": "A quivering mass of crimson ooze that absorbs everything it touches.",
+    "hostile": true,
+    "stats": {
+      "hp": 90,
+      "max_hp": 90,
+      "attack": 11,
+      "defense": 10
+    },
+    "loot_table": [
+      107
+    ],
+    "respawn": 30,
+    "dialogue": [],
+    "flags": [
+      "aggressive"
+    ]
+  },
+  "115": {
+    "vnum": 115,
+    "name": "Tower Champion",
+    "description": "A battle-scarred warrior in dented plate armor. The final test.",
+    "hostile": false,
+    "stats": {
+      "hp": 120,
+      "max_hp": 120,
+      "attack": 15,
+      "defense": 12
+    },
+    "loot_table": [
+      118,
+      119
+    ],
+    "respawn": 30,
+    "dialogue": [],
+    "flags": []
+  },
+  "120": {
+    "vnum": 120,
+    "name": "Instructor Kael",
+    "description": "A grizzled warrior with scars across both arms. He watches newcomers with a knowing eye.",
+    "hostile": false,
+    "stats": {
+      "hp": 500,
+      "max_hp": 500,
+      "attack": 50,
+      "defense": 50
+    },
+    "loot_table": [],
+    "respawn": 0,
+    "dialogue": [
+      {
+        "text": "You've done well to reach the summit. The real challenges lie beyond the gateways.",
+        "conditions": []
+      },
+      {
+        "text": "Remember: power comes from fighting, not from hiding. Seek worthy opponents.",
+        "conditions": []
+      },
+      {
+        "text": "The Bulletin Board always has work. Quest Points buy useful things at the Quest Shop.",
+        "conditions": []
+      }
+    ],
+    "flags": [
+      "npc"
+    ]
+  },
+  "121": {
+    "vnum": 121,
+    "name": "Quartermaster Pip",
+    "description": "A small, energetic gnome-like figure with oversized spectacles and ink-stained fingers.",
+    "hostile": false,
+    "stats": {
+      "hp": 200,
+      "max_hp": 200,
+      "attack": 1,
+      "defense": 1
+    },
+    "loot_table": [],
+    "respawn": 0,
+    "dialogue": [
+      {
+        "text": "Welcome to the Quest Shop! Everything here costs Quest Points.",
+        "conditions": []
+      },
+      {
+        "text": "Complete quests at the Bulletin Board to earn QP. The harder the quest, the better the reward!",
+        "conditions": []
+      },
+      {
+        "text": "I've got weapons, armor, potions, and a few... special items.",
         "conditions": []
       }
     ],
