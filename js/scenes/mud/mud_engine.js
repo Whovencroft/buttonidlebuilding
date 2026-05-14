@@ -74,6 +74,7 @@
         abilities: [],
         abilityCooldowns: {},
         chainProgress: {},
+        glimmeredDefs: {},  // Runtime cache: { [abilityId]: ability def } for chain evolutions
         focusCostModifier: 0,
         recallPoint: 1,
         coreStats: null
@@ -1171,13 +1172,32 @@
           output.push({ type: 'glimmer', text: 'A spark of brilliance! In the heat of battle, you discover something new!' });
           output.push({ type: 'glimmer', text: `Learned "${glimmered.name}"!` });
           output.push({ type: 'glimmer', text: '' });
-          // Add the discovered ability to the player's roster
-          player.abilities.push(glimmered.id);
-          // Update chain progress for chain evolutions
+          // Register the glimmered def so all systems can find it via getAbilityById
+          if (window.MudAbilities?.registerGlimmered) {
+            window.MudAbilities.registerGlimmered(glimmered);
+          }
+          // Also persist in player save so it survives reload
+          if (!player.glimmeredDefs) player.glimmeredDefs = {};
+          player.glimmeredDefs[glimmered.id] = glimmered;
+
+          // Chain evolutions REPLACE the previous rank in the abilities list
           if (glimmered.isChainEvolution || glimmered.chainBaseId) {
+            const baseId = glimmered.chainBaseId || window.MudGlimmer.getBaseAbilityId(glimmered.id);
+            // Find the previous rank to replace (base ability or earlier chain rank)
+            const prevIdx = player.abilities.findIndex(id =>
+              id === baseId || window.MudGlimmer.getBaseAbilityId(id) === baseId
+            );
+            if (prevIdx !== -1) {
+              player.abilities[prevIdx] = glimmered.id; // Replace in-place
+            } else {
+              player.abilities.push(glimmered.id); // No previous rank found, just add
+            }
             player.chainProgress = window.MudGlimmer.updateChainProgress(
               player.chainProgress || {}, glimmered
             );
+          } else {
+            // Non-chain glimmer — just add to the list
+            player.abilities.push(glimmered.id);
           }
           // The glimmered ability replaces the original for this attack
           activeDef = glimmered;
@@ -2097,6 +2117,10 @@
       }
       if (savedState.worldFlags) {
         Object.assign(player.worldFlags, savedState.worldFlags);
+      }
+      // Restore glimmered ability defs into the runtime cache
+      if (player.glimmeredDefs && window.MudAbilities?.loadGlimmeredDefs) {
+        window.MudAbilities.loadGlimmeredDefs(player.glimmeredDefs);
       }
       recalcStats();
     }

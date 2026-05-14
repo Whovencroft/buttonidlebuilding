@@ -1117,8 +1117,37 @@
     }
     return pool;
   }
-  /** Look up any ability by ID across all specs. */
+  /**
+   * Runtime cache for dynamically discovered abilities (chain evolutions).
+   * Populated by registerGlimmered() when a glimmer is learned.
+   * @type {Object<string, object>}
+   */
+  const _runtimeDefs = {};
+
+  /**
+   * Register a dynamically discovered ability (chain evolution / glimmer)
+   * so all systems can find it via getAbilityById / getAbilityByName.
+   * @param {object} def - The ability definition to cache
+   */
+  function registerGlimmered(def) {
+    if (def && def.id) _runtimeDefs[def.id] = def;
+  }
+
+  /**
+   * Bulk-load glimmered defs (e.g., from a save's glimmeredDefs map).
+   * @param {Object<string, object>} defs - Map of { [abilityId]: def }
+   */
+  function loadGlimmeredDefs(defs) {
+    if (!defs) return;
+    for (const [id, def] of Object.entries(defs)) {
+      _runtimeDefs[id] = def;
+    }
+  }
+
+  /** Look up any ability by ID across all specs + runtime cache. */
   function getAbilityById(abilityId) {
+    // Check runtime cache first (chain evolutions)
+    if (_runtimeDefs[abilityId]) return _runtimeDefs[abilityId];
     for (const classSpecs of Object.values(SPECS)) {
       for (const spec of Object.values(classSpecs)) {
         const found = spec.abilities.find(a => a.id === abilityId);
@@ -1127,14 +1156,22 @@
     }
     return null;
   }
-  /** Look up an ability by name (case-insensitive partial match). */
+  /** Look up an ability by name (case-insensitive partial match). Includes runtime cache. */
   function getAbilityByName(name) {
     const lower = name.toLowerCase();
+    // Check runtime cache first
+    for (const def of Object.values(_runtimeDefs)) {
+      if (def.name.toLowerCase() === lower) return def;
+    }
     for (const classSpecs of Object.values(SPECS)) {
       for (const spec of Object.values(classSpecs)) {
         const found = spec.abilities.find(a => a.name.toLowerCase() === lower);
         if (found) return found;
       }
+    }
+    // Partial match fallback
+    for (const def of Object.values(_runtimeDefs)) {
+      if (def.name.toLowerCase().includes(lower)) return def;
     }
     for (const classSpecs of Object.values(SPECS)) {
       for (const spec of Object.values(classSpecs)) {
@@ -1165,6 +1202,8 @@
     getCrossClassPool,
     getAbilityById,
     getAbilityByName,
-    getAbilityCost
+    getAbilityCost,
+    registerGlimmered,
+    loadGlimmeredDefs
   };
 })();
