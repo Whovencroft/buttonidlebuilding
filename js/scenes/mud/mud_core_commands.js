@@ -297,14 +297,30 @@
         name: 'quest',
         aliases: ['quests', 'journal', 'log'],
         category: 'Progression',
-        help: 'View quest log or accept/complete',
-        usage: 'quest [name]',
+        help: 'View quest log or interact with the Bulletin Board',
+        usage: 'quest [accept|board|name]',
         subcommands: {
           accept: (parsed, ctx) => fn.doQuest('accept ' + parsed.subTarget),
           complete: (parsed, ctx) => fn.doQuest('complete ' + parsed.subTarget),
-          list: (parsed, ctx) => fn.doQuest('list')
+          list: (parsed, ctx) => fn.doQuest('list'),
+          /** Redirect 'quest board' to the bulletin board system. */
+          board: () => {
+            if (!window.MudCommands) return [{ type: 'error', text: 'Command system unavailable.' }];
+            return window.MudCommands.execute(
+              { verb: 'board', target: '', args: [], raw: 'board' },
+              { inCombat: false, currentRoom: engine._internals.player.currentRoom }
+            );
+          }
         },
-        handler: (parsed) => fn.doQuest(parsed.target)
+        /** Show quest log; if empty, hint toward the Bulletin Board. */
+        handler: (parsed) => {
+          const result = fn.doQuest(parsed.target);
+          // If the quest log is empty, also mention the board
+          if (result && result.length === 1 && result[0].text?.includes('empty')) {
+            result.push({ type: 'info', text: "Tip: Use 'board' at the Bulletin Board to get procedural quests." });
+          }
+          return result;
+        }
       }
     ]);
 

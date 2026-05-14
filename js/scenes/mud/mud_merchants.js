@@ -126,6 +126,7 @@
   // Maps room vnum ranges to sector keys for default shop generation.
   const VNUM_TO_SECTOR = [
     { min: 1,    max: 99,   sector: 'nexus' },
+    { min: 100,  max: 199,  sector: 'training_grounds' },
     { min: 1000, max: 1199, sector: 'shattered_crown' },
     { min: 1200, max: 1399, sector: 'neon_grid' },
     { min: 1400, max: 1599, sector: 'midnight_rain' },
@@ -176,7 +177,8 @@
     // NPCs whose name/keywords suggest they sell things
     const merchantNames = ['merchant', 'vendor', 'shopkeeper', 'trader',
       'peddler', 'dealer', 'hawker', 'seller', 'smith', 'blacksmith',
-      'armorer', 'apothecary', 'alchemist', 'doc', 'medic'];
+      'armorer', 'apothecary', 'alchemist', 'doc', 'medic',
+      'bartender', 'barkeep', 'innkeeper', 'quartermaster', 'fletcher'];
     const nameLC = (mob.name || '').toLowerCase();
     const isMerchantByName = merchantNames.some(n => nameLC.includes(n));
     if (!isMerchant && !isMerchantByName) return null;

@@ -299,9 +299,14 @@
     /** Process a player command through the engine. */
     function handleCommand(input) {
       if (!engine || !ui) return;
-      const result = engine.execute(input);
-      ui.appendOutput(result);
-      ui.updateContext(engine.getContext());
+      try {
+        const result = engine.execute(input);
+        ui.appendOutput(result);
+        ui.updateContext(engine.getContext());
+      } catch (err) {
+        console.error('[MUD] Command error:', err);
+        ui.appendOutput([{ type: 'error', text: `Something went wrong: ${err.message}` }]);
+      }
     }
 
     // ─── Scene Contract ──────────────────────────────────────────────────────

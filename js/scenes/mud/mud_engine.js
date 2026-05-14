@@ -686,6 +686,8 @@
     /** Auto-save interval tracker (saves every 60 seconds of play). */
     let autoSaveTimer = 0;
     const AUTO_SAVE_INTERVAL = 60;
+    let focusRegenTimer = 0;
+    const FOCUS_REGEN_INTERVAL = 5; // seconds between passive focus ticks
 
     /**
      * Write a note in the current room (max 280 chars).
@@ -1537,6 +1539,17 @@
       if (autoSaveTimer >= AUTO_SAVE_INTERVAL) {
         autoSaveTimer = 0;
         autoSave();
+      }
+
+      // Passive focus regen when out of combat
+      if (!combatState && player.focus < player.maxFocus) {
+        focusRegenTimer += dt;
+        if (focusRegenTimer >= FOCUS_REGEN_INTERVAL) {
+          focusRegenTimer -= FOCUS_REGEN_INTERVAL;
+          player.focus = Math.min(player.maxFocus, player.focus + 1);
+        }
+      } else if (combatState) {
+        focusRegenTimer = 0;
       }
 
       if (!combatState) return;
