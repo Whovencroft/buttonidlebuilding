@@ -854,18 +854,53 @@
       const tiers = window.MudAbilities?.POWER_TIERS || [10, 25, 50, 100];
       const currentTier = tiers.filter(t => player.power >= t).length;
       const nextTier = tiers[currentTier] || 'MAX';
-
-      return [
-        { type: 'info', text: '─── Status ───' },
+      const output = [
+        { type: 'info', text: '═══ Character Status ═══' },
+        { type: 'info', text: '' },
         { type: 'info', text: `  Path:         ${spec?.name || player.specName || 'None'}` },
         { type: 'info', text: `  Power:        ${player.power}${nextTier !== 'MAX' ? ` (next tier at ${nextTier})` : ' (MAX TIER)'}` },
         { type: 'info', text: `  Quest Points: ${player.questPoints}` },
-        { type: 'info', text: `  Focus:        ${player.focus}/${player.maxFocus}` },
+        { type: 'info', text: `  Gold:         ${player.gold}` },
+        { type: 'info', text: '' },
+        { type: 'info', text: '─── Vitals ───' },
         { type: 'info', text: `  HP:           ${player.hp}/${player.maxHp}` },
+        { type: 'info', text: `  Focus:        ${player.focus}/${player.maxFocus}` },
         { type: 'info', text: `  Attack:       ${player.attackPower}` },
         { type: 'info', text: `  Defense:      ${player.defense}` },
-        { type: 'info', text: `  Gold:         ${player.gold}` }
       ];
+      // Core stats (Vigor, Precision, Grit, Instinct)
+      const cs = player.coreStats;
+      if (cs && window.MudStats) {
+        const d = player._derived || {};
+        output.push({ type: 'info', text: '' });
+        output.push({ type: 'info', text: '─── Attributes ───' });
+        output.push({ type: 'info', text: `  Vigor:      ${cs.vigor?.level || 1}  (+${((cs.vigor?.level || 1) * 3)} max HP, +${(((cs.vigor?.level || 1) * 0.5).toFixed(1))} HP/tick regen)` });
+        output.push({ type: 'info', text: `  Precision:  ${cs.precision?.level || 1}  (${((d.critChance || 0.01) * 100).toFixed(1)}% crit, ${((d.damageFloor || 0.5) * 100).toFixed(0)}% dmg floor)` });
+        output.push({ type: 'info', text: `  Grit:       ${cs.grit?.level || 1}  (+${(((cs.grit?.level || 1) * 1.5).toFixed(0))} defense, ${((d.bigHitReduction || 0) * 100).toFixed(0)}% big-hit reduction)` });
+        output.push({ type: 'info', text: `  Instinct:   ${cs.instinct?.level || 1}  (${((d.dodgeChance || 0) * 100).toFixed(1)}% dodge, +${(d.initiativeBonus || 0)} initiative)` });
+        // XP progress bars
+        output.push({ type: 'info', text: '' });
+        output.push({ type: 'info', text: '─── Growth ───' });
+        const statNames = ['vigor', 'precision', 'grit', 'instinct'];
+        for (const name of statNames) {
+          const stat = cs[name] || { level: 1, xp: 0 };
+          const needed = window.MudStats.xpForLevel ? window.MudStats.xpForLevel(stat.level) : (25 * (1 + (stat.level - 1) * 0.35));
+          const pct = Math.min(100, Math.floor((stat.xp / needed) * 100));
+          const filled = Math.floor(pct / 10);
+          const bar = '█'.repeat(filled) + '░'.repeat(10 - filled);
+          output.push({ type: 'info', text: `  ${name.charAt(0).toUpperCase() + name.slice(1).padEnd(10)} ${String(stat.level).padStart(3)}  ${bar} ${pct}%` });
+        }
+      }
+      // Title if available
+      if (player.title) {
+        output.push({ type: 'info', text: '' });
+        output.push({ type: 'info', text: `  Title: ${player.title}` });
+      }
+      // Karma if tracked
+      if (player.karma !== undefined && player.karma !== 0) {
+        output.push({ type: 'info', text: `  Karma: ${player.karma}` });
+      }
+      return output;
     }
 
     /**

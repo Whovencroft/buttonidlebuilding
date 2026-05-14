@@ -125,9 +125,22 @@
         name: 'say',
         aliases: ['speak'],
         category: 'Interaction',
-        help: 'Say something aloud',
+        help: 'Say something aloud — NPCs may respond to keywords',
         usage: 'say <message>',
-        handler: (parsed) => [{ type: 'info', text: `You say: "${parsed.target}"` }]
+        handler: (parsed) => {
+          const msg = parsed.raw.replace(/^(say|speak)\s*/i, '');
+          if (!msg) return [{ type: 'info', text: 'Say what?' }];
+          // Use NPC response system if available
+          if (window.MudNpcSay && engine._internals) {
+            const room = engine._internals.rooms[engine._internals.player.currentRoom];
+            const aliveMobs = engine._internals.getAliveMobsInRoom(room);
+            const allMobs = engine._internals.mobs;
+            const player = engine._internals.player;
+            const quests = window.MudData ? window.MudData.quests : {};
+            return window.MudNpcSay.processSay(msg, aliveMobs, allMobs, player, player.currentRoom, quests);
+          }
+          return [{ type: 'info', text: `You say: "${msg}"` }];
+        }
       }
     ]);
 
@@ -202,9 +215,23 @@
         name: 'buy',
         aliases: ['purchase'],
         category: 'Progression',
-        help: 'Purchase an ability with QP',
+        help: 'Buy an ability (QP) or item from a merchant (gold)',
         usage: 'buy <name|number>',
-        handler: (parsed) => fn.doBuy(parsed.target)
+        handler: (parsed) => {
+          // Check if there's a merchant in the room first
+          if (window.MudMerchants && engine._internals) {
+            const room = engine._internals.rooms[engine._internals.player.currentRoom];
+            const aliveMobs = engine._internals.getAliveMobsInRoom(room);
+            const allMobs = engine._internals.mobs;
+            const player = engine._internals.player;
+            const merchant = window.MudMerchants.findMerchantInRoom(aliveMobs, allMobs, player.currentRoom);
+            if (merchant) {
+              return window.MudMerchants.processBuy(parsed.target, merchant.shop, merchant.mob, player);
+            }
+          }
+          // Fallback to ability purchase
+          return fn.doBuy(parsed.target);
+        }
       },
       {
         name: 'respec',
@@ -265,11 +292,46 @@
       },
       {
         name: 'shop',
-        aliases: ['market', 'marketplace'],
+        aliases: ['market', 'marketplace', 'wares'],
         category: 'Social',
-        help: 'Browse the marketplace',
+        help: 'Browse a local merchant or the marketplace',
         usage: 'shop [id]',
-        handler: (parsed) => fn.doShop(parsed.target)
+        handler: (parsed) => {
+          // Check for local merchant first
+          if (window.MudMerchants && engine._internals) {
+            const room = engine._internals.rooms[engine._internals.player.currentRoom];
+            const aliveMobs = engine._internals.getAliveMobsInRoom(room);
+            const allMobs = engine._internals.mobs;
+            const player = engine._internals.player;
+            const merchant = window.MudMerchants.findMerchantInRoom(aliveMobs, allMobs, player.currentRoom);
+            if (merchant) {
+              return window.MudMerchants.formatShopListing(merchant.mob, merchant.shop, player.gold);
+            }
+          }
+          // Fallback to server marketplace
+          return fn.doShop(parsed.target);
+        }
+      },
+      {
+        name: 'sell',
+        aliases: [],
+        category: 'Social',
+        help: 'Sell an item to a local merchant',
+        usage: 'sell <item>',
+        handler: (parsed) => {
+          if (!window.MudMerchants || !engine._internals) {
+            return [{ type: 'error', text: 'There is no merchant here.' }];
+          }
+          const room = engine._internals.rooms[engine._internals.player.currentRoom];
+          const aliveMobs = engine._internals.getAliveMobsInRoom(room);
+          const allMobs = engine._internals.mobs;
+          const player = engine._internals.player;
+          const merchant = window.MudMerchants.findMerchantInRoom(aliveMobs, allMobs, player.currentRoom);
+          if (!merchant) {
+            return [{ type: 'error', text: 'There is no merchant here to sell to.' }];
+          }
+          return window.MudMerchants.processSell(parsed.target, merchant.mob, player);
+        }
       }
     ]);
 

@@ -47,6 +47,7 @@
           <div class="mud-status-bar" id="mudStatusBar">
             <span class="mud-hp" id="mudHpBar">HP: --/--</span>
             <span class="mud-focus" id="mudFocusBar">Focus: --/--</span>
+            <span class="mud-power" id="mudPowerBar">Power: --</span>
             <span class="mud-room" id="mudRoomName">Unknown</span>
           </div>
           <div class="mud-actions" id="mudActions"></div>
@@ -328,10 +329,12 @@
       // Update status bar
       const hpEl = root.querySelector('#mudHpBar');
       const focusEl = root.querySelector('#mudFocusBar');
+      const powerEl = root.querySelector('#mudPowerBar');
       const roomEl = root.querySelector('#mudRoomName');
 
       if (hpEl) hpEl.textContent = `HP: ${ctx.hp}/${ctx.maxHp}`;
       if (focusEl) focusEl.textContent = `Focus: ${ctx.focus ?? '--'}/${ctx.maxFocus ?? '--'}`;
+      if (powerEl) powerEl.textContent = `Power: ${ctx.power ?? '--'}`;
       if (roomEl) roomEl.textContent = ctx.roomName;
 
       if (!actionsEl) return;
