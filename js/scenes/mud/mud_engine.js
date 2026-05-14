@@ -29,6 +29,7 @@
     let player = createDefaultPlayer();
     let combatState = null;
     let combatTimer = 0;
+    let combatTick = 0;
 
     const COMBAT_TICK_INTERVAL = 2.5; // seconds per auto-attack round
 
@@ -72,6 +73,7 @@
         specName: null,
         abilities: [],
         abilityCooldowns: {},
+        chainProgress: {},
         focusCostModifier: 0,
         recallPoint: 1,
         coreStats: null
@@ -1159,6 +1161,40 @@
       }
 
       output.push({ type: 'info', text: `[Focus: ${player.focus}/${player.maxFocus}]` });
+      // ── Glimmer Roll: check for ability discovery after use ──
+      if (window.MudGlimmer && combatState) {
+        const mob = mobs[combatState.mobVnum];
+        const mobPower = mob ? (mob.stats?.power || mob.stats?.hp || 100) : 100;
+        const glimmered = window.MudGlimmer.rollForGlimmer({
+          usedAbilityId: abilityId,
+          baseClass: player.baseClass,
+          specId: player.specialization,
+          ownedAbilities: player.abilities,
+          playerPower: player.power,
+          mobPower: mobPower,
+          combatTick: combatTick,
+          proficiency: player.proficiency || {},
+          coreStats: player.coreStats || {},
+          chainProgress: player.chainProgress || {}
+        });
+        if (glimmered) {
+          // Add the discovered ability to the player's roster
+          player.abilities.push(glimmered.id);
+          // Update chain progress if it's a chain ability
+          if (glimmered.chainFamily) {
+            player.chainProgress = window.MudGlimmer.updateChainProgress(
+              player.chainProgress || {}, glimmered
+            );
+          }
+          // Show the dramatic discovery message
+          const msgs = window.MudGlimmer.getGlimmerMessage(
+            player.specName || 'You', def.name, glimmered
+          );
+          for (const m of msgs) {
+            output.push({ type: 'glimmer', text: m });
+          }
+        }
+      }
       return output;
     }
 
@@ -1450,7 +1486,8 @@
 
       if (!combatState) return;
 
-      combatTimer += dt;  // dt is already in seconds from host frame loop
+      combatTimer += dt;
+        combatTick++;  // dt is already in seconds from host frame loop
       if (combatTimer < COMBAT_TICK_INTERVAL) return;
       combatTimer -= COMBAT_TICK_INTERVAL;
 
@@ -1995,6 +2032,7 @@
       get mobs() { return mobs; },
       /** Direct reference to combatState for invasion checks. */
       get combatState() { return combatState; },
+        get combatTick() { return combatTick; },
       /** Direct reference to player for invasion stat reads. */
       get player() { return player; }
     };
