@@ -428,6 +428,42 @@
       }
     });
 
+    // ─── Character Reset ──────────────────────────────────────────────
+    window.MudCommands.register({
+      name: 'reset',
+      aliases: ['deletechar'],
+      category: 'System',
+      help: 'Permanently delete your character and start over',
+      usage: 'reset confirm',
+      handler: (parsed) => {
+        if (parsed.target !== 'confirm') {
+          return [
+            { type: 'error', text: '═══ CHARACTER RESET ═══' },
+            { type: 'error', text: 'This will PERMANENTLY delete your character,' },
+            { type: 'error', text: 'all progress, items, and abilities.' },
+            { type: 'info', text: '' },
+            { type: 'info', text: "Type 'reset confirm' to proceed." },
+            { type: 'info', text: 'There is no undo.' }
+          ];
+        }
+        // Wipe the server save and reload
+        const output = [
+          { type: 'info', text: 'Erasing character data...' },
+          { type: 'info', text: 'The world dissolves around you...' }
+        ];
+        if (window.MudAPI?.isLoggedIn()) {
+          window.MudAPI.storeSave({}).then(() => {
+            setTimeout(() => location.reload(), 800);
+          }).catch(() => {
+            setTimeout(() => location.reload(), 800);
+          });
+        } else {
+          setTimeout(() => location.reload(), 800);
+        }
+        return output;
+      }
+    });
+
     return engine;
   };
 })();
