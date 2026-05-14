@@ -739,6 +739,10 @@
             restTimer -= window.MudRest.REST_TICK_INTERVAL;
             const result = window.MudRest.processRegenTick(playerState);
             if (result) {
+              // Persist mutated hp/focus/restState back to the real player
+              setPlayerField('hp', playerState.hp);
+              setPlayerField('focus', playerState.focus);
+              setPlayerField('restState', playerState.restState);
               engine._pendingSystemOutput = (engine._pendingSystemOutput || []).concat(result);
             }
           }

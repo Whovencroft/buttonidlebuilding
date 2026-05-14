@@ -349,7 +349,7 @@
 
       const vnum = player.inventory[idx];
       const item = items[vnum];
-      const slot = item?.stats?.slot || (item?.type === 'weapon' ? 'weapon' : null);
+      const slot = item?.slot || (item?.type === 'weapon' ? 'weapon' : null);
       if (!slot) {
         return [{ type: 'error', text: `You can't wear that.` }];
       }
@@ -1534,6 +1534,9 @@
      * Called each frame. Handles combat auto-attack ticks.
      */
     function update(dt) {
+      // Advance engine clock for mob respawn tracking
+      engineClock += dt;
+
       // Auto-save timer (runs even outside combat)
       autoSaveTimer += dt;  // dt is already in seconds from host frame loop
       if (autoSaveTimer >= AUTO_SAVE_INTERVAL) {
@@ -1978,15 +1981,25 @@
       takenItems[key] = true;
     }
 
-    // Track defeated mobs
-    const defeatedMobs = new Set();
+    // Track defeated mobs with timed respawn
+    const MOB_RESPAWN_TIME = 60; // seconds until a defeated mob respawns
+    const defeatedMobs = new Map(); // vnum -> defeatTime (seconds since engine start)
+    let engineClock = 0; // running clock in seconds
 
+    /** Check if a mob is currently defeated (not yet respawned). */
     function isMobDefeated(vnum) {
-      return defeatedMobs.has(vnum);
+      if (!defeatedMobs.has(vnum)) return false;
+      const elapsed = engineClock - defeatedMobs.get(vnum);
+      if (elapsed >= MOB_RESPAWN_TIME) {
+        defeatedMobs.delete(vnum); // respawned
+        return false;
+      }
+      return true;
     }
 
+    /** Mark a mob as defeated at the current engine clock time. */
     function markMobDefeated(vnum) {
-      defeatedMobs.add(vnum);
+      defeatedMobs.set(vnum, engineClock);
     }
 
     /**
@@ -2066,7 +2079,18 @@
       if (!savedState || !savedState.player) return;
       Object.assign(player, savedState.player);
       if (savedState.defeatedMobs) {
-        savedState.defeatedMobs.forEach(v => defeatedMobs.add(v));
+        // Support both old Set format (array of vnums) and new Map format (array of [vnum, remainingTime])
+        if (Array.isArray(savedState.defeatedMobs)) {
+          for (const entry of savedState.defeatedMobs) {
+            if (Array.isArray(entry)) {
+              // New format: [vnum, remainingSeconds] — schedule relative to current clock
+              defeatedMobs.set(entry[0], engineClock - (MOB_RESPAWN_TIME - entry[1]));
+            } else {
+              // Old format: just a vnum — treat as freshly defeated
+              defeatedMobs.set(entry, engineClock);
+            }
+          }
+        }
       }
       if (savedState.takenItems) {
         Object.assign(takenItems, savedState.takenItems);
@@ -2080,7 +2104,10 @@
     function getSaveSlice() {
       return {
         player: { ...player },
-        defeatedMobs: [...defeatedMobs],
+        // Save as [vnum, remainingSeconds] pairs for respawn persistence
+        defeatedMobs: [...defeatedMobs.entries()]
+          .filter(([v, t]) => engineClock - t < MOB_RESPAWN_TIME)
+          .map(([v, t]) => [v, Math.max(0, MOB_RESPAWN_TIME - (engineClock - t))]),
         takenItems: { ...takenItems }
       };
     }

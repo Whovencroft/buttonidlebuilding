@@ -52,18 +52,15 @@
    * @returns {string} A hint sentence
    */
   function buildMobHint(mobVnum, rooms, mob) {
-    // Try to find a room that spawns this mob
+    // Try to find a room that spawns this mob and use its name
     for (const [rvnum, room] of Object.entries(rooms)) {
       const spawns = room.mob_spawns || room.mobs || [];
       if (spawns.includes(mobVnum) || spawns.includes(Number(mobVnum))) {
-        const zone = room.zone_name || room.zone || '';
-        if (zone) return `Rumor has it they lurk in ${zone}.`;
-        return `They were last seen near ${room.name || 'an unknown area'}.`;
+        const roomName = room.name || 'an unknown area';
+        return `They were last seen near ${roomName}.`;
       }
     }
-    // Fallback: use mob's own zone tag if present
-    if (mob.zone) return `They are said to roam ${mob.zone}.`;
-    return 'Their whereabouts are uncertain — explore and ask around.';
+    return 'Their whereabouts are uncertain \u2014 explore and ask around.';
   }
 
   /**
@@ -73,9 +70,8 @@
    * @returns {string}
    */
   function buildItemHint(zoneName, roomName) {
-    if (zoneName) return `It was last seen somewhere in ${zoneName}.`;
-    if (roomName) return `Try looking near ${roomName}.`;
-    return 'Search the world — it could be anywhere.';
+    if (roomName) return `It was last seen near ${roomName}.`;
+    return 'Search the world \u2014 it could be anywhere.';
   }
 
   /* ─── Quest generation ──────────────────────────────────────────────────── */
