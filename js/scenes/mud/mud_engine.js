@@ -5,90 +5,9 @@
  * Exposes a simple interface: create(), execute(input), update(dt), getSaveSlice().
  */
 (() => {
-  // ─── Parser ────────────────────────────────────────────────────────────────
-
-  const STOP_WORDS = new Set(['the', 'a', 'an', 'to', 'at', 'in', 'on', 'with', 'from', 'is', 'it']);
-
-  const DIRECTION_ALIASES = {
-    n: 'north', s: 'south', e: 'east', w: 'west',
-    u: 'up', d: 'down',
-    north: 'north', south: 'south', east: 'east', west: 'west',
-    up: 'up', down: 'down',
-    ne: 'northeast', nw: 'northwest', se: 'southeast', sw: 'southwest',
-    northeast: 'northeast', northwest: 'northwest', southeast: 'southeast', southwest: 'southwest'
-  };
-
-  const VERB_ALIASES = {
-    go: 'go', walk: 'go', move: 'go', head: 'go',
-    look: 'look', l: 'look', examine: 'look', x: 'look', read: 'look',
-    take: 'take', get: 'take', grab: 'take', pick: 'take',
-    drop: 'drop', leave: 'drop', discard: 'drop',
-    inventory: 'inventory', i: 'inventory', inv: 'inventory', bag: 'inventory',
-    equipment: 'equipment', eq: 'equipment', worn: 'equipment',
-    wear: 'wear', equip: 'wear', wield: 'wear',
-    remove: 'unequip', unequip: 'unequip', takeoff: 'unequip',
-    use: 'use', activate: 'use', pull: 'use', push: 'use',
-    attack: 'attack', kill: 'attack', hit: 'attack', fight: 'attack',
-    flee: 'flee', run: 'flee', escape: 'flee',
-    say: 'say', speak: 'say',
-    talk: 'talk', ask: 'talk', chat: 'talk',
-    help: 'help', '?': 'help', commands: 'help',
-    quest: 'quest', quests: 'quest', journal: 'quest', log: 'quest',
-    write: 'write', note: 'write', notes: 'readnotes',
-    shop: 'shop', market: 'shop', marketplace: 'shop',
-    combine: 'combine', merge: 'combine', craft: 'combine',
-    rotate: 'rotate', turn: 'rotate', spin: 'rotate',
-    train: 'train', learn: 'train',
-    abilities: 'abilities', skills: 'abilities', spells: 'abilities',
-    status: 'status', stat: 'status', stats: 'status', power: 'status', score: 'status',
-    buy: 'buy', purchase: 'buy',
-    respec: 'respec',
-    recall: 'recall', warp: 'recall', home: 'recall',
-    setrecall: 'setrecall', bind: 'setrecall', sethome: 'setrecall',
-    // New system commands (handled by mud_systems_integration.js)
-    sense: 'sense', scan: 'sense',
-    rest: 'rest', sleep: 'sleep', wake: 'wake', stand: 'wake',
-    stance: 'stance', stances: 'stance',
-    suppress: 'suppress',
-    transform: 'transform', henshin: 'transform', bankai: 'transform', ascend: 'transform',
-    detransform: 'detransform', revert: 'detransform', powerdown: 'detransform',
-    class: 'class',
-    mission: 'mission', missions: 'mission', bounty: 'mission', bounties: 'mission',
-    echo: 'echo', echoes: 'echo',
-    release: 'release',
-    cancel: 'cancel',
-    proficiency: 'proficiency', prof: 'proficiency',
-    title: 'title', titles: 'title'
-  };
-
-  /**
-   * Tokenize and normalize raw input into verb + target tokens.
-   * Preserves multi-word targets for item/puzzle matching.
-   */
-  function parse(input) {
-    const cleaned = input.toLowerCase().replace(/[.,!?;:'"]/g, '').trim();
-    const tokens = cleaned.split(/\s+/).filter(t => !STOP_WORDS.has(t));
-
-    if (tokens.length === 0) return { verb: null, target: '' };
-
-    const firstToken = tokens[0];
-
-    // Check if the entire input is a direction (shortcut for movement)
-    if (DIRECTION_ALIASES[firstToken] && tokens.length === 1) {
-      return { verb: 'go', target: DIRECTION_ALIASES[firstToken] };
-    }
-
-    const verb = VERB_ALIASES[firstToken] || null;
-    const targetTokens = tokens.slice(1);
-
-    // If verb is 'go', resolve the direction from the target
-    if (verb === 'go' && targetTokens.length > 0) {
-      const dir = DIRECTION_ALIASES[targetTokens[0]];
-      if (dir) return { verb: 'go', target: dir };
-    }
-
-    return { verb, target: targetTokens.join(' ') };
-  }
+  // ─── Parser (delegates to MudParser + MudCommands) ─────────────────────────
+  // The old flat VERB_ALIASES and STOP_WORDS are replaced by mud_parser.js
+  // and mud_commands.js. This section only keeps deriveKeywords for entity matching.
 
   /**
    * Derive searchable keywords from an item or mob name.
@@ -166,49 +85,42 @@
     }
 
     /**
-     * Execute a parsed command and return output lines.
+     * Execute a command through the unified registry pipeline.
+     * Flow: MudParser.parse → MudCommands.execute → fallback to ability match.
      */
     function execute(input) {
-      const { verb, target } = parse(input);
+      // Use the new parser if available, otherwise basic fallback
+      const parsed = window.MudParser
+        ? window.MudParser.parse(input)
+        : { verb: null, target: input.trim().toLowerCase(), args: [], raw: input };
 
-      // If no recognized verb, check if the full input matches an ability name
-      if (!verb) {
-        const abilityResult = tryUseAbilityByName(input.trim().toLowerCase());
-        if (abilityResult) return abilityResult;
-        return [{ type: 'error', text: "I don't understand that. Type 'help' for commands." }];
+      // Build context for the command registry
+      const ctx = {
+        inCombat: !!combatState,
+        currentRoom: player.currentRoom,
+        player,
+        combatState,
+        rooms,
+        mobs,
+        items,
+        quests
+      };
+
+      // Try the unified command registry first
+      if (parsed.verb && window.MudCommands) {
+        const result = window.MudCommands.execute(parsed, ctx);
+        if (result) return result;
       }
 
-      switch (verb) {
-        case 'go': return doGo(target);
-        case 'look': return doLook(target);
-        case 'take': return doTake(target);
-        case 'drop': return doDrop(target);
-        case 'inventory': return doInventory();
-        case 'equipment': return doEquipment();
-        case 'wear': return doWear(target);
-        case 'unequip': return doUnequip(target);
-        case 'use': return doUse(target);
-        case 'attack': return doAttack(target);
-        case 'flee': return doFlee();
-        case 'talk': return doTalk(target);
-        case 'combine': return doCombine(target);
-        case 'rotate': return doRotate(target);
-        case 'quest': return doQuest(target);
-        case 'train': return doTrain(target);
-        case 'abilities': return doAbilities();
-        case 'status': return doStatus();
-        case 'buy': return doBuy(target);
-        case 'respec': return doRespec(target);
-        case 'recall': return doRecall();
-        case 'setrecall': return doSetRecall();
-        case 'help': return doHelp();
-        case 'say': return [{ type: 'info', text: `You say: "${target}"` }];
-        case 'write': return doWrite(target);
-        case 'readnotes': return doReadNotes();
-        case 'shop': return doShop(target);
-        default:
-          return [{ type: 'error', text: `Unknown command: '${verb}'. Type 'help' for a list.` }];
+      // Fallback: check if the full input matches an ability name (combat)
+      const abilityResult = tryUseAbilityByName(input.trim().toLowerCase());
+      if (abilityResult) return abilityResult;
+
+      // Nothing matched
+      if (parsed.verb) {
+        return [{ type: 'error', text: `Unknown command: '${parsed.verb}'. Type 'help' for a list.` }];
       }
+      return [{ type: 'error', text: "I don't understand that. Type 'help' for commands." }];
     }
 
     // ─── Command Implementations ─────────────────────────────────────────────
@@ -738,54 +650,19 @@
       return [{ type: 'success', text: `Recall point set to: ${room.name}` }];
     }
 
+    /**
+     * Dynamic help — pulls from the command registry if available,
+     * otherwise shows a static fallback.
+     */
     function doHelp() {
+      // If the registry is loaded, generate help from registered commands
+      if (window.MudCommands) {
+        return window.MudCommands.generateHelp();
+      }
+      // Fallback (should never hit if scripts load correctly)
       return [
         { type: 'info', text: '─── Available Commands ───' },
-        { type: 'info', text: '  go <direction>       — Move (n/s/e/w/u/d)' },
-        { type: 'info', text: '  look [target]        — Examine room or object' },
-        { type: 'info', text: '  take <item>          — Pick up an item' },
-        { type: 'info', text: '  drop <item>          — Drop an item' },
-        { type: 'info', text: '  inventory            — List carried items' },
-        { type: 'info', text: '  equipment            — List worn gear' },
-        { type: 'info', text: '  wear <item>          — Equip an item' },
-        { type: 'info', text: '  remove <item>        — Unequip an item' },
-        { type: 'info', text: '  use <object>         — Interact with something' },
-        { type: 'info', text: '  combine <a> <b>      — Combine two items' },
-        { type: 'info', text: '  rotate <obj> <dir>   — Rotate a puzzle object' },
-        { type: 'info', text: '  talk <npc>           — Speak to an NPC' },
-        { type: 'info', text: '  attack [target]      — Start combat' },
-        { type: 'info', text: '  flee                 — Attempt to escape combat' },
-        { type: 'info', text: '  recall               — Warp to your save point' },
-        { type: 'info', text: '  setrecall            — Set current room as save point' },
-        { type: 'info', text: '  <ability name>       — Use an ability in combat' },
-        { type: 'info', text: '  abilities            — List your abilities' },
-        { type: 'info', text: '  status               — View power, QP, and stats' },
-        { type: 'info', text: '  train                — See purchasable abilities (Training Hall)' },
-        { type: 'info', text: '  buy <name>           — Purchase an ability with QP' },
-        { type: 'info', text: '  respec               — Change specialization (30 QP)' },
-        { type: 'info', text: '  quest [name]         — View quest log or accept/complete' },
-        { type: 'info', text: '  write <message>      — Leave a note in this room' },
-        { type: 'info', text: '  notes                — Read notes left by other players' },
-        { type: 'info', text: '  shop                 — Browse the marketplace' },
-        { type: 'info', text: '  help                 — Show this list' },
-        { type: 'info', text: '─── New Systems ───' },
-        { type: 'info', text: '  sense [target]       — Gauge creature strength' },
-        { type: 'info', text: '  rest / sleep         — Recover HP and Focus' },
-        { type: 'info', text: '  wake                 — Stand up from rest' },
-        { type: 'info', text: '  stance [name]        — View or change combat stance' },
-        { type: 'info', text: '  suppress <percent>   — Suppress power for training' },
-        { type: 'info', text: '  transform            — Activate transformation (secret class)' },
-        { type: 'info', text: '  detransform          — Revert transformation' },
-        { type: 'info', text: '  class                — View secret class info' },
-        { type: 'info', text: '  mission              — View bounty board' },
-        { type: 'info', text: '  echo                 — Interact with death echoes' },
-        { type: 'info', text: '  proficiency          — View ability mastery levels' },
-        { type: 'info', text: '  title                — View your current title' },
-        { type: 'info', text: '─── Shortcuts ───' },
-        { type: 'info', text: '  n/s/e/w/u/d          — Move in that direction' },
-        { type: 'info', text: '  l                    — Look around' },
-        { type: 'info', text: '  i                    — Inventory' },
-        { type: 'info', text: '  eq                   — Equipment' }
+        { type: 'info', text: "  Type any command to interact. Type 'help' for details." }
       ];
     }
 
@@ -2008,13 +1885,27 @@
       };
     }
 
+    // ─── Expose internals for the command registry ─────────────────────────
+    const _internals = {
+      doGo, doLook, doTake, doDrop, doInventory, doEquipment,
+      doWear, doUnequip, doUse, doAttack, doFlee, doTalk,
+      doCombine, doRotate, doQuest, doTrain, doAbilities,
+      doStatus, doBuy, doRespec, doRecall, doSetRecall,
+      doHelp, doWrite, doReadNotes, doShop,
+      currentRoom, findItemByKeyword, findMobByKeyword,
+      getAliveMobsInRoom, matchKeyword, getItemName, getMobName,
+      initiateCombat, executeAbility, handleMobKill, pushCombatOutput,
+      recalcStats, autoSave, recordGhost
+    };
+
     return {
       execute,
       update,
       getContext,
       getSaveSlice,
       resume,
-      flushCombatOutput
+      flushCombatOutput,
+      _internals
     };
   }
 
