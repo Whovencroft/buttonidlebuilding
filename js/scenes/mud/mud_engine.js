@@ -1165,7 +1165,8 @@
           output.push({ type: 'glimmer', text: '' });
           // Add the discovered ability to the player's roster
           player.abilities.push(glimmered.id);
-          if (glimmered.chainFamily) {
+          // Update chain progress for chain evolutions
+          if (glimmered.isChainEvolution || glimmered.chainBaseId) {
             player.chainProgress = window.MudGlimmer.updateChainProgress(
               player.chainProgress || {}, glimmered
             );
