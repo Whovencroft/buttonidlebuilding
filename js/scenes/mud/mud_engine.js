@@ -869,26 +869,32 @@
         { type: 'info', text: `  Defense:      ${player.defense}` },
       ];
       // Core stats (Vigor, Precision, Grit, Instinct)
+      // coreStats uses flat format: cs.vigor = number, cs.xp.vigor = number
       const cs = player.coreStats;
       if (cs && window.MudStats) {
         const d = player._derived || {};
+        const v = cs.vigor || 1;
+        const p = cs.precision || 1;
+        const g = cs.grit || 1;
+        const ins = cs.instinct || 1;
         output.push({ type: 'info', text: '' });
         output.push({ type: 'info', text: '─── Attributes ───' });
-        output.push({ type: 'info', text: `  Vigor:      ${cs.vigor?.level || 1}  (+${((cs.vigor?.level || 1) * 3)} max HP, +${(((cs.vigor?.level || 1) * 0.5).toFixed(1))} HP/tick regen)` });
-        output.push({ type: 'info', text: `  Precision:  ${cs.precision?.level || 1}  (${((d.critChance || 0.01) * 100).toFixed(1)}% crit, ${((d.damageFloor || 0.5) * 100).toFixed(0)}% dmg floor)` });
-        output.push({ type: 'info', text: `  Grit:       ${cs.grit?.level || 1}  (+${(((cs.grit?.level || 1) * 1.5).toFixed(0))} defense, ${((d.bigHitReduction || 0) * 100).toFixed(0)}% big-hit reduction)` });
-        output.push({ type: 'info', text: `  Instinct:   ${cs.instinct?.level || 1}  (${((d.dodgeChance || 0) * 100).toFixed(1)}% dodge, +${(d.initiativeBonus || 0)} initiative)` });
+        output.push({ type: 'info', text: `  Vigor:      ${v}  (+${v * 3} max HP, +${(v * 0.5).toFixed(1)} HP/tick regen)` });
+        output.push({ type: 'info', text: `  Precision:  ${p}  (${((d.critChance || 0.01) * 100).toFixed(1)}% crit, ${((d.damageFloor || 0.5) * 100).toFixed(0)}% dmg floor)` });
+        output.push({ type: 'info', text: `  Grit:       ${g}  (+${Math.floor(g * 1.5)} defense, ${((d.bigHitReduction || 0) * 100).toFixed(0)}% big-hit reduction)` });
+        output.push({ type: 'info', text: `  Instinct:   ${ins}  (${((d.dodgeChance || 0) * 100).toFixed(1)}% dodge, ${((d.initiativeChance || 0.05) * 100).toFixed(0)}% initiative)` });
         // XP progress bars
         output.push({ type: 'info', text: '' });
         output.push({ type: 'info', text: '─── Growth ───' });
         const statNames = ['vigor', 'precision', 'grit', 'instinct'];
         for (const name of statNames) {
-          const stat = cs[name] || { level: 1, xp: 0 };
-          const needed = window.MudStats.xpForLevel ? window.MudStats.xpForLevel(stat.level) : (25 * (1 + (stat.level - 1) * 0.35));
-          const pct = Math.min(100, Math.floor((stat.xp / needed) * 100));
+          const level = cs[name] || 1;
+          const xp = (cs.xp && cs.xp[name]) || 0;
+          const needed = window.MudStats.xpForNextLevel(level);
+          const pct = Math.min(100, Math.floor((xp / needed) * 100));
           const filled = Math.floor(pct / 10);
-          const bar = '█'.repeat(filled) + '░'.repeat(10 - filled);
-          output.push({ type: 'info', text: `  ${name.charAt(0).toUpperCase() + name.slice(1).padEnd(10)} ${String(stat.level).padStart(3)}  ${bar} ${pct}%` });
+          const bar = '\u2588'.repeat(filled) + '\u2591'.repeat(10 - filled);
+          output.push({ type: 'info', text: `  ${name.charAt(0).toUpperCase() + name.slice(1).padEnd(10)} ${String(level).padStart(3)}  ${bar} ${pct}%` });
         }
       }
       // Title if available
