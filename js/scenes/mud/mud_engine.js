@@ -1070,6 +1070,8 @@
 
     /**
      * Execute an ability by ID. Handles focus cost, cooldown, and effects.
+     * If a glimmer sparks, the new ability REPLACES the original attack —
+     * the player discovers and immediately uses the new technique.
      */
     function executeAbility(abilityId) {
       const def = window.MudAbilities?.getAbilityById(abilityId);
@@ -1100,72 +1102,13 @@
       const mob = mobs[combatState.mobVnum];
       const output = [];
 
-      // Apply ability effects based on type
-      switch (def.type || 'attack') {
-        case 'attack': {
-          const mult = def.multiplier || 1.5;
-          let dmg = Math.max(1, Math.floor(player.attackPower * mult));
-          if (!def.ignoresDef) {
-            dmg = Math.max(1, dmg - Math.floor((mob?.stats?.defense || 0) / 2));
-          }
-          // Apply Precision-based damage variance and crit to abilities
-          const aDerived = player._derived || {};
-          if (window.MudStats) {
-            dmg = window.MudStats.applyDamageVariance(dmg, aDerived);
-            const aCrit = window.MudStats.rollCrit(aDerived);
-            if (aCrit.isCrit) {
-              dmg = Math.floor(dmg * aCrit.multiplier);
-              output.push({ type: 'combat', text: 'CRITICAL HIT!' });
-            }
-          }
-          combatState.mobHp -= dmg;
-          output.push({ type: 'combat', text: `You use ${def.name}! ${dmg} damage! [Mob HP: ${Math.max(0, combatState.mobHp)}/${combatState.mobMaxHp}]` });
-          // Precision grows from ability use
-          if (window.MudStats && player.coreStats) {
-            const killed = combatState.mobHp <= 0;
-            const pGrowth = window.MudStats.onAbilityUsed(def.tier || 0, killed);
-            const pResult = window.MudStats.applyGrowth(player.coreStats, pGrowth);
-            if (pResult.output.length > 0) output.push(...pResult.output);
-          }
-
-          if (def.healPercent) {
-            const heal = Math.floor(player.maxHp * def.healPercent);
-            player.hp = Math.min(player.maxHp, player.hp + heal);
-            output.push({ type: 'success', text: `You recover ${heal} HP. [HP: ${player.hp}/${player.maxHp}]` });
-          }
-
-          // Check if mob dies from ability
-          if (combatState.mobHp <= 0) {
-            output.push(...handleMobKill(mob));
-          }
-          break;
-        }
-        case 'heal': {
-          const heal = Math.floor(player.maxHp * (def.healPercent || 0.3));
-          player.hp = Math.min(player.maxHp, player.hp + heal);
-          output.push({ type: 'success', text: `You use ${def.name}. Restored ${heal} HP. [HP: ${player.hp}/${player.maxHp}]` });
-          break;
-        }
-        case 'buff': {
-          player.worldFlags[`buff_${abilityId}`] = def.duration || 2;
-          output.push({ type: 'success', text: `You use ${def.name}. Active for ${def.duration || 2} rounds.` });
-          break;
-        }
-        case 'debuff': {
-          player.worldFlags[`debuff_${abilityId}`] = def.duration || 2;
-          output.push({ type: 'success', text: `You use ${def.name}. Enemy weakened for ${def.duration || 2} rounds.` });
-          break;
-        }
-        default:
-          output.push({ type: 'info', text: `You use ${def.name}.` });
-      }
-
-      output.push({ type: 'info', text: `[Focus: ${player.focus}/${player.maxFocus}]` });
-      // ── Glimmer Roll: check for ability discovery after use ──
+      // ── Glimmer Roll: BEFORE damage — check if a new ability sparks ──
+      // If it does, the glimmered ability replaces the original for this attack.
+      let activeDef = def; // The ability that actually fires
+      let glimmered = null;
       if (window.MudGlimmer && combatState) {
-        const mob = mobs[combatState.mobVnum];
         const mobPower = mob ? (mob.stats?.power || mob.stats?.hp || 100) : 100;
-        const glimmered = window.MudGlimmer.rollForGlimmer({
+        glimmered = window.MudGlimmer.rollForGlimmer({
           usedAbilityId: abilityId,
           baseClass: player.baseClass,
           specId: player.specialization,
@@ -1178,23 +1121,93 @@
           chainProgress: player.chainProgress || {}
         });
         if (glimmered) {
+          // Show the initiation of the original ability
+          output.push({ type: 'combat', text: `You use ${def.name}!` });
+          // Dramatic glimmer discovery
+          output.push({ type: 'glimmer', text: '\u2605 GLIMMER \u2605' });
+          output.push({ type: 'glimmer', text: 'A spark of brilliance! In the heat of battle, you discover something new!' });
+          output.push({ type: 'glimmer', text: `Learned "${glimmered.name}"!` });
+          output.push({ type: 'glimmer', text: '' });
           // Add the discovered ability to the player's roster
           player.abilities.push(glimmered.id);
-          // Update chain progress if it's a chain ability
           if (glimmered.chainFamily) {
             player.chainProgress = window.MudGlimmer.updateChainProgress(
               player.chainProgress || {}, glimmered
             );
           }
-          // Show the dramatic discovery message
-          const msgs = window.MudGlimmer.getGlimmerMessage(
-            player.specName || 'You', def.name, glimmered
-          );
-          for (const m of msgs) {
-            output.push({ type: 'glimmer', text: m });
-          }
+          // The glimmered ability replaces the original for this attack
+          activeDef = glimmered;
         }
       }
+
+      // Apply ability effects based on type (using activeDef — either original or glimmered)
+      switch (activeDef.type || 'attack') {
+        case 'attack': {
+          const mult = activeDef.multiplier || 1.5;
+          const hits = activeDef.hits || 1;
+          const aDerived = player._derived || {};
+
+          for (let h = 0; h < hits; h++) {
+            let dmg = Math.max(1, Math.floor(player.attackPower * mult));
+            if (!activeDef.ignoresDef) {
+              dmg = Math.max(1, dmg - Math.floor((mob?.stats?.defense || 0) / 2));
+            }
+            // Apply Precision-based damage variance and crit
+            if (window.MudStats) {
+              dmg = window.MudStats.applyDamageVariance(dmg, aDerived);
+              const aCrit = window.MudStats.rollCrit(aDerived);
+              if (aCrit.isCrit) {
+                dmg = Math.floor(dmg * aCrit.multiplier);
+                output.push({ type: 'combat', text: 'CRITICAL HIT!' });
+              }
+            }
+            combatState.mobHp -= dmg;
+            output.push({ type: 'combat', text: `${hits > 1 ? `[Hit ${h + 1}] ` : (glimmered ? '' : `You use ${activeDef.name}! `)}${dmg} damage! [Mob HP: ${Math.max(0, combatState.mobHp)}/${combatState.mobMaxHp}]` });
+            // Stop hitting if mob is dead
+            if (combatState.mobHp <= 0) break;
+          }
+
+          // Precision grows from ability use
+          if (window.MudStats && player.coreStats) {
+            const killed = combatState.mobHp <= 0;
+            const pGrowth = window.MudStats.onAbilityUsed(activeDef.tier || 0, killed);
+            const pResult = window.MudStats.applyGrowth(player.coreStats, pGrowth);
+            if (pResult.output.length > 0) output.push(...pResult.output);
+          }
+
+          if (activeDef.healPercent) {
+            const heal = Math.floor(player.maxHp * activeDef.healPercent);
+            player.hp = Math.min(player.maxHp, player.hp + heal);
+            output.push({ type: 'success', text: `You recover ${heal} HP. [HP: ${player.hp}/${player.maxHp}]` });
+          }
+
+          // Check if mob dies from ability
+          if (combatState.mobHp <= 0) {
+            output.push(...handleMobKill(mob));
+          }
+          break;
+        }
+        case 'heal': {
+          const heal = Math.floor(player.maxHp * (activeDef.healPercent || 0.3));
+          player.hp = Math.min(player.maxHp, player.hp + heal);
+          output.push({ type: 'success', text: `${glimmered ? '' : `You use ${activeDef.name}. `}Restored ${heal} HP. [HP: ${player.hp}/${player.maxHp}]` });
+          break;
+        }
+        case 'buff': {
+          player.worldFlags[`buff_${activeDef.id || abilityId}`] = activeDef.duration || 2;
+          output.push({ type: 'success', text: `${glimmered ? '' : `You use ${activeDef.name}. `}Active for ${activeDef.duration || 2} rounds.` });
+          break;
+        }
+        case 'debuff': {
+          player.worldFlags[`debuff_${activeDef.id || abilityId}`] = activeDef.duration || 2;
+          output.push({ type: 'success', text: `${glimmered ? '' : `You use ${activeDef.name}. `}Enemy weakened for ${activeDef.duration || 2} rounds.` });
+          break;
+        }
+        default:
+          output.push({ type: 'info', text: `You use ${activeDef.name}.` });
+      }
+
+      output.push({ type: 'info', text: `[Focus: ${player.focus}/${player.maxFocus}]` });
       return output;
     }
 
