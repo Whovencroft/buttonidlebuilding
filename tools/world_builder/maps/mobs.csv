@@ -1,0 +1,64 @@
+VNUM,NAME,DESC,HOSTILE,HP,ATTACK,DEFENSE,LOOT,RESPAWN,DIALOGUE,FLAGS
+1101,Bandit Footpad,A scrawny thief with a rusty dagger and desperate eyes.,true,80,12,5,,60,,roaming
+1102,Forest Wolf,A grey wolf with yellow eyes. It circles warily.,true,100,15,8,,45,,roaming
+1103,Skeleton Warrior,Bones held together by dark magic. It raises a notched sword.,true,120,18,12,,60,,roaming
+1104,Goblin Scout,A green-skinned creature with a crude spear and a nasty grin.,true,90,14,6,,45,,roaming
+1105,Dark Acolyte,A hooded figure muttering forbidden incantations.,true,150,22,10,,90,,stationary
+1106,Iron Golem,A massive construct of rusted iron. Its eyes glow red.,true,300,30,25,,120,,stationary
+1107,Shadow Knight,A warrior in black plate armor. Darkness seeps from the joints.,true,250,35,20,,120,,roaming
+1108,Dragon Whelp,A young dragon the size of a horse. Smoke curls from its nostrils.,true,400,40,30,,180,,stationary
+1201,Street Punk,A wired-up ganger with chrome implants and a switchblade.,true,80,13,5,,60,,roaming
+1202,Rogue Drone,A malfunctioning delivery drone sparking with exposed wires.,true,100,16,10,,45,,roaming
+1203,Corporate Security,A guard in black tactical gear with a stun baton.,true,130,20,15,,60,,stationary
+1204,Cyber Hound,A mechanical dog with razor teeth and infrared eyes.,true,110,18,8,,45,,roaming
+1205,Hacker Ghost,A holographic projection of a dead netrunner. Still dangerous.,true,160,25,5,,90,,stationary
+1206,Mech Enforcer,A bipedal combat mech with twin autocannons.,true,350,38,28,,120,,stationary
+1207,Synth Assassin,An android built for killing. Its face is eerily human.,true,280,42,18,,120,,roaming
+1208,Rogue AI Node,A server rack pulsing with malevolent intelligence. Drones orbit it.,true,500,45,35,,180,,stationary
+1301,Alley Mugger,A desperate man with a snub-nose revolver and shaking hands.,true,70,10,4,,60,,roaming
+1302,Corrupt Cop,A detective with dead eyes and a badge that means nothing.,true,150,22,15,,90,,roaming
+1303,Hired Muscle,A massive enforcer in a cheap suit. Knuckles like walnuts.,true,180,25,18,,60,,roaming
+1304,Cat Burglar,A lithe figure in black. You almost didn't see them.,true,120,20,8,,90,,roaming
+1305,Mob Lieutenant,A sharp-dressed man with cold eyes and a silenced pistol.,true,220,30,20,,120,,stationary
+1306,Femme Fatale,Beautiful and deadly. The knife is already in her hand.,true,200,35,12,,120,,stationary
+1307,Ghost of the Drowned,A waterlogged specter that haunts the rain-slicked docks.,true,300,32,25,,180,,stationary
+1308,The Fixer,A shadowy broker who deals in secrets and violence.,true,400,40,30,,240,,stationary
+1401,Feral Dog Pack,A pack of starving dogs with madness in their eyes.,true,60,8,3,,30,,roaming
+1402,Raider Scout,A wasteland scavenger in patchwork armor.,true,100,15,8,,45,,roaming
+1403,Militia Grunt,A poorly trained soldier with more bravery than skill.,true,130,18,12,,60,,roaming
+1404,Landmine Drone,A small crawling robot that beeps ominously.,true,80,30,2,,90,,stationary
+1405,Sniper Ghillie,A nearly invisible marksman. You only see the muzzle flash.,true,180,40,5,,120,,stationary
+1406,Tank Wraith,The ghost of a destroyed tank. Its cannon still fires.,true,350,35,30,,180,,stationary
+1407,Warlord's Champion,A scarred veteran in salvaged power armor.,true,300,38,25,,120,,roaming
+1408,Siege Mech,A towering war machine bristling with weapons.,true,600,50,40,,240,,stationary
+1501,Void Wisp,A drifting mote of anti-light that drains warmth.,true,90,12,2,,30,,roaming
+1502,Crystal Elemental,A being of living crystal that refracts reality.,true,150,20,20,,60,,roaming
+1503,Astral Predator,A translucent creature that swims through empty space.,true,180,25,10,,60,,roaming
+1504,Echo Fragment,A piece of someone's memory given hostile form.,true,120,18,8,,45,,roaming
+1505,Gravity Anomaly,A sphere of compressed spacetime. It pulls everything inward.,true,250,30,30,,120,,stationary
+1506,Star Wraith,A being of compressed stellar energy. Blindingly bright.,true,350,40,20,,120,,stationary
+1507,Void Leviathan,A massive creature that drifts between the shards.,true,500,45,35,,180,,stationary
+1508,Reality Fracture,A tear in spacetime that lashes out at anything nearby.,true,400,50,15,,240,,stationary
+1601,Gladiator Slave,A desperate fighter with nothing left to lose.,true,100,15,10,,45,,roaming
+1602,Roman Legionnaire,A disciplined soldier in bronze armor with a gladius.,true,150,20,18,,60,,roaming
+1603,Egyptian Guardian,A jackal-headed warrior wielding a khopesh.,true,180,22,15,,60,,stationary
+1604,Samurai Ronin,A masterless warrior seeking death with honor.,true,200,30,12,,90,,roaming
+1605,Viking Berserker,A frothing warrior who feels no pain.,true,250,35,8,,90,,roaming
+1606,Aztec Jaguar Warrior,A fierce warrior in a jaguar pelt with an obsidian blade.,true,220,28,15,,90,,roaming
+1607,Pharaoh's Mummy,Ancient royalty wrapped in enchanted bandages.,true,350,32,28,,120,,stationary
+1608,Time Paradox,A glitching entity that exists in multiple moments simultaneously.,true,500,45,25,,180,,stationary
+1701,Sewer Rat Swarm,Hundreds of rats moving as one hungry mass.,true,80,10,2,,30,,roaming
+1702,Tunnel Crawler,A pale humanoid that has lived too long in the dark.,true,130,18,8,,60,,roaming
+1703,Fungal Shambler,A mass of toxic mushrooms given ambulatory form.,true,160,15,15,,60,,roaming
+1704,Pipe Wraith,A ghost trapped in the water system. It screams through the pipes.,true,200,25,12,,90,,stationary
+1705,Undercity Boss,A massive mutant who rules a section of tunnel.,true,350,35,25,,120,,stationary
+1706,The Collector,A thing that hoards everything — bones and trinkets and screams.,true,400,30,30,,180,,stationary
+1801,Training Dummy,A reinforced practice target. It doesn't fight back.,true,9999,0,0,,5,,stationary
+1802,Sparring Partner,A skilled fighter who pulls their punches. Barely.,true,200,15,15,,30,,stationary
+1803,Gravity Construct,A training golem that gets heavier the longer you fight it.,true,500,25,25,,60,,stationary
+1804,Mirror Self,An exact copy of you. It knows every move you'll make.,true,1,1,1,,120,,stationary
+1901,Lost Soul,A confused spirit wandering the afterlife paths.,true,100,12,5,,30,,roaming
+1902,Spirit Guardian,A warrior who chose to guard the paths between life and death.,true,250,30,20,,90,,stationary
+1903,Oni Gatekeeper,A massive horned demon that guards a checkpoint.,true,400,40,30,,120,,stationary
+1904,Reaper Initiate,A young death god still learning the trade.,true,500,45,25,,180,,roaming
+1905,The Forgotten King,A spirit so old even death has forgotten his name.,true,800,55,40,,300,,stationary

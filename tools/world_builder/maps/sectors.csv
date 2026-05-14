@@ -1,0 +1,11 @@
+SECTOR_ID,SECTOR_NAME,MOB_POOL,LEVEL_RANGE,DESCRIPTION
+nexus,The Nexus of Echoes,,0-0,The central hub connecting all realms. A place of safety and commerce.
+shattered_crown,The Shattered Crown,"1101,1102,1103,1104,1105,1106,1107,1108",50-300,A medieval fantasy realm of castles and dark forests where sword and sorcery reign.
+neon_grid,Neon Grid,"1201,1202,1203,1204,1205,1206,1207,1208",50-300,A cyberpunk dystopia of neon-lit streets and corporate towers.
+midnight_rain,Midnight Rain,"1301,1302,1303,1304,1305,1306,1307,1308",100-500,A noir cityscape where shadows hold secrets and nothing is as it seems.
+blood_chrome,Blood & Chrome,"1401,1402,1403,1404,1405,1406,1407,1408",100-500,A war-torn wasteland of military outposts and brutal survival.
+ethereal_drift,Ethereal Drift,"1501,1502,1503,1504,1505,1506,1507,1508",200-800,Floating shards of reality drifting through a cosmic void.
+forgotten_epoch,Forgotten Epoch,"1601,1602,1603,1604,1605,1606,1607,1608",200-800,Fragments of history frozen in time — gladiators and pharaohs and samurai.
+undercity,The Undercity,"1701,1702,1703,1704,1705,1706",300-1000,A labyrinth of sewers and forgotten tunnels beneath the Nexus.
+training_grounds,Training Grounds,"1801,1802,1803,1804",50-9999,Specialized training facilities where warriors push beyond their limits.
+afterlife,The Afterlife,"1901,1902,1903,1904,1905",500-2000,The spirit realm where the dead train and the worthy are judged.

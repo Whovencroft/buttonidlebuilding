@@ -1774,7 +1774,7 @@
      */
     function getAliveMobsInRoom(room) {
       if (!room) return [];
-      return (room.mobs || []).filter(v => !isMobDefeated(v));
+      return (room.mobs || room.mob_spawns || []).filter(v => !isMobDefeated(v));
     }
 
     // Track taken items per room (keyed by vnum)

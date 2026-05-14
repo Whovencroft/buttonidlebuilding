@@ -1,2660 +1,1136 @@
 {
-  "101": {
-    "vnum": 101,
-    "zone": 0,
-    "name": "Instructor Vex",
-    "description": "A battle-scarred veteran with kind eyes. She teaches newcomers the fundamentals of survival.",
-    "hostile": false,
-    "stats": {
-      "hp": 999,
-      "max_hp": 999,
-      "attack": 0,
-      "defense": 0
-    },
-    "loot_table": [],
-    "respawn": 0,
-    "dialogue": [
-      {
-        "text": "Welcome, traveler. I can teach you the basics. Type 'help' to see all commands. Use 'go <direction>' to move, 'look <thing>' to examine, and 'attack <enemy>' to fight. Remember — you can always 'flee' from combat.",
-        "conditions": []
-      },
-      {
-        "text": "You're getting stronger. Remember: puzzles are the key to finding what you seek. Combat gets you there, but your mind opens the doors.",
-        "conditions": [
-          "flag:has_killed_first_mob"
-        ]
-      }
-    ]
-  },
-  "102": {
-    "vnum": 102,
-    "zone": 0,
-    "name": "Bazaar Keeper Morrigan",
-    "description": "A shrewd-eyed woman in colorful robes. She manages the marketplace and can appraise items.",
-    "hostile": false,
-    "stats": {
-      "hp": 999,
-      "max_hp": 999,
-      "attack": 0,
-      "defense": 0
-    },
-    "loot_table": [],
-    "respawn": 0,
-    "dialogue": [
-      {
-        "text": "Buy, sell, trade — the Bazaar has it all. Other travelers leave their wares here. Browse the stalls or ask me about prices.",
-        "conditions": []
-      }
-    ]
-  },
-  "103": {
-    "vnum": 103,
-    "zone": 0,
-    "name": "Grindstone the Armorer",
-    "description": "A stocky dwarf with arms like tree trunks. His beard is singed at the tips from forge work.",
-    "hostile": false,
-    "stats": {
-      "hp": 999,
-      "max_hp": 999,
-      "attack": 0,
-      "defense": 0
-    },
-    "loot_table": [],
-    "respawn": 0,
-    "dialogue": [
-      {
-        "text": "Need steel? I've got blades from every realm. Bring me materials and I can forge something special.",
-        "conditions": []
-      },
-      {
-        "text": "Ah, you've been to the Crown! Bring me Ironwood and I'll make you something worthy of a knight.",
-        "conditions": [
-          "flag:zone_1_visited"
-        ]
-      }
-    ]
-  },
-  "104": {
-    "vnum": 104,
-    "zone": 0,
-    "name": "Madame Veil",
-    "description": "An ethereal woman whose features shift slightly each time you look away. She brews potions and sells remedies.",
-    "hostile": false,
-    "stats": {
-      "hp": 999,
-      "max_hp": 999,
-      "attack": 0,
-      "defense": 0
-    },
-    "loot_table": [],
-    "respawn": 0,
-    "dialogue": [
-      {
-        "text": "Healing, haste, strength — I brew them all. But the best potions require rare ingredients from the zones. Bring me what I need and I'll make something... special.",
-        "conditions": []
-      }
-    ]
-  },
-  "105": {
-    "vnum": 105,
-    "zone": 0,
-    "name": "Courier Dash",
-    "description": "A hyperactive halfling who never stops moving. Packages and letters are strapped all over his body.",
-    "hostile": false,
-    "stats": {
-      "hp": 999,
-      "max_hp": 999,
-      "attack": 0,
-      "defense": 0
-    },
-    "loot_table": [],
-    "respawn": 0,
-    "dialogue": [
-      {
-        "text": "Deliveries! I've got deliveries that need making! If you're heading to any of the zones, I might have a package for you. Good coin in courier work!",
-        "conditions": []
-      }
-    ]
-  },
-  "106": {
-    "vnum": 106,
-    "zone": 0,
-    "name": "Syllith the Lore Keeper",
-    "description": "An ancient elf whose age is impossible to guess. His eyes hold the weight of millennia. He knows things about the marble.",
-    "hostile": false,
-    "stats": {
-      "hp": 999,
-      "max_hp": 999,
-      "attack": 0,
-      "defense": 0
-    },
-    "loot_table": [],
-    "respawn": 0,
-    "dialogue": [
-      {
-        "text": "Ah, another seeker. The sphere you chase — it has been here before. Many times. It rolls through all realms, gathering... something. Memories, perhaps. Or purpose.",
-        "conditions": []
-      },
-      {
-        "text": "You've solved a puzzle! The marble noticed. It always does. Each lock you open, it moves faster. But it also leaves more traces. Keep looking.",
-        "conditions": [
-          "flag:zone_1_puzzle_complete"
-        ]
-      }
-    ]
-  },
-  "107": {
-    "vnum": 107,
-    "zone": 0,
-    "name": "Bounty Master Krell",
-    "description": "A grizzled half-orc with a ledger book and a no-nonsense attitude. He manages the bounty system.",
-    "hostile": false,
-    "stats": {
-      "hp": 999,
-      "max_hp": 999,
-      "attack": 0,
-      "defense": 0
-    },
-    "loot_table": [],
-    "respawn": 0,
-    "dialogue": [
-      {
-        "text": "Got bounties that need filling. Kill creatures, bring proof, get paid. Simple as that. Check the board for current postings.",
-        "conditions": []
-      }
-    ]
-  },
-  "108": {
-    "vnum": 108,
-    "zone": 0,
-    "name": "Training Construct",
-    "description": "A mechanical humanoid made of bronze and crystal. It activates when challenged and fights at a level appropriate to its opponent.",
-    "hostile": false,
-    "stats": {
-      "hp": 50,
-      "max_hp": 50,
-      "attack": 5,
-      "defense": 3
-    },
-    "loot_table": [],
-    "respawn": 30,
-    "dialogue": [
-      {
-        "text": "[CONSTRUCT ONLINE] Training mode active. Attack me to practice combat. I will not pursue if you flee.",
-        "conditions": []
-      }
-    ]
-  },
-  "109": {
-    "vnum": 109,
-    "zone": 0,
-    "name": "Tumble the Barkeep",
-    "description": "A massive orc with a surprisingly gentle demeanor. He polishes glasses with hands that could crush skulls.",
-    "hostile": false,
-    "stats": {
-      "hp": 999,
-      "max_hp": 999,
-      "attack": 0,
-      "defense": 0
-    },
-    "loot_table": [],
-    "respawn": 0,
-    "dialogue": [
-      {
-        "text": "What'll it be? I hear things from travelers. Rumors, tips, warnings. Buy a drink and I might share what I know.",
-        "conditions": []
-      },
-      {
-        "text": "Word is, something's been rolling through the Noir district. Knocked over a stack of crates in the warehouse. The detective's looking into it.",
-        "conditions": [
-          "flag:zone_1_puzzle_complete"
-        ]
-      }
-    ]
-  },
-  "110": {
-    "vnum": 110,
-    "zone": 0,
-    "name": "The Hooded Gambler",
-    "description": "A figure of indeterminate race and gender. Their hood never slips. They shuffle cards with inhuman speed.",
-    "hostile": false,
-    "stats": {
-      "hp": 999,
-      "max_hp": 999,
-      "attack": 0,
-      "defense": 0
-    },
-    "loot_table": [],
-    "respawn": 0,
-    "dialogue": [
-      {
-        "text": "Care for a game? I deal in information, not coin. Win a hand, and I'll tell you something useful. Lose... and you owe me a favor.",
-        "conditions": []
-      }
-    ]
-  },
-  "1001": {
-    "vnum": 1001,
-    "zone": 1,
-    "name": "Feral Wolf",
-    "description": "A gaunt grey wolf with matted fur and hungry eyes. It circles you, looking for weakness.",
+  "1101": {
+    "vnum": 1101,
+    "name": "Bandit Footpad",
+    "description": "A scrawny thief with a rusty dagger and desperate eyes.",
     "hostile": true,
     "stats": {
-      "hp": 30,
-      "max_hp": 30,
-      "attack": 6,
-      "defense": 2
+      "hp": 80,
+      "max_hp": 80,
+      "attack": 12,
+      "defense": 5
     },
-    "loot": [
-      1003
-    ],
-    "respawn": 90
+    "loot_table": [],
+    "respawn": 60,
+    "dialogue": [],
+    "flags": [
+      "roaming"
+    ]
   },
-  "1002": {
-    "vnum": 1002,
-    "zone": 1,
-    "name": "Goblin Scout",
-    "description": "A wiry green-skinned creature clutching a rusty dagger. It hisses at you.",
+  "1102": {
+    "vnum": 1102,
+    "name": "Forest Wolf",
+    "description": "A grey wolf with yellow eyes. It circles warily.",
     "hostile": true,
     "stats": {
-      "hp": 25,
-      "max_hp": 25,
-      "attack": 5,
-      "defense": 1
+      "hp": 100,
+      "max_hp": 100,
+      "attack": 15,
+      "defense": 8
     },
-    "loot": [
-      1004
-    ],
-    "respawn": 60
+    "loot_table": [],
+    "respawn": 45,
+    "dialogue": [],
+    "flags": [
+      "roaming"
+    ]
   },
-  "1003": {
-    "vnum": 1003,
-    "zone": 1,
-    "name": "Goblin Archer",
-    "description": "A goblin perched on a rock, nocking a crude arrow. Its aim looks surprisingly steady.",
-    "hostile": true,
-    "stats": {
-      "hp": 22,
-      "max_hp": 22,
-      "attack": 7,
-      "defense": 1
-    },
-    "loot": [
-      1004,
-      1005
-    ],
-    "respawn": 75
-  },
-  "1004": {
-    "vnum": 1004,
-    "zone": 1,
+  "1103": {
+    "vnum": 1103,
     "name": "Skeleton Warrior",
-    "description": "Bones held together by dark magic. It raises a notched sword with hollow eye sockets fixed on you.",
+    "description": "Bones held together by dark magic. It raises a notched sword.",
     "hostile": true,
     "stats": {
-      "hp": 35,
-      "max_hp": 35,
-      "attack": 8,
-      "defense": 4
+      "hp": 120,
+      "max_hp": 120,
+      "attack": 18,
+      "defense": 12
     },
-    "loot": [
-      1006
-    ],
-    "respawn": 120
+    "loot_table": [],
+    "respawn": 60,
+    "dialogue": [],
+    "flags": [
+      "roaming"
+    ]
   },
-  "1005": {
-    "vnum": 1005,
-    "zone": 1,
-    "name": "Skeleton Archer",
-    "description": "A skeletal figure drawing a bowstring with bony fingers. An eerie blue glow fills its eye sockets.",
+  "1104": {
+    "vnum": 1104,
+    "name": "Goblin Scout",
+    "description": "A green-skinned creature with a crude spear and a nasty grin.",
     "hostile": true,
     "stats": {
-      "hp": 28,
-      "max_hp": 28,
-      "attack": 9,
-      "defense": 2
-    },
-    "loot": [
-      1006
-    ],
-    "respawn": 120
-  },
-  "1006": {
-    "vnum": 1006,
-    "zone": 1,
-    "name": "Dire Boar",
-    "description": "A massive boar the size of a horse. Its tusks are stained with old blood and its eyes are wild with rage.",
-    "hostile": true,
-    "stats": {
-      "hp": 45,
-      "max_hp": 45,
-      "attack": 10,
-      "defense": 5
-    },
-    "loot": [
-      1007
-    ],
-    "respawn": 180
-  },
-  "1007": {
-    "vnum": 1007,
-    "zone": 1,
-    "name": "Bandit Thug",
-    "description": "A rough-looking human in mismatched armor. A crude tattoo marks him as part of the Thornhold gang.",
-    "hostile": true,
-    "stats": {
-      "hp": 40,
-      "max_hp": 40,
-      "attack": 8,
-      "defense": 3
-    },
-    "loot": [
-      1004,
-      1008
-    ],
-    "respawn": 90
-  },
-  "1008": {
-    "vnum": 1008,
-    "zone": 1,
-    "name": "Bandit Captain",
-    "description": "A scarred woman in decent chainmail. She commands the thugs with sharp barks and a bloodied mace.",
-    "hostile": true,
-    "stats": {
-      "hp": 60,
-      "max_hp": 60,
-      "attack": 12,
+      "hp": 90,
+      "max_hp": 90,
+      "attack": 14,
       "defense": 6
     },
-    "loot": [
-      1008,
-      1009
-    ],
-    "respawn": 300
+    "loot_table": [],
+    "respawn": 45,
+    "dialogue": [],
+    "flags": [
+      "roaming"
+    ]
   },
-  "1009": {
-    "vnum": 1009,
-    "zone": 1,
-    "name": "Corrupted Treant",
-    "description": "A twisted tree that moves with malicious intent. Dark sap oozes from cracks in its bark like black blood.",
+  "1105": {
+    "vnum": 1105,
+    "name": "Dark Acolyte",
+    "description": "A hooded figure muttering forbidden incantations.",
     "hostile": true,
     "stats": {
-      "hp": 55,
-      "max_hp": 55,
-      "attack": 11,
-      "defense": 8
+      "hp": 150,
+      "max_hp": 150,
+      "attack": 22,
+      "defense": 10
     },
-    "loot": [
-      1010
-    ],
-    "respawn": 240
+    "loot_table": [],
+    "respawn": 90,
+    "dialogue": [],
+    "flags": [
+      "stationary"
+    ]
   },
-  "1010": {
-    "vnum": 1010,
-    "zone": 1,
-    "name": "Will-o'-Wisp",
-    "description": "A floating orb of pale blue light that drifts hypnotically. Those who follow it tend not to return.",
+  "1106": {
+    "vnum": 1106,
+    "name": "Iron Golem",
+    "description": "A massive construct of rusted iron. Its eyes glow red.",
     "hostile": true,
     "stats": {
-      "hp": 18,
-      "max_hp": 18,
-      "attack": 14,
-      "defense": 1
+      "hp": 300,
+      "max_hp": 300,
+      "attack": 30,
+      "defense": 25
     },
-    "loot": [
-      1011
-    ],
-    "respawn": 150
+    "loot_table": [],
+    "respawn": 120,
+    "dialogue": [],
+    "flags": [
+      "stationary"
+    ]
   },
-  "1011": {
-    "vnum": 1011,
-    "zone": 1,
-    "name": "Cave Troll",
-    "description": "A hulking grey-skinned brute that barely fits in the passage. It smells of rotting meat and swings a tree trunk as a club.",
+  "1107": {
+    "vnum": 1107,
+    "name": "Shadow Knight",
+    "description": "A warrior in black plate armor. Darkness seeps from the joints.",
+    "hostile": true,
+    "stats": {
+      "hp": 250,
+      "max_hp": 250,
+      "attack": 35,
+      "defense": 20
+    },
+    "loot_table": [],
+    "respawn": 120,
+    "dialogue": [],
+    "flags": [
+      "roaming"
+    ]
+  },
+  "1108": {
+    "vnum": 1108,
+    "name": "Dragon Whelp",
+    "description": "A young dragon the size of a horse. Smoke curls from its nostrils.",
+    "hostile": true,
+    "stats": {
+      "hp": 400,
+      "max_hp": 400,
+      "attack": 40,
+      "defense": 30
+    },
+    "loot_table": [],
+    "respawn": 180,
+    "dialogue": [],
+    "flags": [
+      "stationary"
+    ]
+  },
+  "1201": {
+    "vnum": 1201,
+    "name": "Street Punk",
+    "description": "A wired-up ganger with chrome implants and a switchblade.",
     "hostile": true,
     "stats": {
       "hp": 80,
       "max_hp": 80,
-      "attack": 15,
-      "defense": 7
-    },
-    "loot": [
-      1012,
-      1008
-    ],
-    "respawn": 360
-  },
-  "1012": {
-    "vnum": 1012,
-    "zone": 1,
-    "name": "Wraith",
-    "description": "A translucent figure of shadow and grief. The temperature drops as it drifts toward you, reaching with spectral claws.",
-    "hostile": true,
-    "stats": {
-      "hp": 50,
-      "max_hp": 50,
       "attack": 13,
-      "defense": 3
-    },
-    "loot": [
-      1013
-    ],
-    "respawn": 300
-  },
-  "1013": {
-    "vnum": 1013,
-    "zone": 1,
-    "name": "Giant Spider",
-    "description": "A spider the size of a large dog. Its mandibles drip with venom and its many eyes reflect your terrified face.",
-    "hostile": true,
-    "stats": {
-      "hp": 35,
-      "max_hp": 35,
-      "attack": 9,
-      "defense": 3
-    },
-    "loot": [
-      1014
-    ],
-    "respawn": 120
-  },
-  "1014": {
-    "vnum": 1014,
-    "zone": 1,
-    "name": "Venomous Serpent",
-    "description": "A thick-bodied snake with iridescent scales. It coils and strikes with blinding speed.",
-    "hostile": true,
-    "stats": {
-      "hp": 20,
-      "max_hp": 20,
-      "attack": 11,
-      "defense": 2
-    },
-    "loot": [
-      1015
-    ],
-    "respawn": 90
-  },
-  "1015": {
-    "vnum": 1015,
-    "zone": 1,
-    "name": "Gargoyle",
-    "description": "What you thought was a statue unfolds stone wings and drops from its perch. Its eyes glow red.",
-    "hostile": true,
-    "stats": {
-      "hp": 65,
-      "max_hp": 65,
-      "attack": 12,
-      "defense": 10
-    },
-    "loot": [
-      1006,
-      1012
-    ],
-    "respawn": 360
-  },
-  "1016": {
-    "vnum": 1016,
-    "zone": 1,
-    "name": "Cursed Knight",
-    "description": "A suit of armor that moves without a body inside. Its visor is empty darkness, but its sword arm is strong.",
-    "hostile": true,
-    "stats": {
-      "hp": 70,
-      "max_hp": 70,
-      "attack": 14,
-      "defense": 9
-    },
-    "loot": [
-      1009,
-      1013
-    ],
-    "respawn": 420
-  },
-  "1017": {
-    "vnum": 1017,
-    "zone": 1,
-    "name": "Swamp Lurker",
-    "description": "A humanoid shape made of mud and rotting vegetation. It rises from the muck with a wet sucking sound.",
-    "hostile": true,
-    "stats": {
-      "hp": 40,
-      "max_hp": 40,
-      "attack": 8,
-      "defense": 6
-    },
-    "loot": [
-      1010
-    ],
-    "respawn": 120
-  },
-  "1018": {
-    "vnum": 1018,
-    "zone": 1,
-    "name": "Plague Rat",
-    "description": "An oversized rat with patchy fur and weeping sores. It moves in packs but this one is alone — for now.",
-    "hostile": true,
-    "stats": {
-      "hp": 15,
-      "max_hp": 15,
-      "attack": 4,
-      "defense": 1
-    },
-    "loot": [
-      1015
-    ],
-    "respawn": 45
-  },
-  "1019": {
-    "vnum": 1019,
-    "zone": 1,
-    "name": "Old Farmer Giles",
-    "description": "A weathered old man leaning on a pitchfork. His farm has seen better days, and his eyes are tired.",
-    "hostile": false,
-    "stats": {
-      "hp": 999,
-      "max_hp": 999,
-      "attack": 0,
-      "defense": 0
-    },
-    "loot": [],
-    "respawn": 0,
-    "dialogue": [
-      {
-        "text": "Wolves been takin' my sheep. Three of 'em, big grey ones. Kill 'em and I'll give you what coin I have.",
-        "conditions": [
-          "!flag:quest_z1_wolves_done"
-        ]
-      },
-      {
-        "text": "Bless you, traveler. The wolves are gone. Here's your reward.",
-        "conditions": [
-          "flag:quest_z1_wolves_done"
-        ]
-      }
-    ]
-  },
-  "1020": {
-    "vnum": 1020,
-    "zone": 1,
-    "name": "Wandering Herbalist",
-    "description": "A young woman with a basket of herbs and a worried expression. She's looking for something specific.",
-    "hostile": false,
-    "stats": {
-      "hp": 999,
-      "max_hp": 999,
-      "attack": 0,
-      "defense": 0
-    },
-    "loot": [],
-    "respawn": 0,
-    "dialogue": [
-      {
-        "text": "I need Moonpetal flowers — they only grow in the deep forest. Bring me three and I'll brew you a powerful healing potion.",
-        "conditions": [
-          "!flag:quest_z1_herbs_done"
-        ]
-      },
-      {
-        "text": "You found them! Here, take this Greater Healing Draught. You've earned it.",
-        "conditions": [
-          "flag:quest_z1_herbs_done"
-        ]
-      }
-    ]
-  },
-  "1021": {
-    "vnum": 1021,
-    "zone": 1,
-    "name": "Sir Aldric the Fallen",
-    "description": "A knight in battered armor sitting against a tree. His shield bears the crest of a kingdom that no longer exists.",
-    "hostile": false,
-    "stats": {
-      "hp": 999,
-      "max_hp": 999,
-      "attack": 0,
-      "defense": 0
-    },
-    "loot": [],
-    "respawn": 0,
-    "dialogue": [
-      {
-        "text": "I was sworn to protect the Crown... but it shattered. Now I guard nothing. If you seek the throne room, beware the statues. They watch.",
-        "conditions": []
-      },
-      {
-        "text": "You aligned the statues? Then you've done what I could not. The Crown's last secret is revealed. I wonder... was it worth guarding?",
-        "conditions": [
-          "flag:zone_1_puzzle_complete"
-        ]
-      }
-    ]
-  },
-  "1022": {
-    "vnum": 1022,
-    "zone": 1,
-    "name": "Mysterious Cloaked Figure",
-    "description": "A figure in a deep green cloak stands at the crossroads. Their face is hidden, but they seem to be waiting for you specifically.",
-    "hostile": false,
-    "stats": {
-      "hp": 999,
-      "max_hp": 999,
-      "attack": 0,
-      "defense": 0
-    },
-    "loot": [],
-    "respawn": 0,
-    "dialogue": [
-      {
-        "text": "I've seen what you seek. A sphere of glass and light. It rolled through here three days ago — or was it three centuries? Time is strange in the Crown. It went toward the throne room, but it won't be there when you arrive. It never is.",
-        "conditions": []
-      }
-    ]
-  },
-  "1023": {
-    "vnum": 1023,
-    "zone": 1,
-    "name": "Blacksmith Hanna",
-    "description": "A muscular woman hammering at an anvil. Sparks fly with each strike. Her work is clearly superior to anything the bandits carry.",
-    "hostile": false,
-    "stats": {
-      "hp": 999,
-      "max_hp": 999,
-      "attack": 0,
-      "defense": 0
-    },
-    "loot": [],
-    "respawn": 0,
-    "dialogue": [
-      {
-        "text": "Need repairs? Bring me Ironwood Bark and I'll reinforce your gear. Or if you've got coin, I sell blades that actually hold an edge.",
-        "conditions": []
-      }
-    ]
-  },
-  "2001": {
-    "vnum": 2001,
-    "zone": 2,
-    "name": "Rogue Android",
-    "description": "A malfunctioning service android with glowing red eyes.",
-    "hostile": true,
-    "stats": {
-      "hp": 50,
-      "max_hp": 50,
-      "attack": 10,
       "defense": 5
-    },
-    "loot_table": [
-      2001
-    ],
-    "respawn": 5,
-    "dialogue": []
-  },
-  "2002": {
-    "vnum": 2002,
-    "zone": 2,
-    "name": "Corporate Security Drone",
-    "description": "A hovering drone armed with a light blaster.",
-    "hostile": true,
-    "stats": {
-      "hp": 40,
-      "max_hp": 40,
-      "attack": 12,
-      "defense": 8
-    },
-    "loot_table": [
-      2002
-    ],
-    "respawn": 5,
-    "dialogue": []
-  },
-  "2003": {
-    "vnum": 2003,
-    "zone": 2,
-    "name": "Cyber-Punk Thug",
-    "description": "A street gang member with cheap chrome implants.",
-    "hostile": true,
-    "stats": {
-      "hp": 60,
-      "max_hp": 60,
-      "attack": 15,
-      "defense": 5
-    },
-    "loot_table": [
-      2003
-    ],
-    "respawn": 5,
-    "dialogue": []
-  },
-  "2004": {
-    "vnum": 2004,
-    "zone": 2,
-    "name": "Mutant Rat",
-    "description": "An oversized rat glowing with toxic sludge.",
-    "hostile": true,
-    "stats": {
-      "hp": 30,
-      "max_hp": 30,
-      "attack": 8,
-      "defense": 2
-    },
-    "loot_table": [],
-    "respawn": 3,
-    "dialogue": []
-  },
-  "2005": {
-    "vnum": 2005,
-    "zone": 2,
-    "name": "Hacker Bot",
-    "description": "A small spider-like bot used for slicing terminals.",
-    "hostile": true,
-    "stats": {
-      "hp": 25,
-      "max_hp": 25,
-      "attack": 5,
-      "defense": 10
-    },
-    "loot_table": [
-      2004
-    ],
-    "respawn": 4,
-    "dialogue": []
-  },
-  "2006": {
-    "vnum": 2006,
-    "zone": 2,
-    "name": "Combat Mech",
-    "description": "A heavy bipedal mech with mounted machine guns.",
-    "hostile": true,
-    "stats": {
-      "hp": 150,
-      "max_hp": 150,
-      "attack": 25,
-      "defense": 20
-    },
-    "loot_table": [
-      2005
-    ],
-    "respawn": 10,
-    "dialogue": []
-  },
-  "2007": {
-    "vnum": 2007,
-    "zone": 2,
-    "name": "Viral Construct",
-    "description": "A physical manifestation of a computer virus, glitching in and out of reality.",
-    "hostile": true,
-    "stats": {
-      "hp": 80,
-      "max_hp": 80,
-      "attack": 20,
-      "defense": 5
-    },
-    "loot_table": [],
-    "respawn": 6,
-    "dialogue": []
-  },
-  "2008": {
-    "vnum": 2008,
-    "zone": 2,
-    "name": "Glitch Entity",
-    "description": "A corrupted hologram that deals electrical damage.",
-    "hostile": true,
-    "stats": {
-      "hp": 45,
-      "max_hp": 45,
-      "attack": 18,
-      "defense": 0
-    },
-    "loot_table": [
-      2006
-    ],
-    "respawn": 5,
-    "dialogue": []
-  },
-  "2009": {
-    "vnum": 2009,
-    "zone": 2,
-    "name": "Corrupt AI Node",
-    "description": "A stationary server rack defending itself with laser grids.",
-    "hostile": true,
-    "stats": {
-      "hp": 100,
-      "max_hp": 100,
-      "attack": 15,
-      "defense": 15
-    },
-    "loot_table": [
-      2007
-    ],
-    "respawn": 8,
-    "dialogue": []
-  },
-  "2010": {
-    "vnum": 2010,
-    "zone": 2,
-    "name": "Turret System",
-    "description": "An automated ceiling turret.",
-    "hostile": true,
-    "stats": {
-      "hp": 60,
-      "max_hp": 60,
-      "attack": 22,
-      "defense": 10
-    },
-    "loot_table": [
-      2008
-    ],
-    "respawn": 5,
-    "dialogue": []
-  },
-  "2011": {
-    "vnum": 2011,
-    "zone": 2,
-    "name": "Augmented Thug",
-    "description": "A massive brute with hydraulic arms.",
-    "hostile": true,
-    "stats": {
-      "hp": 120,
-      "max_hp": 120,
-      "attack": 18,
-      "defense": 12
-    },
-    "loot_table": [
-      2009
-    ],
-    "respawn": 6,
-    "dialogue": []
-  },
-  "2012": {
-    "vnum": 2012,
-    "zone": 2,
-    "name": "Netrunner Phantom",
-    "description": "The digital ghost of a fried netrunner.",
-    "hostile": true,
-    "stats": {
-      "hp": 70,
-      "max_hp": 70,
-      "attack": 25,
-      "defense": 5
-    },
-    "loot_table": [
-      2010
-    ],
-    "respawn": 7,
-    "dialogue": []
-  },
-  "2013": {
-    "vnum": 2013,
-    "zone": 2,
-    "name": "Chrome Beast",
-    "description": "A genetically modified dog with titanium plating.",
-    "hostile": true,
-    "stats": {
-      "hp": 90,
-      "max_hp": 90,
-      "attack": 20,
-      "defense": 15
-    },
-    "loot_table": [],
-    "respawn": 6,
-    "dialogue": []
-  },
-  "2014": {
-    "vnum": 2014,
-    "zone": 2,
-    "name": "Toxic Waste Slime",
-    "description": "A sentient puddle of industrial runoff.",
-    "hostile": true,
-    "stats": {
-      "hp": 110,
-      "max_hp": 110,
-      "attack": 12,
-      "defense": 25
-    },
-    "loot_table": [
-      2011
-    ],
-    "respawn": 8,
-    "dialogue": []
-  },
-  "2015": {
-    "vnum": 2015,
-    "zone": 2,
-    "name": "Shock Trooper",
-    "description": "An elite corporate soldier with a plasma rifle.",
-    "hostile": true,
-    "stats": {
-      "hp": 130,
-      "max_hp": 130,
-      "attack": 30,
-      "defense": 18
-    },
-    "loot_table": [
-      2012
-    ],
-    "respawn": 10,
-    "dialogue": []
-  },
-  "2016": {
-    "vnum": 2016,
-    "zone": 2,
-    "name": "Data Wraith",
-    "description": "A terrifying amalgamation of stolen data and rogue code.",
-    "hostile": true,
-    "stats": {
-      "hp": 200,
-      "max_hp": 200,
-      "attack": 35,
-      "defense": 20
-    },
-    "loot_table": [
-      2013
-    ],
-    "respawn": 15,
-    "dialogue": []
-  },
-  "2017": {
-    "vnum": 2017,
-    "zone": 2,
-    "name": "Overclocked Sentinel",
-    "description": "A boss-level security robot, glowing with excess heat.",
-    "hostile": true,
-    "stats": {
-      "hp": 300,
-      "max_hp": 300,
-      "attack": 40,
-      "defense": 30
-    },
-    "loot_table": [
-      2014
-    ],
-    "respawn": 20,
-    "dialogue": []
-  },
-  "2018": {
-    "vnum": 2018,
-    "zone": 2,
-    "name": "Rogue Nanobots",
-    "description": "A swarm of microscopic machines devouring everything.",
-    "hostile": true,
-    "stats": {
-      "hp": 80,
-      "max_hp": 80,
-      "attack": 15,
-      "defense": 30
-    },
-    "loot_table": [],
-    "respawn": 5,
-    "dialogue": []
-  },
-  "2019": {
-    "vnum": 2019,
-    "zone": 2,
-    "name": "Fixer Nine",
-    "description": "A sharp-dressed info broker leaning against a neon sign.",
-    "hostile": false,
-    "stats": {
-      "hp": 100,
-      "max_hp": 100,
-      "attack": 10,
-      "defense": 10
-    },
-    "loot_table": [],
-    "respawn": 0,
-    "dialogue": [
-      "Need some intel? It'll cost ya.",
-      "I heard a perfect sphere rolled through here recently. Left no reflection in the puddles. Weird, right?",
-      "If you find an Encrypted Data Chip, bring it to me. Or don't. I hear it's just garbage anyway."
-    ]
-  },
-  "2020": {
-    "vnum": 2020,
-    "zone": 2,
-    "name": "Doc Splice",
-    "description": "A back-alley cybernetics doctor with blood on his apron.",
-    "hostile": false,
-    "stats": {
-      "hp": 100,
-      "max_hp": 100,
-      "attack": 10,
-      "defense": 10
-    },
-    "loot_table": [],
-    "respawn": 0,
-    "dialogue": [
-      "Need an upgrade? I got fresh chrome.",
-      "Someone came in here looking for a Charged Cyber-Eye. You can make one if you combine a Severed Cyber-Eye with a Power Cell."
-    ]
-  },
-  "2021": {
-    "vnum": 2021,
-    "zone": 2,
-    "name": "Neon Mama",
-    "description": "The tough-as-nails owner of the local dive bar.",
-    "hostile": false,
-    "stats": {
-      "hp": 150,
-      "max_hp": 150,
-      "attack": 20,
-      "defense": 20
-    },
-    "loot_table": [],
-    "respawn": 0,
-    "dialogue": [
-      "Drink up or get out.",
-      "I saw a dent in the floorboards over there. Perfectly circular. Like a heavy marble dropped from the ceiling."
-    ]
-  },
-  "2022": {
-    "vnum": 2022,
-    "zone": 2,
-    "name": "Pixel",
-    "description": "A young kid with a neural jack plugged into a datapad.",
-    "hostile": false,
-    "stats": {
-      "hp": 50,
-      "max_hp": 50,
-      "attack": 5,
-      "defense": 5
-    },
-    "loot_table": [],
-    "respawn": 0,
-    "dialogue": [
-      "I'm trying to hack the mainframe, but I need a Power Cell!",
-      "Have you seen my missing drone?"
-    ]
-  },
-  "2023": {
-    "vnum": 2023,
-    "zone": 2,
-    "name": "Chrome Dog",
-    "description": "A bounty hunter covered in weapons and armor.",
-    "hostile": false,
-    "stats": {
-      "hp": 250,
-      "max_hp": 250,
-      "attack": 30,
-      "defense": 30
-    },
-    "loot_table": [],
-    "respawn": 0,
-    "dialogue": [
-      "I'm hunting a rogue android. Seen one?",
-      "Stay out of my way, rookie."
-    ]
-  },
-  "3001": {
-    "vnum": 3001,
-    "zone": 3,
-    "name": "Detective Malone",
-    "description": "A weary detective in a trench coat, smoking a cigarette.",
-    "hostile": false,
-    "stats": {
-      "hp": 500,
-      "max_hp": 500,
-      "attack": 20,
-      "defense": 20
-    },
-    "loot_table": [],
-    "respawn": 300,
-    "dialogue": [
-      "I'm looking for a safe combo. The year the war ended, maybe? 1945.",
-      "Watch your back in these alleys."
-    ]
-  },
-  "3002": {
-    "vnum": 3002,
-    "zone": 3,
-    "name": "Velvet",
-    "description": "A glamorous jazz singer in a sequined dress.",
-    "hostile": false,
-    "stats": {
-      "hp": 200,
-      "max_hp": 200,
-      "attack": 10,
-      "defense": 10
-    },
-    "loot_table": [],
-    "respawn": 300,
-    "dialogue": [
-      "The boss is keeping something shiny in the vault.",
-      "I saw something roll through the rain, leaving a dry trail on wet pavement."
-    ]
-  },
-  "3003": {
-    "vnum": 3003,
-    "zone": 3,
-    "name": "Sal the Snitch",
-    "description": "A nervous man constantly looking over his shoulder.",
-    "hostile": false,
-    "stats": {
-      "hp": 100,
-      "max_hp": 100,
-      "attack": 5,
-      "defense": 5
-    },
-    "loot_table": [],
-    "respawn": 300,
-    "dialogue": [
-      "Got a coin? I'll tell you a secret.",
-      "The warehouse guards are easily bribed."
-    ]
-  },
-  "3004": {
-    "vnum": 3004,
-    "zone": 3,
-    "name": "Lucky Pete",
-    "description": "A gambler flipping a coin.",
-    "hostile": false,
-    "stats": {
-      "hp": 150,
-      "max_hp": 150,
-      "attack": 10,
-      "defense": 10
-    },
-    "loot_table": [],
-    "respawn": 300,
-    "dialogue": [
-      "Hey pal, I lost my lucky coin. Find it for me, will ya?"
-    ]
-  },
-  "3005": {
-    "vnum": 3005,
-    "zone": 3,
-    "name": "Mama Rosa",
-    "description": "A warm, motherly diner owner.",
-    "hostile": false,
-    "stats": {
-      "hp": 300,
-      "max_hp": 300,
-      "attack": 15,
-      "defense": 15
-    },
-    "loot_table": [],
-    "respawn": 300,
-    "dialogue": [
-      "Eat up, dear. You look starved.",
-      "These streets are no place for a decent person."
-    ]
-  },
-  "3006": {
-    "vnum": 3006,
-    "zone": 3,
-    "name": "Street Thug",
-    "description": "A rough-looking thug with a crowbar.",
-    "hostile": true,
-    "stats": {
-      "hp": 50,
-      "max_hp": 50,
-      "attack": 10,
-      "defense": 5
-    },
-    "loot_table": [
-      3001
-    ],
-    "respawn": 60,
-    "dialogue": []
-  },
-  "3007": {
-    "vnum": 3007,
-    "zone": 3,
-    "name": "Corrupt Cop",
-    "description": "A police officer with a sinister smirk.",
-    "hostile": true,
-    "stats": {
-      "hp": 80,
-      "max_hp": 80,
-      "attack": 15,
-      "defense": 10
-    },
-    "loot_table": [
-      3002
-    ],
-    "respawn": 60,
-    "dialogue": []
-  },
-  "3008": {
-    "vnum": 3008,
-    "zone": 3,
-    "name": "Mob Enforcer",
-    "description": "A hulking brute in a tailored suit.",
-    "hostile": true,
-    "stats": {
-      "hp": 120,
-      "max_hp": 120,
-      "attack": 20,
-      "defense": 15
-    },
-    "loot_table": [
-      3003
-    ],
-    "respawn": 120,
-    "dialogue": []
-  },
-  "3009": {
-    "vnum": 3009,
-    "zone": 3,
-    "name": "Dock Worker",
-    "description": "A burly worker wielding a cargo hook.",
-    "hostile": true,
-    "stats": {
-      "hp": 70,
-      "max_hp": 70,
-      "attack": 12,
-      "defense": 8
     },
     "loot_table": [],
     "respawn": 60,
-    "dialogue": []
+    "dialogue": [],
+    "flags": [
+      "roaming"
+    ]
   },
-  "3010": {
-    "vnum": 3010,
-    "zone": 3,
-    "name": "Alley Cat",
-    "description": "A scrawny, hissing cat.",
-    "hostile": true,
-    "stats": {
-      "hp": 20,
-      "max_hp": 20,
-      "attack": 5,
-      "defense": 2
-    },
-    "loot_table": [],
-    "respawn": 30,
-    "dialogue": []
-  },
-  "3011": {
-    "vnum": 3011,
-    "zone": 3,
-    "name": "Sewer Rat",
-    "description": "An unusually large rat.",
-    "hostile": true,
-    "stats": {
-      "hp": 30,
-      "max_hp": 30,
-      "attack": 8,
-      "defense": 3
-    },
-    "loot_table": [],
-    "respawn": 30,
-    "dialogue": []
-  },
-  "3012": {
-    "vnum": 3012,
-    "zone": 3,
-    "name": "Hired Gun",
-    "description": "A professional killer with cold eyes.",
+  "1202": {
+    "vnum": 1202,
+    "name": "Rogue Drone",
+    "description": "A malfunctioning delivery drone sparking with exposed wires.",
     "hostile": true,
     "stats": {
       "hp": 100,
       "max_hp": 100,
-      "attack": 25,
-      "defense": 10
-    },
-    "loot_table": [
-      3004
-    ],
-    "respawn": 120,
-    "dialogue": []
-  },
-  "3013": {
-    "vnum": 3013,
-    "zone": 3,
-    "name": "Femme Fatale Assassin",
-    "description": "A deadly woman with a concealed weapon.",
-    "hostile": true,
-    "stats": {
-      "hp": 90,
-      "max_hp": 90,
-      "attack": 30,
-      "defense": 5
-    },
-    "loot_table": [
-      3005
-    ],
-    "respawn": 120,
-    "dialogue": []
-  },
-  "3014": {
-    "vnum": 3014,
-    "zone": 3,
-    "name": "Bootlegger",
-    "description": "A smuggler carrying crates of illegal booze.",
-    "hostile": true,
-    "stats": {
-      "hp": 60,
-      "max_hp": 60,
-      "attack": 12,
-      "defense": 6
-    },
-    "loot_table": [
-      3006
-    ],
-    "respawn": 60,
-    "dialogue": []
-  },
-  "3015": {
-    "vnum": 3015,
-    "zone": 3,
-    "name": "Loan Shark",
-    "description": "A sleazy man counting a wad of cash.",
-    "hostile": true,
-    "stats": {
-      "hp": 80,
-      "max_hp": 80,
-      "attack": 10,
-      "defense": 10
-    },
-    "loot_table": [
-      3007
-    ],
-    "respawn": 90,
-    "dialogue": []
-  },
-  "3016": {
-    "vnum": 3016,
-    "zone": 3,
-    "name": "Arsonist",
-    "description": "A maniac playing with a lighter.",
-    "hostile": true,
-    "stats": {
-      "hp": 70,
-      "max_hp": 70,
-      "attack": 18,
-      "defense": 5
-    },
-    "loot_table": [
-      3008
-    ],
-    "respawn": 90,
-    "dialogue": []
-  },
-  "3017": {
-    "vnum": 3017,
-    "zone": 3,
-    "name": "Shadow Stalker",
-    "description": "A figure blending into the darkness.",
-    "hostile": true,
-    "stats": {
-      "hp": 110,
-      "max_hp": 110,
-      "attack": 22,
-      "defense": 12
-    },
-    "loot_table": [],
-    "respawn": 120,
-    "dialogue": []
-  },
-  "3018": {
-    "vnum": 3018,
-    "zone": 3,
-    "name": "Poisoner",
-    "description": "A sinister individual with vials of toxic liquids.",
-    "hostile": true,
-    "stats": {
-      "hp": 60,
-      "max_hp": 60,
-      "attack": 15,
-      "defense": 5
-    },
-    "loot_table": [
-      3009
-    ],
-    "respawn": 90,
-    "dialogue": []
-  },
-  "3019": {
-    "vnum": 3019,
-    "zone": 3,
-    "name": "Brass Knuckle Brawler",
-    "description": "A tough guy with brass knuckles.",
-    "hostile": true,
-    "stats": {
-      "hp": 130,
-      "max_hp": 130,
-      "attack": 18,
-      "defense": 18
-    },
-    "loot_table": [
-      3010
-    ],
-    "respawn": 120,
-    "dialogue": []
-  },
-  "3020": {
-    "vnum": 3020,
-    "zone": 3,
-    "name": "Tommy Gun Gangster",
-    "description": "A mobster wielding a tommy gun.",
-    "hostile": true,
-    "stats": {
-      "hp": 150,
-      "max_hp": 150,
-      "attack": 35,
-      "defense": 15
-    },
-    "loot_table": [
-      3011
-    ],
-    "respawn": 180,
-    "dialogue": []
-  },
-  "3021": {
-    "vnum": 3021,
-    "zone": 3,
-    "name": "Crooked Politician",
-    "description": "A well-dressed man sweating profusely.",
-    "hostile": true,
-    "stats": {
-      "hp": 90,
-      "max_hp": 90,
-      "attack": 5,
-      "defense": 20
-    },
-    "loot_table": [
-      3012
-    ],
-    "respawn": 180,
-    "dialogue": []
-  },
-  "3022": {
-    "vnum": 3022,
-    "zone": 3,
-    "name": "Warehouse Guard",
-    "description": "A bored but armed guard.",
-    "hostile": true,
-    "stats": {
-      "hp": 100,
-      "max_hp": 100,
-      "attack": 15,
-      "defense": 15
-    },
-    "loot_table": [],
-    "respawn": 90,
-    "dialogue": []
-  },
-  "3023": {
-    "vnum": 3023,
-    "zone": 3,
-    "name": "Wharf Rat",
-    "description": "A desperate scavenger of the docks.",
-    "hostile": true,
-    "stats": {
-      "hp": 40,
-      "max_hp": 40,
-      "attack": 8,
-      "defense": 4
-    },
-    "loot_table": [],
-    "respawn": 45,
-    "dialogue": []
-  },
-  "4001": {
-    "vnum": 4001,
-    "zone": 4,
-    "name": "Sergeant Rock",
-    "description": "A grizzled veteran offering combat tips.",
-    "hostile": false,
-    "stats": {
-      "hp": 500,
-      "max_hp": 500,
-      "attack": 50,
-      "defense": 50
-    },
-    "loot_table": [],
-    "respawn": 5,
-    "dialogue": [
-      "Keep your head down, rookie!",
-      "Watch out for the razor wire."
-    ]
-  },
-  "4002": {
-    "vnum": 4002,
-    "zone": 4,
-    "name": "Arms Dealer Vick",
-    "description": "A shady character selling weapons.",
-    "hostile": false,
-    "stats": {
-      "hp": 300,
-      "max_hp": 300,
-      "attack": 20,
-      "defense": 20
-    },
-    "loot_table": [],
-    "respawn": 5,
-    "dialogue": [
-      "Got the best guns in the jungle.",
-      "Cash only."
-    ]
-  },
-  "4003": {
-    "vnum": 4003,
-    "zone": 4,
-    "name": "Nurse Chapel",
-    "description": "A field medic ready to heal.",
-    "hostile": false,
-    "stats": {
-      "hp": 200,
-      "max_hp": 200,
-      "attack": 10,
-      "defense": 10
-    },
-    "loot_table": [],
-    "respawn": 5,
-    "dialogue": [
-      "Let me patch you up.",
-      "Stay safe out there."
-    ]
-  },
-  "4004": {
-    "vnum": 4004,
-    "zone": 4,
-    "name": "Radio Operator Sparks",
-    "description": "A frantic comms officer.",
-    "hostile": false,
-    "stats": {
-      "hp": 150,
-      "max_hp": 150,
-      "attack": 5,
-      "defense": 5
-    },
-    "loot_table": [],
-    "respawn": 5,
-    "dialogue": [
-      "I'm picking up strange signals.",
-      "Can you find the abort code?"
-    ]
-  },
-  "4005": {
-    "vnum": 4005,
-    "zone": 4,
-    "name": "Prisoner Zero",
-    "description": "A captive soldier.",
-    "hostile": false,
-    "stats": {
-      "hp": 100,
-      "max_hp": 100,
-      "attack": 5,
-      "defense": 5
-    },
-    "loot_table": [],
-    "respawn": 5,
-    "dialogue": [
-      "Thank you for rescuing me!",
-      "They took my squad to the silo."
-    ]
-  },
-  "4006": {
-    "vnum": 4006,
-    "zone": 4,
-    "name": "Mercenary Soldier",
-    "description": "A heavily armed gun-for-hire.",
-    "hostile": true,
-    "stats": {
-      "hp": 120,
-      "max_hp": 120,
-      "attack": 25,
-      "defense": 15
-    },
-    "loot_table": [],
-    "respawn": 5,
-    "dialogue": []
-  },
-  "4007": {
-    "vnum": 4007,
-    "zone": 4,
-    "name": "Guard Dog",
-    "description": "A vicious Doberman.",
-    "hostile": true,
-    "stats": {
-      "hp": 80,
-      "max_hp": 80,
-      "attack": 30,
-      "defense": 10
-    },
-    "loot_table": [],
-    "respawn": 5,
-    "dialogue": []
-  },
-  "4008": {
-    "vnum": 4008,
-    "zone": 4,
-    "name": "Jungle Guerrilla",
-    "description": "A master of ambush.",
-    "hostile": true,
-    "stats": {
-      "hp": 100,
-      "max_hp": 100,
-      "attack": 35,
-      "defense": 10
-    },
-    "loot_table": [],
-    "respawn": 5,
-    "dialogue": []
-  },
-  "4009": {
-    "vnum": 4009,
-    "zone": 4,
-    "name": "Base Sentry",
-    "description": "A vigilant guard.",
-    "hostile": true,
-    "stats": {
-      "hp": 110,
-      "max_hp": 110,
-      "attack": 20,
-      "defense": 20
-    },
-    "loot_table": [],
-    "respawn": 5,
-    "dialogue": []
-  },
-  "4010": {
-    "vnum": 4010,
-    "zone": 4,
-    "name": "Sniper",
-    "description": "A hidden marksman.",
-    "hostile": true,
-    "stats": {
-      "hp": 90,
-      "max_hp": 90,
-      "attack": 45,
-      "defense": 5
-    },
-    "loot_table": [],
-    "respawn": 5,
-    "dialogue": []
-  },
-  "4011": {
-    "vnum": 4011,
-    "zone": 4,
-    "name": "Demolition Expert",
-    "description": "Carrying dangerous explosives.",
-    "hostile": true,
-    "stats": {
-      "hp": 130,
-      "max_hp": 130,
-      "attack": 40,
-      "defense": 10
-    },
-    "loot_table": [],
-    "respawn": 5,
-    "dialogue": []
-  },
-  "4012": {
-    "vnum": 4012,
-    "zone": 4,
-    "name": "Flamethrower Troop",
-    "description": "Wielding a deadly stream of fire.",
-    "hostile": true,
-    "stats": {
-      "hp": 150,
-      "max_hp": 150,
-      "attack": 50,
-      "defense": 15
-    },
-    "loot_table": [],
-    "respawn": 5,
-    "dialogue": []
-  },
-  "4013": {
-    "vnum": 4013,
-    "zone": 4,
-    "name": "Armored Vehicle",
-    "description": "A heavily armored mini-boss.",
-    "hostile": true,
-    "stats": {
-      "hp": 400,
-      "max_hp": 400,
-      "attack": 60,
-      "defense": 40
-    },
-    "loot_table": [],
-    "respawn": 5,
-    "dialogue": []
-  },
-  "4014": {
-    "vnum": 4014,
-    "zone": 4,
-    "name": "Helicopter Gunship",
-    "description": "The ultimate boss of the base.",
-    "hostile": true,
-    "stats": {
-      "hp": 800,
-      "max_hp": 800,
-      "attack": 80,
-      "defense": 50
-    },
-    "loot_table": [],
-    "respawn": 5,
-    "dialogue": []
-  },
-  "4015": {
-    "vnum": 4015,
-    "zone": 4,
-    "name": "Drill Sergeant",
-    "description": "Yelling orders constantly.",
-    "hostile": true,
-    "stats": {
-      "hp": 140,
-      "max_hp": 140,
-      "attack": 25,
-      "defense": 20
-    },
-    "loot_table": [],
-    "respawn": 5,
-    "dialogue": []
-  },
-  "4016": {
-    "vnum": 4016,
-    "zone": 4,
-    "name": "Chemical Weapon Troop",
-    "description": "Wearing a hazmat suit.",
-    "hostile": true,
-    "stats": {
-      "hp": 160,
-      "max_hp": 160,
-      "attack": 35,
-      "defense": 25
-    },
-    "loot_table": [],
-    "respawn": 5,
-    "dialogue": []
-  },
-  "4017": {
-    "vnum": 4017,
-    "zone": 4,
-    "name": "Spec-Ops Assassin",
-    "description": "A stealthy killer.",
-    "hostile": true,
-    "stats": {
-      "hp": 180,
-      "max_hp": 180,
-      "attack": 55,
-      "defense": 15
-    },
-    "loot_table": [],
-    "respawn": 5,
-    "dialogue": []
-  },
-  "4018": {
-    "vnum": 4018,
-    "zone": 4,
-    "name": "Rogue General",
-    "description": "The mastermind behind the base.",
-    "hostile": true,
-    "stats": {
-      "hp": 500,
-      "max_hp": 500,
-      "attack": 65,
-      "defense": 35
-    },
-    "loot_table": [],
-    "respawn": 5,
-    "dialogue": []
-  },
-  "4019": {
-    "vnum": 4019,
-    "zone": 4,
-    "name": "Mutant Soldier",
-    "description": "A failed experiment.",
-    "hostile": true,
-    "stats": {
-      "hp": 250,
-      "max_hp": 250,
-      "attack": 45,
-      "defense": 30
-    },
-    "loot_table": [],
-    "respawn": 5,
-    "dialogue": []
-  },
-  "4020": {
-    "vnum": 4020,
-    "zone": 4,
-    "name": "Cyber-Enhanced Commando",
-    "description": "Half man, half machine.",
-    "hostile": true,
-    "stats": {
-      "hp": 300,
-      "max_hp": 300,
-      "attack": 50,
-      "defense": 40
-    },
-    "loot_table": [],
-    "respawn": 5,
-    "dialogue": []
-  },
-  "5001": {
-    "vnum": 5001,
-    "zone": 5,
-    "name": "Shadow Ninja",
-    "description": "A stealthy assassin clad in dark garb.",
-    "hostile": true,
-    "stats": {
-      "hp": 50,
-      "max_hp": 50,
-      "attack": 15,
-      "defense": 5
-    },
-    "loot_table": [
-      5001
-    ],
-    "respawn": 300,
-    "dialogue": []
-  },
-  "5002": {
-    "vnum": 5002,
-    "zone": 5,
-    "name": "Oni Demon",
-    "description": "A hulking red demon with a spiked club.",
-    "hostile": true,
-    "stats": {
-      "hp": 120,
-      "max_hp": 120,
-      "attack": 25,
-      "defense": 10
-    },
-    "loot_table": [
-      5002
-    ],
-    "respawn": 300,
-    "dialogue": []
-  },
-  "5003": {
-    "vnum": 5003,
-    "zone": 5,
-    "name": "Kitsune Trickster",
-    "description": "A multi-tailed fox spirit with a mischievous grin.",
-    "hostile": true,
-    "stats": {
-      "hp": 60,
-      "max_hp": 60,
-      "attack": 20,
-      "defense": 8
-    },
-    "loot_table": [
-      5003
-    ],
-    "respawn": 300,
-    "dialogue": []
-  },
-  "5004": {
-    "vnum": 5004,
-    "zone": 5,
-    "name": "Bamboo Golem",
-    "description": "A construct made entirely of animated bamboo stalks.",
-    "hostile": true,
-    "stats": {
-      "hp": 80,
-      "max_hp": 80,
-      "attack": 12,
-      "defense": 15
-    },
-    "loot_table": [
-      5004
-    ],
-    "respawn": 300,
-    "dialogue": []
-  },
-  "5005": {
-    "vnum": 5005,
-    "zone": 5,
-    "name": "Spirit Fox",
-    "description": "An ethereal fox glowing with blue light.",
-    "hostile": true,
-    "stats": {
-      "hp": 40,
-      "max_hp": 40,
-      "attack": 18,
-      "defense": 5
-    },
-    "loot_table": [],
-    "respawn": 300,
-    "dialogue": []
-  },
-  "5006": {
-    "vnum": 5006,
-    "zone": 5,
-    "name": "Corrupted Monk",
-    "description": "A former holy man now consumed by dark energy.",
-    "hostile": true,
-    "stats": {
-      "hp": 70,
-      "max_hp": 70,
       "attack": 16,
-      "defense": 8
-    },
-    "loot_table": [
-      5005
-    ],
-    "respawn": 300,
-    "dialogue": []
-  },
-  "5007": {
-    "vnum": 5007,
-    "zone": 5,
-    "name": "Thunder Elemental",
-    "description": "A crackling being of pure electricity.",
-    "hostile": true,
-    "stats": {
-      "hp": 90,
-      "max_hp": 90,
-      "attack": 22,
-      "defense": 5
-    },
-    "loot_table": [
-      5006
-    ],
-    "respawn": 300,
-    "dialogue": []
-  },
-  "5008": {
-    "vnum": 5008,
-    "zone": 5,
-    "name": "Ice Wraith",
-    "description": "A chilling spirit that freezes the air around it.",
-    "hostile": true,
-    "stats": {
-      "hp": 65,
-      "max_hp": 65,
-      "attack": 19,
-      "defense": 6
-    },
-    "loot_table": [
-      5007
-    ],
-    "respawn": 300,
-    "dialogue": []
-  },
-  "5009": {
-    "vnum": 5009,
-    "zone": 5,
-    "name": "Dragon Hatchling",
-    "description": "A small but fierce dragon with shimmering scales.",
-    "hostile": true,
-    "stats": {
-      "hp": 100,
-      "max_hp": 100,
-      "attack": 20,
-      "defense": 12
-    },
-    "loot_table": [
-      5008
-    ],
-    "respawn": 300,
-    "dialogue": []
-  },
-  "5010": {
-    "vnum": 5010,
-    "zone": 5,
-    "name": "Tengu Warrior",
-    "description": "A bird-like humanoid wielding a sharp katana.",
-    "hostile": true,
-    "stats": {
-      "hp": 85,
-      "max_hp": 85,
-      "attack": 24,
-      "defense": 9
-    },
-    "loot_table": [
-      5009
-    ],
-    "respawn": 300,
-    "dialogue": []
-  },
-  "5011": {
-    "vnum": 5011,
-    "zone": 5,
-    "name": "Yokai Shapeshifter",
-    "description": "A strange creature whose form constantly shifts.",
-    "hostile": true,
-    "stats": {
-      "hp": 75,
-      "max_hp": 75,
-      "attack": 17,
-      "defense": 7
-    },
-    "loot_table": [],
-    "respawn": 300,
-    "dialogue": []
-  },
-  "5012": {
-    "vnum": 5012,
-    "zone": 5,
-    "name": "Cursed Samurai",
-    "description": "An undead warrior bound to his ancient armor.",
-    "hostile": true,
-    "stats": {
-      "hp": 110,
-      "max_hp": 110,
-      "attack": 21,
-      "defense": 14
-    },
-    "loot_table": [
-      5010
-    ],
-    "respawn": 300,
-    "dialogue": []
-  },
-  "5013": {
-    "vnum": 5013,
-    "zone": 5,
-    "name": "Paper Charm Construct",
-    "description": "A magical being made of folded paper talismans.",
-    "hostile": true,
-    "stats": {
-      "hp": 30,
-      "max_hp": 30,
-      "attack": 10,
-      "defense": 2
-    },
-    "loot_table": [
-      5011
-    ],
-    "respawn": 300,
-    "dialogue": []
-  },
-  "5014": {
-    "vnum": 5014,
-    "zone": 5,
-    "name": "Wind Spirit",
-    "description": "A swirling vortex of razor-sharp winds.",
-    "hostile": true,
-    "stats": {
-      "hp": 55,
-      "max_hp": 55,
-      "attack": 23,
-      "defense": 4
-    },
-    "loot_table": [],
-    "respawn": 300,
-    "dialogue": []
-  },
-  "5015": {
-    "vnum": 5015,
-    "zone": 5,
-    "name": "Jade Serpent",
-    "description": "A massive snake with scales like polished jade.",
-    "hostile": true,
-    "stats": {
-      "hp": 95,
-      "max_hp": 95,
-      "attack": 18,
-      "defense": 11
-    },
-    "loot_table": [
-      5012
-    ],
-    "respawn": 300,
-    "dialogue": []
-  },
-  "5016": {
-    "vnum": 5016,
-    "zone": 5,
-    "name": "Demon General",
-    "description": "A towering boss demon commanding the dark forces.",
-    "hostile": true,
-    "stats": {
-      "hp": 300,
-      "max_hp": 300,
-      "attack": 40,
-      "defense": 20
-    },
-    "loot_table": [
-      5013,
-      5014
-    ],
-    "respawn": 3600,
-    "dialogue": [
-      "You dare challenge me?!"
-    ]
-  },
-  "5017": {
-    "vnum": 5017,
-    "zone": 5,
-    "name": "Training Dummy",
-    "description": "A wooden dummy used for martial arts practice.",
-    "hostile": true,
-    "stats": {
-      "hp": 20,
-      "max_hp": 20,
-      "attack": 1,
-      "defense": 1
-    },
-    "loot_table": [],
-    "respawn": 60,
-    "dialogue": []
-  },
-  "5018": {
-    "vnum": 5018,
-    "zone": 5,
-    "name": "Wild Boar",
-    "description": "An aggressive boar with sharp tusks.",
-    "hostile": true,
-    "stats": {
-      "hp": 45,
-      "max_hp": 45,
-      "attack": 12,
-      "defense": 6
-    },
-    "loot_table": [
-      5015
-    ],
-    "respawn": 300,
-    "dialogue": []
-  },
-  "5019": {
-    "vnum": 5019,
-    "zone": 5,
-    "name": "Master Shen",
-    "description": "An old, wise trainer sitting peacefully.",
-    "hostile": false,
-    "stats": {
-      "hp": 500,
-      "max_hp": 500,
-      "attack": 50,
-      "defense": 50
-    },
-    "loot_table": [],
-    "respawn": 0,
-    "dialogue": [
-      "Patience is the key to true strength.",
-      "Seek the Flame of the Masters in the West Pavilion."
-    ]
-  },
-  "5020": {
-    "vnum": 5020,
-    "zone": 5,
-    "name": "Sakura",
-    "description": "A gentle healer tending to the tea house.",
-    "hostile": false,
-    "stats": {
-      "hp": 100,
-      "max_hp": 100,
-      "attack": 5,
-      "defense": 5
-    },
-    "loot_table": [],
-    "respawn": 0,
-    "dialogue": [
-      "Would you like some tea? It heals the spirit."
-    ]
-  },
-  "5021": {
-    "vnum": 5021,
-    "zone": 5,
-    "name": "Wandering Ronin",
-    "description": "A masterless samurai looking for purpose.",
-    "hostile": false,
-    "stats": {
-      "hp": 150,
-      "max_hp": 150,
-      "attack": 25,
-      "defense": 15
-    },
-    "loot_table": [],
-    "respawn": 0,
-    "dialogue": [
-      "I have a task for you, if you are brave enough.",
-      "Bring me the Ancient Scroll of Power!"
-    ]
-  },
-  "5022": {
-    "vnum": 5022,
-    "zone": 5,
-    "name": "Spirit Guide Yuki",
-    "description": "A translucent figure offering guidance.",
-    "hostile": false,
-    "stats": {
-      "hp": 200,
-      "max_hp": 200,
-      "attack": 10,
-      "defense": 20
-    },
-    "loot_table": [],
-    "respawn": 0,
-    "dialogue": [
-      "A sphere of perfect clarity bounced between the floating shards, leaving ripples in the clouds."
-    ]
-  },
-  "5023": {
-    "vnum": 5023,
-    "zone": 5,
-    "name": "Merchant Tanuki",
-    "description": "A raccoon-dog merchant with a sly smile.",
-    "hostile": false,
-    "stats": {
-      "hp": 80,
-      "max_hp": 80,
-      "attack": 10,
       "defense": 10
     },
     "loot_table": [],
-    "respawn": 0,
-    "dialogue": [
-      "I have many wares, for the right price!"
+    "respawn": 45,
+    "dialogue": [],
+    "flags": [
+      "roaming"
     ]
   },
-  "6001": {
-    "vnum": 6001,
-    "zone": 6,
-    "name": "Gladiator Champion Rex",
-    "desc": "A scarred veteran of the arena.",
-    "hostile": false,
-    "stats": {
-      "hp": 500,
-      "max_hp": 500,
-      "attack": 50,
-      "defense": 40
-    },
-    "loot_table": [
-      6007
-    ],
-    "respawn": 300,
-    "dialogue": [
-      "Train hard, fight harder.",
-      "I have a special reward if you prove yourself."
-    ]
-  },
-  "6002": {
-    "vnum": 6002,
-    "zone": 6,
-    "name": "Scribe Ptolemy",
-    "desc": "An old man surrounded by scrolls.",
-    "hostile": false,
-    "stats": {
-      "hp": 100,
-      "max_hp": 100,
-      "attack": 5,
-      "defense": 5
-    },
-    "loot_table": [],
-    "respawn": 300,
-    "dialogue": [
-      "The Lion's Eye opens the way in the catacombs.",
-      "Knowledge is power."
-    ]
-  },
-  "6003": {
-    "vnum": 6003,
-    "zone": 6,
-    "name": "Merchant Marcus",
-    "desc": "A wealthy merchant selling goods.",
-    "hostile": false,
-    "stats": {
-      "hp": 200,
-      "max_hp": 200,
-      "attack": 10,
-      "defense": 20
-    },
-    "loot_table": [
-      6009
-    ],
-    "respawn": 300,
-    "dialogue": [
-      "Buy my wares!",
-      "Some perfect sphere rolled through here and ruined my amphorae!"
-    ]
-  },
-  "6004": {
-    "vnum": 6004,
-    "zone": 6,
-    "name": "Oracle Pythia",
-    "desc": "A mystic woman breathing strange vapors.",
-    "hostile": false,
-    "stats": {
-      "hp": 150,
-      "max_hp": 150,
-      "attack": 5,
-      "defense": 10
-    },
-    "loot_table": [],
-    "respawn": 300,
-    "dialogue": [
-      "The oracles speak of a perfect sphere that rolled through the forum...",
-      "The future is clouded."
-    ]
-  },
-  "6005": {
-    "vnum": 6005,
-    "zone": 6,
-    "name": "Slave Spartacus",
-    "desc": "A strong man in chains.",
-    "hostile": false,
-    "stats": {
-      "hp": 300,
-      "max_hp": 300,
-      "attack": 20,
-      "defense": 15
-    },
-    "loot_table": [],
-    "respawn": 300,
-    "dialogue": [
-      "If only I had my freedom papers...",
-      "I will not be a slave forever."
-    ]
-  },
-  "6006": {
-    "vnum": 6006,
-    "zone": 6,
-    "name": "Gladiator",
-    "desc": "A fierce fighter in the arena.",
-    "hostile": true,
-    "stats": {
-      "hp": 150,
-      "max_hp": 150,
-      "attack": 20,
-      "defense": 15
-    },
-    "loot_table": [
-      6001
-    ],
-    "respawn": 60,
-    "dialogue": []
-  },
-  "6007": {
-    "vnum": 6007,
-    "zone": 6,
-    "name": "Legionnaire Soldier",
-    "desc": "A disciplined Roman soldier.",
-    "hostile": true,
-    "stats": {
-      "hp": 180,
-      "max_hp": 180,
-      "attack": 18,
-      "defense": 25
-    },
-    "loot_table": [
-      6002
-    ],
-    "respawn": 60,
-    "dialogue": []
-  },
-  "6008": {
-    "vnum": 6008,
-    "zone": 6,
-    "name": "Tomb Guardian",
-    "desc": "An animated statue protecting the tomb.",
-    "hostile": true,
-    "stats": {
-      "hp": 250,
-      "max_hp": 250,
-      "attack": 25,
-      "defense": 30
-    },
-    "loot_table": [
-      6018
-    ],
-    "respawn": 120,
-    "dialogue": []
-  },
-  "6009": {
-    "vnum": 6009,
-    "zone": 6,
-    "name": "Mummy Priest",
-    "desc": "An undead priest wrapped in bandages.",
-    "hostile": true,
-    "stats": {
-      "hp": 200,
-      "max_hp": 200,
-      "attack": 30,
-      "defense": 10
-    },
-    "loot_table": [
-      6013
-    ],
-    "respawn": 120,
-    "dialogue": []
-  },
-  "6010": {
-    "vnum": 6010,
-    "zone": 6,
-    "name": "Viking Berserker",
-    "desc": "A raging warrior.",
-    "hostile": true,
-    "stats": {
-      "hp": 220,
-      "max_hp": 220,
-      "attack": 35,
-      "defense": 5
-    },
-    "loot_table": [
-      6004
-    ],
-    "respawn": 90,
-    "dialogue": []
-  },
-  "6011": {
-    "vnum": 6011,
-    "zone": 6,
-    "name": "Greek Hoplite",
-    "desc": "A soldier in a bronze breastplate.",
-    "hostile": true,
-    "stats": {
-      "hp": 160,
-      "max_hp": 160,
-      "attack": 22,
-      "defense": 20
-    },
-    "loot_table": [
-      6005
-    ],
-    "respawn": 60,
-    "dialogue": []
-  },
-  "6012": {
-    "vnum": 6012,
-    "zone": 6,
-    "name": "Dungeon Rat",
-    "desc": "A massive, diseased rat.",
-    "hostile": true,
-    "stats": {
-      "hp": 50,
-      "max_hp": 50,
-      "attack": 10,
-      "defense": 5
-    },
-    "loot_table": [],
-    "respawn": 30,
-    "dialogue": []
-  },
-  "6013": {
-    "vnum": 6013,
-    "zone": 6,
-    "name": "Skeleton Legion",
-    "desc": "A group of undead soldiers.",
-    "hostile": true,
-    "stats": {
-      "hp": 120,
-      "max_hp": 120,
-      "attack": 15,
-      "defense": 10
-    },
-    "loot_table": [
-      6001
-    ],
-    "respawn": 60,
-    "dialogue": []
-  },
-  "6014": {
-    "vnum": 6014,
-    "zone": 6,
-    "name": "Sand Scorpion",
-    "desc": "A huge scorpion hiding in the sand.",
-    "hostile": true,
-    "stats": {
-      "hp": 100,
-      "max_hp": 100,
-      "attack": 25,
-      "defense": 15
-    },
-    "loot_table": [
-      6010
-    ],
-    "respawn": 60,
-    "dialogue": []
-  },
-  "6015": {
-    "vnum": 6015,
-    "zone": 6,
-    "name": "War Elephant",
-    "desc": "A massive beast of war. (BOSS)",
-    "hostile": true,
-    "stats": {
-      "hp": 800,
-      "max_hp": 800,
-      "attack": 60,
-      "defense": 50
-    },
-    "loot_table": [
-      6011
-    ],
-    "respawn": 600,
-    "dialogue": []
-  },
-  "6016": {
-    "vnum": 6016,
-    "zone": 6,
-    "name": "Chariot Rider",
-    "desc": "A fast-moving attacker on a chariot.",
-    "hostile": true,
-    "stats": {
-      "hp": 140,
-      "max_hp": 140,
-      "attack": 28,
-      "defense": 12
-    },
-    "loot_table": [
-      6012
-    ],
-    "respawn": 60,
-    "dialogue": []
-  },
-  "6017": {
-    "vnum": 6017,
-    "zone": 6,
-    "name": "Temple Priest",
-    "desc": "A corrupted priest.",
+  "1203": {
+    "vnum": 1203,
+    "name": "Corporate Security",
+    "description": "A guard in black tactical gear with a stun baton.",
     "hostile": true,
     "stats": {
       "hp": 130,
       "max_hp": 130,
-      "attack": 30,
-      "defense": 8
-    },
-    "loot_table": [
-      6013
-    ],
-    "respawn": 60,
-    "dialogue": []
-  },
-  "6018": {
-    "vnum": 6018,
-    "zone": 6,
-    "name": "Catacomb Ghoul",
-    "desc": "A flesh-eating undead creature.",
-    "hostile": true,
-    "stats": {
-      "hp": 170,
-      "max_hp": 170,
-      "attack": 24,
-      "defense": 14
-    },
-    "loot_table": [
-      6014
-    ],
-    "respawn": 60,
-    "dialogue": []
-  },
-  "6019": {
-    "vnum": 6019,
-    "zone": 6,
-    "name": "Aqueduct Serpent",
-    "desc": "A giant snake living in the water.",
-    "hostile": true,
-    "stats": {
-      "hp": 190,
-      "max_hp": 190,
-      "attack": 26,
-      "defense": 18
-    },
-    "loot_table": [
-      6015
-    ],
-    "respawn": 90,
-    "dialogue": []
-  },
-  "6020": {
-    "vnum": 6020,
-    "zone": 6,
-    "name": "Forum Thief",
-    "desc": "A sneaky pickpocket.",
-    "hostile": true,
-    "stats": {
-      "hp": 90,
-      "max_hp": 90,
-      "attack": 15,
-      "defense": 5
-    },
-    "loot_table": [
-      6016
-    ],
-    "respawn": 45,
-    "dialogue": []
-  },
-  "6021": {
-    "vnum": 6021,
-    "zone": 6,
-    "name": "Arena Beast",
-    "desc": "A wild lion kept for the games.",
-    "hostile": true,
-    "stats": {
-      "hp": 210,
-      "max_hp": 210,
-      "attack": 32,
+      "attack": 20,
       "defense": 15
     },
-    "loot_table": [
-      6017
-    ],
-    "respawn": 90,
-    "dialogue": []
+    "loot_table": [],
+    "respawn": 60,
+    "dialogue": [],
+    "flags": [
+      "stationary"
+    ]
   },
-  "6022": {
-    "vnum": 6022,
-    "zone": 6,
-    "name": "Undead Pharaoh",
-    "desc": "An ancient ruler raised from the dead.",
+  "1204": {
+    "vnum": 1204,
+    "name": "Cyber Hound",
+    "description": "A mechanical dog with razor teeth and infrared eyes.",
     "hostile": true,
     "stats": {
-      "hp": 400,
-      "max_hp": 400,
-      "attack": 45,
-      "defense": 35
+      "hp": 110,
+      "max_hp": 110,
+      "attack": 18,
+      "defense": 8
     },
-    "loot_table": [
-      6003
-    ],
-    "respawn": 300,
-    "dialogue": []
+    "loot_table": [],
+    "respawn": 45,
+    "dialogue": [],
+    "flags": [
+      "roaming"
+    ]
   },
-  "6023": {
-    "vnum": 6023,
-    "zone": 6,
-    "name": "Stone Golem",
-    "desc": "A magical construct of solid rock.",
+  "1205": {
+    "vnum": 1205,
+    "name": "Hacker Ghost",
+    "description": "A holographic projection of a dead netrunner. Still dangerous.",
+    "hostile": true,
+    "stats": {
+      "hp": 160,
+      "max_hp": 160,
+      "attack": 25,
+      "defense": 5
+    },
+    "loot_table": [],
+    "respawn": 90,
+    "dialogue": [],
+    "flags": [
+      "stationary"
+    ]
+  },
+  "1206": {
+    "vnum": 1206,
+    "name": "Mech Enforcer",
+    "description": "A bipedal combat mech with twin autocannons.",
     "hostile": true,
     "stats": {
       "hp": 350,
       "max_hp": 350,
-      "attack": 20,
-      "defense": 60
+      "attack": 38,
+      "defense": 28
     },
-    "loot_table": [
-      6018
-    ],
+    "loot_table": [],
+    "respawn": 120,
+    "dialogue": [],
+    "flags": [
+      "stationary"
+    ]
+  },
+  "1207": {
+    "vnum": 1207,
+    "name": "Synth Assassin",
+    "description": "An android built for killing. Its face is eerily human.",
+    "hostile": true,
+    "stats": {
+      "hp": 280,
+      "max_hp": 280,
+      "attack": 42,
+      "defense": 18
+    },
+    "loot_table": [],
+    "respawn": 120,
+    "dialogue": [],
+    "flags": [
+      "roaming"
+    ]
+  },
+  "1208": {
+    "vnum": 1208,
+    "name": "Rogue AI Node",
+    "description": "A server rack pulsing with malevolent intelligence. Drones orbit it.",
+    "hostile": true,
+    "stats": {
+      "hp": 500,
+      "max_hp": 500,
+      "attack": 45,
+      "defense": 35
+    },
+    "loot_table": [],
     "respawn": 180,
-    "dialogue": []
+    "dialogue": [],
+    "flags": [
+      "stationary"
+    ]
+  },
+  "1301": {
+    "vnum": 1301,
+    "name": "Alley Mugger",
+    "description": "A desperate man with a snub-nose revolver and shaking hands.",
+    "hostile": true,
+    "stats": {
+      "hp": 70,
+      "max_hp": 70,
+      "attack": 10,
+      "defense": 4
+    },
+    "loot_table": [],
+    "respawn": 60,
+    "dialogue": [],
+    "flags": [
+      "roaming"
+    ]
+  },
+  "1302": {
+    "vnum": 1302,
+    "name": "Corrupt Cop",
+    "description": "A detective with dead eyes and a badge that means nothing.",
+    "hostile": true,
+    "stats": {
+      "hp": 150,
+      "max_hp": 150,
+      "attack": 22,
+      "defense": 15
+    },
+    "loot_table": [],
+    "respawn": 90,
+    "dialogue": [],
+    "flags": [
+      "roaming"
+    ]
+  },
+  "1303": {
+    "vnum": 1303,
+    "name": "Hired Muscle",
+    "description": "A massive enforcer in a cheap suit. Knuckles like walnuts.",
+    "hostile": true,
+    "stats": {
+      "hp": 180,
+      "max_hp": 180,
+      "attack": 25,
+      "defense": 18
+    },
+    "loot_table": [],
+    "respawn": 60,
+    "dialogue": [],
+    "flags": [
+      "roaming"
+    ]
+  },
+  "1304": {
+    "vnum": 1304,
+    "name": "Cat Burglar",
+    "description": "A lithe figure in black. You almost didn't see them.",
+    "hostile": true,
+    "stats": {
+      "hp": 120,
+      "max_hp": 120,
+      "attack": 20,
+      "defense": 8
+    },
+    "loot_table": [],
+    "respawn": 90,
+    "dialogue": [],
+    "flags": [
+      "roaming"
+    ]
+  },
+  "1305": {
+    "vnum": 1305,
+    "name": "Mob Lieutenant",
+    "description": "A sharp-dressed man with cold eyes and a silenced pistol.",
+    "hostile": true,
+    "stats": {
+      "hp": 220,
+      "max_hp": 220,
+      "attack": 30,
+      "defense": 20
+    },
+    "loot_table": [],
+    "respawn": 120,
+    "dialogue": [],
+    "flags": [
+      "stationary"
+    ]
+  },
+  "1306": {
+    "vnum": 1306,
+    "name": "Femme Fatale",
+    "description": "Beautiful and deadly. The knife is already in her hand.",
+    "hostile": true,
+    "stats": {
+      "hp": 200,
+      "max_hp": 200,
+      "attack": 35,
+      "defense": 12
+    },
+    "loot_table": [],
+    "respawn": 120,
+    "dialogue": [],
+    "flags": [
+      "stationary"
+    ]
+  },
+  "1307": {
+    "vnum": 1307,
+    "name": "Ghost of the Drowned",
+    "description": "A waterlogged specter that haunts the rain-slicked docks.",
+    "hostile": true,
+    "stats": {
+      "hp": 300,
+      "max_hp": 300,
+      "attack": 32,
+      "defense": 25
+    },
+    "loot_table": [],
+    "respawn": 180,
+    "dialogue": [],
+    "flags": [
+      "stationary"
+    ]
+  },
+  "1308": {
+    "vnum": 1308,
+    "name": "The Fixer",
+    "description": "A shadowy broker who deals in secrets and violence.",
+    "hostile": true,
+    "stats": {
+      "hp": 400,
+      "max_hp": 400,
+      "attack": 40,
+      "defense": 30
+    },
+    "loot_table": [],
+    "respawn": 240,
+    "dialogue": [],
+    "flags": [
+      "stationary"
+    ]
+  },
+  "1401": {
+    "vnum": 1401,
+    "name": "Feral Dog Pack",
+    "description": "A pack of starving dogs with madness in their eyes.",
+    "hostile": true,
+    "stats": {
+      "hp": 60,
+      "max_hp": 60,
+      "attack": 8,
+      "defense": 3
+    },
+    "loot_table": [],
+    "respawn": 30,
+    "dialogue": [],
+    "flags": [
+      "roaming"
+    ]
+  },
+  "1402": {
+    "vnum": 1402,
+    "name": "Raider Scout",
+    "description": "A wasteland scavenger in patchwork armor.",
+    "hostile": true,
+    "stats": {
+      "hp": 100,
+      "max_hp": 100,
+      "attack": 15,
+      "defense": 8
+    },
+    "loot_table": [],
+    "respawn": 45,
+    "dialogue": [],
+    "flags": [
+      "roaming"
+    ]
+  },
+  "1403": {
+    "vnum": 1403,
+    "name": "Militia Grunt",
+    "description": "A poorly trained soldier with more bravery than skill.",
+    "hostile": true,
+    "stats": {
+      "hp": 130,
+      "max_hp": 130,
+      "attack": 18,
+      "defense": 12
+    },
+    "loot_table": [],
+    "respawn": 60,
+    "dialogue": [],
+    "flags": [
+      "roaming"
+    ]
+  },
+  "1404": {
+    "vnum": 1404,
+    "name": "Landmine Drone",
+    "description": "A small crawling robot that beeps ominously.",
+    "hostile": true,
+    "stats": {
+      "hp": 80,
+      "max_hp": 80,
+      "attack": 30,
+      "defense": 2
+    },
+    "loot_table": [],
+    "respawn": 90,
+    "dialogue": [],
+    "flags": [
+      "stationary"
+    ]
+  },
+  "1405": {
+    "vnum": 1405,
+    "name": "Sniper Ghillie",
+    "description": "A nearly invisible marksman. You only see the muzzle flash.",
+    "hostile": true,
+    "stats": {
+      "hp": 180,
+      "max_hp": 180,
+      "attack": 40,
+      "defense": 5
+    },
+    "loot_table": [],
+    "respawn": 120,
+    "dialogue": [],
+    "flags": [
+      "stationary"
+    ]
+  },
+  "1406": {
+    "vnum": 1406,
+    "name": "Tank Wraith",
+    "description": "The ghost of a destroyed tank. Its cannon still fires.",
+    "hostile": true,
+    "stats": {
+      "hp": 350,
+      "max_hp": 350,
+      "attack": 35,
+      "defense": 30
+    },
+    "loot_table": [],
+    "respawn": 180,
+    "dialogue": [],
+    "flags": [
+      "stationary"
+    ]
+  },
+  "1407": {
+    "vnum": 1407,
+    "name": "Warlord's Champion",
+    "description": "A scarred veteran in salvaged power armor.",
+    "hostile": true,
+    "stats": {
+      "hp": 300,
+      "max_hp": 300,
+      "attack": 38,
+      "defense": 25
+    },
+    "loot_table": [],
+    "respawn": 120,
+    "dialogue": [],
+    "flags": [
+      "roaming"
+    ]
+  },
+  "1408": {
+    "vnum": 1408,
+    "name": "Siege Mech",
+    "description": "A towering war machine bristling with weapons.",
+    "hostile": true,
+    "stats": {
+      "hp": 600,
+      "max_hp": 600,
+      "attack": 50,
+      "defense": 40
+    },
+    "loot_table": [],
+    "respawn": 240,
+    "dialogue": [],
+    "flags": [
+      "stationary"
+    ]
+  },
+  "1501": {
+    "vnum": 1501,
+    "name": "Void Wisp",
+    "description": "A drifting mote of anti-light that drains warmth.",
+    "hostile": true,
+    "stats": {
+      "hp": 90,
+      "max_hp": 90,
+      "attack": 12,
+      "defense": 2
+    },
+    "loot_table": [],
+    "respawn": 30,
+    "dialogue": [],
+    "flags": [
+      "roaming"
+    ]
+  },
+  "1502": {
+    "vnum": 1502,
+    "name": "Crystal Elemental",
+    "description": "A being of living crystal that refracts reality.",
+    "hostile": true,
+    "stats": {
+      "hp": 150,
+      "max_hp": 150,
+      "attack": 20,
+      "defense": 20
+    },
+    "loot_table": [],
+    "respawn": 60,
+    "dialogue": [],
+    "flags": [
+      "roaming"
+    ]
+  },
+  "1503": {
+    "vnum": 1503,
+    "name": "Astral Predator",
+    "description": "A translucent creature that swims through empty space.",
+    "hostile": true,
+    "stats": {
+      "hp": 180,
+      "max_hp": 180,
+      "attack": 25,
+      "defense": 10
+    },
+    "loot_table": [],
+    "respawn": 60,
+    "dialogue": [],
+    "flags": [
+      "roaming"
+    ]
+  },
+  "1504": {
+    "vnum": 1504,
+    "name": "Echo Fragment",
+    "description": "A piece of someone's memory given hostile form.",
+    "hostile": true,
+    "stats": {
+      "hp": 120,
+      "max_hp": 120,
+      "attack": 18,
+      "defense": 8
+    },
+    "loot_table": [],
+    "respawn": 45,
+    "dialogue": [],
+    "flags": [
+      "roaming"
+    ]
+  },
+  "1505": {
+    "vnum": 1505,
+    "name": "Gravity Anomaly",
+    "description": "A sphere of compressed spacetime. It pulls everything inward.",
+    "hostile": true,
+    "stats": {
+      "hp": 250,
+      "max_hp": 250,
+      "attack": 30,
+      "defense": 30
+    },
+    "loot_table": [],
+    "respawn": 120,
+    "dialogue": [],
+    "flags": [
+      "stationary"
+    ]
+  },
+  "1506": {
+    "vnum": 1506,
+    "name": "Star Wraith",
+    "description": "A being of compressed stellar energy. Blindingly bright.",
+    "hostile": true,
+    "stats": {
+      "hp": 350,
+      "max_hp": 350,
+      "attack": 40,
+      "defense": 20
+    },
+    "loot_table": [],
+    "respawn": 120,
+    "dialogue": [],
+    "flags": [
+      "stationary"
+    ]
+  },
+  "1507": {
+    "vnum": 1507,
+    "name": "Void Leviathan",
+    "description": "A massive creature that drifts between the shards.",
+    "hostile": true,
+    "stats": {
+      "hp": 500,
+      "max_hp": 500,
+      "attack": 45,
+      "defense": 35
+    },
+    "loot_table": [],
+    "respawn": 180,
+    "dialogue": [],
+    "flags": [
+      "stationary"
+    ]
+  },
+  "1508": {
+    "vnum": 1508,
+    "name": "Reality Fracture",
+    "description": "A tear in spacetime that lashes out at anything nearby.",
+    "hostile": true,
+    "stats": {
+      "hp": 400,
+      "max_hp": 400,
+      "attack": 50,
+      "defense": 15
+    },
+    "loot_table": [],
+    "respawn": 240,
+    "dialogue": [],
+    "flags": [
+      "stationary"
+    ]
+  },
+  "1601": {
+    "vnum": 1601,
+    "name": "Gladiator Slave",
+    "description": "A desperate fighter with nothing left to lose.",
+    "hostile": true,
+    "stats": {
+      "hp": 100,
+      "max_hp": 100,
+      "attack": 15,
+      "defense": 10
+    },
+    "loot_table": [],
+    "respawn": 45,
+    "dialogue": [],
+    "flags": [
+      "roaming"
+    ]
+  },
+  "1602": {
+    "vnum": 1602,
+    "name": "Roman Legionnaire",
+    "description": "A disciplined soldier in bronze armor with a gladius.",
+    "hostile": true,
+    "stats": {
+      "hp": 150,
+      "max_hp": 150,
+      "attack": 20,
+      "defense": 18
+    },
+    "loot_table": [],
+    "respawn": 60,
+    "dialogue": [],
+    "flags": [
+      "roaming"
+    ]
+  },
+  "1603": {
+    "vnum": 1603,
+    "name": "Egyptian Guardian",
+    "description": "A jackal-headed warrior wielding a khopesh.",
+    "hostile": true,
+    "stats": {
+      "hp": 180,
+      "max_hp": 180,
+      "attack": 22,
+      "defense": 15
+    },
+    "loot_table": [],
+    "respawn": 60,
+    "dialogue": [],
+    "flags": [
+      "stationary"
+    ]
+  },
+  "1604": {
+    "vnum": 1604,
+    "name": "Samurai Ronin",
+    "description": "A masterless warrior seeking death with honor.",
+    "hostile": true,
+    "stats": {
+      "hp": 200,
+      "max_hp": 200,
+      "attack": 30,
+      "defense": 12
+    },
+    "loot_table": [],
+    "respawn": 90,
+    "dialogue": [],
+    "flags": [
+      "roaming"
+    ]
+  },
+  "1605": {
+    "vnum": 1605,
+    "name": "Viking Berserker",
+    "description": "A frothing warrior who feels no pain.",
+    "hostile": true,
+    "stats": {
+      "hp": 250,
+      "max_hp": 250,
+      "attack": 35,
+      "defense": 8
+    },
+    "loot_table": [],
+    "respawn": 90,
+    "dialogue": [],
+    "flags": [
+      "roaming"
+    ]
+  },
+  "1606": {
+    "vnum": 1606,
+    "name": "Aztec Jaguar Warrior",
+    "description": "A fierce warrior in a jaguar pelt with an obsidian blade.",
+    "hostile": true,
+    "stats": {
+      "hp": 220,
+      "max_hp": 220,
+      "attack": 28,
+      "defense": 15
+    },
+    "loot_table": [],
+    "respawn": 90,
+    "dialogue": [],
+    "flags": [
+      "roaming"
+    ]
+  },
+  "1607": {
+    "vnum": 1607,
+    "name": "Pharaoh's Mummy",
+    "description": "Ancient royalty wrapped in enchanted bandages.",
+    "hostile": true,
+    "stats": {
+      "hp": 350,
+      "max_hp": 350,
+      "attack": 32,
+      "defense": 28
+    },
+    "loot_table": [],
+    "respawn": 120,
+    "dialogue": [],
+    "flags": [
+      "stationary"
+    ]
+  },
+  "1608": {
+    "vnum": 1608,
+    "name": "Time Paradox",
+    "description": "A glitching entity that exists in multiple moments simultaneously.",
+    "hostile": true,
+    "stats": {
+      "hp": 500,
+      "max_hp": 500,
+      "attack": 45,
+      "defense": 25
+    },
+    "loot_table": [],
+    "respawn": 180,
+    "dialogue": [],
+    "flags": [
+      "stationary"
+    ]
+  },
+  "1701": {
+    "vnum": 1701,
+    "name": "Sewer Rat Swarm",
+    "description": "Hundreds of rats moving as one hungry mass.",
+    "hostile": true,
+    "stats": {
+      "hp": 80,
+      "max_hp": 80,
+      "attack": 10,
+      "defense": 2
+    },
+    "loot_table": [],
+    "respawn": 30,
+    "dialogue": [],
+    "flags": [
+      "roaming"
+    ]
+  },
+  "1702": {
+    "vnum": 1702,
+    "name": "Tunnel Crawler",
+    "description": "A pale humanoid that has lived too long in the dark.",
+    "hostile": true,
+    "stats": {
+      "hp": 130,
+      "max_hp": 130,
+      "attack": 18,
+      "defense": 8
+    },
+    "loot_table": [],
+    "respawn": 60,
+    "dialogue": [],
+    "flags": [
+      "roaming"
+    ]
+  },
+  "1703": {
+    "vnum": 1703,
+    "name": "Fungal Shambler",
+    "description": "A mass of toxic mushrooms given ambulatory form.",
+    "hostile": true,
+    "stats": {
+      "hp": 160,
+      "max_hp": 160,
+      "attack": 15,
+      "defense": 15
+    },
+    "loot_table": [],
+    "respawn": 60,
+    "dialogue": [],
+    "flags": [
+      "roaming"
+    ]
+  },
+  "1704": {
+    "vnum": 1704,
+    "name": "Pipe Wraith",
+    "description": "A ghost trapped in the water system. It screams through the pipes.",
+    "hostile": true,
+    "stats": {
+      "hp": 200,
+      "max_hp": 200,
+      "attack": 25,
+      "defense": 12
+    },
+    "loot_table": [],
+    "respawn": 90,
+    "dialogue": [],
+    "flags": [
+      "stationary"
+    ]
+  },
+  "1705": {
+    "vnum": 1705,
+    "name": "Undercity Boss",
+    "description": "A massive mutant who rules a section of tunnel.",
+    "hostile": true,
+    "stats": {
+      "hp": 350,
+      "max_hp": 350,
+      "attack": 35,
+      "defense": 25
+    },
+    "loot_table": [],
+    "respawn": 120,
+    "dialogue": [],
+    "flags": [
+      "stationary"
+    ]
+  },
+  "1706": {
+    "vnum": 1706,
+    "name": "The Collector",
+    "description": "A thing that hoards everything \u2014 bones and trinkets and screams.",
+    "hostile": true,
+    "stats": {
+      "hp": 400,
+      "max_hp": 400,
+      "attack": 30,
+      "defense": 30
+    },
+    "loot_table": [],
+    "respawn": 180,
+    "dialogue": [],
+    "flags": [
+      "stationary"
+    ]
+  },
+  "1801": {
+    "vnum": 1801,
+    "name": "Training Dummy",
+    "description": "A reinforced practice target. It doesn't fight back.",
+    "hostile": true,
+    "stats": {
+      "hp": 9999,
+      "max_hp": 9999,
+      "attack": 0,
+      "defense": 0
+    },
+    "loot_table": [],
+    "respawn": 5,
+    "dialogue": [],
+    "flags": [
+      "stationary"
+    ]
+  },
+  "1802": {
+    "vnum": 1802,
+    "name": "Sparring Partner",
+    "description": "A skilled fighter who pulls their punches. Barely.",
+    "hostile": true,
+    "stats": {
+      "hp": 200,
+      "max_hp": 200,
+      "attack": 15,
+      "defense": 15
+    },
+    "loot_table": [],
+    "respawn": 30,
+    "dialogue": [],
+    "flags": [
+      "stationary"
+    ]
+  },
+  "1803": {
+    "vnum": 1803,
+    "name": "Gravity Construct",
+    "description": "A training golem that gets heavier the longer you fight it.",
+    "hostile": true,
+    "stats": {
+      "hp": 500,
+      "max_hp": 500,
+      "attack": 25,
+      "defense": 25
+    },
+    "loot_table": [],
+    "respawn": 60,
+    "dialogue": [],
+    "flags": [
+      "stationary"
+    ]
+  },
+  "1804": {
+    "vnum": 1804,
+    "name": "Mirror Self",
+    "description": "An exact copy of you. It knows every move you'll make.",
+    "hostile": true,
+    "stats": {
+      "hp": 1,
+      "max_hp": 1,
+      "attack": 1,
+      "defense": 1
+    },
+    "loot_table": [],
+    "respawn": 120,
+    "dialogue": [],
+    "flags": [
+      "stationary"
+    ]
+  },
+  "1901": {
+    "vnum": 1901,
+    "name": "Lost Soul",
+    "description": "A confused spirit wandering the afterlife paths.",
+    "hostile": true,
+    "stats": {
+      "hp": 100,
+      "max_hp": 100,
+      "attack": 12,
+      "defense": 5
+    },
+    "loot_table": [],
+    "respawn": 30,
+    "dialogue": [],
+    "flags": [
+      "roaming"
+    ]
+  },
+  "1902": {
+    "vnum": 1902,
+    "name": "Spirit Guardian",
+    "description": "A warrior who chose to guard the paths between life and death.",
+    "hostile": true,
+    "stats": {
+      "hp": 250,
+      "max_hp": 250,
+      "attack": 30,
+      "defense": 20
+    },
+    "loot_table": [],
+    "respawn": 90,
+    "dialogue": [],
+    "flags": [
+      "stationary"
+    ]
+  },
+  "1903": {
+    "vnum": 1903,
+    "name": "Oni Gatekeeper",
+    "description": "A massive horned demon that guards a checkpoint.",
+    "hostile": true,
+    "stats": {
+      "hp": 400,
+      "max_hp": 400,
+      "attack": 40,
+      "defense": 30
+    },
+    "loot_table": [],
+    "respawn": 120,
+    "dialogue": [],
+    "flags": [
+      "stationary"
+    ]
+  },
+  "1904": {
+    "vnum": 1904,
+    "name": "Reaper Initiate",
+    "description": "A young death god still learning the trade.",
+    "hostile": true,
+    "stats": {
+      "hp": 500,
+      "max_hp": 500,
+      "attack": 45,
+      "defense": 25
+    },
+    "loot_table": [],
+    "respawn": 180,
+    "dialogue": [],
+    "flags": [
+      "roaming"
+    ]
+  },
+  "1905": {
+    "vnum": 1905,
+    "name": "The Forgotten King",
+    "description": "A spirit so old even death has forgotten his name.",
+    "hostile": true,
+    "stats": {
+      "hp": 800,
+      "max_hp": 800,
+      "attack": 55,
+      "defense": 40
+    },
+    "loot_table": [],
+    "respawn": 300,
+    "dialogue": [],
+    "flags": [
+      "stationary"
+    ]
   }
 }
