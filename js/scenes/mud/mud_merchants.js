@@ -291,37 +291,62 @@
   }
 
   /**
-   * Process a sell command.
-   * @param {string} target - Item name from inventory
+   * Sell an item from the player's inventory to a merchant.
+   * Checks regular inventory items (by vnum → MudData) first,
+   * then falls back to purchasedItems (synthetic merchant buys).
+   * Sell price = half the item's value (or 1 gold minimum).
+   * @param {string} target - Item name/keyword to sell
    * @param {object} mob - Merchant mob
    * @param {object} player - Player object (mutated: gold, inventory)
+   * @param {object} [itemData] - Item definitions map (MudData.items)
    * @returns {Array} Output lines
    */
-  function processSell(target, mob, player) {
+  function processSell(target, mob, player, itemData) {
     if (!target) {
       return [{ type: 'info', text: `Type 'sell <item>' to sell something from your inventory.` }];
     }
     const targetLC = target.toLowerCase();
-    // Check purchased items first (they have names)
+    const allItems = itemData || window.MudData?.items || {};
+
+    // 1. Check regular inventory items (vnums resolved via MudData)
+    const invIdx = player.inventory.findIndex(v => {
+      const def = allItems[v];
+      if (!def) return false;
+      return def.name.toLowerCase().includes(targetLC)
+        || String(def.vnum) === targetLC;
+    });
+    if (invIdx !== -1) {
+      const vnum = player.inventory[invIdx];
+      const def = allItems[vnum];
+      const sellPrice = Math.max(1, Math.floor((def.value || 10) * 0.5));
+      player.gold += sellPrice;
+      player.inventory.splice(invIdx, 1);
+      return [
+        { type: 'success', text: `You sell ${def.name} to ${mob.name} for ${sellPrice} gold.` },
+        { type: 'info', text: `  Gold: ${player.gold}` }
+      ];
+    }
+
+    // 2. Fallback: check purchasedItems (synthetic merchant items)
     if (player.purchasedItems) {
-      const idx = player.purchasedItems.findIndex(i =>
+      const pIdx = player.purchasedItems.findIndex(i =>
         i && i.name.toLowerCase().includes(targetLC)
       );
-      if (idx !== -1) {
-        const item = player.purchasedItems[idx];
-        const sellPrice = item.sellPrice || Math.floor((item.price || 10) * 0.5);
+      if (pIdx !== -1) {
+        const item = player.purchasedItems[pIdx];
+        const sellPrice = item.sellPrice || Math.max(1, Math.floor((item.price || 10) * 0.5));
         player.gold += sellPrice;
-        player.purchasedItems[idx] = null; // mark as sold
-        // Remove from inventory
-        const synVnum = 90001 + idx;
-        const invIdx = player.inventory.indexOf(synVnum);
-        if (invIdx !== -1) player.inventory.splice(invIdx, 1);
+        player.purchasedItems[pIdx] = null;
+        const synVnum = 90001 + pIdx;
+        const synIdx = player.inventory.indexOf(synVnum);
+        if (synIdx !== -1) player.inventory.splice(synIdx, 1);
         return [
           { type: 'success', text: `You sell ${item.name} to ${mob.name} for ${sellPrice} gold.` },
           { type: 'info', text: `  Gold: ${player.gold}` }
         ];
       }
     }
+
     return [{ type: 'error', text: `You don't have anything matching '${target}' to sell.` }];
   }
 

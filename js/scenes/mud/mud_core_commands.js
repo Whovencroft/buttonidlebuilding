@@ -213,6 +213,82 @@
         help: 'Unequip an item',
         usage: 'unequip <item>',
         handler: (parsed) => fn.doUnequip(parsed.target)
+      },
+      {
+        name: 'inspect',
+        aliases: ['examine', 'id', 'identify'],
+        category: 'Inventory',
+        help: 'View detailed stats of an item in your inventory or equipment',
+        usage: 'inspect <item>',
+        handler: (parsed) => {
+          const target = parsed.target;
+          if (!target) return [{ type: 'error', text: 'Inspect what? Usage: inspect <item>' }];
+          const items = engine._internals.items;
+          const player = engine._internals.player;
+          const targetLC = target.toLowerCase();
+
+          // Search inventory first, then equipped slots
+          let itemDef = null;
+          let source = '';
+          // Check inventory
+          for (const vnum of player.inventory) {
+            const def = items[vnum];
+            if (def && (def.name.toLowerCase().includes(targetLC) || String(def.vnum) === targetLC)) {
+              itemDef = def;
+              source = 'inventory';
+              break;
+            }
+          }
+          // Check equipped items
+          if (!itemDef) {
+            for (const [slot, vnum] of Object.entries(player.equipped)) {
+              if (vnum == null) continue;
+              const def = items[vnum];
+              if (def && (def.name.toLowerCase().includes(targetLC) || String(def.vnum) === targetLC)) {
+                itemDef = def;
+                source = `equipped (${slot})`;
+                break;
+              }
+            }
+          }
+          // Check purchasedItems
+          if (!itemDef && player.purchasedItems) {
+            const pi = player.purchasedItems.find(i => i && i.name.toLowerCase().includes(targetLC));
+            if (pi) {
+              itemDef = pi;
+              source = 'inventory';
+            }
+          }
+          if (!itemDef) return [{ type: 'error', text: `You don't have '${target}'.` }];
+
+          // Build the inspection output
+          const out = [
+            { type: 'info', text: `\u2500\u2500\u2500 ${itemDef.name} \u2500\u2500\u2500` },
+            { type: 'info', text: `  ${itemDef.description || 'No description.'}` },
+            { type: 'info', text: `  Type: ${itemDef.type || 'unknown'}  |  Rarity: ${itemDef.rarity || 'common'}` }
+          ];
+          if (itemDef.slot) {
+            out.push({ type: 'info', text: `  Slot: ${itemDef.slot}` });
+          }
+          // Display stats
+          if (itemDef.stats && typeof itemDef.stats === 'object') {
+            const statLines = [];
+            for (const [k, v] of Object.entries(itemDef.stats)) {
+              if (v == null || v === 0) continue;
+              const label = k.charAt(0).toUpperCase() + k.slice(1);
+              const prefix = typeof v === 'number' && v > 0 ? '+' : '';
+              statLines.push(`${label}: ${prefix}${v}`);
+            }
+            if (statLines.length > 0) {
+              out.push({ type: 'info', text: `  Stats: ${statLines.join('  |  ')}` });
+            }
+          }
+          if (itemDef.value != null) {
+            out.push({ type: 'info', text: `  Value: ${itemDef.value} gold  (sells for ${Math.max(1, Math.floor(itemDef.value * 0.5))})` });
+          }
+          out.push({ type: 'info', text: `  Location: ${source}` });
+          return out;
+        }
       }
     ]);
 

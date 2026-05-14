@@ -2147,6 +2147,8 @@
       getAliveMobsInRoom, matchKeyword, getItemName, getMobName,
       initiateCombat, executeAbility, handleMobKill, pushCombatOutput,
       recalcStats, autoSave, recordGhost,
+      /** Item data lookup — used by merchant/sell/inspect commands. */
+      get items() { return items; },
       /** Room data lookup — used by merchant/say commands. */
       get rooms() { return rooms; },
       /** Mutable mob registry — allows injecting temporary mobs (e.g. echo invasions). */
