@@ -338,7 +338,7 @@
             const player = engine._internals.player;
             const merchant = window.MudMerchants.findMerchantInRoom(aliveMobs, allMobs, player.currentRoom);
             if (merchant) {
-              return window.MudMerchants.processBuy(parsed.target, merchant.shop, merchant.mob, player);
+              return window.MudMerchants.processBuy(parsed.target, merchant.shop, merchant.mob, player, engine._internals.items);
             }
           }
           // Fallback to ability purchase

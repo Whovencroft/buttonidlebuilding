@@ -2122,6 +2122,10 @@
       if (player.glimmeredDefs && window.MudAbilities?.loadGlimmeredDefs) {
         window.MudAbilities.loadGlimmeredDefs(player.glimmeredDefs);
       }
+      // Re-register purchased items so the engine recognises their vnums
+      if (player.purchasedItems && window.MudMerchants?.restorePurchasedItems) {
+        window.MudMerchants.restorePurchasedItems(player.purchasedItems, items);
+      }
       recalcStats();
     }
 

@@ -237,15 +237,54 @@
     return null;
   }
 
+  /** Counter for assigning unique vnums to merchant-purchased items. */
+  let nextPurchaseVnum = 50000;
+
+  /**
+   * Inject a purchased item definition into the engine's items map so
+   * the entire engine (inventory, equip, inspect, sell) treats it as
+   * a real item. Returns the assigned vnum.
+   * @param {object} def - Item definition to register
+   * @param {object} itemsMap - Engine's items map (engine._internals.items)
+   * @returns {number} The vnum assigned to this item
+   */
+  function registerPurchasedItem(def, itemsMap) {
+    const vnum = nextPurchaseVnum++;
+    def.vnum = vnum;
+    if (itemsMap) itemsMap[vnum] = def;
+    return vnum;
+  }
+
+  /**
+   * Re-register purchased items on resume so the engine's items map
+   * recognises them after a page reload.
+   * @param {Array} purchasedItems - player.purchasedItems array
+   * @param {object} itemsMap - Engine's items map
+   */
+  function restorePurchasedItems(purchasedItems, itemsMap) {
+    if (!purchasedItems || !itemsMap) return;
+    for (const entry of purchasedItems) {
+      if (!entry) continue;
+      if (entry.vnum != null) {
+        itemsMap[entry.vnum] = entry;
+        if (entry.vnum >= nextPurchaseVnum) nextPurchaseVnum = entry.vnum + 1;
+      }
+    }
+  }
+
   /**
    * Process a buy command.
+   * Finds the item in the shop, deducts gold, creates a full item
+   * definition, registers it in the engine's items map, and adds
+   * the vnum to the player's inventory.
    * @param {string} target - Item number or name
    * @param {object} shop - Shop data
    * @param {object} mob - Merchant mob
    * @param {object} player - Player object (mutated: gold, inventory)
+   * @param {object} [itemsMap] - Engine's items map for registration
    * @returns {Array} Output lines
    */
-  function processBuy(target, shop, mob, player) {
+  function processBuy(target, shop, mob, player, itemsMap) {
     if (!target) {
       return [{ type: 'info', text: `Type 'buy <number>' or 'buy <name>' to purchase from ${mob.name}.` }];
     }
@@ -255,7 +294,6 @@
     if (!isNaN(num) && num >= 1 && num <= shop.items.length) {
       item = shop.items[num - 1];
     } else {
-      // Try by name (partial match)
       const targetLC = target.toLowerCase();
       item = shop.items.find(i => i.name.toLowerCase().includes(targetLC));
     }
@@ -265,25 +303,31 @@
     if (player.gold < item.price) {
       return [{ type: 'error', text: `You can't afford ${item.name}. (Need ${item.price} gold, have ${player.gold})` }];
     }
-    // Purchase
+    if (player.inventory.length >= 99) {
+      return [{ type: 'error', text: 'Your inventory is full (99 items). Drop something first.' }];
+    }
+    // Deduct gold
     player.gold -= item.price;
-    // Add to inventory as a simple item object
-    const purchased = {
+    // Build a full item definition the engine can use
+    const def = {
       name: item.name,
-      type: item.type,
-      desc: item.desc,
-      effect: item.effect || null,
-      value: item.value || 0,
+      type: item.type || (item.slot ? 'equipment' : 'consumable'),
+      description: item.desc || item.description || '',
       slot: item.slot || null,
-      stats: item.stats || null,
-      sellPrice: Math.floor(item.price * 0.5) // sell back at half price
+      stats: item.stats || {},
+      rarity: item.rarity || 'common',
+      value: item.value || Math.floor(item.price * 0.5),
+      effect: item.effect || null,
+      keywords: item.name.toLowerCase().split(/\s+/)
     };
-    // Store purchased items in a special array since the engine uses vnums
+    // Register in engine items map and get a real vnum
+    const allItems = itemsMap || window.MudData?.items || {};
+    const vnum = registerPurchasedItem(def, allItems);
+    // Track in purchasedItems for save persistence
     if (!player.purchasedItems) player.purchasedItems = [];
-    player.purchasedItems.push(purchased);
-    // Also add a synthetic vnum to the inventory for engine compatibility
-    const syntheticVnum = 90000 + player.purchasedItems.length;
-    player.inventory.push(syntheticVnum);
+    player.purchasedItems.push(def);
+    // Add to inventory
+    player.inventory.push(vnum);
     return [
       { type: 'success', text: `You buy ${item.name} from ${mob.name} for ${item.price} gold.` },
       { type: 'info', text: `  Gold remaining: ${player.gold}` }
@@ -357,6 +401,7 @@
     formatShopListing,
     processBuy,
     processSell,
+    restorePurchasedItems,
     getSectorForRoom,
     SECTOR_SHOPS
   };
