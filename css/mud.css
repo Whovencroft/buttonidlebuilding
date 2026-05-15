@@ -242,6 +242,28 @@
   background: var(--mud-primary);
 }
 
+/* Persistent quick-action row — always visible, visually distinct */
+.mud-quick-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mud-space-xs);
+  padding-bottom: var(--mud-space-xs);
+  border-bottom: 1px solid var(--mud-secondary);
+  margin-bottom: var(--mud-space-xs);
+}
+
+.mud-quick-buttons .mud-action-btn {
+  background: var(--mud-secondary);
+  border-color: var(--mud-border-strong);
+  font-size: 12px;
+  min-height: 36px;
+  padding: var(--mud-space-xs) var(--mud-space-sm);
+}
+
+.mud-quick-buttons .mud-action-btn:hover {
+  background: var(--mud-border-strong);
+}
+
 .mud-dir-buttons,
 .mud-ctx-buttons {
   display: flex;

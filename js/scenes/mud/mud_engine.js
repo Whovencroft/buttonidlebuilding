@@ -905,112 +905,122 @@
     }
 
     /**
-     * Show player status: power, QP, spec, focus.
+     * Display a compact, columnar character status screen.
+     * Weapon proficiency summaries are shown inline; detailed
+     * breakdowns live in the 'proficiency' command.
      */
     function doStatus() {
       const spec = window.MudAbilities?.getSpec(player.baseClass, player.specialization);
       const tiers = window.MudAbilities?.POWER_TIERS || [10, 25, 50, 100];
       const currentTier = tiers.filter(t => player.power >= t).length;
       const nextTier = tiers[currentTier] || 'MAX';
+
+      // ── Header row ──
+      const title = player.title ? `${player.title} ` : '';
+      const specName = spec?.name || player.specName || 'None';
       const output = [
-        { type: 'info', text: '═══ Character Status ═══' },
-        { type: 'info', text: '' },
-        { type: 'info', text: `  Path:         ${spec?.name || player.specName || 'None'}` },
-        { type: 'info', text: `  Power:        ${player.power}${nextTier !== 'MAX' ? ` (next tier at ${nextTier})` : ' (MAX TIER)'}` },
-        { type: 'info', text: `  Quest Points: ${player.questPoints}` },
-        { type: 'info', text: `  Gold:         ${player.gold}` },
-        { type: 'info', text: '' },
-        { type: 'info', text: '─── Vitals ───' },
-        { type: 'info', text: `  HP:           ${player.hp}/${player.maxHp}` },
-        { type: 'info', text: `  Focus:        ${player.focus}/${player.maxFocus}` },
-        { type: 'info', text: `  Attack:       ${player.attackPower}` },
-        { type: 'info', text: `  Defense:      ${player.defense}` },
+        { type: 'info', text: `═══ ${title}${player.name || 'Unknown'} ═══` },
+        { type: 'info', text: `  ${specName}  |  Power ${player.power}${nextTier !== 'MAX' ? ` → ${nextTier}` : ' (MAX)'}  |  QP ${player.questPoints}  |  Gold ${player.gold}` },
       ];
-      // Core stats (Vigor, Precision, Grit, Instinct)
-      // coreStats uses flat format: cs.vigor = number, cs.xp.vigor = number
+
+      // ── Vitals (two-column) ──
+      const hpPct = player.maxHp ? Math.floor((player.hp / player.maxHp) * 100) : 0;
+      const fpPct = player.maxFocus ? Math.floor((player.focus / player.maxFocus) * 100) : 0;
+      output.push({ type: 'info', text: '' });
+      output.push({ type: 'info', text: `  HP ${player.hp}/${player.maxHp} (${hpPct}%)    Focus ${player.focus}/${player.maxFocus} (${fpPct}%)` });
+      output.push({ type: 'info', text: `  ATK ${player.attackPower}    DEF ${player.defense}` });
+
+      // ── Attributes (compact two-column) ──
       const cs = player.coreStats;
       if (cs && window.MudStats) {
         const d = player._derived || {};
-        const v = cs.vigor || 1;
-        const p = cs.precision || 1;
-        const g = cs.grit || 1;
-        const ins = cs.instinct || 1;
         output.push({ type: 'info', text: '' });
         output.push({ type: 'info', text: '─── Attributes ───' });
-        output.push({ type: 'info', text: `  Vigor:      ${v}  (+${v * 3} max HP, +${(v * 0.5).toFixed(1)} HP/tick regen)` });
-        output.push({ type: 'info', text: `  Precision:  ${p}  (${((d.critChance || 0.01) * 100).toFixed(1)}% crit, ${((d.damageFloor || 0.5) * 100).toFixed(0)}% dmg floor)` });
-        output.push({ type: 'info', text: `  Grit:       ${g}  (+${Math.floor(g * 1.5)} defense, ${((d.bigHitReduction || 0) * 100).toFixed(0)}% big-hit reduction)` });
-        output.push({ type: 'info', text: `  Instinct:   ${ins}  (${((d.dodgeChance || 0) * 100).toFixed(1)}% dodge, ${((d.initiativeChance || 0.05) * 100).toFixed(0)}% initiative)` });
-        // XP progress bars
-        output.push({ type: 'info', text: '' });
-        output.push({ type: 'info', text: '─── Growth ───' });
+        const v = cs.vigor || 1, p = cs.precision || 1;
+        const g = cs.grit || 1, ins = cs.instinct || 1;
+        output.push({ type: 'info', text: `  VIG ${v}  (+${v * 3} HP)          PRC ${p}  (${((d.critChance || 0.01) * 100).toFixed(1)}% crit)` });
+        output.push({ type: 'info', text: `  GRT ${g}  (+${Math.floor(g * 1.5)} DEF)         INS ${ins}  (${((d.dodgeChance || 0) * 100).toFixed(1)}% dodge)` });
+        // Growth bars on one line each
         const statNames = ['vigor', 'precision', 'grit', 'instinct'];
+        const abbr = { vigor: 'VIG', precision: 'PRC', grit: 'GRT', instinct: 'INS' };
+        const bars = [];
         for (const name of statNames) {
           const level = cs[name] || 1;
           const xp = (cs.xp && cs.xp[name]) || 0;
           const needed = window.MudStats.xpForNextLevel(level);
           const pct = Math.min(100, Math.floor((xp / needed) * 100));
           const filled = Math.floor(pct / 10);
-          const bar = '\u2588'.repeat(filled) + '\u2591'.repeat(10 - filled);
-          output.push({ type: 'info', text: `  ${name.charAt(0).toUpperCase() + name.slice(1).padEnd(10)} ${String(level).padStart(3)}  ${bar} ${pct}%` });
+          bars.push(`${abbr[name]} ${level} ${'\u2588'.repeat(filled)}${'\u2591'.repeat(10 - filled)}`);
         }
-      }
-      // Combat state: stance, momentum, exhaustion
-      if (window.MudCombatSystems) {
-        output.push({ type: 'info', text: '' });
-        output.push({ type: 'info', text: '─── Combat ───' });
-        const stanceName = window.MudCombatSystems.STANCES[player.stance]?.name || player.stance || 'Balanced';
-        output.push({ type: 'info', text: `  Stance:     ${stanceName}` });
-        if (player.momentum !== undefined) {
-          const momLabel = window.MudCombatSystems.MOMENTUM_LABELS[player.momentum] || 'Neutral';
-          output.push({ type: 'info', text: `  Momentum:   ${player.momentum}/10 (${momLabel})` });
-        }
-        if (player.exhausted) {
-          output.push({ type: 'info', text: '  Status:     EXHAUSTED (-30% ATK/DEF)' });
-        }
+        output.push({ type: 'info', text: `  ${bars[0]}  ${bars[1]}` });
+        output.push({ type: 'info', text: `  ${bars[2]}  ${bars[3]}` });
       }
 
-      // Active buffs and debuffs
-      const activeBuffs = [];
-      const activeDebuffs = [];
+      // ── Combat state (single line when possible) ──
+      const combatParts = [];
+      if (window.MudCombatSystems) {
+        const stanceName = window.MudCombatSystems.STANCES[player.stance]?.name || 'Balanced';
+        combatParts.push(`Stance: ${stanceName}`);
+        if (player.momentum !== undefined && player.momentum !== 6) {
+          const momLabel = window.MudCombatSystems.MOMENTUM_LABELS[player.momentum] || 'Neutral';
+          combatParts.push(`Mom: ${momLabel}`);
+        }
+        if (player.exhausted) combatParts.push('EXHAUSTED');
+      }
+      if (window.MudSecretClasses && player.secretClass && player.transformTier >= 0) {
+        const tMods = window.MudSecretClasses.getTransformMods(player);
+        if (tMods) combatParts.push(`Transform: ATK×${tMods.atkMod} DEF×${tMods.defMod}`);
+      }
+      if (combatParts.length > 0) {
+        output.push({ type: 'info', text: '' });
+        output.push({ type: 'info', text: `  ${combatParts.join('  |  ')}` });
+      }
+
+      // ── Active effects (compact) ──
+      const effects = [];
       for (const [key, remaining] of Object.entries(player.worldFlags || {})) {
         if (remaining <= 0) continue;
         if (key.startsWith('buff_')) {
-          const id = key.slice(5);
-          const def = window.MudAbilities?.getAbilityById(id);
-          activeBuffs.push(`${def?.name || id} (${remaining} rnd)`);
+          const def = window.MudAbilities?.getAbilityById(key.slice(5));
+          effects.push(`+${def?.name || key.slice(5)}(${remaining})`);
         } else if (key.startsWith('debuff_')) {
-          const id = key.slice(7);
-          const def = window.MudAbilities?.getAbilityById(id);
-          activeDebuffs.push(`${def?.name || id} (${remaining} rnd)`);
+          const def = window.MudAbilities?.getAbilityById(key.slice(7));
+          effects.push(`-${def?.name || key.slice(7)}(${remaining})`);
         }
       }
-      if (activeBuffs.length > 0 || activeDebuffs.length > 0) {
-        output.push({ type: 'info', text: '' });
-        output.push({ type: 'info', text: '─── Active Effects ───' });
-        for (const b of activeBuffs) output.push({ type: 'info', text: `  + ${b}` });
-        for (const d of activeDebuffs) output.push({ type: 'info', text: `  - ${d}` });
+      if (effects.length > 0) {
+        output.push({ type: 'info', text: `  Effects: ${effects.join('  ')}` });
       }
 
-      // Transformation status
-      if (window.MudSecretClasses && player.secretClass && player.transformTier >= 0) {
-        const tMods = window.MudSecretClasses.getTransformMods(player);
-        if (tMods) {
+      // ── Weapon proficiencies (summary — detail in 'proficiency' command) ──
+      if (window.MudWeaponProficiency) {
+        const wp = player.weaponProficiency || {};
+        const entries = Object.entries(wp).filter(([, v]) => v > 0).sort((a, b) => b[1] - a[1]);
+        if (entries.length > 0) {
           output.push({ type: 'info', text: '' });
-          output.push({ type: 'info', text: '─── Transformation ───' });
-          output.push({ type: 'info', text: `  ATK ×${tMods.atkMod} | DEF ×${tMods.defMod} | Focus drain: ${tMods.focusCost}/tick` });
+          output.push({ type: 'info', text: '─── Weapon Proficiency ───' });
+          const names = window.MudWeaponProficiency.CATEGORY_NAMES || {};
+          const lines = [];
+          for (const [cat, val] of entries) {
+            const pct = Math.floor(val);
+            const label = (names[cat] || cat).substring(0, 8);
+            lines.push(`${label} ${pct}%`);
+          }
+          // Two per line for compactness
+          for (let i = 0; i < lines.length; i += 2) {
+            const pair = lines.slice(i, i + 2).map(l => l.padEnd(18)).join('');
+            output.push({ type: 'info', text: `  ${pair}` });
+          }
         }
       }
 
-      // Title if available
-      if (player.title) {
-        output.push({ type: 'info', text: '' });
-        output.push({ type: 'info', text: `  Title: ${player.title}` });
-      }
-      // Karma if tracked
+      // ── Karma ──
       if (player.karma !== undefined && player.karma !== 0) {
         output.push({ type: 'info', text: `  Karma: ${player.karma}` });
       }
+
+      output.push({ type: 'info', text: '' });
+      output.push({ type: 'info', text: "  Type 'proficiency' for detailed ability & weapon mastery." });
       return output;
     }
 
@@ -1678,9 +1688,16 @@
 
     // ─── Combat ──────────────────────────────────────────────────────────────
 
+    /** Begin combat with a mob. Refuses quest NPCs and no_attack flagged mobs. */
     function initiateCombat(mobVnum) {
       const mob = mobs[mobVnum];
       if (!mob) return [{ type: 'error', text: 'Nothing to fight.' }];
+
+      // Prevent attacking protected NPCs (quest givers, merchants, trainers)
+      const mobFlags = mob.flags || [];
+      if (mobFlags.includes('no_attack') || mobFlags.includes('quest_npc')) {
+        return [{ type: 'info', text: `${mob.name} is not interested in fighting you.` }];
+      }
 
       combatState = {
         mobVnum,

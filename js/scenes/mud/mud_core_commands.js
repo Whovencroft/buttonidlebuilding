@@ -38,7 +38,7 @@
     window.MudCommands.registerAll([
       {
         name: 'go',
-        aliases: ['walk', 'move', 'head'],
+        aliases: ['walk', 'move', 'head', 'travel', 'proceed'],
         category: 'Movement',
         help: 'Move in a direction',
         usage: 'go <direction>',
@@ -46,7 +46,7 @@
       },
       {
         name: 'recall',
-        aliases: ['warp', 'home'],
+        aliases: ['warp', 'home', 'return', 'hearth'],
         category: 'Movement',
         help: 'Warp to your save point',
         usage: 'recall',
@@ -103,7 +103,7 @@
     window.MudCommands.registerAll([
       {
         name: 'look',
-        aliases: ['l', 'examine', 'x', 'read'],
+        aliases: ['l', 'x', 'read', 'check', 'peek', 'view', 'search'],
         category: 'Interaction',
         help: 'Examine room or object',
         usage: 'look [target]',
@@ -111,7 +111,7 @@
       },
       {
         name: 'take',
-        aliases: ['get', 'grab', 'pick'],
+        aliases: ['get', 'grab', 'pick', 'loot', 'pickup'],
         category: 'Interaction',
         help: 'Pick up an item',
         usage: 'take <item>',
@@ -119,7 +119,7 @@
       },
       {
         name: 'drop',
-        aliases: ['leave', 'discard'],
+        aliases: ['leave', 'discard', 'toss'],
         category: 'Interaction',
         help: 'Drop an item',
         usage: 'drop <item>',
@@ -127,7 +127,7 @@
       },
       {
         name: 'use',
-        aliases: ['activate', 'pull', 'push'],
+        aliases: ['activate', 'pull', 'push', 'interact', 'open'],
         category: 'Interaction',
         help: 'Interact with something',
         usage: 'use <object>',
@@ -151,7 +151,7 @@
       },
       {
         name: 'talk',
-        aliases: ['ask', 'chat'],
+        aliases: ['ask', 'chat', 'converse', 'greet'],
         category: 'Interaction',
         help: 'Speak to an NPC',
         usage: 'talk <npc>',
@@ -159,12 +159,12 @@
       },
       {
         name: 'say',
-        aliases: ['speak'],
+        aliases: ['shout', 'yell'],
         category: 'Interaction',
         help: 'Say something aloud — NPCs may respond to keywords',
         usage: 'say <message>',
         handler: (parsed) => {
-          const msg = parsed.raw.replace(/^(say|speak)\s*/i, '');
+          const msg = parsed.raw.replace(/^(say|shout|yell)\s*/i, '');
           if (!msg) return [{ type: 'info', text: 'Say what?' }];
           // Use NPC response system if available
           if (window.MudNpcSay && engine._internals) {
@@ -184,7 +184,7 @@
     window.MudCommands.registerAll([
       {
         name: 'inventory',
-        aliases: ['i', 'inv', 'bag'],
+        aliases: ['i', 'inv', 'bag', 'pack', 'backpack'],
         category: 'Inventory',
         help: 'List carried items',
         usage: 'inventory',
@@ -192,7 +192,7 @@
       },
       {
         name: 'equipment',
-        aliases: ['eq', 'worn'],
+        aliases: ['eq', 'worn', 'gear', 'loadout'],
         category: 'Inventory',
         help: 'List worn gear',
         usage: 'equipment',
@@ -208,7 +208,7 @@
       },
       {
         name: 'dual',
-        aliases: ['offhand', 'dualwield'],
+        aliases: ['offhand', 'dualwield', 'dw'],
         category: 'Inventory',
         help: 'Equip a weapon in your off hand for dual wielding',
         usage: 'dual <weapon>',
@@ -224,7 +224,7 @@
       },
       {
         name: 'inspect',
-        aliases: ['examine', 'id', 'identify'],
+        aliases: ['examine', 'id', 'identify', 'appraise', 'eval'],
         category: 'Inventory',
         help: 'View detailed stats of an item in your inventory or equipment',
         usage: 'inspect <item>',
@@ -308,7 +308,7 @@
     window.MudCommands.registerAll([
       {
         name: 'attack',
-        aliases: ['kill', 'hit', 'fight'],
+        aliases: ['kill', 'hit', 'fight', 'strike', 'engage'],
         category: 'Combat',
         help: 'Start combat with a target',
         usage: 'attack [target]',
@@ -316,7 +316,7 @@
       },
       {
         name: 'flee',
-        aliases: ['run', 'escape'],
+        aliases: ['run', 'escape', 'retreat', 'withdraw'],
         category: 'Combat',
         help: 'Attempt to escape combat',
         usage: 'flee',
@@ -329,7 +329,7 @@
     window.MudCommands.registerAll([
       {
         name: 'train',
-        aliases: ['learn'],
+        aliases: ['learn', 'study'],
         category: 'Progression',
         help: 'See purchasable abilities (Training Hall)',
         usage: 'train',
@@ -367,7 +367,7 @@
       },
       {
         name: 'abilities',
-        aliases: ['skills', 'spells'],
+        aliases: ['skills', 'spells', 'abs', 'abil'],
         category: 'Progression',
         help: 'List your abilities',
         usage: 'abilities',
@@ -375,26 +375,16 @@
       },
       {
         name: 'status',
-        aliases: ['stat', 'stats', 'power', 'score'],
+        aliases: ['stat', 'sc', 'score', 'info', 'me', 'whoami'],
         category: 'Progression',
         help: 'View power, QP, and stats',
         usage: 'status',
         handler: () => fn.doStatus()
       },
-      {
-        name: 'weaponprof',
-        aliases: ['wprof', 'weaponproficiency', 'wprofs'],
-        category: 'Progression',
-        help: 'View your weapon proficiencies (hidden until unlocked)',
-        usage: 'weaponprof',
-        handler: () => {
-          if (!window.MudWeaponProficiency) return [{ type: 'error', text: 'Weapon proficiency system not loaded.' }];
-          return window.MudWeaponProficiency.formatDisplay(engine._internals.player);
-        }
-      },
+
       {
         name: 'quest',
-        aliases: ['quests', 'journal', 'log'],
+        aliases: ['quests', 'journal', 'log', 'tasks', 'objectives'],
         category: 'Progression',
         help: 'View quest log or interact with the Bulletin Board',
         usage: 'quest [accept|board|name]',
@@ -443,7 +433,7 @@
       },
       {
         name: 'shop',
-        aliases: ['market', 'marketplace', 'wares'],
+        aliases: ['market', 'marketplace', 'wares', 'store', 'browse'],
         category: 'Social',
         help: 'Browse a local merchant or the marketplace',
         usage: 'shop [id]',
@@ -465,7 +455,7 @@
       },
       {
         name: 'sell',
-        aliases: [],
+        aliases: ['pawn'],
         category: 'Social',
         help: 'Sell an item to a local merchant',
         usage: 'sell <item>',
@@ -489,7 +479,7 @@
     // ─── System ─────────────────────────────────────────────────────────
     window.MudCommands.register({
       name: 'help',
-      aliases: ['?', 'commands'],
+      aliases: ['?', 'commands', 'manual', 'guide'],
       category: 'System',
       help: 'Show available commands',
       usage: 'help [command]',

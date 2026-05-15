@@ -196,7 +196,7 @@
       },
       {
         name: 'sense',
-        aliases: ['scan'],
+        aliases: ['scan', 'detect', 'survey'],
         category: 'Awareness',
         help: 'Gauge creature strength',
         usage: 'sense [target]',
@@ -213,7 +213,7 @@
       },
       {
         name: 'rest',
-        aliases: [],
+        aliases: ['sit', 'relax'],
         category: 'Recovery',
         help: 'Sit and recover HP and Focus',
         usage: 'rest',
@@ -232,7 +232,7 @@
       },
       {
         name: 'sleep',
-        aliases: [],
+        aliases: ['nap'],
         category: 'Recovery',
         help: 'Sleep for faster recovery',
         usage: 'sleep',
@@ -251,7 +251,7 @@
       },
       {
         name: 'wake',
-        aliases: ['stand'],
+        aliases: ['stand', 'getup', 'rise'],
         category: 'Recovery',
         help: 'Stand up from rest',
         usage: 'wake',
@@ -265,7 +265,7 @@
       },
       {
         name: 'stance',
-        aliases: ['stances'],
+        aliases: ['stances', 'guard', 'posture'],
         category: 'Combat',
         help: 'View or change combat stance',
         usage: 'stance [name]',
@@ -317,7 +317,7 @@
       },
       {
         name: 'transform',
-        aliases: ['henshin', 'bankai', 'ascend'],
+        aliases: ['henshin', 'bankai', 'ascend', 'morph', 'evolve'],
         category: 'Secret Class',
         help: 'Activate transformation (secret class)',
         usage: 'transform',
@@ -334,7 +334,7 @@
       },
       {
         name: 'detransform',
-        aliases: ['revert', 'powerdown'],
+        aliases: ['revert', 'powerdown', 'demorph'],
         category: 'Secret Class',
         help: 'Revert transformation',
         usage: 'detransform',
@@ -348,7 +348,7 @@
       },
       {
         name: 'class',
-        aliases: [],
+        aliases: ['spec', 'specialization'],
         category: 'Secret Class',
         help: 'View secret class info',
         usage: 'class',
@@ -460,7 +460,7 @@
       },
       {
         name: 'echo',
-        aliases: ['echoes'],
+        aliases: ['echoes', 'ghost', 'ghosts'],
         category: 'Awareness',
         help: 'Interact with death echoes',
         usage: 'echo',
@@ -480,7 +480,7 @@
       },
       {
         name: 'release',
-        aliases: [],
+        aliases: ['fire', 'unleash', 'discharge'],
         category: 'Combat',
         help: 'Release a charged ability early',
         usage: 'release',
@@ -514,7 +514,7 @@
       },
       {
         name: 'cancel',
-        aliases: [],
+        aliases: ['abort', 'stop'],
         category: 'Combat',
         help: 'Cancel a charging ability',
         usage: 'cancel',
@@ -529,36 +529,65 @@
       },
       {
         name: 'proficiency',
-        aliases: ['prof'],
+        aliases: ['prof', 'profs', 'mastery', 'proficiencies', 'wprof', 'weaponprof'],
         category: 'Progression',
-        help: 'View ability mastery levels',
+        help: 'View ability mastery and weapon proficiency levels',
         usage: 'proficiency',
         handler: () => {
-          if (!window.MudProficiency) return [{ type: 'error', text: 'Proficiency system not available.' }];
           const playerState = getPlayerFromSave();
-          const profData = playerState?.proficiency || {};
-          const abilities = playerState?.abilities || [];
-          if (abilities.length === 0) {
-            return [{ type: 'info', text: 'You have no abilities to show proficiency for.' }];
-          }
-          const output = [{ type: 'info', text: '─── Ability Proficiency ───' }];
-          for (const abilityId of abilities) {
-            const def = window.MudAbilities?.getAbilityById(abilityId);
-            if (!def) continue;
-            const level = window.MudProficiency.getLevel(profData, abilityId);
-            const progress = window.MudProficiency.getProgressString(profData, abilityId);
-            const bar = '█'.repeat(level) + '░'.repeat(10 - level);
-            output.push({ type: 'info', text: `  ${def.name}: [${bar}] Lv.${level} (${progress})` });
-            const cdRed = window.MudProficiency.getCooldownReduction(level);
-            const focusRed = window.MudProficiency.getFocusCostReduction(level);
-            const dmgBonus = Math.floor((window.MudProficiency.getDamageBonus(level) - 1) * 100);
-            if (cdRed || focusRed || dmgBonus) {
-              const bonuses = [];
-              if (dmgBonus > 0) bonuses.push(`+${dmgBonus}% dmg`);
-              if (cdRed > 0) bonuses.push(`-${cdRed} CD`);
-              if (focusRed > 0) bonuses.push(`-${focusRed} focus cost`);
-              output.push({ type: 'success', text: `    Bonuses: ${bonuses.join(', ')}` });
+          const output = [{ type: 'info', text: '═══ Proficiency ═══' }];
+
+          // ── Ability mastery section ──
+          if (window.MudProficiency) {
+            const profData = playerState?.proficiency || {};
+            const abilities = playerState?.abilities || [];
+            if (abilities.length > 0) {
+              output.push({ type: 'info', text: '' });
+              output.push({ type: 'info', text: '─── Ability Mastery ───' });
+              for (const abilityId of abilities) {
+                const def = window.MudAbilities?.getAbilityById(abilityId);
+                if (!def) continue;
+                const level = window.MudProficiency.getLevel(profData, abilityId);
+                const progress = window.MudProficiency.getProgressString(profData, abilityId);
+                const bar = '█'.repeat(level) + '░'.repeat(10 - level);
+                output.push({ type: 'info', text: `  ${def.name}: [${bar}] Lv.${level} (${progress})` });
+                const cdRed = window.MudProficiency.getCooldownReduction(level);
+                const focusRed = window.MudProficiency.getFocusCostReduction(level);
+                const dmgBonus = Math.floor((window.MudProficiency.getDamageBonus(level) - 1) * 100);
+                if (cdRed || focusRed || dmgBonus) {
+                  const bonuses = [];
+                  if (dmgBonus > 0) bonuses.push(`+${dmgBonus}% dmg`);
+                  if (cdRed > 0) bonuses.push(`-${cdRed} CD`);
+                  if (focusRed > 0) bonuses.push(`-${focusRed} focus cost`);
+                  output.push({ type: 'success', text: `    Bonuses: ${bonuses.join(', ')}` });
+                }
+              }
             }
+          }
+
+          // ── Weapon proficiency section ──
+          if (window.MudWeaponProficiency) {
+            const wp = playerState?.weaponProficiency || {};
+            const entries = Object.entries(wp).filter(([, v]) => v > 0).sort((a, b) => b[1] - a[1]);
+            if (entries.length > 0) {
+              output.push({ type: 'info', text: '' });
+              output.push({ type: 'info', text: '─── Weapon Proficiency ───' });
+              const names = window.MudWeaponProficiency.CATEGORY_NAMES || {};
+              for (const [cat, val] of entries) {
+                const name = (names[cat] || cat).padEnd(16);
+                const pct = Math.floor(val);
+                const bonus = Math.floor(val / 10);
+                const filled = Math.round(val / 10);
+                const bar = '█'.repeat(filled) + '░'.repeat(10 - filled);
+                const mastery = val >= 100 ? ' ★ MASTERY' : '';
+                output.push({ type: 'info', text: `  ${name} [${bar}] ${pct}%  (+${bonus} atk)${mastery}` });
+              }
+            }
+          }
+
+          // ── Empty state ──
+          if (output.length === 1) {
+            output.push({ type: 'info', text: '  No proficiencies gained yet. Use abilities and weapons in combat.' });
           }
           return output;
         }

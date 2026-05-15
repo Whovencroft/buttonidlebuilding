@@ -2420,5 +2420,38 @@
     },
     "rarity": "rare",
     "value": 55
+  },
+  "1200": {
+    "vnum": 1200,
+    "name": "Planar Resonance Journal",
+    "type": "quest",
+    "description": "A leather-bound journal filled with dense arcane notation. The pages are singed but legible. Diagrams show concentric circles of energy emanating from a central sphere.",
+    "slot": "none",
+    "zone": 7,
+    "flags": [
+      "quest_item"
+    ]
+  },
+  "1201": {
+    "vnum": 1201,
+    "name": "Containment Theory Scrolls",
+    "type": "quest",
+    "description": "A bundle of scrolls detailing theoretical methods for containing objects of immense planar energy. Most of the methods have been crossed out with increasingly frantic handwriting. The last entry simply reads: 'IMPOSSIBLE.'",
+    "slot": "none",
+    "zone": 7,
+    "flags": [
+      "quest_item"
+    ]
+  },
+  "1202": {
+    "vnum": 1202,
+    "name": "Fragment of the Eastern Ward",
+    "type": "quest",
+    "description": "A chunk of crystallized magical energy \u2014 all that remains of the ward that was supposed to protect the east wall of Aldric's tower. It still hums with residual power, and its surface shows a perfect spherical indentation.",
+    "slot": "none",
+    "zone": 7,
+    "flags": [
+      "quest_item"
+    ]
   }
 }

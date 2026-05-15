@@ -633,6 +633,16 @@
     ],
     "flags": [
       "npc"
+    ],
+    "sayResponses": [
+      {
+        "keywords": [
+          "marble",
+          "sphere",
+          "orb"
+        ],
+        "text": "The sphere? Aye, I've heard the stories. Traders from the eastern pass say something tore through the wizard's tower a fortnight ago. Left a hole you could see the sky through. The wizard's been raving about it ever since. If you're looking for answers, he's your best bet \u2014 if he hasn't gone completely mad by now."
+      }
     ]
   },
   "1131": {
@@ -1394,6 +1404,17 @@
     ],
     "flags": [
       "npc"
+    ],
+    "sayResponses": [
+      {
+        "keywords": [
+          "marble",
+          "sphere",
+          "orb",
+          "anomaly"
+        ],
+        "text": "You're asking about the anomaly? That data costs extra. ...Fine. Grid sensors picked up an unidentified object moving through Sector 7 at impossible speed three cycles ago. Mass readings were contradictory \u2014 simultaneously registering as negligible and infinite. Corporate's trying to suppress the footage, but I've got a copy. For the right price."
+      }
     ]
   },
   "1226": {
@@ -1700,6 +1721,17 @@
     "dialogue": [],
     "flags": [
       "stationary"
+    ],
+    "sayResponses": [
+      {
+        "keywords": [
+          "marble",
+          "sphere",
+          "ball",
+          "round"
+        ],
+        "text": "Something round, you say? Yeah, I heard about that. Punched a hole through a wall on Bleecker Street last week. Cops wrote it up as a gas explosion, but I know a guy who saw it. Said it was small, round, and moving like a bullet \u2014 except bullets don't curve around corners and go UP through ceilings. Whatever it is, somebody wants it bad."
+      }
     ]
   },
   "1309": {
@@ -2713,6 +2745,17 @@
     "dialogue": [],
     "flags": [
       "stationary"
+    ],
+    "sayResponses": [
+      {
+        "keywords": [
+          "marble",
+          "sphere",
+          "impact",
+          "crater"
+        ],
+        "text": "The impact site? That's in the restricted zone. Command says it was an unexploded ordnance, but I've seen UXO and that ain't it. The crater's too clean, too perfect. And the radiation signature doesn't match anything in our database. Whatever hit that field came from somewhere else. Somewhere... outside."
+      }
     ]
   },
   "1426": {
@@ -2740,6 +2783,15 @@
     ],
     "flags": [
       "npc"
+    ],
+    "sayResponses": [
+      {
+        "keywords": [
+          "marble",
+          "sphere"
+        ],
+        "text": "Look, I don't know what hit Firebase Delta, and I don't want to know. All I know is we lost three walls, two generators, and a latrine to something that wasn't on any radar. If you're investigating, be my guest. But don't bring whatever it was back here."
+      }
     ]
   },
   "1427": {
@@ -3352,6 +3404,17 @@
     ],
     "flags": [
       "npc"
+    ],
+    "sayResponses": [
+      {
+        "keywords": [
+          "marble",
+          "sphere",
+          "anomaly",
+          "distortion"
+        ],
+        "text": "Ah, you've noticed the gravitational scar. Yes, something passed through this region of space recently \u2014 something with mass that shouldn't exist at that scale. My charts show its trajectory bending through three dimensions... no, four. It's not just moving through space. It's moving through something else as well. I've been trying to plot its course, but the math keeps breaking."
+      }
     ]
   },
   "1524": {
@@ -5287,6 +5350,83 @@
     ],
     "flags": [
       "npc"
+    ]
+  },
+  "1200": {
+    "vnum": 1200,
+    "name": "Aldric the Distraught Wizard",
+    "description": "A tall, thin man in singed robes paces the ruins of his tower. His hair stands at wild angles, and his eyes dart between the destruction around him and the sheaf of notes clutched in his trembling hands. He mutters calculations under his breath, occasionally stopping to stare at the holes in his walls with a mixture of terror and academic fascination.",
+    "hostile": false,
+    "stats": {
+      "hp": 500,
+      "max_hp": 500,
+      "attack": 45,
+      "defense": 30
+    },
+    "loot_table": [],
+    "respawn": 0,
+    "flags": [
+      "no_attack",
+      "quest_npc"
+    ],
+    "sayResponses": [
+      {
+        "keywords": [
+          "marble",
+          "sphere",
+          "orb",
+          "ball",
+          "round"
+        ],
+        "text": "Aldric's eyes go wide. \"You've SEEN it? The sphere? It came through here three days ago \u2014 punched clean through my wards like they were tissue paper. Forty years of protective enchantments, gone in an instant. I've been studying the residual energy signatures. Whatever that thing is, it exists in multiple planes simultaneously. My instruments can't even measure its full mass \u2014 the readings just say UNDEFINED.\""
+      },
+      {
+        "keywords": [
+          "help",
+          "quest",
+          "task",
+          "need"
+        ],
+        "text": "Aldric runs a hand through his singed hair. \"Help? I need... I need to understand what happened here. My planar resonance detector is still picking up traces of the sphere's energy. If you encounter any more signs of its passage \u2014 impact sites, temporal distortions, gravitational anomalies \u2014 please, come tell me. Every data point brings me closer to understanding what we're dealing with.\""
+      },
+      {
+        "keywords": [
+          "research",
+          "notes",
+          "study",
+          "findings",
+          "theory"
+        ],
+        "text": "Aldric shuffles through his papers excitedly. \"My working theory? It's not from this plane. The energy signature is consistent with extra-dimensional origin \u2014 something that slipped through a crack between worlds. But here's what terrifies me: the trajectory analysis suggests it's not random. It's CHOOSING where to go. It changed direction mid-flight inside my tower. That implies intelligence, or at least intent.\""
+      },
+      {
+        "keywords": [
+          "tower",
+          "damage",
+          "destruction",
+          "ruins"
+        ],
+        "text": "Aldric gestures at the devastation around him with barely contained frustration. \"Forty years I spent building this tower. Forty years of wards, enchantments, protective circles. It punched through ALL of them without even slowing down. The entry hole is three inches across \u2014 perfectly circular. But look at the trajectory between entry and exit. It CURVED. Inside my tower. As if it was... exploring.\""
+      },
+      {
+        "keywords": [
+          "danger",
+          "warning",
+          "safe",
+          "careful"
+        ],
+        "text": "Aldric grabs your arm, his grip surprisingly strong. \"Listen to me carefully. My instruments measured the energy output of that sphere. It's... I don't have a word for it. My scales go to ten. The readings were at infinity. DO NOT try to stop it. Do not try to contain it. If you find it, observe from a distance. And if it starts moving toward you?\" He pauses. \"Run. Run and don't look back.\""
+      },
+      {
+        "keywords": [
+          "magic",
+          "ward",
+          "spell",
+          "enchantment",
+          "arcane"
+        ],
+        "text": "Aldric laughs bitterly. \"Magic? Against THAT? My wards were the strongest in the kingdom \u2014 layered enchantments, planar anchors, temporal locks. It went through them like they didn't exist. No, whatever that sphere is, it operates on principles beyond our understanding of magic. It's not anti-magic either \u2014 my detection spells work fine around the impact sites. It simply... doesn't care about our rules.\""
+      }
     ]
   }
 }

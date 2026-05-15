@@ -360,6 +360,17 @@
       if (!actionsEl) return;
       actionsEl.innerHTML = '';
 
+      // ─── Persistent Quick-Actions Row ───────────────────────────────
+      // Always-visible buttons for commonly used info commands.
+      const quickRow = document.createElement('div');
+      quickRow.className = 'mud-quick-buttons';
+      quickRow.appendChild(createActionButton('Status', 'status'));
+      quickRow.appendChild(createActionButton('Prof', 'proficiency'));
+      quickRow.appendChild(createActionButton('Abilities', 'abilities'));
+      quickRow.appendChild(createActionButton('Help', 'help'));
+      quickRow.appendChild(createActionButton('Board', 'board'));
+      actionsEl.appendChild(quickRow);
+
       // ─── Direction Row ──────────────────────────────────────────────
       const dirRow = document.createElement('div');
       dirRow.className = 'mud-dir-buttons';

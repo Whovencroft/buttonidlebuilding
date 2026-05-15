@@ -240,3 +240,4 @@ VNUM,NAME,DESC,HOSTILE,HP,ATTACK,DEFENSE,LOOT,RESPAWN,DIALOGUE,FLAGS
 1917,Judge's Scribe,A spectral bureaucrat who records the deeds of the dead.,false,100,5,5,,300,Your name is not yet in my ledger.;All are judged. All are weighed.,npc
 1918,Afterlife Ferryman,A hooded figure with a long pole who transports souls across the river.,false,200,10,10,,300,The crossing costs a memory. Choose wisely.;I have ferried kings and beggars alike.,npc
 1919,Spirit Healer,A gentle ghost who mends the wounds of the recently deceased.,false,150,5,5,,300,You are not dead yet. Interesting.;Rest here. Even spirits need rest.,npc
+1200,Aldric the Distraught Wizard,"A tall thin man in singed robes paces the ruins of his tower",false,500,45,30,,,no_attack,quest_npc
