@@ -476,7 +476,125 @@
       }
     ]);
 
-    // ─── System ─────────────────────────────────────────────────────────
+    // ─── Information ────────────────────────────────────────────────────────
+    window.MudCommands.registerAll([
+      {
+        name: 'consider',
+        aliases: ['con', 'assess', 'gauge'],
+        category: 'Information',
+        help: 'Gauge how dangerous a mob is relative to your power',
+        usage: 'consider <target>',
+        handler: (parsed) => {
+          if (!parsed.target) return [{ type: 'error', text: 'Consider what? Usage: consider <target>' }];
+          const room = engine._internals.rooms[engine._internals.player.currentRoom];
+          const aliveMobs = engine._internals.getAliveMobsInRoom(room);
+          const allMobs = engine._internals.mobs;
+          const player = engine._internals.player;
+          const target = parsed.target.toLowerCase();
+          let foundVnum = null;
+          for (const mv of aliveMobs) {
+            const mob = allMobs[mv];
+            if (!mob) continue;
+            const kws = mob.keywords || mob.name.toLowerCase().split(' ');
+            if (kws.some(k => k.includes(target) || target.includes(k))) {
+              foundVnum = mv;
+              break;
+            }
+          }
+          if (!foundVnum) return [{ type: 'error', text: `You don't see '${parsed.target}' here.` }];
+          const mob = allMobs[foundVnum];
+          const mobPower = (mob.stats.hp || 0) + (mob.stats.attack || 0) * 3 + (mob.stats.defense || 0) * 2;
+          const ratio = mobPower / Math.max(1, player.power);
+          let assessment, color;
+          if (ratio < 0.25) { assessment = 'is barely worth your time.'; color = 'info'; }
+          else if (ratio < 0.5) { assessment = 'would be easy prey.'; color = 'info'; }
+          else if (ratio < 0.8) { assessment = 'looks like a fair fight.'; color = 'success'; }
+          else if (ratio < 1.2) { assessment = 'is well-matched to you.'; color = 'success'; }
+          else if (ratio < 2.0) { assessment = 'looks dangerous!'; color = 'combat'; }
+          else if (ratio < 4.0) { assessment = 'would likely destroy you.'; color = 'error'; }
+          else { assessment = 'radiates overwhelming power. Run.'; color = 'error'; }
+          const isBoss = (mob.flags || []).includes('boss');
+          const output = [{ type: color, text: `${mob.name} ${assessment}` }];
+          if (isBoss) output.push({ type: 'error', text: '  \u2620 BOSS \u2014 telegraphed attacks require Tier 2+ counters!' });
+          return output;
+        }
+      },
+      {
+        name: 'map',
+        aliases: ['area', 'zone'],
+        category: 'Information',
+        help: 'Show a mini-map of nearby rooms you have visited',
+        usage: 'map',
+        handler: () => {
+          const player = engine._internals.player;
+          const rooms = engine._internals.rooms;
+          const current = player.currentRoom;
+          const room = rooms[current];
+          if (!room) return [{ type: 'error', text: 'You are nowhere.' }];
+          const output = [{ type: 'info', text: '\u2500\u2500\u2500 Area Map \u2500\u2500\u2500' }];
+          const exits = room.exits || {};
+          const dirSymbols = { north: 'N', south: 'S', east: 'E', west: 'W', up: 'U', down: 'D' };
+          output.push({ type: 'info', text: `  [*] ${room.name || 'Here'} (you are here)` });
+          output.push({ type: 'info', text: '' });
+          for (const [dir, ex] of Object.entries(exits)) {
+            const targetVnum = typeof ex === 'object' ? ex.target_vnum : ex;
+            const targetRoom = rooms[targetVnum];
+            const visited = player.visitedRooms?.[targetVnum];
+            const name = visited ? (targetRoom?.name || '???') : '(unexplored)';
+            const sym = dirSymbols[dir] || dir.charAt(0).toUpperCase();
+            output.push({ type: 'info', text: `   ${sym} \u2192 ${name}` });
+          }
+          const zoneNum = Math.floor(current / 100);
+          const zoneRooms = Object.keys(rooms).filter(v => Math.floor(parseInt(v) / 100) === zoneNum);
+          const visitedInZone = zoneRooms.filter(v => player.visitedRooms?.[v]);
+          output.push({ type: 'info', text: '' });
+          output.push({ type: 'info', text: `  Zone explored: ${visitedInZone.length}/${zoneRooms.length} rooms` });
+          return output;
+        }
+      },
+      {
+        name: 'compare',
+        aliases: ['comp'],
+        category: 'Information',
+        help: 'Compare an item to your currently equipped gear',
+        usage: 'compare <item>',
+        handler: (parsed) => {
+          if (!parsed.target) return [{ type: 'error', text: 'Compare what? Usage: compare <item>' }];
+          const player = engine._internals.player;
+          const items = engine._internals.items;
+          const target = parsed.target.toLowerCase();
+          const invVnum = player.inventory.find(v => {
+            const item = items[v];
+            if (!item) return false;
+            return item.name.toLowerCase().includes(target);
+          });
+          if (invVnum === undefined) return [{ type: 'error', text: `You don't have '${parsed.target}' in your inventory.` }];
+          const item = items[invVnum];
+          if (!item) return [{ type: 'error', text: 'Item not found.' }];
+          const slot = item.slot || (item.type === 'weapon' ? 'weapon' : null);
+          if (!slot) return [{ type: 'info', text: `${item.name} is not equippable.` }];
+          const equippedVnum = player.equipped[slot];
+          const equipped = equippedVnum != null ? items[equippedVnum] : null;
+          const output = [{ type: 'info', text: `\u2500\u2500\u2500 Compare: ${item.name} vs ${equipped ? equipped.name : '(nothing)'} [${slot}] \u2500\u2500\u2500` }];
+          const stats = ['attack', 'defense', 'hp', 'focus'];
+          for (const stat of stats) {
+            const newVal = item.stats?.[stat] || 0;
+            const oldVal = equipped?.stats?.[stat] || 0;
+            if (newVal === 0 && oldVal === 0) continue;
+            const diff = newVal - oldVal;
+            const sign = diff > 0 ? '+' : '';
+            const indicator = diff > 0 ? '\u25b2' : (diff < 0 ? '\u25bc' : '\u2550');
+            output.push({ type: diff > 0 ? 'success' : (diff < 0 ? 'error' : 'info'), text: `  ${stat.padEnd(8)} ${String(oldVal).padStart(4)} \u2192 ${String(newVal).padStart(4)}  (${sign}${diff}) ${indicator}` });
+          }
+          if (item.weapon_category && (!equipped || item.weapon_category !== equipped.weapon_category)) {
+            output.push({ type: 'info', text: `  Type: ${item.weapon_category}${equipped?.weapon_category ? ` (was: ${equipped.weapon_category})` : ''}` });
+          }
+          return output;
+        }
+      }
+    ]);
+
+    // ─── System ─────────────────────────────────────────────────────────────
     window.MudCommands.register({
       name: 'help',
       aliases: ['?', 'commands', 'manual', 'guide'],
@@ -503,8 +621,35 @@
             return output;
           }
         }
-        // Show full help
-        const output = window.MudCommands.generateHelp();
+        // Show full help grouped by category with topic filter
+        const allCmds = window.MudCommands.getAll ? window.MudCommands.getAll() : [];
+        const categories = {};
+        for (const cmd of allCmds) {
+          const cat = cmd.category || 'Other';
+          if (!categories[cat]) categories[cat] = [];
+          categories[cat].push(cmd);
+        }
+        const output = [{ type: 'info', text: '═══ Command Reference ═══' }];
+        const catOrder = ['Movement', 'Combat', 'Information', 'Items', 'Social', 'System'];
+        for (const cat of catOrder) {
+          if (!categories[cat]) continue;
+          output.push({ type: 'info', text: '' });
+          output.push({ type: 'info', text: `─── ${cat} ───` });
+          for (const cmd of categories[cat]) {
+            const aliases = cmd.aliases?.length ? ` (${cmd.aliases.slice(0, 3).join(', ')})` : '';
+            output.push({ type: 'info', text: `  ${cmd.name.padEnd(14)} ${cmd.help}${aliases}` });
+          }
+        }
+        // Remaining categories not in catOrder
+        for (const [cat, cmds] of Object.entries(categories)) {
+          if (catOrder.includes(cat)) continue;
+          output.push({ type: 'info', text: '' });
+          output.push({ type: 'info', text: `─── ${cat} ───` });
+          for (const cmd of cmds) {
+            output.push({ type: 'info', text: `  ${cmd.name.padEnd(14)} ${cmd.help}` });
+          }
+        }
+        output.push({ type: 'info', text: '' });
         output.push({ type: 'info', text: '─── Shortcuts ───' });
         output.push({ type: 'info', text: '  n/s/e/w/u/d          — Move in that direction' });
         output.push({ type: 'info', text: '  l                    — Look around' });

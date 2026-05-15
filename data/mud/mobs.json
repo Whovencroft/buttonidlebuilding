@@ -5,10 +5,10 @@
     "description": "A scrawny thief with a rusty dagger and desperate eyes.",
     "hostile": true,
     "stats": {
-      "hp": 80,
+      "hp": 47,
       "max_hp": 80,
-      "attack": 12,
-      "defense": 5
+      "attack": 7,
+      "defense": 2
     },
     "loot_table": [
       250,
@@ -18,6 +18,11 @@
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "bandit",
+      "bandit footpad",
+      "footpad"
     ]
   },
   "1102": {
@@ -26,10 +31,10 @@
     "description": "A grey wolf with yellow eyes. It circles warily.",
     "hostile": true,
     "stats": {
-      "hp": 100,
+      "hp": 52,
       "max_hp": 100,
-      "attack": 15,
-      "defense": 8
+      "attack": 7,
+      "defense": 4
     },
     "loot_table": [
       280,
@@ -39,6 +44,11 @@
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "forest",
+      "forest wolf",
+      "wolf"
     ]
   },
   "1103": {
@@ -47,10 +57,10 @@
     "description": "Bones held together by dark magic. It raises a notched sword.",
     "hostile": true,
     "stats": {
-      "hp": 120,
+      "hp": 57,
       "max_hp": 120,
-      "attack": 18,
-      "defense": 12
+      "attack": 8,
+      "defense": 5
     },
     "loot_table": [
       260,
@@ -60,6 +70,11 @@
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "warrior",
+      "skeleton",
+      "skeleton warrior"
     ]
   },
   "1104": {
@@ -68,10 +83,10 @@
     "description": "A green-skinned creature with a crude spear and a nasty grin.",
     "hostile": true,
     "stats": {
-      "hp": 90,
+      "hp": 49,
       "max_hp": 90,
-      "attack": 14,
-      "defense": 6
+      "attack": 7,
+      "defense": 3
     },
     "loot_table": [
       250,
@@ -81,6 +96,11 @@
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "scout",
+      "goblin scout",
+      "goblin"
     ]
   },
   "1105": {
@@ -89,10 +109,10 @@
     "description": "A hooded figure muttering forbidden incantations.",
     "hostile": true,
     "stats": {
-      "hp": 150,
+      "hp": 66,
       "max_hp": 150,
-      "attack": 22,
-      "defense": 10
+      "attack": 9,
+      "defense": 4
     },
     "loot_table": [
       200,
@@ -102,6 +122,11 @@
     "dialogue": [],
     "flags": [
       "stationary"
+    ],
+    "keywords": [
+      "acolyte",
+      "dark acolyte",
+      "dark"
     ]
   },
   "1106": {
@@ -110,10 +135,10 @@
     "description": "A massive construct of rusted iron. Its eyes glow red.",
     "hostile": true,
     "stats": {
-      "hp": 300,
+      "hp": 110,
       "max_hp": 300,
-      "attack": 30,
-      "defense": 25
+      "attack": 11,
+      "defense": 9
     },
     "loot_table": [
       260,
@@ -123,6 +148,11 @@
     "dialogue": [],
     "flags": [
       "stationary"
+    ],
+    "keywords": [
+      "iron golem",
+      "golem",
+      "iron"
     ]
   },
   "1107": {
@@ -131,10 +161,10 @@
     "description": "A warrior in black plate armor. Darkness seeps from the joints.",
     "hostile": true,
     "stats": {
-      "hp": 250,
+      "hp": 94,
       "max_hp": 250,
-      "attack": 35,
-      "defense": 20
+      "attack": 13,
+      "defense": 7
     },
     "loot_table": [
       280,
@@ -144,6 +174,11 @@
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "shadow",
+      "knight",
+      "shadow knight"
     ]
   },
   "1108": {
@@ -152,10 +187,10 @@
     "description": "A young dragon the size of a horse. Smoke curls from its nostrils.",
     "hostile": true,
     "stats": {
-      "hp": 400,
+      "hp": 206,
       "max_hp": 400,
-      "attack": 40,
-      "defense": 30
+      "attack": 20,
+      "defense": 15
     },
     "loot_table": [
       220,
@@ -164,7 +199,13 @@
     "respawn": 180,
     "dialogue": [],
     "flags": [
-      "stationary"
+      "stationary",
+      "boss"
+    ],
+    "keywords": [
+      "dragon whelp",
+      "whelp",
+      "dragon"
     ]
   },
   "1109": {
@@ -173,9 +214,9 @@
     "description": "A tiny brown mouse that scurries between the cobblestones. Harmless but annoying.",
     "hostile": true,
     "stats": {
-      "hp": 25,
+      "hp": 34,
       "max_hp": 25,
-      "attack": 3,
+      "attack": 4,
       "defense": 1
     },
     "loot_table": [
@@ -186,6 +227,11 @@
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "field",
+      "field mouse",
+      "mouse"
     ]
   },
   "1110": {
@@ -194,10 +240,10 @@
     "description": "A mangy tabby cat with one torn ear. It hisses at your approach.",
     "hostile": true,
     "stats": {
-      "hp": 35,
+      "hp": 33,
       "max_hp": 35,
-      "attack": 5,
-      "defense": 2
+      "attack": 4,
+      "defense": 1
     },
     "loot_table": [
       260,
@@ -207,6 +253,11 @@
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "stray cat",
+      "cat",
+      "stray"
     ]
   },
   "1111": {
@@ -215,10 +266,10 @@
     "description": "A bristle-backed boar with yellowed tusks. It paws the ground aggressively.",
     "hostile": true,
     "stats": {
-      "hp": 110,
+      "hp": 57,
       "max_hp": 110,
-      "attack": 16,
-      "defense": 10
+      "attack": 8,
+      "defense": 5
     },
     "loot_table": [
       220,
@@ -228,6 +279,11 @@
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "boar",
+      "feral",
+      "feral boar"
     ]
   },
   "1112": {
@@ -236,10 +292,10 @@
     "description": "A rangy woman with a shortbow and a quiver of black-fletched arrows.",
     "hostile": true,
     "stats": {
-      "hp": 75,
+      "hp": 43,
       "max_hp": 75,
-      "attack": 18,
-      "defense": 4
+      "attack": 10,
+      "defense": 2
     },
     "loot_table": [
       250,
@@ -249,6 +305,11 @@
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "bandit",
+      "bandit archer",
+      "archer"
     ]
   },
   "1113": {
@@ -257,10 +318,10 @@
     "description": "A scarred man in mismatched armor barking orders at his crew.",
     "hostile": true,
     "stats": {
-      "hp": 160,
+      "hp": 74,
       "max_hp": 160,
-      "attack": 24,
-      "defense": 14
+      "attack": 11,
+      "defense": 6
     },
     "loot_table": [
       200,
@@ -270,6 +331,43 @@
     "dialogue": [],
     "flags": [
       "stationary"
+    ],
+    "keywords": [
+      "captain",
+      "bandit",
+      "bandit captain"
+    ],
+    "sayResponses": [
+      {
+        "keywords": [
+          "help",
+          "advice"
+        ],
+        "text": "The kingdom has seen better days. Beware the deeper halls."
+      },
+      {
+        "keywords": [
+          "danger",
+          "warning"
+        ],
+        "text": "Dark things stir in the lower levels. Steel yourself."
+      },
+      {
+        "keywords": [
+          "quest",
+          "task",
+          "job"
+        ],
+        "text": "The crown's agents post bounties at the tavern board."
+      },
+      {
+        "keywords": [
+          "king",
+          "kingdom",
+          "crown"
+        ],
+        "text": "The king hasn't been seen in months. Some say the throne room is sealed."
+      }
     ]
   },
   "1114": {
@@ -278,10 +376,10 @@
     "description": "A hunched goblin rattling a bone staff and chanting in a guttural tongue.",
     "hostile": true,
     "stats": {
-      "hp": 100,
+      "hp": 53,
       "max_hp": 100,
-      "attack": 20,
-      "defense": 5
+      "attack": 10,
+      "defense": 2
     },
     "loot_table": [
       270,
@@ -291,6 +389,11 @@
     "dialogue": [],
     "flags": [
       "stationary"
+    ],
+    "keywords": [
+      "shaman",
+      "goblin",
+      "goblin shaman"
     ]
   },
   "1115": {
@@ -299,10 +402,10 @@
     "description": "A massive goblin nearly the size of an orc. It drags a spiked club.",
     "hostile": true,
     "stats": {
-      "hp": 140,
+      "hp": 68,
       "max_hp": 140,
-      "attack": 22,
-      "defense": 8
+      "attack": 10,
+      "defense": 3
     },
     "loot_table": [
       250,
@@ -312,6 +415,11 @@
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "goblin brute",
+      "goblin",
+      "brute"
     ]
   },
   "1116": {
@@ -320,10 +428,10 @@
     "description": "A wolf twice the normal size with frost on its muzzle and murder in its eyes.",
     "hostile": true,
     "stats": {
-      "hp": 160,
+      "hp": 75,
       "max_hp": 160,
-      "attack": 22,
-      "defense": 12
+      "attack": 10,
+      "defense": 5
     },
     "loot_table": [
       270,
@@ -333,6 +441,11 @@
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "dire",
+      "dire wolf",
+      "wolf"
     ]
   },
   "1117": {
@@ -341,10 +454,10 @@
     "description": "A thick-bodied snake coiled in the underbrush. Its rattle buzzes a warning.",
     "hostile": true,
     "stats": {
-      "hp": 50,
+      "hp": 35,
       "max_hp": 50,
-      "attack": 12,
-      "defense": 3
+      "attack": 8,
+      "defense": 2
     },
     "loot_table": [
       260,
@@ -354,6 +467,11 @@
     "dialogue": [],
     "flags": [
       "stationary"
+    ],
+    "keywords": [
+      "timber",
+      "rattlesnake",
+      "timber rattlesnake"
     ]
   },
   "1118": {
@@ -362,10 +480,10 @@
     "description": "A spider the size of a dog with venom dripping from its fangs.",
     "hostile": true,
     "stats": {
-      "hp": 90,
+      "hp": 50,
       "max_hp": 90,
-      "attack": 16,
-      "defense": 6
+      "attack": 8,
+      "defense": 3
     },
     "loot_table": [
       220,
@@ -375,6 +493,11 @@
     "dialogue": [],
     "flags": [
       "stationary"
+    ],
+    "keywords": [
+      "spider",
+      "giant spider",
+      "giant"
     ]
   },
   "1119": {
@@ -383,10 +506,10 @@
     "description": "A skeleton with a cracked longbow. It draws back a bone-tipped arrow.",
     "hostile": true,
     "stats": {
-      "hp": 100,
+      "hp": 52,
       "max_hp": 100,
-      "attack": 20,
-      "defense": 8
+      "attack": 10,
+      "defense": 4
     },
     "loot_table": [
       200,
@@ -396,6 +519,11 @@
     "dialogue": [],
     "flags": [
       "stationary"
+    ],
+    "keywords": [
+      "skeleton archer",
+      "skeleton",
+      "archer"
     ]
   },
   "1120": {
@@ -404,10 +532,10 @@
     "description": "A robed skeleton clutching a staff that crackles with necrotic energy.",
     "hostile": true,
     "stats": {
-      "hp": 80,
+      "hp": 43,
       "max_hp": 80,
-      "attack": 25,
-      "defense": 5
+      "attack": 13,
+      "defense": 2
     },
     "loot_table": [
       270,
@@ -417,6 +545,11 @@
     "dialogue": [],
     "flags": [
       "stationary"
+    ],
+    "keywords": [
+      "skeleton mage",
+      "skeleton",
+      "mage"
     ]
   },
   "1121": {
@@ -425,10 +558,10 @@
     "description": "A translucent figure drifting through the ruins. Its wail chills the blood.",
     "hostile": true,
     "stats": {
-      "hp": 70,
+      "hp": 43,
       "max_hp": 70,
-      "attack": 15,
-      "defense": 2
+      "attack": 9,
+      "defense": 1
     },
     "loot_table": [
       270,
@@ -438,6 +571,11 @@
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "spirit",
+      "restless spirit",
+      "restless"
     ]
   },
   "1122": {
@@ -446,10 +584,10 @@
     "description": "A knight in tarnished armor. The visor is rusted shut but something moves inside.",
     "hostile": true,
     "stats": {
-      "hp": 200,
+      "hp": 87,
       "max_hp": 200,
-      "attack": 28,
-      "defense": 18
+      "attack": 12,
+      "defense": 7
     },
     "loot_table": [
       260,
@@ -459,6 +597,11 @@
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "cursed knight",
+      "cursed",
+      "knight"
     ]
   },
   "1123": {
@@ -467,10 +610,10 @@
     "description": "A hulking green-skinned brute that regenerates wounds before your eyes.",
     "hostile": true,
     "stats": {
-      "hp": 250,
+      "hp": 107,
       "max_hp": 250,
-      "attack": 25,
-      "defense": 15
+      "attack": 10,
+      "defense": 6
     },
     "loot_table": [
       250,
@@ -480,6 +623,9 @@
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "troll"
     ]
   },
   "1124": {
@@ -488,10 +634,10 @@
     "description": "A dim-witted giant in a loincloth swinging a tree trunk as a weapon.",
     "hostile": true,
     "stats": {
-      "hp": 220,
+      "hp": 95,
       "max_hp": 220,
-      "attack": 30,
-      "defense": 10
+      "attack": 13,
+      "defense": 4
     },
     "loot_table": [
       200,
@@ -501,6 +647,9 @@
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "ogre"
     ]
   },
   "1125": {
@@ -509,10 +658,10 @@
     "description": "A shrieking bird-woman with talons like daggers. She dives from above.",
     "hostile": true,
     "stats": {
-      "hp": 130,
+      "hp": 64,
       "max_hp": 130,
-      "attack": 22,
-      "defense": 6
+      "attack": 10,
+      "defense": 2
     },
     "loot_table": [
       220,
@@ -522,6 +671,9 @@
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "harpy"
     ]
   },
   "1126": {
@@ -530,10 +682,10 @@
     "description": "A bull-headed warrior in bronze armor. The labyrinth is his domain.",
     "hostile": true,
     "stats": {
-      "hp": 280,
+      "hp": 115,
       "max_hp": 280,
-      "attack": 32,
-      "defense": 22
+      "attack": 13,
+      "defense": 9
     },
     "loot_table": [
       250,
@@ -543,6 +695,9 @@
     "dialogue": [],
     "flags": [
       "stationary"
+    ],
+    "keywords": [
+      "minotaur"
     ]
   },
   "1127": {
@@ -551,10 +706,10 @@
     "description": "An ancient spirit of terrible power. The air freezes in its presence.",
     "hostile": true,
     "stats": {
-      "hp": 350,
+      "hp": 140,
       "max_hp": 350,
-      "attack": 38,
-      "defense": 18
+      "attack": 15,
+      "defense": 7
     },
     "loot_table": [
       260,
@@ -564,6 +719,11 @@
     "dialogue": [],
     "flags": [
       "stationary"
+    ],
+    "keywords": [
+      "lord",
+      "wraith lord",
+      "wraith"
     ]
   },
   "1128": {
@@ -572,10 +732,10 @@
     "description": "A skeletal mage surrounded by floating spell-tomes and crackling runes.",
     "hostile": true,
     "stats": {
-      "hp": 300,
+      "hp": 131,
       "max_hp": 300,
-      "attack": 42,
-      "defense": 15
+      "attack": 18,
+      "defense": 6
     },
     "loot_table": [
       200,
@@ -585,6 +745,11 @@
     "dialogue": [],
     "flags": [
       "stationary"
+    ],
+    "keywords": [
+      "lich apprentice",
+      "lich",
+      "apprentice"
     ]
   },
   "1129": {
@@ -593,10 +758,10 @@
     "description": "A statue that wasn't a statue. Its stone wings crack open as it lunges.",
     "hostile": true,
     "stats": {
-      "hp": 200,
+      "hp": 114,
       "max_hp": 200,
-      "attack": 20,
-      "defense": 30
+      "attack": 11,
+      "defense": 17
     },
     "loot_table": [
       280,
@@ -606,6 +771,11 @@
     "dialogue": [],
     "flags": [
       "stationary"
+    ],
+    "keywords": [
+      "stone gargoyle",
+      "stone",
+      "gargoyle"
     ]
   },
   "1130": {
@@ -614,10 +784,10 @@
     "description": "A jovial halfling with an overloaded pack mule and a winning smile.",
     "hostile": false,
     "stats": {
-      "hp": 150,
+      "hp": 96,
       "max_hp": 150,
-      "attack": 5,
-      "defense": 5
+      "attack": 3,
+      "defense": 3
     },
     "loot_table": [],
     "respawn": 300,
@@ -643,6 +813,11 @@
         ],
         "text": "The sphere? Aye, I've heard the stories. Traders from the eastern pass say something tore through the wizard's tower a fortnight ago. Left a hole you could see the sky through. The wizard's been raving about it ever since. If you're looking for answers, he's your best bet \u2014 if he hasn't gone completely mad by now."
       }
+    ],
+    "keywords": [
+      "merchant",
+      "wandering merchant",
+      "wandering"
     ]
   },
   "1131": {
@@ -651,10 +826,10 @@
     "description": "A weathered man in patched robes leaning on a gnarled staff.",
     "hostile": false,
     "stats": {
-      "hp": 100,
+      "hp": 72,
       "max_hp": 100,
-      "attack": 3,
-      "defense": 3
+      "attack": 2,
+      "defense": 2
     },
     "loot_table": [],
     "respawn": 300,
@@ -670,6 +845,43 @@
     ],
     "flags": [
       "npc"
+    ],
+    "keywords": [
+      "hermit",
+      "old",
+      "old hermit"
+    ],
+    "sayResponses": [
+      {
+        "keywords": [
+          "help",
+          "advice"
+        ],
+        "text": "The kingdom has seen better days. Beware the deeper halls."
+      },
+      {
+        "keywords": [
+          "danger",
+          "warning"
+        ],
+        "text": "Dark things stir in the lower levels. Steel yourself."
+      },
+      {
+        "keywords": [
+          "quest",
+          "task",
+          "job"
+        ],
+        "text": "The crown's agents post bounties at the tavern board."
+      },
+      {
+        "keywords": [
+          "king",
+          "kingdom",
+          "crown"
+        ],
+        "text": "The king hasn't been seen in months. Some say the throne room is sealed."
+      }
     ]
   },
   "1132": {
@@ -678,10 +890,10 @@
     "description": "A soldier in the livery of the Shattered Crown. Alert but not hostile.",
     "hostile": false,
     "stats": {
-      "hp": 180,
+      "hp": 105,
       "max_hp": 180,
-      "attack": 20,
-      "defense": 15
+      "attack": 11,
+      "defense": 8
     },
     "loot_table": [],
     "respawn": 120,
@@ -697,6 +909,44 @@
     ],
     "flags": [
       "npc"
+    ],
+    "keywords": [
+      "crown",
+      "militia",
+      "guard",
+      "crown militia guard"
+    ],
+    "sayResponses": [
+      {
+        "keywords": [
+          "help",
+          "advice"
+        ],
+        "text": "The kingdom has seen better days. Beware the deeper halls."
+      },
+      {
+        "keywords": [
+          "danger",
+          "warning"
+        ],
+        "text": "Dark things stir in the lower levels. Steel yourself."
+      },
+      {
+        "keywords": [
+          "quest",
+          "task",
+          "job"
+        ],
+        "text": "The crown's agents post bounties at the tavern board."
+      },
+      {
+        "keywords": [
+          "king",
+          "kingdom",
+          "crown"
+        ],
+        "text": "The king hasn't been seen in months. Some say the throne room is sealed."
+      }
     ]
   },
   "1133": {
@@ -705,10 +955,10 @@
     "description": "A soot-covered youth hammering at a bent horseshoe.",
     "hostile": false,
     "stats": {
-      "hp": 120,
+      "hp": 77,
       "max_hp": 120,
-      "attack": 10,
-      "defense": 8
+      "attack": 6,
+      "defense": 5
     },
     "loot_table": [],
     "respawn": 300,
@@ -720,6 +970,11 @@
     ],
     "flags": [
       "npc"
+    ],
+    "keywords": [
+      "blacksmith apprentice",
+      "blacksmith",
+      "apprentice"
     ]
   },
   "1134": {
@@ -728,10 +983,10 @@
     "description": "A bloated rat with patchy fur and weeping sores. Disease incarnate.",
     "hostile": true,
     "stats": {
-      "hp": 45,
+      "hp": 38,
       "max_hp": 45,
-      "attack": 8,
-      "defense": 2
+      "attack": 6,
+      "defense": 1
     },
     "loot_table": [
       200,
@@ -741,6 +996,11 @@
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "plague rat",
+      "rat",
+      "plague"
     ]
   },
   "1135": {
@@ -762,6 +1022,11 @@
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "crow",
+      "carrion crow",
+      "carrion"
     ]
   },
   "1136": {
@@ -770,10 +1035,10 @@
     "description": "A shambling mass of earth and moss. Mushrooms sprout from its shoulders.",
     "hostile": true,
     "stats": {
-      "hp": 180,
+      "hp": 104,
       "max_hp": 180,
-      "attack": 18,
-      "defense": 22
+      "attack": 10,
+      "defense": 12
     },
     "loot_table": [
       200,
@@ -783,6 +1048,11 @@
     "dialogue": [],
     "flags": [
       "stationary"
+    ],
+    "keywords": [
+      "moss golem",
+      "golem",
+      "moss"
     ]
   },
   "1137": {
@@ -791,10 +1061,10 @@
     "description": "A desiccated corpse in ancient finery. Gold coins spill from its eye sockets.",
     "hostile": true,
     "stats": {
-      "hp": 220,
+      "hp": 124,
       "max_hp": 220,
-      "attack": 30,
-      "defense": 16
+      "attack": 16,
+      "defense": 9
     },
     "loot_table": [
       260,
@@ -804,6 +1074,11 @@
     "dialogue": [],
     "flags": [
       "stationary"
+    ],
+    "keywords": [
+      "barrow",
+      "barrow wight",
+      "wight"
     ]
   },
   "1138": {
@@ -812,10 +1087,10 @@
     "description": "A smaller troll covered in bark and lichen. It blends with the trees.",
     "hostile": true,
     "stats": {
-      "hp": 190,
+      "hp": 110,
       "max_hp": 190,
-      "attack": 22,
-      "defense": 14
+      "attack": 12,
+      "defense": 8
     },
     "loot_table": [
       250,
@@ -825,6 +1100,11 @@
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "troll",
+      "forest",
+      "forest troll"
     ]
   },
   "1139": {
@@ -833,10 +1113,10 @@
     "description": "A dancing ball of pale light that leads travelers astray.",
     "hostile": true,
     "stats": {
-      "hp": 40,
+      "hp": 34,
       "max_hp": 40,
-      "attack": 10,
-      "defense": 1
+      "attack": 8,
+      "defense": 0
     },
     "loot_table": [
       200,
@@ -846,6 +1126,9 @@
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "will-o-wisp"
     ]
   },
   "1140": {
@@ -854,10 +1137,10 @@
     "description": "A terrifying hybrid of owl and bear. It hoots and roars simultaneously.",
     "hostile": true,
     "stats": {
-      "hp": 240,
+      "hp": 134,
       "max_hp": 240,
-      "attack": 28,
-      "defense": 16
+      "attack": 15,
+      "defense": 8
     },
     "loot_table": [
       250,
@@ -867,6 +1150,9 @@
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "owlbear"
     ]
   },
   "1201": {
@@ -875,7 +1161,7 @@
     "description": "A wired-up ganger with chrome implants and a switchblade.",
     "hostile": true,
     "stats": {
-      "hp": 80,
+      "hp": 81,
       "max_hp": 80,
       "attack": 13,
       "defense": 5
@@ -888,6 +1174,11 @@
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "street",
+      "street punk",
+      "punk"
     ]
   },
   "1202": {
@@ -896,10 +1187,10 @@
     "description": "A malfunctioning delivery drone sparking with exposed wires.",
     "hostile": true,
     "stats": {
-      "hp": 100,
+      "hp": 87,
       "max_hp": 100,
-      "attack": 16,
-      "defense": 10
+      "attack": 13,
+      "defense": 8
     },
     "loot_table": [
       232,
@@ -909,6 +1200,11 @@
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "drone",
+      "rogue",
+      "rogue drone"
     ]
   },
   "1203": {
@@ -917,10 +1213,10 @@
     "description": "A guard in black tactical gear with a stun baton.",
     "hostile": true,
     "stats": {
-      "hp": 130,
+      "hp": 98,
       "max_hp": 130,
-      "attack": 20,
-      "defense": 15
+      "attack": 15,
+      "defense": 11
     },
     "loot_table": [
       286,
@@ -930,6 +1226,11 @@
     "dialogue": [],
     "flags": [
       "stationary"
+    ],
+    "keywords": [
+      "corporate security",
+      "corporate",
+      "security"
     ]
   },
   "1204": {
@@ -938,10 +1239,10 @@
     "description": "A mechanical dog with razor teeth and infrared eyes.",
     "hostile": true,
     "stats": {
-      "hp": 110,
+      "hp": 92,
       "max_hp": 110,
-      "attack": 18,
-      "defense": 8
+      "attack": 15,
+      "defense": 6
     },
     "loot_table": [
       242,
@@ -951,6 +1252,11 @@
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "cyber hound",
+      "hound",
+      "cyber"
     ]
   },
   "1205": {
@@ -959,10 +1265,10 @@
     "description": "A holographic projection of a dead netrunner. Still dangerous.",
     "hostile": true,
     "stats": {
-      "hp": 160,
+      "hp": 114,
       "max_hp": 160,
-      "attack": 25,
-      "defense": 5
+      "attack": 17,
+      "defense": 3
     },
     "loot_table": [
       262,
@@ -972,6 +1278,11 @@
     "dialogue": [],
     "flags": [
       "stationary"
+    ],
+    "keywords": [
+      "hacker",
+      "hacker ghost",
+      "ghost"
     ]
   },
   "1206": {
@@ -980,10 +1291,10 @@
     "description": "A bipedal combat mech with twin autocannons.",
     "hostile": true,
     "stats": {
-      "hp": 350,
+      "hp": 188,
       "max_hp": 350,
-      "attack": 38,
-      "defense": 28
+      "attack": 20,
+      "defense": 15
     },
     "loot_table": [
       232,
@@ -993,6 +1304,11 @@
     "dialogue": [],
     "flags": [
       "stationary"
+    ],
+    "keywords": [
+      "enforcer",
+      "mech enforcer",
+      "mech"
     ]
   },
   "1207": {
@@ -1001,10 +1317,10 @@
     "description": "An android built for killing. Its face is eerily human.",
     "hostile": true,
     "stats": {
-      "hp": 280,
+      "hp": 158,
       "max_hp": 280,
-      "attack": 42,
-      "defense": 18
+      "attack": 23,
+      "defense": 10
     },
     "loot_table": [
       262,
@@ -1014,6 +1330,11 @@
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "synth assassin",
+      "assassin",
+      "synth"
     ]
   },
   "1208": {
@@ -1022,10 +1343,10 @@
     "description": "A server rack pulsing with malevolent intelligence. Drones orbit it.",
     "hostile": true,
     "stats": {
-      "hp": 500,
+      "hp": 372,
       "max_hp": 500,
-      "attack": 45,
-      "defense": 35
+      "attack": 33,
+      "defense": 26
     },
     "loot_table": [
       205,
@@ -1034,7 +1355,14 @@
     "respawn": 180,
     "dialogue": [],
     "flags": [
-      "stationary"
+      "stationary",
+      "boss"
+    ],
+    "keywords": [
+      "rogue ai node",
+      "rogue",
+      "ai",
+      "node"
     ]
   },
   "1209": {
@@ -1043,10 +1371,10 @@
     "description": "A rat with a circuit board fused to its spine. Its eyes glow faintly blue.",
     "hostile": true,
     "stats": {
-      "hp": 30,
+      "hp": 68,
       "max_hp": 30,
-      "attack": 4,
-      "defense": 1
+      "attack": 9,
+      "defense": 2
     },
     "loot_table": [
       286,
@@ -1056,6 +1384,11 @@
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "junk",
+      "junk rat",
+      "rat"
     ]
   },
   "1210": {
@@ -1064,10 +1397,10 @@
     "description": "A robotic cat with torn synthetic fur. It sparks when it moves.",
     "hostile": true,
     "stats": {
-      "hp": 40,
+      "hp": 64,
       "max_hp": 40,
-      "attack": 6,
-      "defense": 3
+      "attack": 9,
+      "defense": 4
     },
     "loot_table": [
       205,
@@ -1077,6 +1410,11 @@
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "stray synth-cat",
+      "synth-cat",
+      "stray"
     ]
   },
   "1211": {
@@ -1085,9 +1423,9 @@
     "description": "A swarm of tiny metallic insects that eat through wiring.",
     "hostile": true,
     "stats": {
-      "hp": 50,
+      "hp": 69,
       "max_hp": 50,
-      "attack": 8,
+      "attack": 11,
       "defense": 2
     },
     "loot_table": [
@@ -1098,6 +1436,11 @@
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "glitch",
+      "glitch beetle",
+      "beetle"
     ]
   },
   "1212": {
@@ -1106,9 +1449,9 @@
     "description": "A twitching addict with a crackling stun-knuckle and nothing to lose.",
     "hostile": true,
     "stats": {
-      "hp": 60,
+      "hp": 72,
       "max_hp": 60,
-      "attack": 10,
+      "attack": 12,
       "defense": 3
     },
     "loot_table": [
@@ -1119,6 +1462,11 @@
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "neon junkie",
+      "junkie",
+      "neon"
     ]
   },
   "1213": {
@@ -1127,10 +1475,10 @@
     "description": "A street soldier with a chrome arm and a sawed-off shotgun.",
     "hostile": true,
     "stats": {
-      "hp": 95,
+      "hp": 84,
       "max_hp": 95,
-      "attack": 16,
-      "defense": 8
+      "attack": 14,
+      "defense": 7
     },
     "loot_table": [
       252,
@@ -1140,6 +1488,11 @@
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "ganger",
+      "chrome ganger",
+      "chrome"
     ]
   },
   "1214": {
@@ -1148,7 +1501,7 @@
     "description": "A nervous runner with encrypted data-chips and a holdout pistol.",
     "hostile": true,
     "stats": {
-      "hp": 70,
+      "hp": 75,
       "max_hp": 70,
       "attack": 12,
       "defense": 4
@@ -1161,6 +1514,11 @@
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "courier",
+      "data courier",
+      "data"
     ]
   },
   "1215": {
@@ -1169,10 +1527,10 @@
     "description": "A terrified office worker who pulled a taser from their desk drawer.",
     "hostile": true,
     "stats": {
-      "hp": 55,
+      "hp": 68,
       "max_hp": 55,
-      "attack": 8,
-      "defense": 6
+      "attack": 10,
+      "defense": 7
     },
     "loot_table": [
       242,
@@ -1182,6 +1540,11 @@
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "intern",
+      "corpo intern",
+      "corpo"
     ]
   },
   "1216": {
@@ -1190,10 +1553,10 @@
     "description": "A ceiling-mounted auto-turret tracking movement with a red laser.",
     "hostile": true,
     "stats": {
-      "hp": 120,
+      "hp": 88,
       "max_hp": 120,
-      "attack": 22,
-      "defense": 20
+      "attack": 16,
+      "defense": 14
     },
     "loot_table": [
       252,
@@ -1203,6 +1566,11 @@
     "dialogue": [],
     "flags": [
       "stationary"
+    ],
+    "keywords": [
+      "sentry",
+      "turret",
+      "sentry turret"
     ]
   },
   "1217": {
@@ -1211,10 +1579,10 @@
     "description": "A utility robot gone haywire. Its welding torch swings wildly.",
     "hostile": true,
     "stats": {
-      "hp": 90,
+      "hp": 80,
       "max_hp": 90,
-      "attack": 14,
-      "defense": 12
+      "attack": 12,
+      "defense": 10
     },
     "loot_table": [
       205,
@@ -1224,6 +1592,11 @@
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "maintenance",
+      "bot",
+      "maintenance bot"
     ]
   },
   "1218": {
@@ -1232,10 +1605,10 @@
     "description": "The digital ghost of a flatlined hacker. It attacks through your implants.",
     "hostile": true,
     "stats": {
-      "hp": 140,
+      "hp": 102,
       "max_hp": 140,
-      "attack": 28,
-      "defense": 3
+      "attack": 20,
+      "defense": 2
     },
     "loot_table": [
       252,
@@ -1245,6 +1618,11 @@
     "dialogue": [],
     "flags": [
       "stationary"
+    ],
+    "keywords": [
+      "shade",
+      "netrunner shade",
+      "netrunner"
     ]
   },
   "1219": {
@@ -1253,10 +1631,10 @@
     "description": "A black-clad operative with a monofilament blade. Corpo wetwork.",
     "hostile": true,
     "stats": {
-      "hp": 200,
+      "hp": 125,
       "max_hp": 200,
-      "attack": 35,
-      "defense": 12
+      "attack": 22,
+      "defense": 7
     },
     "loot_table": [
       286,
@@ -1266,6 +1644,11 @@
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "corporate ninja",
+      "corporate",
+      "ninja"
     ]
   },
   "1220": {
@@ -1274,10 +1657,10 @@
     "description": "Three corpo soldiers in heavy tactical gear moving in formation.",
     "hostile": true,
     "stats": {
-      "hp": 300,
+      "hp": 170,
       "max_hp": 300,
-      "attack": 32,
-      "defense": 25
+      "attack": 18,
+      "defense": 14
     },
     "loot_table": [
       232,
@@ -1287,6 +1670,12 @@
     "dialogue": [],
     "flags": [
       "stationary"
+    ],
+    "keywords": [
+      "armored response unit",
+      "response",
+      "armored",
+      "unit"
     ]
   },
   "1221": {
@@ -1295,10 +1684,10 @@
     "description": "A chrome-loaded maniac who lost their humanity to too many implants.",
     "hostile": true,
     "stats": {
-      "hp": 250,
+      "hp": 147,
       "max_hp": 250,
-      "attack": 40,
-      "defense": 10
+      "attack": 23,
+      "defense": 5
     },
     "loot_table": [
       205,
@@ -1308,6 +1697,9 @@
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "cyber-psycho"
     ]
   },
   "1222": {
@@ -1316,10 +1708,10 @@
     "description": "Hostile intrusion countermeasure. It manifests as crackling black lightning.",
     "hostile": true,
     "stats": {
-      "hp": 180,
+      "hp": 117,
       "max_hp": 180,
-      "attack": 35,
-      "defense": 8
+      "attack": 22,
+      "defense": 5
     },
     "loot_table": [
       252,
@@ -1329,6 +1721,11 @@
     "dialogue": [],
     "flags": [
       "stationary"
+    ],
+    "keywords": [
+      "black ice",
+      "black",
+      "ice"
     ]
   },
   "1223": {
@@ -1337,10 +1734,10 @@
     "description": "A massive industrial robot repurposed for violence. It crushes.",
     "hostile": true,
     "stats": {
-      "hp": 280,
+      "hp": 162,
       "max_hp": 280,
-      "attack": 25,
-      "defense": 30
+      "attack": 14,
+      "defense": 17
     },
     "loot_table": [
       262,
@@ -1350,6 +1747,12 @@
     "dialogue": [],
     "flags": [
       "stationary"
+    ],
+    "keywords": [
+      "compactor",
+      "trash",
+      "bot",
+      "trash compactor bot"
     ]
   },
   "1224": {
@@ -1358,7 +1761,7 @@
     "description": "A cheerful woman selling street food from a hovering cart.",
     "hostile": false,
     "stats": {
-      "hp": 100,
+      "hp": 107,
       "max_hp": 100,
       "attack": 3,
       "defense": 3
@@ -1377,6 +1780,44 @@
     ],
     "flags": [
       "npc"
+    ],
+    "keywords": [
+      "neon district vendor",
+      "vendor",
+      "district",
+      "neon"
+    ],
+    "sayResponses": [
+      {
+        "keywords": [
+          "help",
+          "advice"
+        ],
+        "text": "Keep your firmware updated and watch for rogue subroutines."
+      },
+      {
+        "keywords": [
+          "danger",
+          "warning"
+        ],
+        "text": "The deeper network nodes are corrupted. Proceed with caution."
+      },
+      {
+        "keywords": [
+          "quest",
+          "task",
+          "job"
+        ],
+        "text": "Check the job board on the main terminal."
+      },
+      {
+        "keywords": [
+          "hack",
+          "system",
+          "network"
+        ],
+        "text": "The network's been unstable since the AI fragmented."
+      }
     ]
   },
   "1225": {
@@ -1385,7 +1826,7 @@
     "description": "A thin man in mirrorshades who knows everyone's secrets.",
     "hostile": false,
     "stats": {
-      "hp": 80,
+      "hp": 91,
       "max_hp": 80,
       "attack": 5,
       "defense": 5
@@ -1415,6 +1856,11 @@
         ],
         "text": "You're asking about the anomaly? That data costs extra. ...Fine. Grid sensors picked up an unidentified object moving through Sector 7 at impossible speed three cycles ago. Mass readings were contradictory \u2014 simultaneously registering as negligible and infinite. Corporate's trying to suppress the footage, but I've got a copy. For the right price."
       }
+    ],
+    "keywords": [
+      "info",
+      "broker",
+      "info broker"
     ]
   },
   "1226": {
@@ -1423,10 +1869,10 @@
     "description": "A former corpo surgeon running a back-alley clinic.",
     "hostile": false,
     "stats": {
-      "hp": 120,
+      "hp": 105,
       "max_hp": 120,
-      "attack": 8,
-      "defense": 8
+      "attack": 7,
+      "defense": 7
     },
     "loot_table": [],
     "respawn": 300,
@@ -1442,6 +1888,11 @@
     ],
     "flags": [
       "npc"
+    ],
+    "keywords": [
+      "street doc",
+      "street",
+      "doc"
     ]
   },
   "1227": {
@@ -1450,10 +1901,10 @@
     "description": "A tired cop in light armor doing their best in a broken system.",
     "hostile": false,
     "stats": {
-      "hp": 150,
+      "hp": 110,
       "max_hp": 150,
-      "attack": 18,
-      "defense": 12
+      "attack": 13,
+      "defense": 8
     },
     "loot_table": [],
     "respawn": 120,
@@ -1469,6 +1920,44 @@
     ],
     "flags": [
       "npc"
+    ],
+    "keywords": [
+      "grid",
+      "patrol",
+      "grid patrol officer",
+      "officer"
+    ],
+    "sayResponses": [
+      {
+        "keywords": [
+          "help",
+          "advice"
+        ],
+        "text": "Keep your firmware updated and watch for rogue subroutines."
+      },
+      {
+        "keywords": [
+          "danger",
+          "warning"
+        ],
+        "text": "The deeper network nodes are corrupted. Proceed with caution."
+      },
+      {
+        "keywords": [
+          "quest",
+          "task",
+          "job"
+        ],
+        "text": "Check the job board on the main terminal."
+      },
+      {
+        "keywords": [
+          "hack",
+          "system",
+          "network"
+        ],
+        "text": "The network's been unstable since the AI fragmented."
+      }
     ]
   },
   "1228": {
@@ -1477,9 +1966,9 @@
     "description": "A tiny holographic mascot that attacks with pop-up ads and malware.",
     "hostile": true,
     "stats": {
-      "hp": 35,
+      "hp": 63,
       "max_hp": 35,
-      "attack": 6,
+      "attack": 10,
       "defense": 1
     },
     "loot_table": [
@@ -1490,6 +1979,12 @@
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "adware",
+      "sprite",
+      "viral adware sprite",
+      "viral"
     ]
   },
   "1229": {
@@ -1498,10 +1993,10 @@
     "description": "A delivery drone hacked to kamikaze speed. It rams anything in its path.",
     "hostile": true,
     "stats": {
-      "hp": 65,
+      "hp": 64,
       "max_hp": 65,
-      "attack": 15,
-      "defense": 2
+      "attack": 14,
+      "defense": 1
     },
     "loot_table": [
       221,
@@ -1511,6 +2006,12 @@
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "drone",
+      "courier",
+      "overclocked courier drone",
+      "overclocked"
     ]
   },
   "1230": {
@@ -1519,9 +2020,9 @@
     "description": "A palm-sized robot that latches on and fries electronics.",
     "hostile": true,
     "stats": {
-      "hp": 45,
+      "hp": 54,
       "max_hp": 45,
-      "attack": 12,
+      "attack": 14,
       "defense": 1
     },
     "loot_table": [
@@ -1532,6 +2033,11 @@
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "emp",
+      "emp spider",
+      "spider"
     ]
   },
   "1231": {
@@ -1540,10 +2046,10 @@
     "description": "A scarred veteran in a custom exo-suit. She's seen everything.",
     "hostile": true,
     "stats": {
-      "hp": 400,
+      "hp": 207,
       "max_hp": 400,
-      "attack": 45,
-      "defense": 30
+      "attack": 23,
+      "defense": 15
     },
     "loot_table": [
       242,
@@ -1553,6 +2059,12 @@
     "dialogue": [],
     "flags": [
       "stationary"
+    ],
+    "keywords": [
+      "corpo security chief",
+      "security",
+      "corpo",
+      "chief"
     ]
   },
   "1301": {
@@ -1561,10 +2073,10 @@
     "description": "A desperate man with a snub-nose revolver and shaking hands.",
     "hostile": true,
     "stats": {
-      "hp": 70,
+      "hp": 124,
       "max_hp": 70,
-      "attack": 10,
-      "defense": 4
+      "attack": 17,
+      "defense": 7
     },
     "loot_table": [
       233,
@@ -1574,6 +2086,11 @@
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "mugger",
+      "alley",
+      "alley mugger"
     ]
   },
   "1302": {
@@ -1582,10 +2099,10 @@
     "description": "A detective with dead eyes and a badge that means nothing.",
     "hostile": true,
     "stats": {
-      "hp": 150,
+      "hp": 171,
       "max_hp": 150,
-      "attack": 22,
-      "defense": 15
+      "attack": 25,
+      "defense": 17
     },
     "loot_table": [
       233,
@@ -1595,6 +2112,11 @@
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "cop",
+      "corrupt",
+      "corrupt cop"
     ]
   },
   "1303": {
@@ -1603,10 +2125,10 @@
     "description": "A massive enforcer in a cheap suit. Knuckles like walnuts.",
     "hostile": true,
     "stats": {
-      "hp": 180,
+      "hp": 192,
       "max_hp": 180,
-      "attack": 25,
-      "defense": 18
+      "attack": 26,
+      "defense": 19
     },
     "loot_table": [
       222,
@@ -1616,6 +2138,11 @@
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "hired muscle",
+      "muscle",
+      "hired"
     ]
   },
   "1304": {
@@ -1624,10 +2151,10 @@
     "description": "A lithe figure in black. You almost didn't see them.",
     "hostile": true,
     "stats": {
-      "hp": 120,
+      "hp": 152,
       "max_hp": 120,
-      "attack": 20,
-      "defense": 8
+      "attack": 25,
+      "defense": 10
     },
     "loot_table": [
       233,
@@ -1637,6 +2164,11 @@
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "burglar",
+      "cat",
+      "cat burglar"
     ]
   },
   "1305": {
@@ -1645,10 +2177,10 @@
     "description": "A sharp-dressed man with cold eyes and a silenced pistol.",
     "hostile": true,
     "stats": {
-      "hp": 220,
+      "hp": 219,
       "max_hp": 220,
-      "attack": 30,
-      "defense": 20
+      "attack": 29,
+      "defense": 19
     },
     "loot_table": [
       208,
@@ -1658,6 +2190,11 @@
     "dialogue": [],
     "flags": [
       "stationary"
+    ],
+    "keywords": [
+      "lieutenant",
+      "mob lieutenant",
+      "mob"
     ]
   },
   "1306": {
@@ -1666,7 +2203,7 @@
     "description": "Beautiful and deadly. The knife is already in her hand.",
     "hostile": true,
     "stats": {
-      "hp": 200,
+      "hp": 204,
       "max_hp": 200,
       "attack": 35,
       "defense": 12
@@ -1679,6 +2216,11 @@
     "dialogue": [],
     "flags": [
       "stationary"
+    ],
+    "keywords": [
+      "femme",
+      "femme fatale",
+      "fatale"
     ]
   },
   "1307": {
@@ -1687,10 +2229,10 @@
     "description": "A waterlogged specter that haunts the rain-slicked docks.",
     "hostile": true,
     "stats": {
-      "hp": 300,
+      "hp": 277,
       "max_hp": 300,
-      "attack": 32,
-      "defense": 25
+      "attack": 29,
+      "defense": 23
     },
     "loot_table": [
       272,
@@ -1700,6 +2242,13 @@
     "dialogue": [],
     "flags": [
       "stationary"
+    ],
+    "keywords": [
+      "the",
+      "of",
+      "drowned",
+      "ghost of the drowned",
+      "ghost"
     ]
   },
   "1308": {
@@ -1708,10 +2257,10 @@
     "description": "A shadowy broker who deals in secrets and violence.",
     "hostile": true,
     "stats": {
-      "hp": 400,
+      "hp": 517,
       "max_hp": 400,
-      "attack": 40,
-      "defense": 30
+      "attack": 51,
+      "defense": 38
     },
     "loot_table": [
       233,
@@ -1720,7 +2269,8 @@
     "respawn": 240,
     "dialogue": [],
     "flags": [
-      "stationary"
+      "stationary",
+      "boss"
     ],
     "sayResponses": [
       {
@@ -1732,6 +2282,11 @@
         ],
         "text": "Something round, you say? Yeah, I heard about that. Punched a hole through a wall on Bleecker Street last week. Cops wrote it up as a gas explosion, but I know a guy who saw it. Said it was small, round, and moving like a bullet \u2014 except bullets don't curve around corners and go UP through ceilings. Whatever it is, somebody wants it bad."
       }
+    ],
+    "keywords": [
+      "the",
+      "fixer",
+      "the fixer"
     ]
   },
   "1309": {
@@ -1740,10 +2295,10 @@
     "description": "A fat wharf rat the size of a terrier. It gnaws on something unidentifiable.",
     "hostile": true,
     "stats": {
-      "hp": 30,
+      "hp": 102,
       "max_hp": 30,
-      "attack": 4,
-      "defense": 1
+      "attack": 13,
+      "defense": 3
     },
     "loot_table": [
       233,
@@ -1753,6 +2308,11 @@
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "dock rat",
+      "dock",
+      "rat"
     ]
   },
   "1310": {
@@ -1761,10 +2321,10 @@
     "description": "A one-eyed tom with scars and an attitude. It yowls in the dark.",
     "hostile": true,
     "stats": {
-      "hp": 35,
+      "hp": 98,
       "max_hp": 35,
-      "attack": 5,
-      "defense": 2
+      "attack": 14,
+      "defense": 5
     },
     "loot_table": [
       208,
@@ -1774,6 +2334,12 @@
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "cat",
+      "feral",
+      "alley",
+      "feral alley cat"
     ]
   },
   "1311": {
@@ -1782,10 +2348,10 @@
     "description": "A scrawny child with quick hands and quicker feet.",
     "hostile": true,
     "stats": {
-      "hp": 40,
+      "hp": 103,
       "max_hp": 40,
-      "attack": 6,
-      "defense": 1
+      "attack": 15,
+      "defense": 2
     },
     "loot_table": [
       208,
@@ -1795,6 +2361,11 @@
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "pickpocket kid",
+      "kid",
+      "pickpocket"
     ]
   },
   "1312": {
@@ -1803,10 +2374,10 @@
     "description": "A staggering man reeking of cheap whiskey. He swings a bottle.",
     "hostile": true,
     "stats": {
-      "hp": 65,
+      "hp": 118,
       "max_hp": 65,
-      "attack": 8,
-      "defense": 3
+      "attack": 14,
+      "defense": 5
     },
     "loot_table": [
       272,
@@ -1816,6 +2387,11 @@
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "sailor",
+      "drunk sailor",
+      "drunk"
     ]
   },
   "1313": {
@@ -1824,10 +2400,10 @@
     "description": "A thick-necked man with brass knuckles and a debt to collect.",
     "hostile": true,
     "stats": {
-      "hp": 100,
+      "hp": 129,
       "max_hp": 100,
-      "attack": 14,
-      "defense": 8
+      "attack": 18,
+      "defense": 10
     },
     "loot_table": [
       272,
@@ -1837,6 +2413,12 @@
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "loan",
+      "loan shark's thug",
+      "shark's",
+      "thug"
     ]
   },
   "1314": {
@@ -1845,10 +2427,10 @@
     "description": "A sweating man with a ledger full of lies and a derringer.",
     "hostile": true,
     "stats": {
-      "hp": 80,
+      "hp": 119,
       "max_hp": 80,
-      "attack": 12,
-      "defense": 5
+      "attack": 17,
+      "defense": 7
     },
     "loot_table": [
       233,
@@ -1858,6 +2440,11 @@
     "dialogue": [],
     "flags": [
       "stationary"
+    ],
+    "keywords": [
+      "crooked bookie",
+      "bookie",
+      "crooked"
     ]
   },
   "1315": {
@@ -1866,10 +2453,10 @@
     "description": "A drowsy but dangerous man with a curved knife and glazed eyes.",
     "hostile": true,
     "stats": {
-      "hp": 110,
+      "hp": 132,
       "max_hp": 110,
-      "attack": 16,
-      "defense": 10
+      "attack": 19,
+      "defense": 12
     },
     "loot_table": [
       233,
@@ -1879,6 +2466,44 @@
     "dialogue": [],
     "flags": [
       "stationary"
+    ],
+    "keywords": [
+      "opium den guard",
+      "den",
+      "guard",
+      "opium"
+    ],
+    "sayResponses": [
+      {
+        "keywords": [
+          "help",
+          "advice"
+        ],
+        "text": "Trust nobody down here. Everyone's got an angle."
+      },
+      {
+        "keywords": [
+          "danger",
+          "warning"
+        ],
+        "text": "The deeper tunnels? People go in. They don't come back."
+      },
+      {
+        "keywords": [
+          "quest",
+          "task",
+          "job"
+        ],
+        "text": "Talk to the bartender. He hears things."
+      },
+      {
+        "keywords": [
+          "crime",
+          "gang",
+          "boss"
+        ],
+        "text": "The syndicates run everything below street level."
+      }
     ]
   },
   "1316": {
@@ -1887,10 +2512,10 @@
     "description": "A wiry woman in a peacoat with contraband sewn into the lining.",
     "hostile": true,
     "stats": {
-      "hp": 90,
+      "hp": 123,
       "max_hp": 90,
-      "attack": 14,
-      "defense": 6
+      "attack": 19,
+      "defense": 8
     },
     "loot_table": [
       208,
@@ -1900,6 +2525,9 @@
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "smuggler"
     ]
   },
   "1317": {
@@ -1908,10 +2536,10 @@
     "description": "The spirit of a longshoreman crushed by falling cargo. Still working.",
     "hostile": true,
     "stats": {
-      "hp": 130,
+      "hp": 146,
       "max_hp": 130,
-      "attack": 18,
-      "defense": 8
+      "attack": 20,
+      "defense": 9
     },
     "loot_table": [
       272,
@@ -1921,6 +2549,12 @@
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "dock worker ghost",
+      "worker",
+      "dock",
+      "ghost"
     ]
   },
   "1318": {
@@ -1929,10 +2563,10 @@
     "description": "A mountain of a man in a too-tight vest. He cracks his knuckles.",
     "hostile": true,
     "stats": {
-      "hp": 160,
+      "hp": 157,
       "max_hp": 160,
-      "attack": 22,
-      "defense": 16
+      "attack": 21,
+      "defense": 15
     },
     "loot_table": [
       222,
@@ -1942,6 +2576,11 @@
     "dialogue": [],
     "flags": [
       "stationary"
+    ],
+    "keywords": [
+      "speakeasy",
+      "bouncer",
+      "speakeasy bouncer"
     ]
   },
   "1319": {
@@ -1950,10 +2589,10 @@
     "description": "A woman in a red dress with a voice like honey and eyes like razors.",
     "hostile": false,
     "stats": {
-      "hp": 100,
+      "hp": 150,
       "max_hp": 100,
-      "attack": 5,
-      "defense": 5
+      "attack": 7,
+      "defense": 7
     },
     "loot_table": [],
     "respawn": 300,
@@ -1969,6 +2608,12 @@
     ],
     "flags": [
       "npc"
+    ],
+    "keywords": [
+      "jazz club singer",
+      "jazz",
+      "club",
+      "singer"
     ]
   },
   "1320": {
@@ -1977,10 +2622,10 @@
     "description": "A rumpled man in a trench coat nursing a bourbon. He watches everything.",
     "hostile": false,
     "stats": {
-      "hp": 120,
+      "hp": 150,
       "max_hp": 120,
-      "attack": 10,
-      "defense": 8
+      "attack": 12,
+      "defense": 10
     },
     "loot_table": [],
     "respawn": 300,
@@ -1996,6 +2641,11 @@
     ],
     "flags": [
       "npc"
+    ],
+    "keywords": [
+      "eye",
+      "private",
+      "private eye"
     ]
   },
   "1321": {
@@ -2004,10 +2654,10 @@
     "description": "A kid hawking papers on the corner. He knows every rumor in town.",
     "hostile": false,
     "stats": {
-      "hp": 40,
+      "hp": 120,
       "max_hp": 40,
-      "attack": 2,
-      "defense": 2
+      "attack": 6,
+      "defense": 6
     },
     "loot_table": [],
     "respawn": 300,
@@ -2023,6 +2673,11 @@
     ],
     "flags": [
       "npc"
+    ],
+    "keywords": [
+      "boy",
+      "newspaper",
+      "newspaper boy"
     ]
   },
   "1322": {
@@ -2031,7 +2686,7 @@
     "description": "A stone-faced man polishing a glass. He's heard every story twice.",
     "hostile": false,
     "stats": {
-      "hp": 130,
+      "hp": 138,
       "max_hp": 130,
       "attack": 8,
       "defense": 8
@@ -2050,6 +2705,41 @@
     ],
     "flags": [
       "npc"
+    ],
+    "keywords": [
+      "bartender"
+    ],
+    "sayResponses": [
+      {
+        "keywords": [
+          "help",
+          "advice"
+        ],
+        "text": "Trust nobody down here. Everyone's got an angle."
+      },
+      {
+        "keywords": [
+          "danger",
+          "warning"
+        ],
+        "text": "The deeper tunnels? People go in. They don't come back."
+      },
+      {
+        "keywords": [
+          "quest",
+          "task",
+          "job"
+        ],
+        "text": "Talk to the bartender. He hears things."
+      },
+      {
+        "keywords": [
+          "crime",
+          "gang",
+          "boss"
+        ],
+        "text": "The syndicates run everything below street level."
+      }
     ]
   },
   "1323": {
@@ -2058,30 +2748,9 @@
     "description": "A silent woman with a shoulder holster and dead eyes.",
     "hostile": true,
     "stats": {
-      "hp": 170,
+      "hp": 147,
       "max_hp": 170,
-      "attack": 26,
-      "defense": 14
-    },
-    "loot_table": [
-      233,
-      272
-    ],
-    "respawn": 90,
-    "dialogue": [],
-    "flags": [
-      "stationary"
-    ]
-  },
-  "1324": {
-    "vnum": 1324,
-    "name": "Triad Enforcer",
-    "description": "A tattooed man with a hatchet and a code of honor that doesn't include you.",
-    "hostile": true,
-    "stats": {
-      "hp": 190,
-      "max_hp": 190,
-      "attack": 28,
+      "attack": 22,
       "defense": 12
     },
     "loot_table": [
@@ -2091,7 +2760,39 @@
     "respawn": 90,
     "dialogue": [],
     "flags": [
+      "stationary"
+    ],
+    "keywords": [
+      "bodyguard",
+      "torch singer's bodyguard",
+      "torch",
+      "singer's"
+    ]
+  },
+  "1324": {
+    "vnum": 1324,
+    "name": "Triad Enforcer",
+    "description": "A tattooed man with a hatchet and a code of honor that doesn't include you.",
+    "hostile": true,
+    "stats": {
+      "hp": 160,
+      "max_hp": 190,
+      "attack": 23,
+      "defense": 10
+    },
+    "loot_table": [
+      233,
+      272
+    ],
+    "respawn": 90,
+    "dialogue": [],
+    "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "triad",
+      "enforcer",
+      "triad enforcer"
     ]
   },
   "1325": {
@@ -2100,9 +2801,9 @@
     "description": "A sweating man in a fine suit. He reaches for a hidden gun.",
     "hostile": true,
     "stats": {
-      "hp": 100,
+      "hp": 108,
       "max_hp": 100,
-      "attack": 18,
+      "attack": 19,
       "defense": 5
     },
     "loot_table": [
@@ -2113,6 +2814,11 @@
     "dialogue": [],
     "flags": [
       "stationary"
+    ],
+    "keywords": [
+      "dirty",
+      "politician",
+      "dirty politician"
     ]
   },
   "1326": {
@@ -2121,10 +2827,10 @@
     "description": "A ghostly taxi that runs you down in the fog. The meter's still running.",
     "hostile": true,
     "stats": {
-      "hp": 160,
+      "hp": 143,
       "max_hp": 160,
-      "attack": 24,
-      "defense": 10
+      "attack": 21,
+      "defense": 8
     },
     "loot_table": [
       233,
@@ -2134,6 +2840,11 @@
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "phantom cabbie",
+      "phantom",
+      "cabbie"
     ]
   },
   "1327": {
@@ -2142,10 +2853,10 @@
     "description": "A massive albino alligator that lurks in the storm drains.",
     "hostile": true,
     "stats": {
-      "hp": 220,
+      "hp": 178,
       "max_hp": 220,
-      "attack": 26,
-      "defense": 20
+      "attack": 21,
+      "defense": 16
     },
     "loot_table": [
       208,
@@ -2155,6 +2866,11 @@
     "dialogue": [],
     "flags": [
       "stationary"
+    ],
+    "keywords": [
+      "sewer",
+      "gator",
+      "sewer gator"
     ]
   },
   "1328": {
@@ -2163,10 +2879,10 @@
     "description": "A figure made of falling rain. It dissolves and reforms endlessly.",
     "hostile": true,
     "stats": {
-      "hp": 250,
+      "hp": 196,
       "max_hp": 250,
-      "attack": 30,
-      "defense": 15
+      "attack": 23,
+      "defense": 11
     },
     "loot_table": [
       208,
@@ -2176,6 +2892,11 @@
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "rain",
+      "rain wraith",
+      "wraith"
     ]
   },
   "1329": {
@@ -2184,10 +2905,10 @@
     "description": "A body double for someone important. Armed and expendable.",
     "hostile": true,
     "stats": {
-      "hp": 200,
+      "hp": 164,
       "max_hp": 200,
-      "attack": 28,
-      "defense": 18
+      "attack": 23,
+      "defense": 14
     },
     "loot_table": [
       233,
@@ -2197,6 +2918,12 @@
     "dialogue": [],
     "flags": [
       "stationary"
+    ],
+    "keywords": [
+      "boss's",
+      "mob boss's double",
+      "mob",
+      "double"
     ]
   },
   "1330": {
@@ -2205,10 +2932,10 @@
     "description": "A hunched woman who buys and sells stolen goods from a boat.",
     "hostile": false,
     "stats": {
-      "hp": 90,
+      "hp": 117,
       "max_hp": 90,
-      "attack": 5,
-      "defense": 5
+      "attack": 6,
+      "defense": 6
     },
     "loot_table": [],
     "respawn": 300,
@@ -2220,6 +2947,11 @@
     ],
     "flags": [
       "npc"
+    ],
+    "keywords": [
+      "dockside fence",
+      "fence",
+      "dockside"
     ]
   },
   "1401": {
@@ -2228,10 +2960,10 @@
     "description": "A pack of starving dogs with madness in their eyes.",
     "hostile": true,
     "stats": {
-      "hp": 60,
+      "hp": 183,
       "max_hp": 60,
-      "attack": 8,
-      "defense": 3
+      "attack": 24,
+      "defense": 9
     },
     "loot_table": [
       261,
@@ -2241,6 +2973,12 @@
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "feral dog pack",
+      "feral",
+      "dog",
+      "pack"
     ]
   },
   "1402": {
@@ -2249,10 +2987,10 @@
     "description": "A wasteland scavenger in patchwork armor.",
     "hostile": true,
     "stats": {
-      "hp": 100,
+      "hp": 196,
       "max_hp": 100,
-      "attack": 15,
-      "defense": 8
+      "attack": 29,
+      "defense": 15
     },
     "loot_table": [
       209,
@@ -2262,6 +3000,11 @@
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "raider scout",
+      "raider",
+      "scout"
     ]
   },
   "1403": {
@@ -2270,10 +3013,10 @@
     "description": "A poorly trained soldier with more bravery than skill.",
     "hostile": true,
     "stats": {
-      "hp": 130,
+      "hp": 214,
       "max_hp": 130,
-      "attack": 18,
-      "defense": 12
+      "attack": 29,
+      "defense": 19
     },
     "loot_table": [
       251,
@@ -2283,6 +3026,11 @@
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "militia",
+      "militia grunt",
+      "grunt"
     ]
   },
   "1404": {
@@ -2291,10 +3039,10 @@
     "description": "A small crawling robot that beeps ominously.",
     "hostile": true,
     "stats": {
-      "hp": 80,
+      "hp": 148,
       "max_hp": 80,
-      "attack": 30,
-      "defense": 2
+      "attack": 55,
+      "defense": 3
     },
     "loot_table": [
       209,
@@ -2304,6 +3052,11 @@
     "dialogue": [],
     "flags": [
       "stationary"
+    ],
+    "keywords": [
+      "drone",
+      "landmine",
+      "landmine drone"
     ]
   },
   "1405": {
@@ -2312,10 +3065,10 @@
     "description": "A nearly invisible marksman. You only see the muzzle flash.",
     "hostile": true,
     "stats": {
-      "hp": 180,
+      "hp": 233,
       "max_hp": 180,
-      "attack": 40,
-      "defense": 5
+      "attack": 51,
+      "defense": 6
     },
     "loot_table": [
       261,
@@ -2325,6 +3078,11 @@
     "dialogue": [],
     "flags": [
       "stationary"
+    ],
+    "keywords": [
+      "sniper ghillie",
+      "sniper",
+      "ghillie"
     ]
   },
   "1406": {
@@ -2333,7 +3091,7 @@
     "description": "The ghost of a destroyed tank. Its cannon still fires.",
     "hostile": true,
     "stats": {
-      "hp": 350,
+      "hp": 353,
       "max_hp": 350,
       "attack": 35,
       "defense": 30
@@ -2346,6 +3104,11 @@
     "dialogue": [],
     "flags": [
       "stationary"
+    ],
+    "keywords": [
+      "wraith",
+      "tank wraith",
+      "tank"
     ]
   },
   "1407": {
@@ -2354,10 +3117,10 @@
     "description": "A scarred veteran in salvaged power armor.",
     "hostile": true,
     "stats": {
-      "hp": 300,
+      "hp": 316,
       "max_hp": 300,
-      "attack": 38,
-      "defense": 25
+      "attack": 40,
+      "defense": 26
     },
     "loot_table": [
       209,
@@ -2367,6 +3130,11 @@
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "champion",
+      "warlord's champion",
+      "warlord's"
     ]
   },
   "1408": {
@@ -2375,10 +3143,10 @@
     "description": "A towering war machine bristling with weapons.",
     "hostile": true,
     "stats": {
-      "hp": 600,
+      "hp": 759,
       "max_hp": 600,
-      "attack": 50,
-      "defense": 40
+      "attack": 63,
+      "defense": 50
     },
     "loot_table": [
       261,
@@ -2387,7 +3155,13 @@
     "respawn": 240,
     "dialogue": [],
     "flags": [
-      "stationary"
+      "stationary",
+      "boss"
+    ],
+    "keywords": [
+      "siege",
+      "siege mech",
+      "mech"
     ]
   },
   "1409": {
@@ -2396,10 +3170,10 @@
     "description": "A huge bald bird circling overhead. It's patient.",
     "hostile": true,
     "stats": {
-      "hp": 40,
+      "hp": 166,
       "max_hp": 40,
-      "attack": 6,
-      "defense": 2
+      "attack": 24,
+      "defense": 8
     },
     "loot_table": [
       209,
@@ -2409,6 +3183,11 @@
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "carrion vulture",
+      "carrion",
+      "vulture"
     ]
   },
   "1410": {
@@ -2417,10 +3196,10 @@
     "description": "A mangy coyote with glowing patches on its hide. It moves wrong.",
     "hostile": true,
     "stats": {
-      "hp": 55,
+      "hp": 173,
       "max_hp": 55,
-      "attack": 8,
-      "defense": 3
+      "attack": 25,
+      "defense": 9
     },
     "loot_table": [
       251,
@@ -2430,6 +3209,11 @@
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "irradiated coyote",
+      "coyote",
+      "irradiated"
     ]
   },
   "1411": {
@@ -2438,10 +3222,10 @@
     "description": "A metallic beetle the size of a fist that feeds on ammunition casings.",
     "hostile": true,
     "stats": {
-      "hp": 25,
+      "hp": 138,
       "max_hp": 25,
-      "attack": 4,
-      "defense": 4
+      "attack": 22,
+      "defense": 22
     },
     "loot_table": [
       209,
@@ -2451,6 +3235,11 @@
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "scrap beetle",
+      "scrap",
+      "beetle"
     ]
   },
   "1412": {
@@ -2459,10 +3248,10 @@
     "description": "A gaunt figure in rags shambling through the dust. Not quite alive.",
     "hostile": true,
     "stats": {
-      "hp": 70,
+      "hp": 178,
       "max_hp": 70,
-      "attack": 10,
-      "defense": 4
+      "attack": 25,
+      "defense": 10
     },
     "loot_table": [
       261,
@@ -2472,6 +3261,11 @@
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "wasteland drifter",
+      "drifter",
+      "wasteland"
     ]
   },
   "1413": {
@@ -2480,10 +3274,10 @@
     "description": "A screaming lunatic in spiked armor charging with a fire axe.",
     "hostile": true,
     "stats": {
-      "hp": 120,
+      "hp": 191,
       "max_hp": 120,
-      "attack": 22,
-      "defense": 6
+      "attack": 35,
+      "defense": 9
     },
     "loot_table": [
       261,
@@ -2493,6 +3287,11 @@
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "raider",
+      "raider berserker",
+      "berserker"
     ]
   },
   "1414": {
@@ -2501,10 +3300,10 @@
     "description": "A raider with a jury-rigged machine gun mounted on a shopping cart.",
     "hostile": true,
     "stats": {
-      "hp": 110,
+      "hp": 177,
       "max_hp": 110,
-      "attack": 25,
-      "defense": 5
+      "attack": 40,
+      "defense": 8
     },
     "loot_table": [
       230,
@@ -2514,6 +3313,11 @@
     "dialogue": [],
     "flags": [
       "stationary"
+    ],
+    "keywords": [
+      "raider",
+      "gunner",
+      "raider gunner"
     ]
   },
   "1415": {
@@ -2522,10 +3326,10 @@
     "description": "A grizzled NCO with a battered rifle and a thousand-yard stare.",
     "hostile": true,
     "stats": {
-      "hp": 170,
+      "hp": 222,
       "max_hp": 170,
-      "attack": 22,
-      "defense": 15
+      "attack": 28,
+      "defense": 19
     },
     "loot_table": [
       261,
@@ -2535,6 +3339,11 @@
     "dialogue": [],
     "flags": [
       "stationary"
+    ],
+    "keywords": [
+      "sergeant",
+      "militia",
+      "militia sergeant"
     ]
   },
   "1416": {
@@ -2543,10 +3352,10 @@
     "description": "A field medic with a red cross armband and a combat shotgun.",
     "hostile": true,
     "stats": {
-      "hp": 140,
+      "hp": 209,
       "max_hp": 140,
-      "attack": 18,
-      "defense": 12
+      "attack": 26,
+      "defense": 17
     },
     "loot_table": [
       209,
@@ -2556,6 +3365,11 @@
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "militia",
+      "medic",
+      "militia medic"
     ]
   },
   "1417": {
@@ -2564,10 +3378,10 @@
     "description": "The ghost of a soldier who stepped on his own mine. He warns too late.",
     "hostile": true,
     "stats": {
-      "hp": 100,
+      "hp": 178,
       "max_hp": 100,
-      "attack": 20,
-      "defense": 5
+      "attack": 35,
+      "defense": 8
     },
     "loot_table": [
       251,
@@ -2577,6 +3391,11 @@
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "minefield specter",
+      "specter",
+      "minefield"
     ]
   },
   "1418": {
@@ -2585,10 +3404,10 @@
     "description": "A burned humanoid that drags itself through the ash. It was something once.",
     "hostile": true,
     "stats": {
-      "hp": 90,
+      "hp": 178,
       "max_hp": 90,
-      "attack": 14,
-      "defense": 8
+      "attack": 27,
+      "defense": 15
     },
     "loot_table": [
       209,
@@ -2598,6 +3417,11 @@
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "scorched",
+      "crawler",
+      "scorched crawler"
     ]
   },
   "1419": {
@@ -2606,10 +3430,10 @@
     "description": "A trained attack dog in a kevlar vest. It responds to whistle commands.",
     "hostile": true,
     "stats": {
-      "hp": 85,
+      "hp": 164,
       "max_hp": 85,
-      "attack": 16,
-      "defense": 10
+      "attack": 31,
+      "defense": 19
     },
     "loot_table": [
       209,
@@ -2619,6 +3443,11 @@
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "war dog",
+      "dog",
+      "war"
     ]
   },
   "1420": {
@@ -2627,10 +3456,10 @@
     "description": "An autonomous APC with a mounted turret. Its AI is degraded.",
     "hostile": true,
     "stats": {
-      "hp": 400,
+      "hp": 338,
       "max_hp": 400,
-      "attack": 35,
-      "defense": 35
+      "attack": 29,
+      "defense": 29
     },
     "loot_table": [
       261,
@@ -2640,6 +3469,12 @@
     "dialogue": [],
     "flags": [
       "stationary"
+    ],
+    "keywords": [
+      "personnel",
+      "armored personnel carrier",
+      "carrier",
+      "armored"
     ]
   },
   "1421": {
@@ -2648,10 +3483,10 @@
     "description": "A soldier in a heat-resistant suit with a backpack fuel tank.",
     "hostile": true,
     "stats": {
-      "hp": 200,
+      "hp": 235,
       "max_hp": 200,
-      "attack": 30,
-      "defense": 12
+      "attack": 35,
+      "defense": 14
     },
     "loot_table": [
       209,
@@ -2661,6 +3496,11 @@
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "flamethrower trooper",
+      "flamethrower",
+      "trooper"
     ]
   },
   "1422": {
@@ -2669,10 +3509,10 @@
     "description": "A soldier exposed to nerve agent. Still walking. Still armed.",
     "hostile": true,
     "stats": {
-      "hp": 150,
+      "hp": 218,
       "max_hp": 150,
-      "attack": 20,
-      "defense": 8
+      "attack": 29,
+      "defense": 11
     },
     "loot_table": [
       230,
@@ -2682,6 +3522,11 @@
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "zombie",
+      "chemical",
+      "chemical zombie"
     ]
   },
   "1423": {
@@ -2690,9 +3535,9 @@
     "description": "A cloud of micro-drones that strip flesh from bone in seconds.",
     "hostile": true,
     "stats": {
-      "hp": 180,
+      "hp": 233,
       "max_hp": 180,
-      "attack": 28,
+      "attack": 36,
       "defense": 2
     },
     "loot_table": [
@@ -2703,6 +3548,11 @@
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "drone",
+      "swarm",
+      "drone swarm"
     ]
   },
   "1424": {
@@ -2711,10 +3561,10 @@
     "description": "The spectral crew of a destroyed howitzer. They fire phantom shells.",
     "hostile": true,
     "stats": {
-      "hp": 280,
+      "hp": 274,
       "max_hp": 280,
-      "attack": 40,
-      "defense": 15
+      "attack": 39,
+      "defense": 14
     },
     "loot_table": [
       209,
@@ -2724,6 +3574,11 @@
     "dialogue": [],
     "flags": [
       "stationary"
+    ],
+    "keywords": [
+      "artillery ghost",
+      "artillery",
+      "ghost"
     ]
   },
   "1425": {
@@ -2732,9 +3587,9 @@
     "description": "A decorated officer with a sidearm and tactical genius.",
     "hostile": true,
     "stats": {
-      "hp": 250,
+      "hp": 258,
       "max_hp": 250,
-      "attack": 32,
+      "attack": 33,
       "defense": 22
     },
     "loot_table": [
@@ -2756,6 +3611,11 @@
         ],
         "text": "The impact site? That's in the restricted zone. Command says it was an unexploded ordnance, but I've seen UXO and that ain't it. The crater's too clean, too perfect. And the radiation signature doesn't match anything in our database. Whatever hit that field came from somewhere else. Somewhere... outside."
       }
+    ],
+    "keywords": [
+      "field",
+      "field commander",
+      "commander"
     ]
   },
   "1426": {
@@ -2764,10 +3624,10 @@
     "description": "A gruff supply sergeant behind a cage of military surplus.",
     "hostile": false,
     "stats": {
-      "hp": 160,
+      "hp": 245,
       "max_hp": 160,
-      "attack": 10,
-      "defense": 10
+      "attack": 15,
+      "defense": 15
     },
     "loot_table": [],
     "respawn": 300,
@@ -2792,6 +3652,9 @@
         ],
         "text": "Look, I don't know what hit Firebase Delta, and I don't want to know. All I know is we lost three walls, two generators, and a latrine to something that wasn't on any radar. If you're investigating, be my guest. But don't bring whatever it was back here."
       }
+    ],
+    "keywords": [
+      "quartermaster"
     ]
   },
   "1427": {
@@ -2800,10 +3663,10 @@
     "description": "A weary medic with bloodstained hands and a kind voice.",
     "hostile": false,
     "stats": {
-      "hp": 140,
+      "hp": 240,
       "max_hp": 140,
-      "attack": 8,
-      "defense": 8
+      "attack": 13,
+      "defense": 13
     },
     "loot_table": [],
     "respawn": 300,
@@ -2819,6 +3682,11 @@
     ],
     "flags": [
       "npc"
+    ],
+    "keywords": [
+      "combat medic",
+      "medic",
+      "combat"
     ]
   },
   "1428": {
@@ -2827,10 +3695,10 @@
     "description": "A civilian with a camera and more courage than sense.",
     "hostile": false,
     "stats": {
-      "hp": 60,
+      "hp": 209,
       "max_hp": 60,
-      "attack": 3,
-      "defense": 3
+      "attack": 10,
+      "defense": 10
     },
     "loot_table": [],
     "respawn": 300,
@@ -2846,6 +3714,11 @@
     ],
     "flags": [
       "npc"
+    ],
+    "keywords": [
+      "war correspondent",
+      "correspondent",
+      "war"
     ]
   },
   "1429": {
@@ -2854,10 +3727,10 @@
     "description": "A hollow-eyed civilian clutching a bundle of possessions.",
     "hostile": false,
     "stats": {
-      "hp": 40,
+      "hp": 200,
       "max_hp": 40,
-      "attack": 2,
-      "defense": 2
+      "attack": 10,
+      "defense": 10
     },
     "loot_table": [],
     "respawn": 300,
@@ -2873,6 +3746,9 @@
     ],
     "flags": [
       "npc"
+    ],
+    "keywords": [
+      "refugee"
     ]
   },
   "1430": {
@@ -2881,10 +3757,10 @@
     "description": "A rat nesting in an ammo crate. It chews on primer caps.",
     "hostile": true,
     "stats": {
-      "hp": 30,
+      "hp": 150,
       "max_hp": 30,
-      "attack": 6,
-      "defense": 1
+      "attack": 30,
+      "defense": 5
     },
     "loot_table": [
       251,
@@ -2894,6 +3770,11 @@
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "munitions rat",
+      "munitions",
+      "rat"
     ]
   },
   "1431": {
@@ -2902,10 +3783,10 @@
     "description": "A scorpion the size of a cat living in a burned-out vehicle.",
     "hostile": true,
     "stats": {
-      "hp": 50,
+      "hp": 135,
       "max_hp": 50,
-      "attack": 10,
-      "defense": 6
+      "attack": 27,
+      "defense": 16
     },
     "loot_table": [
       230,
@@ -2915,6 +3796,11 @@
     "dialogue": [],
     "flags": [
       "stationary"
+    ],
+    "keywords": [
+      "scorpion",
+      "rust",
+      "rust scorpion"
     ]
   },
   "1501": {
@@ -2923,10 +3809,10 @@
     "description": "A drifting mote of anti-light that drains warmth.",
     "hostile": true,
     "stats": {
-      "hp": 90,
+      "hp": 337,
       "max_hp": 90,
-      "attack": 12,
-      "defense": 2
+      "attack": 45,
+      "defense": 7
     },
     "loot_table": [
       287,
@@ -2936,6 +3822,11 @@
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "wisp",
+      "void",
+      "void wisp"
     ]
   },
   "1502": {
@@ -2944,10 +3835,10 @@
     "description": "A being of living crystal that refracts reality.",
     "hostile": true,
     "stats": {
-      "hp": 150,
+      "hp": 356,
       "max_hp": 150,
-      "attack": 20,
-      "defense": 20
+      "attack": 47,
+      "defense": 47
     },
     "loot_table": [
       211,
@@ -2957,6 +3848,11 @@
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "crystal elemental",
+      "crystal",
+      "elemental"
     ]
   },
   "1503": {
@@ -2965,10 +3861,10 @@
     "description": "A translucent creature that swims through empty space.",
     "hostile": true,
     "stats": {
-      "hp": 180,
+      "hp": 403,
       "max_hp": 180,
-      "attack": 25,
-      "defense": 10
+      "attack": 56,
+      "defense": 22
     },
     "loot_table": [
       234,
@@ -2978,6 +3874,11 @@
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "predator",
+      "astral predator",
+      "astral"
     ]
   },
   "1504": {
@@ -2986,10 +3887,10 @@
     "description": "A piece of someone's memory given hostile form.",
     "hostile": true,
     "stats": {
-      "hp": 120,
+      "hp": 342,
       "max_hp": 120,
-      "attack": 18,
-      "defense": 8
+      "attack": 51,
+      "defense": 22
     },
     "loot_table": [
       234,
@@ -2999,6 +3900,11 @@
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "fragment",
+      "echo fragment",
+      "echo"
     ]
   },
   "1505": {
@@ -3007,10 +3913,10 @@
     "description": "A sphere of compressed spacetime. It pulls everything inward.",
     "hostile": true,
     "stats": {
-      "hp": 250,
+      "hp": 455,
       "max_hp": 250,
-      "attack": 30,
-      "defense": 30
+      "attack": 54,
+      "defense": 54
     },
     "loot_table": [
       210,
@@ -3020,6 +3926,11 @@
     "dialogue": [],
     "flags": [
       "stationary"
+    ],
+    "keywords": [
+      "anomaly",
+      "gravity anomaly",
+      "gravity"
     ]
   },
   "1506": {
@@ -3028,10 +3939,10 @@
     "description": "A being of compressed stellar energy. Blindingly bright.",
     "hostile": true,
     "stats": {
-      "hp": 350,
+      "hp": 558,
       "max_hp": 350,
-      "attack": 40,
-      "defense": 20
+      "attack": 63,
+      "defense": 31
     },
     "loot_table": [
       211,
@@ -3041,6 +3952,11 @@
     "dialogue": [],
     "flags": [
       "stationary"
+    ],
+    "keywords": [
+      "star wraith",
+      "star",
+      "wraith"
     ]
   },
   "1507": {
@@ -3049,10 +3965,10 @@
     "description": "A massive creature that drifts between the shards.",
     "hostile": true,
     "stats": {
-      "hp": 500,
+      "hp": 959,
       "max_hp": 500,
-      "attack": 45,
-      "defense": 35
+      "attack": 86,
+      "defense": 67
     },
     "loot_table": [
       210,
@@ -3061,7 +3977,13 @@
     "respawn": 180,
     "dialogue": [],
     "flags": [
-      "stationary"
+      "stationary",
+      "boss"
+    ],
+    "keywords": [
+      "void leviathan",
+      "void",
+      "leviathan"
     ]
   },
   "1508": {
@@ -3070,10 +3992,10 @@
     "description": "A tear in spacetime that lashes out at anything nearby.",
     "hostile": true,
     "stats": {
-      "hp": 400,
+      "hp": 447,
       "max_hp": 400,
-      "attack": 50,
-      "defense": 15
+      "attack": 55,
+      "defense": 16
     },
     "loot_table": [
       223,
@@ -3083,6 +4005,11 @@
     "dialogue": [],
     "flags": [
       "stationary"
+    ],
+    "keywords": [
+      "fracture",
+      "reality fracture",
+      "reality"
     ]
   },
   "1509": {
@@ -3091,10 +4018,10 @@
     "description": "A tiny particle of cosmic debris that drifts aimlessly. Barely a threat.",
     "hostile": true,
     "stats": {
-      "hp": 20,
+      "hp": 258,
       "max_hp": 20,
-      "attack": 3,
-      "defense": 1
+      "attack": 38,
+      "defense": 12
     },
     "loot_table": [
       223,
@@ -3104,6 +4031,11 @@
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "dust mote",
+      "mote",
+      "dust"
     ]
   },
   "1510": {
@@ -3112,10 +4044,10 @@
     "description": "A luminous insect with wings of condensed light. Beautiful and fragile.",
     "hostile": true,
     "stats": {
-      "hp": 30,
+      "hp": 255,
       "max_hp": 30,
-      "attack": 5,
-      "defense": 1
+      "attack": 42,
+      "defense": 8
     },
     "loot_table": [
       234,
@@ -3125,6 +4057,11 @@
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "starlight",
+      "moth",
+      "starlight moth"
     ]
   },
   "1511": {
@@ -3133,10 +4070,10 @@
     "description": "A translucent creature trailing bioluminescent tendrils through the void.",
     "hostile": true,
     "stats": {
-      "hp": 60,
+      "hp": 250,
       "max_hp": 60,
-      "attack": 10,
-      "defense": 3
+      "attack": 41,
+      "defense": 12
     },
     "loot_table": [
       211,
@@ -3146,6 +4083,11 @@
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "jellyfish",
+      "nebula jellyfish",
+      "nebula"
     ]
   },
   "1512": {
@@ -3154,10 +4096,10 @@
     "description": "A chunk of ice and rock hurtling through space with a mind of its own.",
     "hostile": true,
     "stats": {
-      "hp": 80,
+      "hp": 243,
       "max_hp": 80,
-      "attack": 14,
-      "defense": 8
+      "attack": 42,
+      "defense": 24
     },
     "loot_table": [
       234,
@@ -3167,6 +4109,11 @@
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "comet shard",
+      "shard",
+      "comet"
     ]
   },
   "1513": {
@@ -3175,10 +4122,10 @@
     "description": "A spider that blinks in and out of reality. Hard to hit.",
     "hostile": true,
     "stats": {
-      "hp": 100,
+      "hp": 264,
       "max_hp": 100,
-      "attack": 20,
-      "defense": 2
+      "attack": 52,
+      "defense": 5
     },
     "loot_table": [
       271,
@@ -3188,6 +4135,11 @@
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "phase",
+      "spider",
+      "phase spider"
     ]
   },
   "1514": {
@@ -3196,10 +4148,10 @@
     "description": "A worm-like creature that feeds on starlight and radiates cold.",
     "hostile": true,
     "stats": {
-      "hp": 130,
+      "hp": 288,
       "max_hp": 130,
-      "attack": 18,
-      "defense": 10
+      "attack": 39,
+      "defense": 22
     },
     "loot_table": [
       210,
@@ -3209,6 +4161,11 @@
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "stellar parasite",
+      "parasite",
+      "stellar"
     ]
   },
   "1515": {
@@ -3217,10 +4174,10 @@
     "description": "A playful entity that reverses local gravity for fun. Yours.",
     "hostile": true,
     "stats": {
-      "hp": 70,
+      "hp": 247,
       "max_hp": 70,
-      "attack": 12,
-      "defense": 5
+      "attack": 42,
+      "defense": 17
     },
     "loot_table": [
       287,
@@ -3230,6 +4187,11 @@
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "gravity sprite",
+      "sprite",
+      "gravity"
     ]
   },
   "1516": {
@@ -3238,10 +4200,10 @@
     "description": "A predator perfectly adapted to the emptiness. You see only its teeth.",
     "hostile": true,
     "stats": {
-      "hp": 200,
+      "hp": 321,
       "max_hp": 200,
-      "attack": 30,
-      "defense": 12
+      "attack": 48,
+      "defense": 19
     },
     "loot_table": [
       211,
@@ -3251,6 +4213,11 @@
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "void stalker",
+      "void",
+      "stalker"
     ]
   },
   "1517": {
@@ -3259,10 +4226,10 @@
     "description": "A moth whose wings show scenes from other times. Its dust causes vertigo.",
     "hostile": true,
     "stats": {
-      "hp": 110,
+      "hp": 282,
       "max_hp": 110,
-      "attack": 16,
-      "defense": 6
+      "attack": 41,
+      "defense": 15
     },
     "loot_table": [
       234,
@@ -3272,6 +4239,11 @@
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "moth",
+      "temporal",
+      "temporal moth"
     ]
   },
   "1518": {
@@ -3280,10 +4252,10 @@
     "description": "A frozen moment from someone's life given solid form. It attacks with regret.",
     "hostile": true,
     "stats": {
-      "hp": 160,
+      "hp": 298,
       "max_hp": 160,
-      "attack": 22,
-      "defense": 15
+      "attack": 40,
+      "defense": 27
     },
     "loot_table": [
       211,
@@ -3293,6 +4265,11 @@
     "dialogue": [],
     "flags": [
       "stationary"
+    ],
+    "keywords": [
+      "crystallized",
+      "crystallized memory",
+      "memory"
     ]
   },
   "1519": {
@@ -3301,10 +4278,10 @@
     "description": "A creature that accelerates decay in everything it touches.",
     "hostile": true,
     "stats": {
-      "hp": 190,
+      "hp": 323,
       "max_hp": 190,
-      "attack": 28,
-      "defense": 8
+      "attack": 47,
+      "defense": 13
     },
     "loot_table": [
       211,
@@ -3314,6 +4291,11 @@
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "entropy",
+      "entropy worm",
+      "worm"
     ]
   },
   "1520": {
@@ -3322,9 +4304,9 @@
     "description": "A beam of pure energy that has achieved sentience and malice.",
     "hostile": true,
     "stats": {
-      "hp": 140,
+      "hp": 267,
       "max_hp": 140,
-      "attack": 35,
+      "attack": 66,
       "defense": 1
     },
     "loot_table": [
@@ -3335,6 +4317,11 @@
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "cosmic ray",
+      "cosmic",
+      "ray"
     ]
   },
   "1521": {
@@ -3343,10 +4330,10 @@
     "description": "A crystalline construct tasked with protecting a floating island.",
     "hostile": true,
     "stats": {
-      "hp": 280,
+      "hp": 363,
       "max_hp": 280,
-      "attack": 32,
-      "defense": 28
+      "attack": 41,
+      "defense": 36
     },
     "loot_table": [
       210,
@@ -3356,6 +4343,43 @@
     "dialogue": [],
     "flags": [
       "stationary"
+    ],
+    "keywords": [
+      "shard guardian",
+      "guardian",
+      "shard"
+    ],
+    "sayResponses": [
+      {
+        "keywords": [
+          "help",
+          "advice"
+        ],
+        "text": "Reality is... flexible here. Don't trust your eyes."
+      },
+      {
+        "keywords": [
+          "danger",
+          "warning"
+        ],
+        "text": "The void whispers. Don't listen too long."
+      },
+      {
+        "keywords": [
+          "quest",
+          "task",
+          "job"
+        ],
+        "text": "The beacons need tending. Always."
+      },
+      {
+        "keywords": [
+          "void",
+          "space",
+          "stars"
+        ],
+        "text": "Something vast moves between the stars. Best not to dwell on it."
+      }
     ]
   },
   "1522": {
@@ -3364,10 +4388,10 @@
     "description": "A colossal figure made of gas and dust. Stars burn in its chest.",
     "hostile": true,
     "stats": {
-      "hp": 450,
+      "hp": 465,
       "max_hp": 450,
-      "attack": 42,
-      "defense": 30
+      "attack": 43,
+      "defense": 31
     },
     "loot_table": [
       271,
@@ -3377,6 +4401,11 @@
     "dialogue": [],
     "flags": [
       "stationary"
+    ],
+    "keywords": [
+      "titan",
+      "nebula",
+      "nebula titan"
     ]
   },
   "1523": {
@@ -3385,10 +4414,10 @@
     "description": "An ancient being that maps the drift. It trades in coordinates.",
     "hostile": false,
     "stats": {
-      "hp": 200,
+      "hp": 410,
       "max_hp": 200,
-      "attack": 5,
-      "defense": 5
+      "attack": 10,
+      "defense": 10
     },
     "loot_table": [],
     "respawn": 300,
@@ -3415,6 +4444,11 @@
         ],
         "text": "Ah, you've noticed the gravitational scar. Yes, something passed through this region of space recently \u2014 something with mass that shouldn't exist at that scale. My charts show its trajectory bending through three dimensions... no, four. It's not just moving through space. It's moving through something else as well. I've been trying to plot its course, but the math keeps breaking."
       }
+    ],
+    "keywords": [
+      "the cartographer",
+      "the",
+      "cartographer"
     ]
   },
   "1524": {
@@ -3423,10 +4457,10 @@
     "description": "A human who chose to live alone on a floating rock. Surprisingly sane.",
     "hostile": false,
     "stats": {
-      "hp": 80,
+      "hp": 336,
       "max_hp": 80,
-      "attack": 3,
-      "defense": 3
+      "attack": 12,
+      "defense": 12
     },
     "loot_table": [],
     "respawn": 300,
@@ -3442,6 +4476,43 @@
     ],
     "flags": [
       "npc"
+    ],
+    "keywords": [
+      "hermit",
+      "drift hermit",
+      "drift"
+    ],
+    "sayResponses": [
+      {
+        "keywords": [
+          "help",
+          "advice"
+        ],
+        "text": "Reality is... flexible here. Don't trust your eyes."
+      },
+      {
+        "keywords": [
+          "danger",
+          "warning"
+        ],
+        "text": "The void whispers. Don't listen too long."
+      },
+      {
+        "keywords": [
+          "quest",
+          "task",
+          "job"
+        ],
+        "text": "The beacons need tending. Always."
+      },
+      {
+        "keywords": [
+          "void",
+          "space",
+          "stars"
+        ],
+        "text": "Something vast moves between the stars. Best not to dwell on it."
+      }
     ]
   },
   "1525": {
@@ -3450,10 +4521,10 @@
     "description": "A four-armed being selling exotic goods from a hovering bazaar.",
     "hostile": false,
     "stats": {
-      "hp": 150,
+      "hp": 342,
       "max_hp": 150,
-      "attack": 5,
-      "defense": 5
+      "attack": 11,
+      "defense": 11
     },
     "loot_table": [],
     "respawn": 300,
@@ -3469,6 +4540,43 @@
     ],
     "flags": [
       "npc"
+    ],
+    "keywords": [
+      "astral merchant",
+      "merchant",
+      "astral"
+    ],
+    "sayResponses": [
+      {
+        "keywords": [
+          "help",
+          "advice"
+        ],
+        "text": "Reality is... flexible here. Don't trust your eyes."
+      },
+      {
+        "keywords": [
+          "danger",
+          "warning"
+        ],
+        "text": "The void whispers. Don't listen too long."
+      },
+      {
+        "keywords": [
+          "quest",
+          "task",
+          "job"
+        ],
+        "text": "The beacons need tending. Always."
+      },
+      {
+        "keywords": [
+          "void",
+          "space",
+          "stars"
+        ],
+        "text": "Something vast moves between the stars. Best not to dwell on it."
+      }
     ]
   },
   "1601": {
@@ -3477,16 +4585,21 @@
     "description": "A desperate fighter with nothing left to lose.",
     "hostile": true,
     "stats": {
-      "hp": 100,
+      "hp": 389,
       "max_hp": 100,
-      "attack": 15,
-      "defense": 10
+      "attack": 58,
+      "defense": 38
     },
     "loot_table": [],
     "respawn": 45,
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "slave",
+      "gladiator",
+      "gladiator slave"
     ]
   },
   "1602": {
@@ -3495,16 +4608,21 @@
     "description": "A disciplined soldier in bronze armor with a gladius.",
     "hostile": true,
     "stats": {
-      "hp": 150,
+      "hp": 445,
       "max_hp": 150,
-      "attack": 20,
-      "defense": 18
+      "attack": 59,
+      "defense": 53
     },
     "loot_table": [],
     "respawn": 60,
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "roman",
+      "roman legionnaire",
+      "legionnaire"
     ]
   },
   "1603": {
@@ -3513,16 +4631,53 @@
     "description": "A jackal-headed warrior wielding a khopesh.",
     "hostile": true,
     "stats": {
-      "hp": 180,
+      "hp": 486,
       "max_hp": 180,
-      "attack": 22,
-      "defense": 15
+      "attack": 59,
+      "defense": 40
     },
     "loot_table": [],
     "respawn": 60,
     "dialogue": [],
     "flags": [
       "stationary"
+    ],
+    "keywords": [
+      "egyptian",
+      "guardian",
+      "egyptian guardian"
+    ],
+    "sayResponses": [
+      {
+        "keywords": [
+          "help",
+          "advice"
+        ],
+        "text": "Time flows strangely here. Don't be alarmed if things repeat."
+      },
+      {
+        "keywords": [
+          "danger",
+          "warning"
+        ],
+        "text": "Paradoxes are... unpleasant. Avoid your other selves."
+      },
+      {
+        "keywords": [
+          "quest",
+          "task",
+          "job"
+        ],
+        "text": "The chronometers need calibrating. Always drifting."
+      },
+      {
+        "keywords": [
+          "time",
+          "past",
+          "future"
+        ],
+        "text": "Past and future bleed together here. It's unsettling."
+      }
     ]
   },
   "1604": {
@@ -3531,16 +4686,21 @@
     "description": "A masterless warrior seeking death with honor.",
     "hostile": true,
     "stats": {
-      "hp": 200,
+      "hp": 495,
       "max_hp": 200,
-      "attack": 30,
-      "defense": 12
+      "attack": 74,
+      "defense": 29
     },
     "loot_table": [],
     "respawn": 90,
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "samurai ronin",
+      "samurai",
+      "ronin"
     ]
   },
   "1605": {
@@ -3549,16 +4709,21 @@
     "description": "A frothing warrior who feels no pain.",
     "hostile": true,
     "stats": {
-      "hp": 250,
+      "hp": 552,
       "max_hp": 250,
-      "attack": 35,
-      "defense": 8
+      "attack": 77,
+      "defense": 17
     },
     "loot_table": [],
     "respawn": 90,
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "berserker",
+      "viking",
+      "viking berserker"
     ]
   },
   "1606": {
@@ -3567,16 +4732,22 @@
     "description": "A fierce warrior in a jaguar pelt with an obsidian blade.",
     "hostile": true,
     "stats": {
-      "hp": 220,
+      "hp": 507,
       "max_hp": 220,
-      "attack": 28,
-      "defense": 15
+      "attack": 64,
+      "defense": 34
     },
     "loot_table": [],
     "respawn": 90,
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "aztec",
+      "aztec jaguar warrior",
+      "jaguar",
+      "warrior"
     ]
   },
   "1607": {
@@ -3585,16 +4756,21 @@
     "description": "Ancient royalty wrapped in enchanted bandages.",
     "hostile": true,
     "stats": {
-      "hp": 350,
+      "hp": 641,
       "max_hp": 350,
-      "attack": 32,
-      "defense": 28
+      "attack": 58,
+      "defense": 51
     },
     "loot_table": [],
     "respawn": 120,
     "dialogue": [],
     "flags": [
       "stationary"
+    ],
+    "keywords": [
+      "mummy",
+      "pharaoh's mummy",
+      "pharaoh's"
     ]
   },
   "1608": {
@@ -3603,16 +4779,22 @@
     "description": "A glitching entity that exists in multiple moments simultaneously.",
     "hostile": true,
     "stats": {
-      "hp": 500,
+      "hp": 1065,
       "max_hp": 500,
-      "attack": 45,
-      "defense": 25
+      "attack": 95,
+      "defense": 53
     },
     "loot_table": [],
     "respawn": 180,
     "dialogue": [],
     "flags": [
-      "stationary"
+      "stationary",
+      "boss"
+    ],
+    "keywords": [
+      "time paradox",
+      "time",
+      "paradox"
     ]
   },
   "1609": {
@@ -3621,16 +4803,21 @@
     "description": "A prehistoric rat the size of a small dog. Primitive and vicious.",
     "hostile": true,
     "stats": {
-      "hp": 35,
+      "hp": 331,
       "max_hp": 35,
-      "attack": 5,
-      "defense": 2
+      "attack": 47,
+      "defense": 18
     },
     "loot_table": [],
     "respawn": 20,
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "cave",
+      "cave rat",
+      "rat"
     ]
   },
   "1610": {
@@ -3639,16 +4826,21 @@
     "description": "A pigeon from some era. It pecks aggressively at anything shiny.",
     "hostile": true,
     "stats": {
-      "hp": 20,
+      "hp": 322,
       "max_hp": 20,
-      "attack": 3,
-      "defense": 1
+      "attack": 48,
+      "defense": 16
     },
     "loot_table": [],
     "respawn": 15,
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "pigeon",
+      "feral pigeon",
+      "feral"
     ]
   },
   "1611": {
@@ -3657,16 +4849,21 @@
     "description": "A golden beetle the size of a fist that burrows through sand and flesh.",
     "hostile": true,
     "stats": {
-      "hp": 45,
+      "hp": 292,
       "max_hp": 45,
-      "attack": 8,
-      "defense": 4
+      "attack": 51,
+      "defense": 25
     },
     "loot_table": [],
     "respawn": 25,
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "sand scarab",
+      "scarab",
+      "sand"
     ]
   },
   "1612": {
@@ -3675,16 +4872,21 @@
     "description": "A net-and-trident fighter with a cruel smile and quick reflexes.",
     "hostile": true,
     "stats": {
-      "hp": 120,
+      "hp": 346,
       "max_hp": 120,
-      "attack": 18,
-      "defense": 8
+      "attack": 51,
+      "defense": 23
     },
     "loot_table": [],
     "respawn": 60,
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "retiarius",
+      "gladiator",
+      "gladiator retiarius"
     ]
   },
   "1613": {
@@ -3693,16 +4895,21 @@
     "description": "A heavily armored gladiator with a tower shield and short sword.",
     "hostile": true,
     "stats": {
-      "hp": 140,
+      "hp": 349,
       "max_hp": 140,
-      "attack": 16,
-      "defense": 20
+      "attack": 39,
+      "defense": 49
     },
     "loot_table": [],
     "respawn": 60,
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "gladiator murmillo",
+      "gladiator",
+      "murmillo"
     ]
   },
   "1614": {
@@ -3711,16 +4918,21 @@
     "description": "An officer in a red-crested helmet commanding with iron authority.",
     "hostile": true,
     "stats": {
-      "hp": 200,
+      "hp": 389,
       "max_hp": 200,
-      "attack": 25,
-      "defense": 20
+      "attack": 48,
+      "defense": 38
     },
     "loot_table": [],
     "respawn": 90,
     "dialogue": [],
     "flags": [
       "stationary"
+    ],
+    "keywords": [
+      "roman",
+      "centurion",
+      "roman centurion"
     ]
   },
   "1615": {
@@ -3729,16 +4941,53 @@
     "description": "A shaven-headed priest chanting protection spells over sacred ground.",
     "hostile": true,
     "stats": {
-      "hp": 130,
+      "hp": 346,
       "max_hp": 130,
-      "attack": 20,
-      "defense": 10
+      "attack": 53,
+      "defense": 26
     },
     "loot_table": [],
     "respawn": 75,
     "dialogue": [],
     "flags": [
       "stationary"
+    ],
+    "keywords": [
+      "egyptian",
+      "egyptian priest",
+      "priest"
+    ],
+    "sayResponses": [
+      {
+        "keywords": [
+          "help",
+          "advice"
+        ],
+        "text": "Time flows strangely here. Don't be alarmed if things repeat."
+      },
+      {
+        "keywords": [
+          "danger",
+          "warning"
+        ],
+        "text": "Paradoxes are... unpleasant. Avoid your other selves."
+      },
+      {
+        "keywords": [
+          "quest",
+          "task",
+          "job"
+        ],
+        "text": "The chronometers need calibrating. Always drifting."
+      },
+      {
+        "keywords": [
+          "time",
+          "past",
+          "future"
+        ],
+        "text": "Past and future bleed together here. It's unsettling."
+      }
     ]
   },
   "1616": {
@@ -3747,16 +4996,21 @@
     "description": "A supernatural jackal with golden eyes that guards the dead.",
     "hostile": true,
     "stats": {
-      "hp": 170,
+      "hp": 371,
       "max_hp": 170,
-      "attack": 24,
-      "defense": 14
+      "attack": 52,
+      "defense": 30
     },
     "loot_table": [],
     "respawn": 75,
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "anubis jackal",
+      "anubis",
+      "jackal"
     ]
   },
   "1617": {
@@ -3765,16 +5019,19 @@
     "description": "A shadow-clad warrior who attacks from concealment with shuriken.",
     "hostile": true,
     "stats": {
-      "hp": 160,
+      "hp": 364,
       "max_hp": 160,
-      "attack": 28,
-      "defense": 6
+      "attack": 63,
+      "defense": 13
     },
     "loot_table": [],
     "respawn": 75,
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "ninja"
     ]
   },
   "1618": {
@@ -3783,16 +5040,21 @@
     "description": "A common foot soldier with a long spear and wicker armor.",
     "hostile": true,
     "stats": {
-      "hp": 110,
+      "hp": 329,
       "max_hp": 110,
-      "attack": 16,
-      "defense": 12
+      "attack": 47,
+      "defense": 35
     },
     "loot_table": [],
     "respawn": 45,
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "ashigaru",
+      "ashigaru spearman",
+      "spearman"
     ]
   },
   "1619": {
@@ -3801,16 +5063,21 @@
     "description": "A fierce woman with a round shield and a hand axe. She sings as she fights.",
     "hostile": true,
     "stats": {
-      "hp": 190,
+      "hp": 383,
       "max_hp": 190,
-      "attack": 26,
-      "defense": 16
+      "attack": 52,
+      "defense": 32
     },
     "loot_table": [],
     "respawn": 90,
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "viking shieldmaiden",
+      "shieldmaiden",
+      "viking"
     ]
   },
   "1620": {
@@ -3819,16 +5086,21 @@
     "description": "A warrior-poet whose battle songs strengthen allies and weaken foes.",
     "hostile": true,
     "stats": {
-      "hp": 140,
+      "hp": 367,
       "max_hp": 140,
-      "attack": 18,
-      "defense": 10
+      "attack": 47,
+      "defense": 26
     },
     "loot_table": [],
     "respawn": 75,
     "dialogue": [],
     "flags": [
       "stationary"
+    ],
+    "keywords": [
+      "viking skald",
+      "viking",
+      "skald"
     ]
   },
   "1621": {
@@ -3837,16 +5109,22 @@
     "description": "An elite soldier in feathered armor with a macuahuitl edged in obsidian.",
     "hostile": true,
     "stats": {
-      "hp": 240,
+      "hp": 419,
       "max_hp": 240,
-      "attack": 30,
-      "defense": 18
+      "attack": 52,
+      "defense": 31
     },
     "loot_table": [],
     "respawn": 90,
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "aztec",
+      "aztec eagle warrior",
+      "warrior",
+      "eagle"
     ]
   },
   "1622": {
@@ -3855,16 +5133,21 @@
     "description": "A clay warrior that animates when intruders approach. It does not tire.",
     "hostile": true,
     "stats": {
-      "hp": 200,
+      "hp": 388,
       "max_hp": 200,
-      "attack": 22,
-      "defense": 25
+      "attack": 42,
+      "defense": 48
     },
     "loot_table": [],
     "respawn": 90,
     "dialogue": [],
     "flags": [
       "stationary"
+    ],
+    "keywords": [
+      "terracotta soldier",
+      "soldier",
+      "terracotta"
     ]
   },
   "1623": {
@@ -3873,16 +5156,22 @@
     "description": "A mounted warrior firing arrows at a full gallop. Nearly impossible to catch.",
     "hostile": true,
     "stats": {
-      "hp": 180,
+      "hp": 376,
       "max_hp": 180,
-      "attack": 30,
-      "defense": 8
+      "attack": 62,
+      "defense": 16
     },
     "loot_table": [],
     "respawn": 90,
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "mongol",
+      "mongol horse archer",
+      "horse",
+      "archer"
     ]
   },
   "1624": {
@@ -3891,16 +5180,21 @@
     "description": "A bronze-armored soldier with a long spear and aspis shield.",
     "hostile": true,
     "stats": {
-      "hp": 170,
+      "hp": 367,
       "max_hp": 170,
-      "attack": 20,
-      "defense": 22
+      "attack": 43,
+      "defense": 47
     },
     "loot_table": [],
     "respawn": 75,
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "greek hoplite",
+      "hoplite",
+      "greek"
     ]
   },
   "1625": {
@@ -3909,16 +5203,21 @@
     "description": "An elite warrior who has trained since childhood for war.",
     "hostile": true,
     "stats": {
-      "hp": 280,
+      "hp": 434,
       "max_hp": 280,
-      "attack": 35,
-      "defense": 25
+      "attack": 54,
+      "defense": 38
     },
     "loot_table": [],
     "respawn": 120,
     "dialogue": [],
     "flags": [
       "stationary"
+    ],
+    "keywords": [
+      "spartan",
+      "champion",
+      "spartan champion"
     ]
   },
   "1626": {
@@ -3927,16 +5226,53 @@
     "description": "A swaggering buccaneer with a cutlass and a flintlock pistol.",
     "hostile": true,
     "stats": {
-      "hp": 210,
+      "hp": 402,
       "max_hp": 210,
-      "attack": 28,
-      "defense": 14
+      "attack": 53,
+      "defense": 26
     },
     "loot_table": [],
     "respawn": 90,
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "captain",
+      "pirate",
+      "pirate captain"
+    ],
+    "sayResponses": [
+      {
+        "keywords": [
+          "help",
+          "advice"
+        ],
+        "text": "Time flows strangely here. Don't be alarmed if things repeat."
+      },
+      {
+        "keywords": [
+          "danger",
+          "warning"
+        ],
+        "text": "Paradoxes are... unpleasant. Avoid your other selves."
+      },
+      {
+        "keywords": [
+          "quest",
+          "task",
+          "job"
+        ],
+        "text": "The chronometers need calibrating. Always drifting."
+      },
+      {
+        "keywords": [
+          "time",
+          "past",
+          "future"
+        ],
+        "text": "Past and future bleed together here. It's unsettling."
+      }
     ]
   },
   "1627": {
@@ -3945,16 +5281,21 @@
     "description": "A mechanical warrior from a future that never was. Gears whir inside.",
     "hostile": true,
     "stats": {
-      "hp": 260,
+      "hp": 431,
       "max_hp": 260,
-      "attack": 30,
-      "defense": 22
+      "attack": 49,
+      "defense": 36
     },
     "loot_table": [],
     "respawn": 120,
     "dialogue": [],
     "flags": [
       "stationary"
+    ],
+    "keywords": [
+      "clockwork",
+      "soldier",
+      "clockwork soldier"
     ]
   },
   "1628": {
@@ -3963,16 +5304,53 @@
     "description": "A being tasked with protecting the timestream. You are a violation.",
     "hostile": true,
     "stats": {
-      "hp": 350,
+      "hp": 483,
       "max_hp": 350,
-      "attack": 38,
-      "defense": 28
+      "attack": 52,
+      "defense": 38
     },
     "loot_table": [],
     "respawn": 150,
     "dialogue": [],
     "flags": [
       "stationary"
+    ],
+    "keywords": [
+      "temporal guardian",
+      "guardian",
+      "temporal"
+    ],
+    "sayResponses": [
+      {
+        "keywords": [
+          "help",
+          "advice"
+        ],
+        "text": "Time flows strangely here. Don't be alarmed if things repeat."
+      },
+      {
+        "keywords": [
+          "danger",
+          "warning"
+        ],
+        "text": "Paradoxes are... unpleasant. Avoid your other selves."
+      },
+      {
+        "keywords": [
+          "quest",
+          "task",
+          "job"
+        ],
+        "text": "The chronometers need calibrating. Always drifting."
+      },
+      {
+        "keywords": [
+          "time",
+          "past",
+          "future"
+        ],
+        "text": "Past and future bleed together here. It's unsettling."
+      }
     ]
   },
   "1629": {
@@ -3981,16 +5359,19 @@
     "description": "A creature unstuck in time. It ages and de-ages as it fights.",
     "hostile": true,
     "stats": {
-      "hp": 300,
+      "hp": 461,
       "max_hp": 300,
-      "attack": 35,
-      "defense": 18
+      "attack": 53,
+      "defense": 27
     },
     "loot_table": [],
     "respawn": 120,
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "chrono-beast"
     ]
   },
   "1630": {
@@ -3999,10 +5380,10 @@
     "description": "A time-displaced trader selling goods from every century.",
     "hostile": false,
     "stats": {
-      "hp": 120,
+      "hp": 435,
       "max_hp": 120,
-      "attack": 5,
-      "defense": 5
+      "attack": 18,
+      "defense": 18
     },
     "loot_table": [],
     "respawn": 300,
@@ -4018,6 +5399,43 @@
     ],
     "flags": [
       "npc"
+    ],
+    "keywords": [
+      "era",
+      "merchant",
+      "era merchant"
+    ],
+    "sayResponses": [
+      {
+        "keywords": [
+          "help",
+          "advice"
+        ],
+        "text": "Time flows strangely here. Don't be alarmed if things repeat."
+      },
+      {
+        "keywords": [
+          "danger",
+          "warning"
+        ],
+        "text": "Paradoxes are... unpleasant. Avoid your other selves."
+      },
+      {
+        "keywords": [
+          "quest",
+          "task",
+          "job"
+        ],
+        "text": "The chronometers need calibrating. Always drifting."
+      },
+      {
+        "keywords": [
+          "time",
+          "past",
+          "future"
+        ],
+        "text": "Past and future bleed together here. It's unsettling."
+      }
     ]
   },
   "1631": {
@@ -4026,10 +5444,10 @@
     "description": "A confused academic studying the frozen moments of history.",
     "hostile": false,
     "stats": {
-      "hp": 80,
+      "hp": 421,
       "max_hp": 80,
-      "attack": 3,
-      "defense": 3
+      "attack": 15,
+      "defense": 15
     },
     "loot_table": [],
     "respawn": 300,
@@ -4045,6 +5463,43 @@
     ],
     "flags": [
       "npc"
+    ],
+    "keywords": [
+      "scholar",
+      "temporal scholar",
+      "temporal"
+    ],
+    "sayResponses": [
+      {
+        "keywords": [
+          "help",
+          "advice"
+        ],
+        "text": "Time flows strangely here. Don't be alarmed if things repeat."
+      },
+      {
+        "keywords": [
+          "danger",
+          "warning"
+        ],
+        "text": "Paradoxes are... unpleasant. Avoid your other selves."
+      },
+      {
+        "keywords": [
+          "quest",
+          "task",
+          "job"
+        ],
+        "text": "The chronometers need calibrating. Always drifting."
+      },
+      {
+        "keywords": [
+          "time",
+          "past",
+          "future"
+        ],
+        "text": "Past and future bleed together here. It's unsettling."
+      }
     ]
   },
   "1632": {
@@ -4053,10 +5508,10 @@
     "description": "A retired fighter covered in scars who trains the next generation.",
     "hostile": false,
     "stats": {
-      "hp": 200,
+      "hp": 363,
       "max_hp": 200,
-      "attack": 15,
-      "defense": 15
+      "attack": 27,
+      "defense": 27
     },
     "loot_table": [],
     "respawn": 300,
@@ -4072,6 +5527,11 @@
     ],
     "flags": [
       "npc"
+    ],
+    "keywords": [
+      "gladiator trainer",
+      "trainer",
+      "gladiator"
     ]
   },
   "1701": {
@@ -4080,16 +5540,22 @@
     "description": "Hundreds of rats moving as one hungry mass.",
     "hostile": true,
     "stats": {
-      "hp": 80,
+      "hp": 130,
       "max_hp": 80,
-      "attack": 10,
-      "defense": 2
+      "attack": 16,
+      "defense": 3
     },
     "loot_table": [],
     "respawn": 30,
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "sewer",
+      "swarm",
+      "sewer rat swarm",
+      "rat"
     ]
   },
   "1702": {
@@ -4098,16 +5564,21 @@
     "description": "A pale humanoid that has lived too long in the dark.",
     "hostile": true,
     "stats": {
-      "hp": 130,
+      "hp": 174,
       "max_hp": 130,
-      "attack": 18,
-      "defense": 8
+      "attack": 24,
+      "defense": 10
     },
     "loot_table": [],
     "respawn": 60,
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "crawler",
+      "tunnel",
+      "tunnel crawler"
     ]
   },
   "1703": {
@@ -4116,16 +5587,21 @@
     "description": "A mass of toxic mushrooms given ambulatory form.",
     "hostile": true,
     "stats": {
-      "hp": 160,
+      "hp": 205,
       "max_hp": 160,
-      "attack": 15,
-      "defense": 15
+      "attack": 19,
+      "defense": 19
     },
     "loot_table": [],
     "respawn": 60,
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "shambler",
+      "fungal shambler",
+      "fungal"
     ]
   },
   "1704": {
@@ -4134,16 +5610,21 @@
     "description": "A ghost trapped in the water system. It screams through the pipes.",
     "hostile": true,
     "stats": {
-      "hp": 200,
+      "hp": 242,
       "max_hp": 200,
-      "attack": 25,
-      "defense": 12
+      "attack": 30,
+      "defense": 14
     },
     "loot_table": [],
     "respawn": 90,
     "dialogue": [],
     "flags": [
       "stationary"
+    ],
+    "keywords": [
+      "pipe wraith",
+      "pipe",
+      "wraith"
     ]
   },
   "1705": {
@@ -4152,16 +5633,21 @@
     "description": "A massive mutant who rules a section of tunnel.",
     "hostile": true,
     "stats": {
-      "hp": 350,
+      "hp": 386,
       "max_hp": 350,
-      "attack": 35,
-      "defense": 25
+      "attack": 38,
+      "defense": 27
     },
     "loot_table": [],
     "respawn": 120,
     "dialogue": [],
     "flags": [
       "stationary"
+    ],
+    "keywords": [
+      "undercity",
+      "undercity boss",
+      "boss"
     ]
   },
   "1706": {
@@ -4170,16 +5656,22 @@
     "description": "A thing that hoards everything \u2014 bones and trinkets and screams.",
     "hostile": true,
     "stats": {
-      "hp": 400,
+      "hp": 650,
       "max_hp": 400,
-      "attack": 30,
-      "defense": 30
+      "attack": 48,
+      "defense": 48
     },
     "loot_table": [],
     "respawn": 180,
     "dialogue": [],
     "flags": [
-      "stationary"
+      "stationary",
+      "boss"
+    ],
+    "keywords": [
+      "the collector",
+      "the",
+      "collector"
     ]
   },
   "1707": {
@@ -4188,16 +5680,21 @@
     "description": "A cockroach the size of your hand. It skitters across the wet stone.",
     "hostile": true,
     "stats": {
-      "hp": 15,
+      "hp": 65,
       "max_hp": 15,
-      "attack": 2,
-      "defense": 1
+      "attack": 8,
+      "defense": 4
     },
     "loot_table": [],
     "respawn": 10,
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "sewer",
+      "roach",
+      "sewer roach"
     ]
   },
   "1708": {
@@ -4206,16 +5703,21 @@
     "description": "A fat grey slug leaving a trail of corrosive slime.",
     "hostile": true,
     "stats": {
-      "hp": 40,
+      "hp": 62,
       "max_hp": 40,
-      "attack": 6,
-      "defense": 3
+      "attack": 9,
+      "defense": 4
     },
     "loot_table": [],
     "respawn": 20,
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "slug",
+      "drain slug",
+      "drain"
     ]
   },
   "1709": {
@@ -4224,9 +5726,9 @@
     "description": "A pale eyeless fish that has grown legs and teeth.",
     "hostile": true,
     "stats": {
-      "hp": 50,
+      "hp": 65,
       "max_hp": 50,
-      "attack": 8,
+      "attack": 10,
       "defense": 2
     },
     "loot_table": [],
@@ -4234,6 +5736,11 @@
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "blind",
+      "blind fish",
+      "fish"
     ]
   },
   "1710": {
@@ -4242,9 +5749,9 @@
     "description": "A patch of aggressive mold that launches spores at warm bodies.",
     "hostile": true,
     "stats": {
-      "hp": 60,
+      "hp": 69,
       "max_hp": 60,
-      "attack": 10,
+      "attack": 11,
       "defense": 5
     },
     "loot_table": [],
@@ -4252,6 +5759,11 @@
     "dialogue": [],
     "flags": [
       "stationary"
+    ],
+    "keywords": [
+      "mold colony",
+      "mold",
+      "colony"
     ]
   },
   "1711": {
@@ -4260,9 +5772,9 @@
     "description": "A long thin snake adapted to the pipes. It drops from above.",
     "hostile": true,
     "stats": {
-      "hp": 55,
+      "hp": 64,
       "max_hp": 55,
-      "attack": 12,
+      "attack": 14,
       "defense": 2
     },
     "loot_table": [],
@@ -4270,6 +5782,11 @@
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "gutter snake",
+      "gutter",
+      "snake"
     ]
   },
   "1712": {
@@ -4278,7 +5795,7 @@
     "description": "A pale spider with translucent skin. You can see its organs pulse.",
     "hostile": true,
     "stats": {
-      "hp": 70,
+      "hp": 74,
       "max_hp": 70,
       "attack": 14,
       "defense": 4
@@ -4288,6 +5805,11 @@
     "dialogue": [],
     "flags": [
       "stationary"
+    ],
+    "keywords": [
+      "spider",
+      "tunnel spider",
+      "tunnel"
     ]
   },
   "1713": {
@@ -4296,16 +5818,21 @@
     "description": "An albino alligator that has grown enormous in the dark.",
     "hostile": true,
     "stats": {
-      "hp": 200,
+      "hp": 157,
       "max_hp": 200,
-      "attack": 24,
-      "defense": 18
+      "attack": 18,
+      "defense": 14
     },
     "loot_table": [],
     "respawn": 90,
     "dialogue": [],
     "flags": [
       "stationary"
+    ],
+    "keywords": [
+      "sewer",
+      "gator",
+      "sewer gator"
     ]
   },
   "1714": {
@@ -4314,16 +5841,21 @@
     "description": "A humanoid fungus that communicates through spore clouds.",
     "hostile": true,
     "stats": {
-      "hp": 120,
+      "hp": 107,
       "max_hp": 120,
-      "attack": 16,
-      "defense": 12
+      "attack": 14,
+      "defense": 10
     },
     "loot_table": [],
     "respawn": 60,
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "mushroom",
+      "mushroom man",
+      "man"
     ]
   },
   "1715": {
@@ -4332,16 +5864,21 @@
     "description": "Something that crawled out of a lab drain. It has too many limbs.",
     "hostile": true,
     "stats": {
-      "hp": 180,
+      "hp": 146,
       "max_hp": 180,
-      "attack": 22,
-      "defense": 10
+      "attack": 17,
+      "defense": 8
     },
     "loot_table": [],
     "respawn": 75,
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "escaped",
+      "escaped experiment",
+      "experiment"
     ]
   },
   "1716": {
@@ -4350,16 +5887,21 @@
     "description": "A human who lives in the tunnels. Territorial and desperate.",
     "hostile": true,
     "stats": {
-      "hp": 90,
+      "hp": 88,
       "max_hp": 90,
-      "attack": 14,
-      "defense": 6
+      "attack": 13,
+      "defense": 5
     },
     "loot_table": [],
     "respawn": 45,
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "undercity scavenger",
+      "undercity",
+      "scavenger"
     ]
   },
   "1717": {
@@ -4368,16 +5910,21 @@
     "description": "A masked figure in a long coat administering dubious cures.",
     "hostile": true,
     "stats": {
-      "hp": 150,
+      "hp": 127,
       "max_hp": 150,
-      "attack": 20,
-      "defense": 10
+      "attack": 16,
+      "defense": 8
     },
     "loot_table": [],
     "respawn": 75,
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "plague doctor",
+      "doctor",
+      "plague"
     ]
   },
   "1718": {
@@ -4386,16 +5933,21 @@
     "description": "A hunched figure that builds sculptures from the bones of the dead.",
     "hostile": true,
     "stats": {
-      "hp": 170,
+      "hp": 140,
       "max_hp": 170,
-      "attack": 18,
-      "defense": 14
+      "attack": 14,
+      "defense": 11
     },
     "loot_table": [],
     "respawn": 75,
     "dialogue": [],
     "flags": [
       "stationary"
+    ],
+    "keywords": [
+      "bone",
+      "bone collector",
+      "collector"
     ]
   },
   "1719": {
@@ -4404,16 +5956,21 @@
     "description": "A sentient mass of sewage and industrial waste. It absorbs what it touches.",
     "hostile": true,
     "stats": {
-      "hp": 250,
+      "hp": 191,
       "max_hp": 250,
-      "attack": 22,
-      "defense": 20
+      "attack": 16,
+      "defense": 15
     },
     "loot_table": [],
     "respawn": 120,
     "dialogue": [],
     "flags": [
       "stationary"
+    ],
+    "keywords": [
+      "the drip",
+      "the",
+      "drip"
     ]
   },
   "1720": {
@@ -4422,10 +5979,10 @@
     "description": "An old woman who knows every passage in the Undercity.",
     "hostile": false,
     "stats": {
-      "hp": 60,
+      "hp": 80,
       "max_hp": 60,
-      "attack": 3,
-      "defense": 3
+      "attack": 4,
+      "defense": 4
     },
     "loot_table": [],
     "respawn": 300,
@@ -4441,6 +5998,43 @@
     ],
     "flags": [
       "npc"
+    ],
+    "keywords": [
+      "tunnel hermit",
+      "hermit",
+      "tunnel"
+    ],
+    "sayResponses": [
+      {
+        "keywords": [
+          "help",
+          "advice"
+        ],
+        "text": "Keep your voice down. Walls have ears here."
+      },
+      {
+        "keywords": [
+          "danger",
+          "warning"
+        ],
+        "text": "Cross the wrong people and you'll vanish. Quietly."
+      },
+      {
+        "keywords": [
+          "quest",
+          "task",
+          "job"
+        ],
+        "text": "Jobs are posted in code. Learn the cipher."
+      },
+      {
+        "keywords": [
+          "buy",
+          "sell",
+          "trade"
+        ],
+        "text": "Everything's for sale here. Everything."
+      }
     ]
   },
   "1721": {
@@ -4449,7 +6043,7 @@
     "description": "A pale man who cultivates edible fungi in the damp tunnels.",
     "hostile": false,
     "stats": {
-      "hp": 70,
+      "hp": 77,
       "max_hp": 70,
       "attack": 4,
       "defense": 4
@@ -4468,6 +6062,11 @@
     ],
     "flags": [
       "npc"
+    ],
+    "keywords": [
+      "mushroom",
+      "farmer",
+      "mushroom farmer"
     ]
   },
   "1801": {
@@ -4486,6 +6085,11 @@
     "dialogue": [],
     "flags": [
       "stationary"
+    ],
+    "keywords": [
+      "training",
+      "training dummy",
+      "dummy"
     ]
   },
   "1802": {
@@ -4504,6 +6108,11 @@
     "dialogue": [],
     "flags": [
       "stationary"
+    ],
+    "keywords": [
+      "sparring",
+      "partner",
+      "sparring partner"
     ]
   },
   "1803": {
@@ -4522,6 +6131,11 @@
     "dialogue": [],
     "flags": [
       "stationary"
+    ],
+    "keywords": [
+      "gravity construct",
+      "construct",
+      "gravity"
     ]
   },
   "1804": {
@@ -4540,6 +6154,11 @@
     "dialogue": [],
     "flags": [
       "stationary"
+    ],
+    "keywords": [
+      "self",
+      "mirror self",
+      "mirror"
     ]
   },
   "1805": {
@@ -4558,6 +6177,12 @@
     "dialogue": [],
     "flags": [
       "stationary"
+    ],
+    "keywords": [
+      "post",
+      "wooden striking post",
+      "wooden",
+      "striking"
     ]
   },
   "1806": {
@@ -4576,6 +6201,12 @@
     "dialogue": [],
     "flags": [
       "stationary"
+    ],
+    "keywords": [
+      "speed bag golem",
+      "speed",
+      "bag",
+      "golem"
     ]
   },
   "1807": {
@@ -4594,6 +6225,12 @@
     "dialogue": [],
     "flags": [
       "stationary"
+    ],
+    "keywords": [
+      "iron sparring golem",
+      "sparring",
+      "golem",
+      "iron"
     ]
   },
   "1808": {
@@ -4612,6 +6249,12 @@
     "dialogue": [],
     "flags": [
       "stationary"
+    ],
+    "keywords": [
+      "training",
+      "elemental training orb",
+      "orb",
+      "elemental"
     ]
   },
   "1809": {
@@ -4630,6 +6273,11 @@
     "dialogue": [],
     "flags": [
       "stationary"
+    ],
+    "keywords": [
+      "shadow",
+      "shadow clone",
+      "clone"
     ]
   },
   "1810": {
@@ -4648,6 +6296,11 @@
     "dialogue": [],
     "flags": [
       "stationary"
+    ],
+    "keywords": [
+      "endurance",
+      "pillar",
+      "endurance pillar"
     ]
   },
   "1811": {
@@ -4675,6 +6328,11 @@
     ],
     "flags": [
       "npc"
+    ],
+    "keywords": [
+      "training",
+      "master",
+      "training master"
     ]
   },
   "1812": {
@@ -4702,6 +6360,11 @@
     ],
     "flags": [
       "npc"
+    ],
+    "keywords": [
+      "meditation guide",
+      "meditation",
+      "guide"
     ]
   },
   "1901": {
@@ -4710,16 +6373,21 @@
     "description": "A confused spirit wandering the afterlife paths.",
     "hostile": true,
     "stats": {
-      "hp": 100,
+      "hp": 574,
       "max_hp": 100,
-      "attack": 12,
-      "defense": 5
+      "attack": 68,
+      "defense": 28
     },
     "loot_table": [],
     "respawn": 30,
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "soul",
+      "lost",
+      "lost soul"
     ]
   },
   "1902": {
@@ -4728,16 +6396,53 @@
     "description": "A warrior who chose to guard the paths between life and death.",
     "hostile": true,
     "stats": {
-      "hp": 250,
+      "hp": 750,
       "max_hp": 250,
-      "attack": 30,
-      "defense": 20
+      "attack": 90,
+      "defense": 60
     },
     "loot_table": [],
     "respawn": 90,
     "dialogue": [],
     "flags": [
       "stationary"
+    ],
+    "keywords": [
+      "spirit guardian",
+      "guardian",
+      "spirit"
+    ],
+    "sayResponses": [
+      {
+        "keywords": [
+          "help",
+          "advice"
+        ],
+        "text": "The old ones left warnings carved in stone. Heed them."
+      },
+      {
+        "keywords": [
+          "danger",
+          "warning"
+        ],
+        "text": "The deeper chambers hold things that should stay buried."
+      },
+      {
+        "keywords": [
+          "quest",
+          "task",
+          "job"
+        ],
+        "text": "The relics call to those who seek them."
+      },
+      {
+        "keywords": [
+          "ruin",
+          "ancient",
+          "old"
+        ],
+        "text": "This place is older than memory. Older than names."
+      }
     ]
   },
   "1903": {
@@ -4746,16 +6451,21 @@
     "description": "A massive horned demon that guards a checkpoint.",
     "hostile": true,
     "stats": {
-      "hp": 400,
+      "hp": 923,
       "max_hp": 400,
-      "attack": 40,
-      "defense": 30
+      "attack": 92,
+      "defense": 69
     },
     "loot_table": [],
     "respawn": 120,
     "dialogue": [],
     "flags": [
       "stationary"
+    ],
+    "keywords": [
+      "gatekeeper",
+      "oni gatekeeper",
+      "oni"
     ]
   },
   "1904": {
@@ -4764,16 +6474,21 @@
     "description": "A young death god still learning the trade.",
     "hostile": true,
     "stats": {
-      "hp": 500,
+      "hp": 983,
       "max_hp": 500,
-      "attack": 45,
-      "defense": 25
+      "attack": 88,
+      "defense": 49
     },
     "loot_table": [],
     "respawn": 180,
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "reaper initiate",
+      "initiate",
+      "reaper"
     ]
   },
   "1905": {
@@ -4782,16 +6497,23 @@
     "description": "A spirit so old even death has forgotten his name.",
     "hostile": true,
     "stats": {
-      "hp": 800,
+      "hp": 1892,
       "max_hp": 800,
-      "attack": 55,
-      "defense": 40
+      "attack": 130,
+      "defense": 94
     },
     "loot_table": [],
     "respawn": 300,
     "dialogue": [],
     "flags": [
-      "stationary"
+      "stationary",
+      "boss"
+    ],
+    "keywords": [
+      "king",
+      "the",
+      "the forgotten king",
+      "forgotten"
     ]
   },
   "1906": {
@@ -4800,16 +6522,21 @@
     "description": "A tiny luminous insect that feeds on spiritual energy.",
     "hostile": true,
     "stats": {
-      "hp": 25,
+      "hp": 448,
       "max_hp": 25,
-      "attack": 4,
-      "defense": 1
+      "attack": 71,
+      "defense": 17
     },
     "loot_table": [],
     "respawn": 15,
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "soul moth",
+      "moth",
+      "soul"
     ]
   },
   "1907": {
@@ -4818,16 +6545,21 @@
     "description": "A formless shadow drifting without purpose or memory.",
     "hostile": true,
     "stats": {
-      "hp": 60,
+      "hp": 466,
       "max_hp": 60,
-      "attack": 8,
-      "defense": 3
+      "attack": 62,
+      "defense": 23
     },
     "loot_table": [],
     "respawn": 25,
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "shade",
+      "wandering shade",
+      "wandering"
     ]
   },
   "1908": {
@@ -4836,16 +6568,21 @@
     "description": "A spirit consumed by a single desire it can never fulfill.",
     "hostile": true,
     "stats": {
-      "hp": 80,
+      "hp": 451,
       "max_hp": 80,
-      "attack": 12,
-      "defense": 4
+      "attack": 67,
+      "defense": 22
     },
     "loot_table": [],
     "respawn": 30,
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "hungry ghost",
+      "hungry",
+      "ghost"
     ]
   },
   "1909": {
@@ -4854,16 +6591,21 @@
     "description": "A ghostly fox with multiple tails. Mischievous but dangerous.",
     "hostile": true,
     "stats": {
-      "hp": 110,
+      "hp": 459,
       "max_hp": 110,
-      "attack": 16,
-      "defense": 8
+      "attack": 66,
+      "defense": 33
     },
     "loot_table": [],
     "respawn": 45,
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "spirit fox",
+      "spirit",
+      "fox"
     ]
   },
   "1910": {
@@ -4872,16 +6614,21 @@
     "description": "The spirit of a great fighter who trains eternally in death.",
     "hostile": true,
     "stats": {
-      "hp": 180,
+      "hp": 498,
       "max_hp": 180,
-      "attack": 25,
-      "defense": 15
+      "attack": 69,
+      "defense": 41
     },
     "loot_table": [],
     "respawn": 75,
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "ancestral warrior",
+      "warrior",
+      "ancestral"
     ]
   },
   "1911": {
@@ -4890,16 +6637,22 @@
     "description": "A minor demon with red skin and a barbed spear.",
     "hostile": true,
     "stats": {
-      "hp": 150,
+      "hp": 477,
       "max_hp": 150,
-      "attack": 22,
-      "defense": 12
+      "attack": 70,
+      "defense": 38
     },
     "loot_table": [],
     "respawn": 60,
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "demon",
+      "soldier",
+      "demon foot soldier",
+      "foot"
     ]
   },
   "1912": {
@@ -4908,16 +6661,21 @@
     "description": "An armored spirit serving the judges of the dead.",
     "hostile": true,
     "stats": {
-      "hp": 200,
+      "hp": 505,
       "max_hp": 200,
-      "attack": 28,
-      "defense": 18
+      "attack": 70,
+      "defense": 45
     },
     "loot_table": [],
     "respawn": 90,
     "dialogue": [],
     "flags": [
       "stationary"
+    ],
+    "keywords": [
+      "soldier",
+      "celestial",
+      "celestial soldier"
     ]
   },
   "1913": {
@@ -4926,16 +6684,21 @@
     "description": "A bloated spirit that consumes other ghosts to grow stronger.",
     "hostile": true,
     "stats": {
-      "hp": 280,
+      "hp": 580,
       "max_hp": 280,
-      "attack": 35,
-      "defense": 15
+      "attack": 72,
+      "defense": 31
     },
     "loot_table": [],
     "respawn": 120,
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "eater",
+      "soul",
+      "soul eater"
     ]
   },
   "1914": {
@@ -4944,16 +6707,21 @@
     "description": "A three-headed dog made of black fire that guards the deeper paths.",
     "hostile": true,
     "stats": {
-      "hp": 220,
+      "hp": 518,
       "max_hp": 220,
-      "attack": 30,
-      "defense": 20
+      "attack": 70,
+      "defense": 47
     },
     "loot_table": [],
     "respawn": 90,
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "infernal",
+      "hound",
+      "infernal hound"
     ]
   },
   "1915": {
@@ -4962,16 +6730,21 @@
     "description": "A spirit twisted by rage who attacks the living on sight.",
     "hostile": true,
     "stats": {
-      "hp": 170,
+      "hp": 494,
       "max_hp": 170,
-      "attack": 26,
-      "defense": 10
+      "attack": 75,
+      "defense": 29
     },
     "loot_table": [],
     "respawn": 75,
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "wrathful",
+      "ancestor",
+      "wrathful ancestor"
     ]
   },
   "1916": {
@@ -4980,16 +6753,21 @@
     "description": "A massive snake made of interlocking bones that slithers through the spirit realm.",
     "hostile": true,
     "stats": {
-      "hp": 240,
+      "hp": 544,
       "max_hp": 240,
-      "attack": 28,
-      "defense": 22
+      "attack": 63,
+      "defense": 49
     },
     "loot_table": [],
     "respawn": 90,
     "dialogue": [],
     "flags": [
       "roaming"
+    ],
+    "keywords": [
+      "serpent",
+      "bone",
+      "bone serpent"
     ]
   },
   "1917": {
@@ -4998,10 +6776,10 @@
     "description": "A spectral bureaucrat who records the deeds of the dead.",
     "hostile": false,
     "stats": {
-      "hp": 100,
+      "hp": 560,
       "max_hp": 100,
-      "attack": 5,
-      "defense": 5
+      "attack": 28,
+      "defense": 28
     },
     "loot_table": [],
     "respawn": 300,
@@ -5017,6 +6795,11 @@
     ],
     "flags": [
       "npc"
+    ],
+    "keywords": [
+      "judge's",
+      "judge's scribe",
+      "scribe"
     ]
   },
   "1918": {
@@ -5025,10 +6808,10 @@
     "description": "A hooded figure with a long pole who transports souls across the river.",
     "hostile": false,
     "stats": {
-      "hp": 200,
+      "hp": 593,
       "max_hp": 200,
-      "attack": 10,
-      "defense": 10
+      "attack": 29,
+      "defense": 29
     },
     "loot_table": [],
     "respawn": 300,
@@ -5044,6 +6827,11 @@
     ],
     "flags": [
       "npc"
+    ],
+    "keywords": [
+      "ferryman",
+      "afterlife",
+      "afterlife ferryman"
     ]
   },
   "1919": {
@@ -5052,10 +6840,10 @@
     "description": "A gentle ghost who mends the wounds of the recently deceased.",
     "hostile": false,
     "stats": {
-      "hp": 150,
+      "hp": 600,
       "max_hp": 150,
-      "attack": 5,
-      "defense": 5
+      "attack": 20,
+      "defense": 20
     },
     "loot_table": [],
     "respawn": 300,
@@ -5071,6 +6859,43 @@
     ],
     "flags": [
       "npc"
+    ],
+    "keywords": [
+      "spirit healer",
+      "spirit",
+      "healer"
+    ],
+    "sayResponses": [
+      {
+        "keywords": [
+          "help",
+          "advice"
+        ],
+        "text": "The old ones left warnings carved in stone. Heed them."
+      },
+      {
+        "keywords": [
+          "danger",
+          "warning"
+        ],
+        "text": "The deeper chambers hold things that should stay buried."
+      },
+      {
+        "keywords": [
+          "quest",
+          "task",
+          "job"
+        ],
+        "text": "The relics call to those who seek them."
+      },
+      {
+        "keywords": [
+          "ruin",
+          "ancient",
+          "old"
+        ],
+        "text": "This place is older than memory. Older than names."
+      }
     ]
   },
   "101": {
@@ -5079,7 +6904,7 @@
     "description": "A crude training dummy stuffed with straw. It doesn't fight back much.",
     "hostile": false,
     "stats": {
-      "hp": 20,
+      "hp": 17,
       "max_hp": 20,
       "attack": 1,
       "defense": 0
@@ -5089,7 +6914,12 @@
     ],
     "respawn": 30,
     "dialogue": [],
-    "flags": []
+    "flags": [],
+    "keywords": [
+      "dummy",
+      "straw dummy",
+      "straw"
+    ]
   },
   "102": {
     "vnum": 102,
@@ -5097,10 +6927,10 @@
     "description": "A large grey rat with beady red eyes. It hisses at your approach.",
     "hostile": true,
     "stats": {
-      "hp": 30,
+      "hp": 16,
       "max_hp": 30,
-      "attack": 3,
-      "defense": 1
+      "attack": 1,
+      "defense": 0
     },
     "loot_table": [
       101
@@ -5109,6 +6939,11 @@
     "dialogue": [],
     "flags": [
       "aggressive"
+    ],
+    "keywords": [
+      "tower",
+      "rat",
+      "tower rat"
     ]
   },
   "103": {
@@ -5117,10 +6952,10 @@
     "description": "A palm-sized spider with venomous-looking fangs.",
     "hostile": true,
     "stats": {
-      "hp": 35,
+      "hp": 15,
       "max_hp": 35,
-      "attack": 5,
-      "defense": 2
+      "attack": 2,
+      "defense": 0
     },
     "loot_table": [
       102
@@ -5129,6 +6964,11 @@
     "dialogue": [],
     "flags": [
       "aggressive"
+    ],
+    "keywords": [
+      "spider",
+      "cave",
+      "cave spider"
     ]
   },
   "105": {
@@ -5137,10 +6977,10 @@
     "description": "A scarred dog gone wild. It bares its teeth and circles you.",
     "hostile": true,
     "stats": {
-      "hp": 50,
+      "hp": 17,
       "max_hp": 50,
-      "attack": 7,
-      "defense": 3
+      "attack": 2,
+      "defense": 1
     },
     "loot_table": [
       103
@@ -5149,6 +6989,11 @@
     "dialogue": [],
     "flags": [
       "aggressive"
+    ],
+    "keywords": [
+      "feral hound",
+      "hound",
+      "feral"
     ]
   },
   "107": {
@@ -5157,10 +7002,10 @@
     "description": "A reanimated skeleton clutching a rusted sword. It moves with jerky purpose.",
     "hostile": true,
     "stats": {
-      "hp": 60,
+      "hp": 17,
       "max_hp": 60,
-      "attack": 9,
-      "defense": 5
+      "attack": 2,
+      "defense": 1
     },
     "loot_table": [
       112
@@ -5169,6 +7014,11 @@
     "dialogue": [],
     "flags": [
       "aggressive"
+    ],
+    "keywords": [
+      "skeleton sentry",
+      "sentry",
+      "skeleton"
     ]
   },
   "108": {
@@ -5177,10 +7027,10 @@
     "description": "A small green creature perched on a ledge, bow drawn.",
     "hostile": true,
     "stats": {
-      "hp": 45,
+      "hp": 14,
       "max_hp": 45,
-      "attack": 12,
-      "defense": 3
+      "attack": 3,
+      "defense": 0
     },
     "loot_table": [
       113
@@ -5189,6 +7039,11 @@
     "dialogue": [],
     "flags": [
       "aggressive"
+    ],
+    "keywords": [
+      "goblin archer",
+      "goblin",
+      "archer"
     ]
   },
   "110": {
@@ -5197,10 +7052,10 @@
     "description": "A stone golem animated by faint magic. It blocks the stairs upward.",
     "hostile": true,
     "stats": {
-      "hp": 80,
+      "hp": 20,
       "max_hp": 80,
-      "attack": 10,
-      "defense": 8
+      "attack": 2,
+      "defense": 2
     },
     "loot_table": [
       116
@@ -5209,6 +7064,35 @@
     "dialogue": [],
     "flags": [
       "aggressive"
+    ],
+    "keywords": [
+      "tower",
+      "tower guardian",
+      "guardian"
+    ],
+    "sayResponses": [
+      {
+        "keywords": [
+          "help",
+          "advice"
+        ],
+        "text": "Take your time exploring. There's no rush here."
+      },
+      {
+        "keywords": [
+          "danger",
+          "warning"
+        ],
+        "text": "Stick to the well-lit paths until you're stronger."
+      },
+      {
+        "keywords": [
+          "quest",
+          "task",
+          "job"
+        ],
+        "text": "Speak to the instructors \u2014 they always need capable hands."
+      }
     ]
   },
   "111": {
@@ -5217,10 +7101,10 @@
     "description": "A translucent figure made of swirling air. It moans softly.",
     "hostile": true,
     "stats": {
-      "hp": 70,
+      "hp": 18,
       "max_hp": 70,
-      "attack": 14,
-      "defense": 4
+      "attack": 3,
+      "defense": 1
     },
     "loot_table": [
       106
@@ -5229,6 +7113,11 @@
     "dialogue": [],
     "flags": [
       "aggressive"
+    ],
+    "keywords": [
+      "wind",
+      "wind wraith",
+      "wraith"
     ]
   },
   "112": {
@@ -5237,10 +7126,10 @@
     "description": "A thick book that floats in the air, its pages fluttering with malice.",
     "hostile": true,
     "stats": {
-      "hp": 55,
+      "hp": 14,
       "max_hp": 55,
-      "attack": 16,
-      "defense": 6
+      "attack": 4,
+      "defense": 1
     },
     "loot_table": [
       117
@@ -5249,6 +7138,11 @@
     "dialogue": [],
     "flags": [
       "aggressive"
+    ],
+    "keywords": [
+      "animated",
+      "tome",
+      "animated tome"
     ]
   },
   "113": {
@@ -5257,10 +7151,10 @@
     "description": "A quivering mass of crimson ooze that absorbs everything it touches.",
     "hostile": true,
     "stats": {
-      "hp": 90,
+      "hp": 21,
       "max_hp": 90,
-      "attack": 11,
-      "defense": 10
+      "attack": 2,
+      "defense": 2
     },
     "loot_table": [
       107
@@ -5269,6 +7163,11 @@
     "dialogue": [],
     "flags": [
       "aggressive"
+    ],
+    "keywords": [
+      "slime",
+      "blood slime",
+      "blood"
     ]
   },
   "115": {
@@ -5277,10 +7176,10 @@
     "description": "A battle-scarred warrior in dented plate armor. The final test.",
     "hostile": false,
     "stats": {
-      "hp": 120,
+      "hp": 24,
       "max_hp": 120,
-      "attack": 15,
-      "defense": 12
+      "attack": 3,
+      "defense": 2
     },
     "loot_table": [
       118,
@@ -5288,7 +7187,12 @@
     ],
     "respawn": 30,
     "dialogue": [],
-    "flags": []
+    "flags": [],
+    "keywords": [
+      "tower",
+      "champion",
+      "tower champion"
+    ]
   },
   "120": {
     "vnum": 120,
@@ -5296,10 +7200,10 @@
     "description": "A grizzled warrior with scars across both arms. He watches newcomers with a knowing eye.",
     "hostile": false,
     "stats": {
-      "hp": 500,
+      "hp": 100,
       "max_hp": 500,
-      "attack": 50,
-      "defense": 50
+      "attack": 10,
+      "defense": 10
     },
     "loot_table": [],
     "respawn": 0,
@@ -5318,7 +7222,37 @@
       }
     ],
     "flags": [
-      "npc"
+      "npc",
+      "boss"
+    ],
+    "keywords": [
+      "kael",
+      "instructor kael",
+      "instructor"
+    ],
+    "sayResponses": [
+      {
+        "keywords": [
+          "help",
+          "advice"
+        ],
+        "text": "Take your time exploring. There's no rush here."
+      },
+      {
+        "keywords": [
+          "danger",
+          "warning"
+        ],
+        "text": "Stick to the well-lit paths until you're stronger."
+      },
+      {
+        "keywords": [
+          "quest",
+          "task",
+          "job"
+        ],
+        "text": "Speak to the instructors \u2014 they always need capable hands."
+      }
     ]
   },
   "121": {
@@ -5327,10 +7261,10 @@
     "description": "A small, energetic gnome-like figure with oversized spectacles and ink-stained fingers.",
     "hostile": false,
     "stats": {
-      "hp": 200,
+      "hp": 97,
       "max_hp": 200,
       "attack": 1,
-      "defense": 1
+      "defense": 0
     },
     "loot_table": [],
     "respawn": 0,
@@ -5350,6 +7284,11 @@
     ],
     "flags": [
       "npc"
+    ],
+    "keywords": [
+      "quartermaster pip",
+      "pip",
+      "quartermaster"
     ]
   },
   "1200": {
@@ -5358,10 +7297,10 @@
     "description": "A tall, thin man in singed robes paces the ruins of his tower. His hair stands at wild angles, and his eyes dart between the destruction around him and the sheaf of notes clutched in his trembling hands. He mutters calculations under his breath, occasionally stopping to stare at the holes in his walls with a mixture of terror and academic fascination.",
     "hostile": false,
     "stats": {
-      "hp": 500,
+      "hp": 251,
       "max_hp": 500,
-      "attack": 45,
-      "defense": 30
+      "attack": 22,
+      "defense": 15
     },
     "loot_table": [],
     "respawn": 0,
@@ -5427,6 +7366,13 @@
         ],
         "text": "Aldric laughs bitterly. \"Magic? Against THAT? My wards were the strongest in the kingdom \u2014 layered enchantments, planar anchors, temporal locks. It went through them like they didn't exist. No, whatever that sphere is, it operates on principles beyond our understanding of magic. It's not anti-magic either \u2014 my detection spells work fine around the impact sites. It simply... doesn't care about our rules.\""
       }
+    ],
+    "keywords": [
+      "the",
+      "wizard",
+      "aldric the distraught wizard",
+      "aldric",
+      "distraught"
     ]
   }
 }

@@ -1,0 +1,107 @@
+{
+  "1": {
+    "name": "Healing Salve",
+    "description": "Combine herbs and venom to create a potent healing salve.",
+    "ingredients": [{"vnum": 1015, "qty": 1}, {"vnum": 285, "qty": 1}],
+    "result": {"vnum": 280, "qty": 2},
+    "skill_required": 0
+  },
+  "2": {
+    "name": "Reinforced Armor Patch",
+    "description": "Fuse scrap metal and ironwood bark into a defensive patch.",
+    "ingredients": [{"vnum": 2001, "qty": 2}, {"vnum": 1010, "qty": 1}],
+    "result": {"vnum": 286, "qty": 1},
+    "skill_required": 0
+  },
+  "3": {
+    "name": "Focus Elixir",
+    "description": "Distill wisp essence with a focus crystal for mental clarity.",
+    "ingredients": [{"vnum": 1011, "qty": 1}, {"vnum": 105, "qty": 1}],
+    "result": {"vnum": 283, "qty": 2},
+    "skill_required": 0
+  },
+  "4": {
+    "name": "Silk Bandage",
+    "description": "Weave spider silk into a superior bandage.",
+    "ingredients": [{"vnum": 102, "qty": 2}],
+    "result": {"vnum": 280, "qty": 1},
+    "skill_required": 0
+  },
+  "5": {
+    "name": "Poison Blade Oil",
+    "description": "Extract venom sac contents into a weapon coating.",
+    "ingredients": [{"vnum": 1015, "qty": 2}, {"vnum": 3009, "qty": 1}],
+    "result": {"vnum": 3009, "qty": 3},
+    "skill_required": 10
+  },
+  "6": {
+    "name": "Thunder Bomb",
+    "description": "Pack a thunder core into a throwable explosive.",
+    "ingredients": [{"vnum": 5006, "qty": 1}, {"vnum": 2001, "qty": 1}],
+    "result": {"vnum": 4004, "qty": 2},
+    "skill_required": 10
+  },
+  "7": {
+    "name": "Dragon Scale Shield",
+    "description": "Forge dragon scales into a powerful shield.",
+    "ingredients": [{"vnum": 5008, "qty": 3}, {"vnum": 2001, "qty": 2}],
+    "result": {"vnum": 5004, "qty": 1},
+    "skill_required": 25
+  },
+  "8": {
+    "name": "Astral Draught",
+    "description": "Combine cherry blossom petals with cloud silk for cosmic healing.",
+    "ingredients": [{"vnum": 5019, "qty": 2}, {"vnum": 5020, "qty": 1}],
+    "result": {"vnum": 287, "qty": 2},
+    "skill_required": 20
+  },
+  "9": {
+    "name": "Smoke Bomb",
+    "description": "Pack glitch dust into a disorienting smoke device.",
+    "ingredients": [{"vnum": 2006, "qty": 2}, {"vnum": 3008, "qty": 1}],
+    "result": {"vnum": 284, "qty": 3},
+    "skill_required": 5
+  },
+  "10": {
+    "name": "Bone Dagger",
+    "description": "Sharpen bone fragments into a crude but effective blade.",
+    "ingredients": [{"vnum": 1006, "qty": 3}, {"vnum": 1007, "qty": 1}],
+    "result": {"vnum": 208, "qty": 1},
+    "skill_required": 5
+  },
+  "11": {
+    "name": "AI Core Upgrade",
+    "description": "Integrate an AI core with data fragments for enhanced processing.",
+    "ingredients": [{"vnum": 2007, "qty": 1}, {"vnum": 2013, "qty": 3}],
+    "result": {"vnum": 283, "qty": 3},
+    "skill_required": 15
+  },
+  "12": {
+    "name": "Golem Heart",
+    "description": "Combine a golem core with sentinel core for immense power.",
+    "ingredients": [{"vnum": 6018, "qty": 1}, {"vnum": 2014, "qty": 1}],
+    "result": {"vnum": 281, "qty": 3},
+    "skill_required": 30
+  },
+  "13": {
+    "name": "Wolf Cloak",
+    "description": "Stitch wolf pelts into a warm protective cloak.",
+    "ingredients": [{"vnum": 1003, "qty": 3}],
+    "result": {"vnum": 1002, "qty": 1},
+    "skill_required": 5
+  },
+  "14": {
+    "name": "Serpent Antidote",
+    "description": "Process serpent scales into a universal antidote.",
+    "ingredients": [{"vnum": 6015, "qty": 2}, {"vnum": 285, "qty": 1}],
+    "result": {"vnum": 285, "qty": 4},
+    "skill_required": 10
+  },
+  "15": {
+    "name": "Meditation Candle",
+    "description": "Infuse cherry blossoms with incense for deep meditation.",
+    "ingredients": [{"vnum": 5019, "qty": 1}, {"vnum": 108, "qty": 1}],
+    "result": {"vnum": 282, "qty": 2},
+    "skill_required": 10
+  }
+}

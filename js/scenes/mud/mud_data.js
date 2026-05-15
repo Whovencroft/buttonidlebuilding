@@ -14,7 +14,8 @@
     rooms: {},
     mobs: {},
     items: {},
-    quests: {}
+    quests: {},
+    recipes: {}
   };
 
   /**
@@ -41,14 +42,16 @@
       fetchJSON('rooms.json'),
       fetchJSON('mobs.json'),
       fetchJSON('items.json'),
-      fetchJSON('quests.json')
-    ]).then(([rooms, mobs, items, quests]) => {
+      fetchJSON('quests.json'),
+      fetchJSON('recipes.json')
+    ]).then(([rooms, mobs, items, quests, recipes]) => {
       data.rooms = rooms;
       data.mobs = mobs;
       data.items = items;
       data.quests = quests;
+      data.recipes = recipes;
       loaded = true;
-      console.log(`[MudData] Loaded: ${Object.keys(rooms).length} rooms, ${Object.keys(mobs).length} mobs, ${Object.keys(items).length} items, ${Object.keys(quests).length} quests`);
+      console.log(`[MudData] Loaded: ${Object.keys(rooms).length} rooms, ${Object.keys(mobs).length} mobs, ${Object.keys(items).length} items, ${Object.keys(quests).length} quests, ${Object.keys(recipes).length} recipes`);
     });
 
     return loadPromise;
@@ -66,6 +69,7 @@
     get mobs() { return data.mobs; },
     get items() { return data.items; },
     get quests() { return data.quests; },
+    get recipes() { return data.recipes; },
     load,
     isReady
   };

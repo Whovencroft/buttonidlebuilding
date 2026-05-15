@@ -415,7 +415,13 @@
         { type: 'info', text: '' }
       ];
       RACES.forEach((r, i) => {
-        lines.push({ type: 'items', text: `  ${i + 1}. ${r.name} — ${r.desc}` });
+        const s = r.stats;
+        const mods = [];
+        if (s.hp)      mods.push(`HP${s.hp > 0 ? '+' : ''}${s.hp}`);
+        if (s.attack)  mods.push(`ATK${s.attack > 0 ? '+' : ''}${s.attack}`);
+        if (s.defense) mods.push(`DEF${s.defense > 0 ? '+' : ''}${s.defense}`);
+        const statStr = mods.length ? ` [${mods.join(' ')}]` : '';
+        lines.push({ type: 'items', text: `  ${i + 1}. ${r.name}${statStr} — ${r.desc}` });
       });
       lines.push({ type: 'info', text: '' });
       lines.push({ type: 'success', text: 'Type the number or name of your choice.' });

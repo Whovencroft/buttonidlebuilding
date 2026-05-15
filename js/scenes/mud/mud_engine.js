@@ -43,6 +43,7 @@
       mobs = window.MudData.mobs || {};
       items = window.MudData.items || {};
       quests = window.MudData.quests || {};
+      engine._recipes = window.MudData.recipes || {};
     }
 
     // Restore from save if available
@@ -174,7 +175,10 @@
         return [{ type: 'error', text: 'An impassable barrier blocks your way.' }];
       }
 
+      // Zone transition detection
+      const prevZone = Math.floor(player.currentRoom / 100);
       player.currentRoom = vnum;
+      const newZone = Math.floor(vnum / 100);
       const isNewRoom = !player.visitedRooms.includes(vnum);
       if (isNewRoom) {
         player.visitedRooms.push(vnum);
@@ -198,6 +202,19 @@
       const room = currentRoom();
 
       const output = [];
+
+      // Zone transition message
+      if (newZone !== prevZone && prevZone > 0) {
+        const ZONE_NAMES = {
+          1: 'The Nexus', 11: 'Shattered Crown', 12: 'Neon Sprawl',
+          13: 'Undercity', 14: 'Iron Wastes', 15: 'Void Reach',
+          16: 'Temporal Rift', 17: 'Shadow Market', 18: 'Training Grounds',
+          19: 'Ancient Ruins', 20: 'Wizard Tower'
+        };
+        const zoneName = ZONE_NAMES[newZone] || `Zone ${newZone}`;
+        output.push({ type: 'info', text: `\u2550\u2550\u2550 Entering: ${zoneName} \u2550\u2550\u2550` });
+      }
+
       output.push({ type: 'room-name', text: room.name });
       output.push({ type: 'room-desc', text: room.description });
 
@@ -220,12 +237,22 @@
         }
       }
 
-      // List mobs
+      // List mobs with power hint
       const roomMobs = getAliveMobsInRoom(room);
       if (roomMobs.length > 0) {
-        const names = roomMobs.map(v => getMobName(v)).filter(Boolean);
-        if (names.length > 0) {
-          output.push({ type: 'mobs', text: `Present: ${names.join(', ')}` });
+        const mobEntries = roomMobs.map(v => {
+          const mob = mobs[v];
+          if (!mob) return null;
+          const mobPow = (mob.stats?.hp || 0) + (mob.stats?.attack || 0) * 3 + (mob.stats?.defense || 0) * 2;
+          const ratio = mobPow / Math.max(1, player.power);
+          let tag = '';
+          if (ratio > 4) tag = ' [!!]';
+          else if (ratio > 2) tag = ' [!]';
+          else if (ratio < 0.25) tag = ' [~]';
+          return mob.name + tag;
+        }).filter(Boolean);
+        if (mobEntries.length > 0) {
+          output.push({ type: 'mobs', text: `Present: ${mobEntries.join(', ')}` });
         }
       }
 
@@ -587,9 +614,11 @@
 
       // Remove ingredients, add result
       player.inventory = player.inventory.filter((v, i) => i !== idx1 && i !== idx2);
-      player.inventory.push(result.vnum);
+      const qty = result.qty || 1;
+      for (let i = 0; i < qty; i++) player.inventory.push(result.vnum);
 
-      return [{ type: 'success', text: `You combine them into: ${getItemName(result.vnum)}` }];
+      const qtyText = qty > 1 ? ` (x${qty})` : '';
+      return [{ type: 'success', text: `You craft: ${getItemName(result.vnum)}${qtyText}` }];
     }
 
     /**
@@ -683,12 +712,16 @@
         });
         if (validExits.length > 0) {
           const dir = validExits[Math.floor(Math.random() * validExits.length)];
+          // Mob heals to full when player flees
+          const mob = mobs[combatState.mobVnum];
+          combatState.mobHp = combatState.mobMaxHp;
           combatState = null;
           combatTimer = 0;
           const ex = room.exits[dir];
           const targetVnum = typeof ex === 'object' ? ex.target_vnum : ex;
           return [
             { type: 'combat', text: `You flee to the ${dir}!` },
+            { type: 'info', text: `The ${mob?.name || 'creature'} recovers as you disengage.` },
             ...moveToRoom(targetVnum)
           ];
         }
@@ -741,6 +774,8 @@
 
     /** Auto-save interval tracker (saves every 60 seconds of play). */
     let autoSaveTimer = 0;
+    let ambientTimer = 0;
+    const AMBIENT_INTERVAL = 30; // Show ambient text every 30 seconds when idle
     const AUTO_SAVE_INTERVAL = 60;
     let focusRegenTimer = 0;
     const FOCUS_REGEN_INTERVAL = 5; // seconds between passive focus ticks
@@ -1277,6 +1312,26 @@
       const mob = mobs[combatState.mobVnum];
       const output = [];
 
+      // ── Boss Counter: if telegraph is active and ability qualifies, resolve counter ──
+      if (combatState.isBoss && combatState.bossCounter?.telegraphRound && window.MudBossCounter) {
+        if (window.MudBossCounter.isValidCounter(abilityId)) {
+          const baseDmg = Math.max(1, player.attackPower - Math.floor((mob.stats.defense || 0) / 2));
+          const counter = window.MudBossCounter.resolveCounter(def, player, mob, baseDmg);
+          combatState.mobHp -= counter.damage;
+          output.push(...counter.output);
+          if (player.momentum !== undefined) player.momentum = Math.min(12, player.momentum + counter.momentumDelta);
+          combatState.bossCounter.telegraphRound = false;
+          combatState.bossCounter.telegraphActive = false;
+          combatState.bossCounter.roundsSinceLastTelegraph = 0;
+          output.push({ type: 'combat', text: `[Mob HP: ${Math.max(0, combatState.mobHp)}/${combatState.mobMaxHp}]` });
+          if (combatState.mobHp <= 0) {
+            output.push(...handleMobKill(mob));
+          }
+          return output;
+        }
+        // Ability was too low tier — it still fires normally but counter fails next round
+      }
+
       // ── Glimmer Roll: BEFORE damage — check if a new ability sparks ──
       // If it does, the glimmered ability replaces the original for this attack.
       let activeDef = def; // The ability that actually fires
@@ -1699,10 +1754,14 @@
         return [{ type: 'info', text: `${mob.name} is not interested in fighting you.` }];
       }
 
+      const isBoss = (mob.flags || []).includes('boss');
       combatState = {
         mobVnum,
         mobHp: mob.stats.hp,
-        mobMaxHp: mob.stats.max_hp || mob.stats.hp
+        mobMaxHp: mob.stats.max_hp || mob.stats.hp,
+        // Boss counter state
+        isBoss,
+        bossCounter: isBoss ? window.MudBossCounter?.createBossCounterState() : null
       };
       combatTimer = 0;
 
@@ -1721,6 +1780,22 @@
       if (autoSaveTimer >= AUTO_SAVE_INTERVAL) {
         autoSaveTimer = 0;
         autoSave();
+      }
+
+      // Ambient flavor text when idle (not in combat)
+      if (!combatState) {
+        ambientTimer += dt;
+        if (ambientTimer >= AMBIENT_INTERVAL) {
+          ambientTimer = 0;
+          const room = currentRoom();
+          if (room?.ambient) {
+            const msgs = Array.isArray(room.ambient) ? room.ambient : [room.ambient];
+            const msg = msgs[Math.floor(Math.random() * msgs.length)];
+            pushCombatOutput([{ type: 'info', text: msg }]);
+          }
+        }
+      } else {
+        ambientTimer = 0;
       }
 
       // Passive focus regen when out of combat
@@ -1869,6 +1944,11 @@
           const def = window.MudAbilities?.getAbilityById(abilityId);
           if (def?.atkMod) debuffMobAtkMod *= def.atkMod;  // Reduces mob attack
           if (def?.defMod) debuffMobDefMod *= def.defMod;  // Reduces mob defense
+        } else if (key === 'death_weakness') {
+          // Death penalty: 10% reduction to player attack and defense
+          const dw = player.worldFlags[key];
+          if (dw && dw.atkMod) buffAtkMod *= dw.atkMod;
+          if (dw && dw.defMod) buffDefMod *= dw.defMod;
         }
       }
 
@@ -1891,8 +1971,16 @@
         playerMissed = true;
       }
 
+      // Combat message variety pools
+      const MISS_MSGS = [
+        `You swing at ${mob.name} but miss!`,
+        `Your attack goes wide — ${mob.name} sidesteps!`,
+        `You lunge at ${mob.name} but find only air!`,
+        `${mob.name} weaves aside as you strike!`,
+        `Your blow glances off harmlessly!`
+      ];
       if (playerMissed) {
-        output.push({ type: 'combat', text: `You swing at ${mob.name} but miss!` });
+        output.push({ type: 'combat', text: MISS_MSGS[Math.floor(Math.random() * MISS_MSGS.length)] });
       }
 
       if (!playerMissed) {
@@ -1915,7 +2003,22 @@
         const playerDmg = rawPlayerDmg;
         combatState.mobHp -= playerDmg;
         const critTag = playerCrit ? ' CRITICAL!' : '';
-        output.push({ type: 'combat', text: `You hit ${mob.name} for ${playerDmg} damage.${critTag} [Mob HP: ${Math.max(0, combatState.mobHp)}/${combatState.mobMaxHp}]` });
+        const HIT_MSGS = [
+          `You hit ${mob.name} for ${playerDmg} damage.`,
+          `You strike ${mob.name} solidly for ${playerDmg} damage.`,
+          `Your attack connects — ${playerDmg} damage to ${mob.name}.`,
+          `You land a blow on ${mob.name} for ${playerDmg} damage.`,
+          `${mob.name} staggers from your ${playerDmg} damage hit.`
+        ];
+        const CRIT_MSGS = [
+          `CRITICAL! You devastate ${mob.name} for ${playerDmg} damage!`,
+          `CRITICAL HIT! ${playerDmg} damage tears into ${mob.name}!`,
+          `A perfect strike! ${playerDmg} CRITICAL damage to ${mob.name}!`
+        ];
+        const hitMsg = playerCrit
+          ? CRIT_MSGS[Math.floor(Math.random() * CRIT_MSGS.length)]
+          : HIT_MSGS[Math.floor(Math.random() * HIT_MSGS.length)];
+        output.push({ type: 'combat', text: `${hitMsg} [Mob HP: ${Math.max(0, combatState.mobHp)}/${combatState.mobMaxHp}]` });
         // Precision grows from landing basic attacks
         if (window.MudStats && player.coreStats) {
           const growth = window.MudStats.onBasicAttackLanded();
@@ -1989,6 +2092,16 @@
             const label = def?.name || abilityId;
             output.push({ type: 'info', text: `${key.startsWith('buff_') ? 'Buff' : 'Debuff'} faded: ${label}` });
           }
+        } else if (key === 'death_weakness') {
+          // Tick death weakness duration
+          const dw = player.worldFlags[key];
+          if (dw && dw.rounds > 0) {
+            dw.rounds--;
+            if (dw.rounds <= 0) {
+              delete player.worldFlags[key];
+              output.push({ type: 'success', text: 'Your strength returns to normal.' });
+            }
+          }
         }
       }
 
@@ -2018,10 +2131,41 @@
         }
       }
 
+      // ─── Boss Counter System ─────────────────────────────────────────
+      if (combatState.isBoss && combatState.bossCounter && window.MudBossCounter) {
+        const bc = combatState.bossCounter;
+        if (bc.telegraphRound) {
+          // Player didn't counter in time — resolve failed counter
+          const mobAtk = mob.stats.attack || 10;
+          const fail = window.MudBossCounter.resolveFail(mob, mobAtk);
+          player.hp -= fail.damage;
+          output.push(...fail.output);
+          if (player.momentum !== undefined) player.momentum = Math.max(0, player.momentum + fail.momentumDelta);
+          bc.telegraphRound = false;
+          bc.telegraphActive = false;
+          bc.roundsSinceLastTelegraph = 0;
+        } else {
+          bc.roundsSinceLastTelegraph++;
+          if (window.MudBossCounter.shouldTelegraph(bc.roundsSinceLastTelegraph, true)) {
+            bc.telegraphActive = true;
+            bc.telegraphRound = true;
+            output.push({ type: 'error', text: window.MudBossCounter.getTelegraphMessage(mob) });
+            output.push({ type: 'info', text: 'Use a Tier 2+ ability NOW to counter!' });
+          }
+        }
+      }
+
       // Mob attacks player (with dodge, big-hit reduction, stat growth)
       // Roll for dodge (Instinct)
       if (window.MudStats && window.MudStats.rollDodge(derived)) {
-        output.push({ type: 'combat', text: `You dodge ${mob.name}'s attack!` });
+        const DODGE_MSGS = [
+          `You dodge ${mob.name}'s attack!`,
+          `You sidestep ${mob.name}'s strike!`,
+          `${mob.name} swings — you duck just in time!`,
+          `You roll away from ${mob.name}'s blow!`,
+          `${mob.name}'s attack whiffs past you!`
+        ];
+        output.push({ type: 'combat', text: DODGE_MSGS[Math.floor(Math.random() * DODGE_MSGS.length)] });
         // Instinct grows from dodging
         if (player.coreStats) {
           const growth = window.MudStats.onDodge();
@@ -2037,7 +2181,14 @@
           mobDmg = window.MudStats.applyBigHitReduction(mobDmg, player.maxHp, derived);
         }
         player.hp -= mobDmg;
-        output.push({ type: 'combat', text: `${mob.name} hits you for ${mobDmg} damage. [HP: ${player.hp}/${player.maxHp}]` });
+        const MOB_HIT_MSGS = [
+          `${mob.name} hits you for ${mobDmg} damage.`,
+          `${mob.name} strikes you for ${mobDmg} damage.`,
+          `${mob.name} lands a blow — ${mobDmg} damage.`,
+          `You take ${mobDmg} damage from ${mob.name}'s attack.`,
+          `${mob.name} connects — ${mobDmg} damage!`
+        ];
+        output.push({ type: 'combat', text: `${MOB_HIT_MSGS[Math.floor(Math.random() * MOB_HIT_MSGS.length)]} [HP: ${player.hp}/${player.maxHp}]` });
         // Vigor grows from taking damage and surviving
         if (window.MudStats && player.coreStats && player.hp > 0) {
           const vGrowth = window.MudStats.onDamageTaken(mobDmg, player.maxHp, player.hp);
@@ -2075,6 +2226,11 @@
 
         // Clear exhaustion on death
         player.exhausted = false;
+
+        // Apply 10% weakness debuff for 1 minute (24 combat rounds at 2.5s each)
+        if (!player.worldFlags) player.worldFlags = {};
+        player.worldFlags.death_weakness = { rounds: 24, atkMod: 0.9, defMod: 0.9 };
+        output.push({ type: 'error', text: 'You feel weakened... (10% penalty for 1 minute)' });
 
         player.hp = player.maxHp;
         combatState = null;
@@ -2262,16 +2418,29 @@
      * Returns { vnum } of the result item, or null.
      */
     function checkCombineRecipe(vnum1, vnum2) {
-      // Recipes are order-independent
-      const pair = [vnum1, vnum2].sort((a, b) => a - b);
-      const key = `${pair[0]}_${pair[1]}`;
-
-      const RECIPES = {
-        // Severed Cyber-Eye (2001) + Power Cell (2002) = Charged Cyber-Eye (2006)
-        '2001_2002': { vnum: 2006 }
-      };
-
-      return RECIPES[key] || null;
+      // Check loaded recipes from data/mud/recipes.json
+      if (!engine._recipes) return null;
+      const inv = player.inventory;
+      for (const recipe of Object.values(engine._recipes)) {
+        const ings = recipe.ingredients || [];
+        // Check if all ingredients are present in inventory
+        const needed = {};
+        for (const ing of ings) {
+          needed[ing.vnum] = (needed[ing.vnum] || 0) + ing.qty;
+        }
+        // For 2-item combine, check if both vnums satisfy a recipe
+        if (ings.length <= 2) {
+          const provided = {};
+          provided[vnum1] = (provided[vnum1] || 0) + 1;
+          provided[vnum2] = (provided[vnum2] || 0) + 1;
+          let match = true;
+          for (const [v, qty] of Object.entries(needed)) {
+            if ((provided[parseInt(v)] || 0) < qty) { match = false; break; }
+          }
+          if (match) return { vnum: recipe.result.vnum, qty: recipe.result.qty || 1, name: recipe.name };
+        }
+      }
+      return null;
     }
 
     // ─── Dialogue System ─────────────────────────────────────────────────────
@@ -2326,20 +2495,112 @@
 
     /**
      * Use a consumable item from inventory.
+     * Handles: heal, hp_restore, focus, attack_boost, damage, flee, cure.
      */
     function useConsumable(vnum) {
       const item = items[vnum];
       if (!item) return [{ type: 'error', text: 'Nothing happens.' }];
-
+      const stats = item.stats || {};
       const output = [];
-      const healAmount = item.stats?.heal || 20;
-      player.hp = Math.min(player.maxHp, player.hp + healAmount);
+      let consumed = false;
+
+      // Flee effect — guaranteed escape from combat
+      if (stats.flee) {
+        if (!combatState) {
+          return [{ type: 'error', text: "You aren't in combat — no need for that." }];
+        }
+        combatState = null;
+        combatTimer = 0;
+        const room = currentRoom();
+        const validExits = Object.keys(room?.exits || {}).filter(dir => {
+          const ex = room.exits[dir];
+          const target = typeof ex === 'object' ? ex.target_vnum : ex;
+          return target != null && rooms[target];
+        });
+        if (validExits.length > 0) {
+          const dir = validExits[Math.floor(Math.random() * validExits.length)];
+          const ex = room.exits[dir];
+          const targetVnum = typeof ex === 'object' ? ex.target_vnum : ex;
+          output.push({ type: 'success', text: `You use the ${item.name} and vanish in a cloud of smoke!` });
+          output.push(...moveToRoom(targetVnum));
+        } else {
+          output.push({ type: 'success', text: `You use the ${item.name} — combat ends!` });
+        }
+        consumed = true;
+      }
+
+      // Damage effect — deal damage to current combat target
+      if (stats.damage && !consumed) {
+        if (!combatState) {
+          return [{ type: 'error', text: "No target — you need to be in combat to use that." }];
+        }
+        const dmg = stats.damage;
+        combatState.mobHp -= dmg;
+        const mob = mobs[combatState.mobVnum];
+        output.push({ type: 'combat', text: `You hurl the ${item.name}! ${dmg} damage! [Mob HP: ${Math.max(0, combatState.mobHp)}/${combatState.mobMaxHp}]` });
+        if (combatState.mobHp <= 0) {
+          output.push(...handleMobKill(mob));
+        }
+        consumed = true;
+      }
+
+      // HP healing (heal and hp_restore are equivalent)
+      const healAmount = (stats.heal || 0) + (stats.hp_restore || 0);
+      if (healAmount > 0 && !consumed) {
+        const before = player.hp;
+        player.hp = Math.min(player.maxHp, player.hp + healAmount);
+        const healed = player.hp - before;
+        output.push({ type: 'success', text: `You use the ${item.name}. Restored ${healed} HP. [HP: ${player.hp}/${player.maxHp}]` });
+        consumed = true;
+      }
+
+      // Focus restoration
+      if (stats.focus && !consumed) {
+        const before = player.focus;
+        player.focus = Math.min(player.maxFocus, player.focus + stats.focus);
+        const restored = player.focus - before;
+        output.push({ type: 'success', text: `You use the ${item.name}. Restored ${restored} Focus. [Focus: ${player.focus}/${player.maxFocus}]` });
+        consumed = true;
+      } else if (stats.focus && consumed) {
+        // Dual-effect items (e.g., Astral Nectar: heal + focus)
+        player.focus = Math.min(player.maxFocus, player.focus + stats.focus);
+        output.push({ type: 'info', text: `Also restored ${stats.focus} Focus. [Focus: ${player.focus}/${player.maxFocus}]` });
+      }
+
+      // Attack boost — temporary buff stored in worldFlags
+      if (stats.attack_boost) {
+        player.worldFlags['buff_consumable_atk'] = 5; // Lasts 5 combat rounds
+        output.push({ type: 'success', text: `You use the ${item.name}. Attack boosted for 5 rounds!` });
+        consumed = true;
+      }
+
+      // Cure — remove debuffs
+      if (stats.cure) {
+        let cured = 0;
+        for (const key of Object.keys(player.worldFlags)) {
+          if (key.startsWith('debuff_') || key === 'death_weakness') {
+            delete player.worldFlags[key];
+            cured++;
+          }
+        }
+        if (!consumed) {
+          output.push({ type: 'success', text: `You use the ${item.name}. ${cured > 0 ? `Cured ${cured} ailment${cured > 1 ? 's' : ''}!` : 'You feel refreshed.'}` });
+          consumed = true;
+        } else {
+          output.push({ type: 'info', text: `Also cured ${cured} ailment${cured > 1 ? 's' : ''}.` });
+        }
+      }
+
+      // Fallback for items with no recognized stats
+      if (!consumed) {
+        player.hp = Math.min(player.maxHp, player.hp + 20);
+        output.push({ type: 'success', text: `You use the ${item.name}. [HP: ${player.hp}/${player.maxHp}]` });
+      }
 
       // Remove from inventory
       const idx = player.inventory.indexOf(vnum);
       if (idx !== -1) player.inventory.splice(idx, 1);
 
-      output.push({ type: 'success', text: `You use the ${item.name}. [HP: ${player.hp}/${player.maxHp}]` });
       return output;
     }
 

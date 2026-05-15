@@ -8493,6 +8493,11 @@
       1110,
       1104,
       1116
+    ],
+    "ambient": [
+      "Moss creeps along ancient stonework, reclaiming what was built.",
+      "The wind carries the distant clash of steel.",
+      "A faint glow pulses from runes etched into the walls."
     ]
   },
   "1102": {
@@ -8510,6 +8515,11 @@
     "mob_spawns": [
       1120,
       1131
+    ],
+    "ambient": [
+      "The scent of old parchment and candle wax lingers here.",
+      "A faint glow pulses from runes etched into the walls.",
+      "The wind carries the distant clash of steel."
     ]
   },
   "1103": {
@@ -8549,6 +8559,11 @@
     "mob_spawns": [
       1101,
       1102
+    ],
+    "ambient": [
+      "A raven caws from a crumbling battlement above.",
+      "A faint glow pulses from runes etched into the walls.",
+      "Moss creeps along ancient stonework, reclaiming what was built."
     ]
   },
   "1105": {
@@ -8584,6 +8599,11 @@
     ],
     "flags": [
       "dark"
+    ],
+    "ambient": [
+      "A faint glow pulses from runes etched into the walls.",
+      "Moss creeps along ancient stonework, reclaiming what was built.",
+      "A raven caws from a crumbling battlement above."
     ]
   },
   "1107": {
@@ -8602,6 +8622,11 @@
     },
     "mob_spawns": [
       1122
+    ],
+    "ambient": [
+      "The scent of old parchment and candle wax lingers here.",
+      "A raven caws from a crumbling battlement above.",
+      "The wind carries the distant clash of steel."
     ]
   },
   "1108": {
@@ -8622,6 +8647,11 @@
     "mob_spawns": [
       1135,
       1101
+    ],
+    "ambient": [
+      "Moss creeps along ancient stonework, reclaiming what was built.",
+      "The wind carries the distant clash of steel.",
+      "A raven caws from a crumbling battlement above."
     ]
   },
   "1109": {
@@ -8658,6 +8688,11 @@
     },
     "mob_spawns": [
       1131
+    ],
+    "ambient": [
+      "The wind carries the distant clash of steel.",
+      "A raven caws from a crumbling battlement above.",
+      "Moss creeps along ancient stonework, reclaiming what was built."
     ]
   },
   "1111": {
@@ -8676,6 +8711,11 @@
     ],
     "flags": [
       "dark"
+    ],
+    "ambient": [
+      "The scent of old parchment and candle wax lingers here.",
+      "Moss creeps along ancient stonework, reclaiming what was built.",
+      "The wind carries the distant clash of steel."
     ]
   },
   "1112": {
@@ -8750,6 +8790,11 @@
     "mob_spawns": [
       1131,
       1121
+    ],
+    "ambient": [
+      "The scent of old parchment and candle wax lingers here.",
+      "A faint glow pulses from runes etched into the walls.",
+      "The wind carries the distant clash of steel."
     ]
   },
   "1116": {
@@ -8815,6 +8860,11 @@
     ],
     "flags": [
       "dark"
+    ],
+    "ambient": [
+      "A raven caws from a crumbling battlement above.",
+      "The wind carries the distant clash of steel.",
+      "Moss creeps along ancient stonework, reclaiming what was built."
     ]
   },
   "1119": {
@@ -8830,6 +8880,11 @@
     },
     "mob_spawns": [
       1116
+    ],
+    "ambient": [
+      "A raven caws from a crumbling battlement above.",
+      "The scent of old parchment and candle wax lingers here.",
+      "The wind carries the distant clash of steel."
     ]
   },
   "1120": {
@@ -8849,6 +8904,11 @@
     "mob_spawns": [
       1139,
       1137
+    ],
+    "ambient": [
+      "Moss creeps along ancient stonework, reclaiming what was built.",
+      "The wind carries the distant clash of steel.",
+      "A faint glow pulses from runes etched into the walls."
     ]
   },
   "1121": {
@@ -8867,6 +8927,11 @@
     "mob_spawns": [
       1103,
       1117
+    ],
+    "ambient": [
+      "The scent of old parchment and candle wax lingers here.",
+      "A faint glow pulses from runes etched into the walls.",
+      "The wind carries the distant clash of steel."
     ]
   },
   "1122": {
@@ -8897,6 +8962,11 @@
     },
     "mob_spawns": [
       1136
+    ],
+    "ambient": [
+      "A faint glow pulses from runes etched into the walls.",
+      "The scent of old parchment and candle wax lingers here.",
+      "The wind carries the distant clash of steel."
     ]
   },
   "1124": {
@@ -8912,6 +8982,11 @@
     },
     "mob_spawns": [
       1110
+    ],
+    "ambient": [
+      "Moss creeps along ancient stonework, reclaiming what was built.",
+      "The scent of old parchment and candle wax lingers here.",
+      "A raven caws from a crumbling battlement above."
     ]
   },
   "8001": {
@@ -9916,6 +9991,11 @@
     "flags": [],
     "mob_spawns": [
       101
+    ],
+    "ambient": [
+      "A gentle breeze carries the scent of distant worlds.",
+      "Distant echoes of other travelers drift through the corridors.",
+      "The air shimmers with residual portal energy."
     ]
   },
   "102": {
@@ -9944,6 +10024,11 @@
     "flags": [],
     "mob_spawns": [
       103
+    ],
+    "ambient": [
+      "Distant echoes of other travelers drift through the corridors.",
+      "The air shimmers with residual portal energy.",
+      "A faint hum resonates through the crystalline walls."
     ]
   },
   "104": {
@@ -9960,6 +10045,11 @@
     "initial_items": [
       110,
       111
+    ],
+    "ambient": [
+      "A faint hum resonates through the crystalline walls.",
+      "Distant echoes of other travelers drift through the corridors.",
+      "A gentle breeze carries the scent of distant worlds."
     ]
   },
   "105": {
@@ -9974,6 +10064,11 @@
     "flags": [],
     "mob_spawns": [
       105
+    ],
+    "ambient": [
+      "The air shimmers with residual portal energy.",
+      "A gentle breeze carries the scent of distant worlds.",
+      "Distant echoes of other travelers drift through the corridors."
     ]
   },
   "106": {
@@ -9992,6 +10087,11 @@
     "initial_items": [
       104,
       105
+    ],
+    "ambient": [
+      "The air shimmers with residual portal energy.",
+      "A gentle breeze carries the scent of distant worlds.",
+      "A faint hum resonates through the crystalline walls."
     ]
   },
   "107": {
@@ -10036,6 +10136,11 @@
     "initial_items": [
       114,
       115
+    ],
+    "ambient": [
+      "A gentle breeze carries the scent of distant worlds.",
+      "A faint hum resonates through the crystalline walls.",
+      "The air shimmers with residual portal energy."
     ]
   },
   "110": {
@@ -10092,6 +10197,11 @@
     "flags": [],
     "mob_spawns": [
       113
+    ],
+    "ambient": [
+      "A faint hum resonates through the crystalline walls.",
+      "Distant echoes of other travelers drift through the corridors.",
+      "The air shimmers with residual portal energy."
     ]
   },
   "114": {
@@ -10110,6 +10220,11 @@
     "initial_items": [
       108,
       109
+    ],
+    "ambient": [
+      "The air shimmers with residual portal energy.",
+      "Distant echoes of other travelers drift through the corridors.",
+      "A gentle breeze carries the scent of distant worlds."
     ]
   },
   "115": {
@@ -10124,6 +10239,11 @@
     "mob_spawns": [
       115,
       120
+    ],
+    "ambient": [
+      "Distant echoes of other travelers drift through the corridors.",
+      "The air shimmers with residual portal energy.",
+      "A faint hum resonates through the crystalline walls."
     ]
   },
   "150": {
@@ -10143,7 +10263,12 @@
     "named_exits": {
       "bulletin board": 12,
       "board": 12
-    }
+    },
+    "ambient": [
+      "A faint hum resonates through the crystalline walls.",
+      "Distant echoes of other travelers drift through the corridors.",
+      "The air shimmers with residual portal energy."
+    ]
   },
   "1125": {
     "vnum": 1125,
@@ -10193,6 +10318,11 @@
         ],
         "description": "What were once precision arcane instruments are now abstract sculptures of melted brass and crystal. The measurement scales have been fused at their maximum readings. One device \u2014 a planar resonance detector \u2014 is still faintly ticking, its needle pinned hard to the right. Whatever passed through here left a residual energy signature that's still measurable."
       }
+    ],
+    "ambient": [
+      "The wind carries the distant clash of steel.",
+      "A faint glow pulses from runes etched into the walls.",
+      "A raven caws from a crumbling battlement above."
     ]
   }
 }
