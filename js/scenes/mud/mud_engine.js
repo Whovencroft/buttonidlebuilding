@@ -361,12 +361,65 @@
         player.inventory.push(currentlyEquipped);
       }
 
+      // If equipping a weapon into primary slot, clear offhand if primary is now two-handed
+      if (slot === 'weapon' && item.two_handed && player.equipped.offhand != null) {
+        player.inventory.push(player.equipped.offhand);
+        player.equipped.offhand = null;
+      }
+
       player.inventory.splice(idx, 1);
       player.equipped[slot] = vnum;
 
       // Recalculate stats
       recalcStats();
       return [{ type: 'success', text: `You equip the ${item.name}.` }];
+    }
+
+    /**
+     * Equip a weapon in the offhand slot for dual wielding.
+     * Requires a one-handed weapon in the primary slot.
+     */
+    function doDualWield(target) {
+      if (!target) return [{ type: 'error', text: 'Dual wield what? Usage: dual <weapon>' }];
+
+      // Must have a primary weapon first
+      const primaryVnum = player.equipped.weapon;
+      if (primaryVnum == null) {
+        return [{ type: 'error', text: 'You need a weapon equipped first before dual wielding.' }];
+      }
+      const primaryItem = items[primaryVnum];
+      if (primaryItem?.two_handed) {
+        return [{ type: 'error', text: 'You can\'t dual wield with a two-handed weapon.' }];
+      }
+
+      // Find the weapon in inventory
+      const idx = player.inventory.findIndex(v => {
+        const item = items[v];
+        return item && item.slot === 'weapon' && matchKeyword(item, target);
+      });
+      if (idx === -1) return [{ type: 'error', text: `You don't have a weapon called '${target}'.` }];
+
+      const vnum = player.inventory[idx];
+      const item = items[vnum];
+      if (item.two_handed) {
+        return [{ type: 'error', text: `${item.name} is two-handed and can't be used as an offhand weapon.` }];
+      }
+
+      // Unequip current offhand if any
+      if (player.equipped.offhand != null) {
+        player.inventory.push(player.equipped.offhand);
+      }
+      // Also unequip shield if one is in the offhand-adjacent slot
+      if (player.equipped.shield != null) {
+        player.inventory.push(player.equipped.shield);
+        player.equipped.shield = null;
+      }
+
+      player.inventory.splice(idx, 1);
+      player.equipped.offhand = vnum;
+
+      recalcStats();
+      return [{ type: 'success', text: `You dual wield the ${item.name} in your off hand.` }];
     }
 
     function doUnequip(target) {
@@ -1589,30 +1642,77 @@
 
       // Player attacks mob (with stat-derived variance, crit, initiative)
       const derived = player._derived || {};
-      let rawPlayerDmg = Math.max(1, player.attackPower - Math.floor((mob.stats.defense || 0) / 2));
-      // Apply damage variance (Precision reduces randomness)
-      if (window.MudStats) {
-        rawPlayerDmg = window.MudStats.applyDamageVariance(rawPlayerDmg, derived);
-      }
-      // Roll for critical hit (Precision)
-      let playerCrit = false;
-      if (window.MudStats) {
-        const critRoll = window.MudStats.rollCrit(derived);
-        if (critRoll.isCrit) {
-          rawPlayerDmg = Math.floor(rawPlayerDmg * critRoll.multiplier);
-          playerCrit = true;
+
+      // Hit/miss check — base 15% miss chance, reduced by weapon proficiency
+      let playerMissed = false;
+      const BASE_MISS_CHANCE = 0.15;
+      if (window.MudWeaponProficiency && player.equipped.weapon != null) {
+        const wpnItem = items[player.equipped.weapon];
+        const cat = wpnItem?.weapon_category;
+        if (cat && !window.MudWeaponProficiency.cannotMiss(player, cat)) {
+          const prof = window.MudWeaponProficiency.getProficiency(player, cat);
+          const missChance = BASE_MISS_CHANCE * (1 - prof / 100);
+          if (Math.random() < missChance) playerMissed = true;
         }
+      } else if (Math.random() < BASE_MISS_CHANCE) {
+        // No weapon equipped — base miss chance applies
+        playerMissed = true;
       }
-      const playerDmg = rawPlayerDmg;
-      combatState.mobHp -= playerDmg;
-      const critTag = playerCrit ? ' CRITICAL!' : '';
-      output.push({ type: 'combat', text: `You hit ${mob.name} for ${playerDmg} damage.${critTag} [Mob HP: ${Math.max(0, combatState.mobHp)}/${combatState.mobMaxHp}]` });
-      // Precision grows from landing basic attacks
-      if (window.MudStats && player.coreStats) {
-        const growth = window.MudStats.onBasicAttackLanded();
-        const result = window.MudStats.applyGrowth(player.coreStats, growth);
-        if (result.output.length > 0) output.push(...result.output);
+
+      if (playerMissed) {
+        output.push({ type: 'combat', text: `You swing at ${mob.name} but miss!` });
       }
+
+      if (!playerMissed) {
+        let rawPlayerDmg = Math.max(1, player.attackPower - Math.floor((mob.stats.defense || 0) / 2));
+        // Apply damage variance (Precision reduces randomness)
+        if (window.MudStats) {
+          rawPlayerDmg = window.MudStats.applyDamageVariance(rawPlayerDmg, derived);
+        }
+        // Roll for critical hit (Precision)
+        let playerCrit = false;
+        if (window.MudStats) {
+          const critRoll = window.MudStats.rollCrit(derived);
+          if (critRoll.isCrit) {
+            rawPlayerDmg = Math.floor(rawPlayerDmg * critRoll.multiplier);
+            playerCrit = true;
+          }
+        }
+        const playerDmg = rawPlayerDmg;
+        combatState.mobHp -= playerDmg;
+        const critTag = playerCrit ? ' CRITICAL!' : '';
+        output.push({ type: 'combat', text: `You hit ${mob.name} for ${playerDmg} damage.${critTag} [Mob HP: ${Math.max(0, combatState.mobHp)}/${combatState.mobMaxHp}]` });
+        // Precision grows from landing basic attacks
+        if (window.MudStats && player.coreStats) {
+          const growth = window.MudStats.onBasicAttackLanded();
+          const result = window.MudStats.applyGrowth(player.coreStats, growth);
+          if (result.output.length > 0) output.push(...result.output);
+        }
+        // Weapon proficiency gain for primary weapon category
+        if (window.MudWeaponProficiency && player.equipped.weapon != null) {
+          const wpnItem = items[player.equipped.weapon];
+          if (wpnItem?.weapon_category) {
+            const wpResult = window.MudWeaponProficiency.onWeaponUsed(player, wpnItem.weapon_category);
+            if (wpResult?.message) output.push({ type: 'info', text: wpResult.message });
+          }
+        }
+
+        // Offhand attack (dual wield) — 60% of offhand weapon damage
+        if (player.equipped.offhand != null && combatState.mobHp > 0) {
+          const ohItem = items[player.equipped.offhand];
+          if (ohItem) {
+            let ohDmg = Math.max(1, Math.floor((ohItem.stats?.attack || 3) * 0.6) - Math.floor((mob.stats.defense || 0) / 3));
+            if (ohDmg < 1) ohDmg = 1;
+            combatState.mobHp -= ohDmg;
+            output.push({ type: 'combat', text: `Your off-hand ${ohItem.name} strikes ${mob.name} for ${ohDmg} damage. [Mob HP: ${Math.max(0, combatState.mobHp)}/${combatState.mobMaxHp}]` });
+            // Weapon proficiency gain for offhand category
+            if (window.MudWeaponProficiency && ohItem.weapon_category) {
+              const wpResult = window.MudWeaponProficiency.onWeaponUsed(player, ohItem.weapon_category);
+              if (wpResult?.message) output.push({ type: 'info', text: wpResult.message });
+            }
+          }
+        }
+      } // end !playerMissed
 
       // Check mob death
       if (combatState.mobHp <= 0) {
@@ -2028,12 +2128,24 @@
     function recalcStats() {
       let bonusAtk = 0;
       let bonusDef = 0;
-      for (const vnum of Object.values(player.equipped)) {
+      for (const [slot, vnum] of Object.entries(player.equipped)) {
         if (vnum == null) continue;
         const item = items[vnum];
         if (!item) continue;
-        bonusAtk += item.stats?.attack || 0;
+        // Offhand weapon contributes 60% of its attack bonus
+        if (slot === 'offhand') {
+          bonusAtk += Math.floor((item.stats?.attack || 0) * 0.6);
+        } else {
+          bonusAtk += item.stats?.attack || 0;
+        }
         bonusDef += item.stats?.defense || 0;
+      }
+      // Add weapon proficiency attack bonus for equipped primary weapon
+      if (window.MudWeaponProficiency && player.equipped.weapon != null) {
+        const wpnItem = items[player.equipped.weapon];
+        if (wpnItem?.weapon_category) {
+          bonusAtk += window.MudWeaponProficiency.getAttackBonus(player, wpnItem.weapon_category);
+        }
       }
       // Apply stat-derived bonuses if MudStats is loaded
       const stats = player.coreStats;
@@ -2143,7 +2255,7 @@
     // ─── Expose internals for the command registry ─────────────────────────
     const _internals = {
       doGo, moveToRoom, doLook, doTake, doDrop, doInventory, doEquipment,
-      doWear, doUnequip, doUse, doAttack, doFlee, doTalk,
+      doWear, doDualWield, doUnequip, doUse, doAttack, doFlee, doTalk,
       doCombine, doRotate, doQuest, doTrain, doAbilities,
       doStatus, doBuy, doRespec, doRecall, doSetRecall,
       doHelp, doWrite, doReadNotes, doShop,

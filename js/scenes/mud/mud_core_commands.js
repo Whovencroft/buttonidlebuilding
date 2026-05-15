@@ -207,6 +207,14 @@
         handler: (parsed) => fn.doWear(parsed.target)
       },
       {
+        name: 'dual',
+        aliases: ['offhand', 'dualwield'],
+        category: 'Inventory',
+        help: 'Equip a weapon in your off hand for dual wielding',
+        usage: 'dual <weapon>',
+        handler: (parsed) => fn.doDualWield(parsed.target)
+      },
+      {
         name: 'unequip',
         aliases: ['remove', 'takeoff'],
         category: 'Inventory',
@@ -368,6 +376,17 @@
         help: 'View power, QP, and stats',
         usage: 'status',
         handler: () => fn.doStatus()
+      },
+      {
+        name: 'proficiency',
+        aliases: ['prof', 'profs', 'weaponprof'],
+        category: 'Progression',
+        help: 'View your weapon proficiencies (hidden until unlocked)',
+        usage: 'proficiency',
+        handler: () => {
+          if (!window.MudWeaponProficiency) return [{ type: 'error', text: 'Weapon proficiency system not loaded.' }];
+          return window.MudWeaponProficiency.formatDisplay(engine._internals.player);
+        }
       },
       {
         name: 'quest',

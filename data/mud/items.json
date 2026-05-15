@@ -47,7 +47,8 @@
       "attack": 3
     },
     "rarity": "common",
-    "value": 15
+    "value": 15,
+    "weapon_category": "sword"
   },
   "5": {
     "vnum": 5,
@@ -106,7 +107,9 @@
       "attack": 7
     },
     "rarity": "uncommon",
-    "value": 50
+    "value": 50,
+    "weapon_category": "sword",
+    "two_handed": true
   },
   "1002": {
     "vnum": 1002,
@@ -233,7 +236,8 @@
       "attack": 12
     },
     "rarity": "rare",
-    "value": 75
+    "value": 75,
+    "weapon_category": "blunt"
   },
   "1013": {
     "vnum": 1013,
@@ -361,7 +365,9 @@
       "attack": 5
     },
     "rarity": "common",
-    "value": 20
+    "value": 20,
+    "weapon_category": "blunt",
+    "two_handed": true
   },
   "2004": {
     "vnum": 2004,
@@ -467,7 +473,9 @@
       "attack": 25
     },
     "rarity": "epic",
-    "value": 500
+    "value": 500,
+    "weapon_category": "firearm",
+    "two_handed": true
   },
   "2013": {
     "vnum": 2013,
@@ -567,12 +575,13 @@
     "name": "Crowbar",
     "description": "A heavy iron crowbar.",
     "type": "weapon",
-    "slot": "hand",
+    "slot": "weapon",
     "stats": {
       "attack": 5
     },
     "rarity": "common",
-    "value": 10
+    "value": 10,
+    "weapon_category": "blunt"
   },
   "3002": {
     "vnum": 3002,
@@ -580,12 +589,13 @@
     "name": "Police Baton",
     "description": "A standard issue police baton.",
     "type": "weapon",
-    "slot": "hand",
+    "slot": "weapon",
     "stats": {
       "attack": 8
     },
     "rarity": "common",
-    "value": 15
+    "value": 15,
+    "weapon_category": "blunt"
   },
   "3003": {
     "vnum": 3003,
@@ -606,12 +616,13 @@
     "name": "Silenced Pistol",
     "description": "A sleek pistol with a silencer.",
     "type": "weapon",
-    "slot": "hand",
+    "slot": "weapon",
     "stats": {
       "attack": 20
     },
     "rarity": "rare",
-    "value": 100
+    "value": 100,
+    "weapon_category": "firearm"
   },
   "3005": {
     "vnum": 3005,
@@ -619,12 +630,13 @@
     "name": "Concealed Dagger",
     "description": "A sharp, easily hidden blade.",
     "type": "weapon",
-    "slot": "hand",
+    "slot": "weapon",
     "stats": {
       "attack": 15
     },
     "rarity": "uncommon",
-    "value": 40
+    "value": 40,
+    "weapon_category": "dagger"
   },
   "3006": {
     "vnum": 3006,
@@ -680,12 +692,13 @@
     "name": "Brass Knuckles",
     "description": "Heavy brass knuckles.",
     "type": "weapon",
-    "slot": "hand",
+    "slot": "weapon",
     "stats": {
       "attack": 12
     },
     "rarity": "uncommon",
-    "value": 30
+    "value": 30,
+    "weapon_category": "blunt"
   },
   "3011": {
     "vnum": 3011,
@@ -693,12 +706,14 @@
     "name": "Tommy Gun",
     "description": "A devastating submachine gun.",
     "type": "weapon",
-    "slot": "hand",
+    "slot": "weapon",
     "stats": {
       "attack": 30
     },
     "rarity": "epic",
-    "value": 200
+    "value": 200,
+    "weapon_category": "firearm",
+    "two_handed": true
   },
   "3012": {
     "vnum": 3012,
@@ -811,12 +826,14 @@
     "name": "M16 Assault Rifle",
     "description": "A standard issue rifle.",
     "type": "weapon",
-    "slot": "hands",
+    "slot": "weapon",
     "stats": {
       "attack": 25
     },
     "rarity": "common",
-    "value": 100
+    "value": 100,
+    "weapon_category": "firearm",
+    "two_handed": true
   },
   "4002": {
     "vnum": 4002,
@@ -837,12 +854,13 @@
     "name": "Combat Knife",
     "description": "A sharp tactical knife.",
     "type": "weapon",
-    "slot": "hands",
+    "slot": "weapon",
     "stats": {
       "attack": 15
     },
     "rarity": "common",
-    "value": 50
+    "value": 50,
+    "weapon_category": "dagger"
   },
   "4004": {
     "vnum": 4004,
@@ -876,12 +894,14 @@
     "name": "Sniper Rifle",
     "description": "High damage from afar.",
     "type": "weapon",
-    "slot": "hands",
+    "slot": "weapon",
     "stats": {
       "attack": 45
     },
     "rarity": "rare",
-    "value": 300
+    "value": 300,
+    "weapon_category": "firearm",
+    "two_handed": true
   },
   "4007": {
     "vnum": 4007,
@@ -1005,12 +1025,14 @@
     "name": "Rocket Launcher",
     "description": "Heavy anti-armor weapon.",
     "type": "weapon",
-    "slot": "hands",
+    "slot": "weapon",
     "stats": {
       "attack": 80
     },
     "rarity": "epic",
-    "value": 500
+    "value": 500,
+    "weapon_category": "firearm",
+    "two_handed": true
   },
   "4018": {
     "vnum": 4018,
@@ -1054,12 +1076,13 @@
     "name": "Ninja Kunai",
     "description": "A sharp throwing knife.",
     "type": "weapon",
-    "slot": "wield",
+    "slot": "weapon",
     "stats": {
       "damage": 5
     },
     "rarity": "common",
-    "value": 10
+    "value": 10,
+    "weapon_category": "dagger"
   },
   "5002": {
     "vnum": 5002,
@@ -1067,12 +1090,13 @@
     "name": "Oni Club",
     "description": "A heavy spiked club.",
     "type": "weapon",
-    "slot": "wield",
+    "slot": "weapon",
     "stats": {
       "damage": 15
     },
     "rarity": "uncommon",
-    "value": 50
+    "value": 50,
+    "weapon_category": "blunt"
   },
   "5003": {
     "vnum": 5003,
@@ -1093,12 +1117,14 @@
     "name": "Bamboo Staff",
     "description": "A sturdy staff made of bamboo.",
     "type": "weapon",
-    "slot": "wield",
+    "slot": "weapon",
     "stats": {
       "damage": 8
     },
     "rarity": "common",
-    "value": 15
+    "value": 15,
+    "weapon_category": "staff",
+    "two_handed": true
   },
   "5005": {
     "vnum": 5005,
@@ -1153,12 +1179,13 @@
     "name": "Tengu Katana",
     "description": "A finely crafted sword.",
     "type": "weapon",
-    "slot": "wield",
+    "slot": "weapon",
     "stats": {
       "damage": 18
     },
     "rarity": "rare",
-    "value": 250
+    "value": 250,
+    "weapon_category": "sword"
   },
   "5010": {
     "vnum": 5010,
@@ -1215,12 +1242,14 @@
     "name": "General's Halberd",
     "description": "A terrifying weapon of war.",
     "type": "weapon",
-    "slot": "wield",
+    "slot": "weapon",
     "stats": {
       "damage": 30
     },
     "rarity": "legendary",
-    "value": 2000
+    "value": 2000,
+    "weapon_category": "polearm",
+    "two_handed": true
   },
   "5015": {
     "vnum": 5015,
@@ -1298,12 +1327,13 @@
     "name": "Gladius",
     "desc": "A sharp Roman short sword.",
     "type": "weapon",
-    "slot": "hand",
+    "slot": "weapon",
     "stats": {
       "attack": 15
     },
     "rarity": "common",
-    "value": 50
+    "value": 50,
+    "weapon_category": "sword"
   },
   "6002": {
     "vnum": 6002,
@@ -1338,12 +1368,14 @@
     "name": "Viking Battleaxe",
     "desc": "A heavy, double-bladed axe.",
     "type": "weapon",
-    "slot": "hand",
+    "slot": "weapon",
     "stats": {
       "attack": 25
     },
     "rarity": "uncommon",
-    "value": 120
+    "value": 120,
+    "weapon_category": "axe",
+    "two_handed": true
   },
   "6005": {
     "vnum": 6005,
@@ -1351,12 +1383,13 @@
     "name": "Hoplite Spear",
     "desc": "A long spear used by Greek soldiers.",
     "type": "weapon",
-    "slot": "hand",
+    "slot": "weapon",
     "stats": {
       "attack": 18
     },
     "rarity": "common",
-    "value": 70
+    "value": 70,
+    "weapon_category": "polearm"
   },
   "6006": {
     "vnum": 6006,
@@ -1479,13 +1512,14 @@
     "name": "Thief's Dagger",
     "desc": "A small, easily concealed blade.",
     "type": "weapon",
-    "slot": "hand",
+    "slot": "weapon",
     "stats": {
       "attack": 12,
       "speed": 5
     },
     "rarity": "common",
-    "value": 45
+    "value": 45,
+    "weapon_category": "dagger"
   },
   "6017": {
     "vnum": 6017,
@@ -1668,7 +1702,8 @@
       "attack": 2
     },
     "rarity": "common",
-    "value": 5
+    "value": 5,
+    "weapon_category": "sword"
   },
   "111": {
     "vnum": 111,
@@ -1694,7 +1729,8 @@
       "attack": 4
     },
     "rarity": "common",
-    "value": 12
+    "value": 12,
+    "weapon_category": "blunt"
   },
   "113": {
     "vnum": 113,
@@ -1707,7 +1743,8 @@
       "attack": 5
     },
     "rarity": "common",
-    "value": 15
+    "value": 15,
+    "weapon_category": "bow"
   },
   "114": {
     "vnum": 114,
@@ -1772,7 +1809,8 @@
       "attack": 7
     },
     "rarity": "uncommon",
-    "value": 40
+    "value": 40,
+    "weapon_category": "sword"
   },
   "119": {
     "vnum": 119,
@@ -1798,7 +1836,9 @@
       "attack": 5
     },
     "rarity": "common",
-    "value": 20
+    "value": 20,
+    "weapon_category": "sword",
+    "two_handed": true
   },
   "201": {
     "vnum": 201,
@@ -1811,7 +1851,8 @@
       "attack": 6
     },
     "rarity": "common",
-    "value": 25
+    "value": 25,
+    "weapon_category": "polearm"
   },
   "202": {
     "vnum": 202,
@@ -1824,7 +1865,9 @@
       "attack": 8
     },
     "rarity": "common",
-    "value": 35
+    "value": 35,
+    "weapon_category": "blunt",
+    "two_handed": true
   },
   "203": {
     "vnum": 203,
@@ -1837,7 +1880,9 @@
       "attack": 7
     },
     "rarity": "uncommon",
-    "value": 40
+    "value": 40,
+    "weapon_category": "bow",
+    "two_handed": true
   },
   "204": {
     "vnum": 204,
@@ -1850,7 +1895,9 @@
       "attack": 10
     },
     "rarity": "uncommon",
-    "value": 55
+    "value": 55,
+    "weapon_category": "axe",
+    "two_handed": true
   },
   "205": {
     "vnum": 205,
@@ -1863,7 +1910,8 @@
       "attack": 12
     },
     "rarity": "uncommon",
-    "value": 70
+    "value": 70,
+    "weapon_category": "firearm"
   },
   "206": {
     "vnum": 206,
@@ -1876,7 +1924,8 @@
       "attack": 14
     },
     "rarity": "rare",
-    "value": 90
+    "value": 90,
+    "weapon_category": "exotic"
   },
   "207": {
     "vnum": 207,
@@ -1889,7 +1938,8 @@
       "attack": 9
     },
     "rarity": "common",
-    "value": 45
+    "value": 45,
+    "weapon_category": "firearm"
   },
   "208": {
     "vnum": 208,
@@ -1902,7 +1952,8 @@
       "attack": 6
     },
     "rarity": "common",
-    "value": 20
+    "value": 20,
+    "weapon_category": "sword"
   },
   "209": {
     "vnum": 209,
@@ -1915,7 +1966,9 @@
       "attack": 11
     },
     "rarity": "common",
-    "value": 60
+    "value": 60,
+    "weapon_category": "firearm",
+    "two_handed": true
   },
   "210": {
     "vnum": 210,
@@ -1928,7 +1981,9 @@
       "attack": 13
     },
     "rarity": "rare",
-    "value": 80
+    "value": 80,
+    "weapon_category": "staff",
+    "two_handed": true
   },
   "211": {
     "vnum": 211,
@@ -1941,7 +1996,8 @@
       "attack": 16
     },
     "rarity": "rare",
-    "value": 100
+    "value": 100,
+    "weapon_category": "dagger"
   },
   "212": {
     "vnum": 212,
@@ -1954,7 +2010,9 @@
       "attack": 11
     },
     "rarity": "uncommon",
-    "value": 65
+    "value": 65,
+    "weapon_category": "bow",
+    "two_handed": true
   },
   "213": {
     "vnum": 213,
@@ -1967,7 +2025,9 @@
       "attack": 9
     },
     "rarity": "common",
-    "value": 40
+    "value": 40,
+    "weapon_category": "exotic",
+    "two_handed": true
   },
   "214": {
     "vnum": 214,
@@ -1980,7 +2040,8 @@
       "attack": 15
     },
     "rarity": "rare",
-    "value": 95
+    "value": 95,
+    "weapon_category": "blunt"
   },
   "220": {
     "vnum": 220,

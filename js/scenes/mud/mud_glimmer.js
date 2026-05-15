@@ -205,6 +205,10 @@
    * @returns {object} Ability object compatible with the combat system
    */
   function buildChainAbility(entry, baseId, chain) {
+    // Cap cooldown at the base ability's cooldown so upgrades never increase CD
+    const baseDef = window.MudAbilities?.getAbilityById(baseId);
+    const baseCd = baseDef?.cooldown || 3;
+    const cd = Math.min(entry.cooldown || 3, baseCd);
     return {
       id: entry.id,
       name: entry.name,
@@ -212,7 +216,7 @@
       multiplier: entry.multiplier || 1.0,
       healPercent: entry.healPercent || null,
       hits: entry.hits || 1,
-      cooldown: entry.cooldown || 3,
+      cooldown: cd,
       desc: entry.desc || `Rank ${entry.rank} evolution of ${baseId}.`,
       // Chain metadata for tracking
       isChainEvolution: true,
