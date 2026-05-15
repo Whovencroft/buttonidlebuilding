@@ -698,7 +698,7 @@
     },
     "rarity": "uncommon",
     "value": 30,
-    "weapon_category": "blunt"
+    "weapon_category": "unarmed"
   },
   "3011": {
     "vnum": 3011,
@@ -1031,7 +1031,7 @@
     },
     "rarity": "epic",
     "value": 500,
-    "weapon_category": "firearm",
+    "weapon_category": "heavy",
     "two_handed": true
   },
   "4018": {
@@ -1818,7 +1818,7 @@
     "name": "Champion's Signet Ring",
     "description": "A ring bearing the tower's crest. Proof of completing the training.",
     "type": "armor",
-    "slot": "neck",
+    "slot": "finger",
     "stats": {
       "defense": 2
     },
@@ -1953,7 +1953,7 @@
     },
     "rarity": "common",
     "value": 20,
-    "weapon_category": "sword"
+    "weapon_category": "dagger"
   },
   "209": {
     "vnum": 209,
@@ -2011,7 +2011,7 @@
     },
     "rarity": "uncommon",
     "value": 65,
-    "weapon_category": "bow",
+    "weapon_category": "crossbow",
     "two_handed": true
   },
   "213": {
@@ -2041,7 +2041,7 @@
     },
     "rarity": "rare",
     "value": 95,
-    "weapon_category": "blunt"
+    "weapon_category": "unarmed"
   },
   "220": {
     "vnum": 220,
