@@ -48,7 +48,7 @@
     };
 
     // ─── Non-persisted State ────────────────────────────────────────────
-    let chargeState = null;
+    // chargeState is shared with the engine via _internals getter/setter
     let restTimer = 0;
     let trainingState = null;
     let trainingTimer = 0;
@@ -486,14 +486,29 @@
         usage: 'release',
         requires: { combat: true },
         handler: () => {
-          if (!chargeState || !chargeState.active) {
+          const _cs = engine._internals.chargeState;
+          if (!_cs || !_cs.active) {
             return [{ type: 'error', text: 'You are not charging anything.' }];
           }
           const mult = window.MudCharge?.getChargeDamageMultiplier(
-            chargeState.roundsCharged, chargeState.requiredRounds
+            _cs.roundsCharged, _cs.requiredRounds
           ) || 1.0;
+          const aDef = _cs.abilityDef;
+          const baseMult = aDef?.multiplier || 1.5;
+          const playerState = getPlayerFromSave();
+          const totalDmg = Math.floor((playerState?.attackPower || 10) * baseMult * mult);
           const output = [{ type: 'combat', text: `You release early! (${Math.floor(mult * 100)}% charge power)` }];
-          chargeState = null;
+          // Apply damage to current combat target
+          const cs = engine._internals.combatState;
+          if (cs) {
+            cs.mobHp -= totalDmg;
+            const mobData = engine._internals.mobs[cs.mobVnum];
+            output.push({ type: 'combat', text: `${aDef?.name || 'Charged Attack'} deals ${totalDmg} damage! [Mob HP: ${Math.max(0, cs.mobHp)}/${cs.mobMaxHp}]` });
+            if (cs.mobHp <= 0 && mobData) {
+              output.push(...engine._internals.handleMobKill(mobData));
+            }
+          }
+          engine._internals.chargeState = null;
           return output;
         }
       },
@@ -504,10 +519,11 @@
         help: 'Cancel a charging ability',
         usage: 'cancel',
         handler: () => {
-          if (!chargeState || !chargeState.active) {
+          const _cs = engine._internals.chargeState;
+          if (!_cs || !_cs.active) {
             return [{ type: 'info', text: 'Nothing to cancel.' }];
           }
-          chargeState = null;
+          engine._internals.chargeState = null;
           return [{ type: 'info', text: 'You abort the charge. Focus wasted.' }];
         }
       },

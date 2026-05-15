@@ -382,11 +382,11 @@
         handler: () => fn.doStatus()
       },
       {
-        name: 'proficiency',
-        aliases: ['prof', 'profs', 'weaponprof'],
+        name: 'weaponprof',
+        aliases: ['wprof', 'weaponproficiency', 'wprofs'],
         category: 'Progression',
         help: 'View your weapon proficiencies (hidden until unlocked)',
-        usage: 'proficiency',
+        usage: 'weaponprof',
         handler: () => {
           if (!window.MudWeaponProficiency) return [{ type: 'error', text: 'Weapon proficiency system not loaded.' }];
           return window.MudWeaponProficiency.formatDisplay(engine._internals.player);

@@ -30,6 +30,8 @@
     let combatState = null;
     let combatTimer = 0;
     let combatTick = 0;
+    let lastAbilityUsed = null;  // Track last ability for finishing moves
+    let chargeState = null;  // Active charge-up ability state
 
     const COMBAT_TICK_INTERVAL = 2.5; // seconds per auto-attack round
 
@@ -953,6 +955,53 @@
           output.push({ type: 'info', text: `  ${name.charAt(0).toUpperCase() + name.slice(1).padEnd(10)} ${String(level).padStart(3)}  ${bar} ${pct}%` });
         }
       }
+      // Combat state: stance, momentum, exhaustion
+      if (window.MudCombatSystems) {
+        output.push({ type: 'info', text: '' });
+        output.push({ type: 'info', text: '─── Combat ───' });
+        const stanceName = window.MudCombatSystems.STANCES[player.stance]?.name || player.stance || 'Balanced';
+        output.push({ type: 'info', text: `  Stance:     ${stanceName}` });
+        if (player.momentum !== undefined) {
+          const momLabel = window.MudCombatSystems.MOMENTUM_LABELS[player.momentum] || 'Neutral';
+          output.push({ type: 'info', text: `  Momentum:   ${player.momentum}/10 (${momLabel})` });
+        }
+        if (player.exhausted) {
+          output.push({ type: 'info', text: '  Status:     EXHAUSTED (-30% ATK/DEF)' });
+        }
+      }
+
+      // Active buffs and debuffs
+      const activeBuffs = [];
+      const activeDebuffs = [];
+      for (const [key, remaining] of Object.entries(player.worldFlags || {})) {
+        if (remaining <= 0) continue;
+        if (key.startsWith('buff_')) {
+          const id = key.slice(5);
+          const def = window.MudAbilities?.getAbilityById(id);
+          activeBuffs.push(`${def?.name || id} (${remaining} rnd)`);
+        } else if (key.startsWith('debuff_')) {
+          const id = key.slice(7);
+          const def = window.MudAbilities?.getAbilityById(id);
+          activeDebuffs.push(`${def?.name || id} (${remaining} rnd)`);
+        }
+      }
+      if (activeBuffs.length > 0 || activeDebuffs.length > 0) {
+        output.push({ type: 'info', text: '' });
+        output.push({ type: 'info', text: '─── Active Effects ───' });
+        for (const b of activeBuffs) output.push({ type: 'info', text: `  + ${b}` });
+        for (const d of activeDebuffs) output.push({ type: 'info', text: `  - ${d}` });
+      }
+
+      // Transformation status
+      if (window.MudSecretClasses && player.secretClass && player.transformTier >= 0) {
+        const tMods = window.MudSecretClasses.getTransformMods(player);
+        if (tMods) {
+          output.push({ type: 'info', text: '' });
+          output.push({ type: 'info', text: '─── Transformation ───' });
+          output.push({ type: 'info', text: `  ATK ×${tMods.atkMod} | DEF ×${tMods.defMod} | Focus drain: ${tMods.focusCost}/tick` });
+        }
+      }
+
       // Title if available
       if (player.title) {
         output.push({ type: 'info', text: '' });
@@ -1196,6 +1245,21 @@
         return [{ type: 'error', text: `Not enough focus. Need ${cost}, have ${player.focus}.` }];
       }
 
+      // Check if this ability uses the charge system
+      if (window.MudCharge && window.MudCharge.isChargeable(abilityId)) {
+        player.focus -= cost;
+        player.abilityCooldowns[abilityId] = def.cooldown || 3;
+        const chargeData = window.MudCharge.beginCharge(abilityId);
+        chargeData.abilityDef = def;
+        chargeState = chargeData;
+        const msg = window.MudCharge.getChargeMessage(abilityId, 0);
+        return [
+          { type: 'combat', text: `You begin charging ${def.name}...` },
+          { type: 'info', text: msg },
+          { type: 'info', text: `(${chargeData.requiredRounds} rounds to full power. Type 'release' early or 'cancel' to abort.)` }
+        ];
+      }
+
       // Spend focus and set cooldown
       player.focus -= cost;
       player.abilityCooldowns[abilityId] = def.cooldown || 3;
@@ -1259,6 +1323,17 @@
           // The glimmered ability replaces the original for this attack
           activeDef = glimmered;
         }
+      }
+
+      // Track last ability used for finishing moves
+      lastAbilityUsed = { name: activeDef.name, type: activeDef.type || 'attack' };
+
+      // Shift momentum on ability use (+2 for offensive, +1 for others)
+      if (window.MudCombatSystems && player.momentum !== undefined) {
+        const delta = (activeDef.type === 'attack') ? 2 : 1;
+        const shift = window.MudCombatSystems.shiftMomentum(player.momentum, delta);
+        player.momentum = shift.newValue;
+        if (shift.message) output.push({ type: 'combat', text: shift.message });
       }
 
       // Apply ability effects based on type (using activeDef — either original or glimmered)
@@ -1338,7 +1413,17 @@
      */
     function handleMobKill(mob) {
       const output = [];
-      output.push({ type: 'combat', text: `${mob.name} has been defeated!` });
+
+      // Finishing move text if killed by an ability
+      if (lastAbilityUsed && window.MudCombatSystems) {
+        const finisher = window.MudCombatSystems.getFinishingMove(
+          lastAbilityUsed.name, mob.name, lastAbilityUsed.type
+        );
+        output.push({ type: 'combat', text: finisher });
+      } else {
+        output.push({ type: 'combat', text: `${mob.name} has been defeated!` });
+      }
+      lastAbilityUsed = null;  // Reset after use
       markMobDefeated(combatState.mobVnum);
       player.killCounts[combatState.mobVnum] = (player.killCounts[combatState.mobVnum] || 0) + 1;
 
@@ -1635,14 +1720,140 @@
       if (!combatState) return;
 
       combatTimer += dt;
-        combatTick++;  // dt is already in seconds from host frame loop
       if (combatTimer < COMBAT_TICK_INTERVAL) return;
       combatTimer -= COMBAT_TICK_INTERVAL;
+      combatTick++;  // Increment once per combat round (every COMBAT_TICK_INTERVAL seconds)
 
       const mob = mobs[combatState.mobVnum];
       if (!mob) { combatState = null; return; }
 
       const output = [];
+
+      // ─── Charge system: tick active charge instead of auto-attacking ───
+      if (chargeState && chargeState.active && window.MudCharge) {
+        // Check for charge interruption from mob damage
+        const profLevel = (player.proficiency?.[chargeState.abilityId] || 0);
+        if (window.MudCharge.checkChargeInterrupt(profLevel)) {
+          output.push({ type: 'combat', text: `Your ${chargeState.abilityDef?.name || 'charge'} is interrupted!` });
+          chargeState = null;
+        } else {
+          const tick = window.MudCharge.tickCharge(chargeState);
+          output.push({ type: 'info', text: tick.message });
+          if (tick.complete) {
+            // Full charge: fire the ability at 2x multiplier
+            const mult = window.MudCharge.getChargeDamageMultiplier(
+              chargeState.roundsCharged, chargeState.requiredRounds
+            );
+            const aDef = chargeState.abilityDef;
+            const baseMult = aDef?.multiplier || 1.5;
+            const totalDmg = Math.floor(player.attackPower * baseMult * mult);
+            combatState.mobHp -= totalDmg;
+            output.push({ type: 'combat', text: `FULLY CHARGED! ${aDef?.name || 'Attack'} unleashes for ${totalDmg} damage! [Mob HP: ${Math.max(0, combatState.mobHp)}/${combatState.mobMaxHp}]` });
+            lastAbilityUsed = { name: aDef?.name || 'Charged Attack', type: aDef?.type || 'attack' };
+            chargeState = null;
+            if (combatState.mobHp <= 0) {
+              output.push(...handleMobKill(mob));
+              pushCombatOutput(output);
+              return;
+            }
+          }
+        }
+        // Mob still attacks while player is charging
+        // (fall through to mob attack section below)
+        if (chargeState) {
+          // Skip player auto-attack, go straight to cooldown/buff/mob attack
+          // Tick down ability cooldowns
+          for (const key of Object.keys(player.abilityCooldowns)) {
+            player.abilityCooldowns[key] = Math.max(0, player.abilityCooldowns[key] - 1);
+          }
+          // Mob attacks player
+          const mobAtk = mob.stats.attack || 10;
+          let mobDmg = Math.max(1, mobAtk - Math.floor(player.defense / 2));
+          if (window.MudStats) {
+            const derived = player._derived || {};
+            mobDmg = window.MudStats.applyBigHitReduction(mobDmg, player.maxHp, derived);
+          }
+          player.hp -= mobDmg;
+          output.push({ type: 'combat', text: `${mob.name} hits you for ${mobDmg} damage while you charge. [HP: ${player.hp}/${player.maxHp}]` });
+          if (player.hp <= 0) {
+            output.push({ type: 'combat', text: 'You have been defeated...' });
+            const deathPower = calcPowerGain(getCreaturePower(mob), player.power, false);
+            player.power += deathPower;
+            output.push({ type: 'info', text: `+${deathPower} power from the struggle. (total: ${player.power})` });
+            output.push({ type: 'info', text: 'You awaken back at the Nexus.' });
+            if (window.MudEchoes) {
+              const echo = window.MudEchoes.createEcho(player, player.currentRoom, mob.name);
+              if (!player.echoes) player.echoes = [];
+              player.echoes.push(echo);
+              player.echoes = window.MudEchoes.pruneExpired(player.echoes);
+              output.push({ type: 'info', text: 'A faint echo of your struggle lingers behind...' });
+            }
+            player.exhausted = false;
+            player.hp = player.maxHp;
+            combatState = null;
+            combatTimer = 0;
+            chargeState = null;
+            player.currentRoom = player.recallPoint || 1;
+          }
+          pushCombatOutput(output);
+          return;
+        }
+      }
+
+      // ─── Collect active buff/debuff modifiers ──────────────────────────
+      let buffAtkMod = 1.0;  // Multiplier for player attack from buffs
+      let buffDefMod = 1.0;  // Multiplier for player defense from buffs
+      let debuffMobAtkMod = 1.0;  // Multiplier for mob attack from debuffs
+      let debuffMobDefMod = 1.0;  // Multiplier for mob defense from debuffs
+
+      // Apply stance modifiers to buff multipliers
+      if (window.MudCombatSystems && player.stance) {
+        const stanceDef = window.MudCombatSystems.STANCES[player.stance]
+          || window.MudCombatSystems.SPEC_STANCES[player.spec];
+        if (stanceDef && (player.stance === stanceDef.id || window.MudCombatSystems.STANCES[player.stance])) {
+          const s = window.MudCombatSystems.STANCES[player.stance] || stanceDef;
+          buffAtkMod *= s.atkMod || 1.0;
+          buffDefMod *= s.defMod || 1.0;
+        }
+      }
+
+      // Apply momentum damage modifier
+      if (window.MudCombatSystems && player.momentum !== undefined) {
+        const momMod = window.MudCombatSystems.getMomentumDamageMod(player.momentum);
+        buffAtkMod *= momMod;
+      }
+
+      // Apply exhaustion penalties
+      if (player.exhausted && window.MudCombatSystems) {
+        buffAtkMod *= window.MudCombatSystems.EXHAUSTION_ATK_PENALTY;
+        buffDefMod *= window.MudCombatSystems.EXHAUSTION_DEF_PENALTY;
+      }
+
+      // Apply transformation stat modifiers (secret class transforms)
+      if (window.MudSecretClasses) {
+        const tMods = window.MudSecretClasses.getTransformMods(player);
+        if (tMods) {
+          buffAtkMod *= tMods.atkMod;
+          buffDefMod *= tMods.defMod;
+        }
+        // Drain focus per tick while transformed
+        const drainOutput = window.MudSecretClasses.tickTransformDrain(player);
+        if (drainOutput) output.push(...drainOutput);
+      }
+      for (const [key, remaining] of Object.entries(player.worldFlags)) {
+        if (remaining <= 0) continue;
+        if (key.startsWith('buff_')) {
+          const abilityId = key.slice(5);
+          const def = window.MudAbilities?.getAbilityById(abilityId);
+          if (def?.atkMod) buffAtkMod *= def.atkMod;
+          if (def?.defMod) buffDefMod *= def.defMod;
+        } else if (key.startsWith('debuff_')) {
+          const abilityId = key.slice(7);
+          const def = window.MudAbilities?.getAbilityById(abilityId);
+          if (def?.atkMod) debuffMobAtkMod *= def.atkMod;  // Reduces mob attack
+          if (def?.defMod) debuffMobDefMod *= def.defMod;  // Reduces mob defense
+        }
+      }
 
       // Player attacks mob (with stat-derived variance, crit, initiative)
       const derived = player._derived || {};
@@ -1668,7 +1879,9 @@
       }
 
       if (!playerMissed) {
-        let rawPlayerDmg = Math.max(1, player.attackPower - Math.floor((mob.stats.defense || 0) / 2));
+        const effectiveAtk = Math.floor(player.attackPower * buffAtkMod);
+        const effectiveMobDef = Math.floor((mob.stats.defense || 0) * debuffMobDefMod);
+        let rawPlayerDmg = Math.max(1, effectiveAtk - Math.floor(effectiveMobDef / 2));
         // Apply damage variance (Precision reduces randomness)
         if (window.MudStats) {
           rawPlayerDmg = window.MudStats.applyDamageVariance(rawPlayerDmg, derived);
@@ -1718,6 +1931,24 @@
         }
       } // end !playerMissed
 
+      // Multi-attack: extra hits from stances, training, and power progression
+      if (!playerMissed && combatState.mobHp > 0 && window.MudCombatSystems) {
+        const totalAttacks = window.MudCombatSystems.calcAttacksPerRound({
+          power: player.power,
+          stanceId: player.stance || 'balanced',
+          specId: player.spec,
+          hasMultiAttackTraining: !!player.worldFlags?.multi_attack_trained
+        });
+        for (let extra = 1; extra < totalAttacks && combatState.mobHp > 0; extra++) {
+          const effectiveAtk = Math.floor(player.attackPower * buffAtkMod);
+          const effectiveMobDef = Math.floor((mob.stats.defense || 0) * debuffMobDefMod);
+          let extraDmg = Math.max(1, effectiveAtk - Math.floor(effectiveMobDef / 2));
+          if (window.MudStats) extraDmg = window.MudStats.applyDamageVariance(extraDmg, derived);
+          combatState.mobHp -= extraDmg;
+          output.push({ type: 'combat', text: `Extra strike! You hit ${mob.name} for ${extraDmg} damage. [Mob HP: ${Math.max(0, combatState.mobHp)}/${combatState.mobMaxHp}]` });
+        }
+      }
+
       // Check mob death
       if (combatState.mobHp <= 0) {
         output.push(...handleMobKill(mob));
@@ -1728,6 +1959,46 @@
       // Tick down ability cooldowns each combat round
       for (const key of Object.keys(player.abilityCooldowns)) {
         player.abilityCooldowns[key] = Math.max(0, player.abilityCooldowns[key] - 1);
+      }
+
+      // Tick down buff/debuff durations and remove expired ones
+      for (const key of Object.keys(player.worldFlags)) {
+        if (key.startsWith('buff_') || key.startsWith('debuff_')) {
+          player.worldFlags[key]--;
+          if (player.worldFlags[key] <= 0) {
+            delete player.worldFlags[key];
+            const abilityId = key.startsWith('buff_') ? key.slice(5) : key.slice(7);
+            const def = window.MudAbilities?.getAbilityById(abilityId);
+            const label = def?.name || abilityId;
+            output.push({ type: 'info', text: `${key.startsWith('buff_') ? 'Buff' : 'Debuff'} faded: ${label}` });
+          }
+        }
+      }
+
+      // Drift momentum toward neutral each round
+      if (window.MudCombatSystems && player.momentum !== undefined) {
+        const drift = window.MudCombatSystems.driftMomentum(player.momentum);
+        player.momentum = drift.newValue;
+        if (drift.message) output.push({ type: 'combat', text: drift.message });
+      }
+
+      // Check exhaustion state transitions
+      if (window.MudCombatSystems) {
+        if (!player.exhausted && window.MudCombatSystems.shouldExhaust(player.focus)) {
+          player.exhausted = true;
+          output.push({ type: 'combat', text: 'You collapse from exhaustion! ATK and DEF reduced until you recover focus.' });
+        } else if (player.exhausted && window.MudCombatSystems.shouldRecoverExhaustion(player.focus, player.maxFocus)) {
+          player.exhausted = false;
+          output.push({ type: 'combat', text: 'You catch your second wind — exhaustion fades!' });
+        }
+      }
+
+      // Stance-based focus regen (some spec stances grant focus per tick)
+      if (window.MudCombatSystems && player.stance) {
+        const specStance = window.MudCombatSystems.SPEC_STANCES[player.spec];
+        if (specStance && player.stance === specStance.id && specStance.focusRegen) {
+          player.focus = Math.min(player.maxFocus, player.focus + specStance.focusRegen);
+        }
       }
 
       // Mob attacks player (with dodge, big-hit reduction, stat growth)
@@ -1741,8 +2012,9 @@
           if (result.output.length > 0) output.push(...result.output);
         }
       } else {
-        const mobAtk = mob.stats.attack || 10;
-        let mobDmg = Math.max(1, mobAtk - Math.floor(player.defense / 2));
+        const mobAtk = Math.floor((mob.stats.attack || 10) * debuffMobAtkMod);
+        const effectivePlayerDef = Math.floor(player.defense * buffDefMod);
+        let mobDmg = Math.max(1, mobAtk - Math.floor(effectivePlayerDef / 2));
         // Apply big-hit reduction (Grit)
         if (window.MudStats) {
           mobDmg = window.MudStats.applyBigHitReduction(mobDmg, player.maxHp, derived);
@@ -1773,6 +2045,20 @@
         player.power += deathPower;
         output.push({ type: 'info', text: `+${deathPower} power from the struggle. (total: ${player.power})` });
         output.push({ type: 'info', text: 'You awaken back at the Nexus.' });
+
+        // Create a death echo at the location where the player fell
+        if (window.MudEchoes) {
+          const echo = window.MudEchoes.createEcho(player, player.currentRoom, mob.name);
+          if (!player.echoes) player.echoes = [];
+          player.echoes.push(echo);
+          // Prune expired echoes to prevent unbounded growth
+          player.echoes = window.MudEchoes.pruneExpired(player.echoes);
+          output.push({ type: 'info', text: 'A faint echo of your struggle lingers behind...' });
+        }
+
+        // Clear exhaustion on death
+        player.exhausted = false;
+
         player.hp = player.maxHp;
         combatState = null;
         combatTimer = 0;
@@ -2277,7 +2563,10 @@
       get combatState() { return combatState; },
         get combatTick() { return combatTick; },
       /** Direct reference to player for invasion stat reads. */
-      get player() { return player; }
+      get player() { return player; },
+      /** Charge state shared between engine and systems_integration. */
+      get chargeState() { return chargeState; },
+      set chargeState(v) { chargeState = v; }
     };
 
     return {
