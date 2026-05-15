@@ -351,6 +351,30 @@
   }
   .mud-input { font-size: 16px; }
   .mud-log { padding: var(--mud-space-sm); }
+
+  /* Pin input row above the on-screen keyboard */
+  .mud-input-row {
+    position: sticky;
+    bottom: 0;
+    z-index: 10;
+    padding-bottom: calc(var(--mud-space-sm) + env(safe-area-inset-bottom, 0px));
+    background: var(--mud-surface-inverse);
+    border-top: 2px solid var(--mud-info);
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.4);
+  }
+
+  /* Ensure the terminal fills the viewport height on mobile */
+  .mud-terminal {
+    height: 100dvh;
+    max-height: 100dvh;
+  }
+
+  /* Shrink the log to leave room for the pinned input */
+  .mud-log {
+    flex: 1 1 0;
+    min-height: 0;
+    padding-bottom: 60px; /* extra scroll room so last lines aren't hidden */
+  }
 }
 
 /* ─── Glimmer Glow Effect ───────────────────────────────────────────────── */

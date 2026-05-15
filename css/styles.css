@@ -573,6 +573,32 @@ button, input, textarea, select { font: inherit; }
   min-height: 0;
 }
 
+.buy-mode-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-sm);
+  padding: var(--space-xs) 0;
+}
+.buy-mode-btn {
+  padding: 4px 12px;
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-dim);
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: background 0.15s, color 0.15s;
+}
+.buy-mode-btn:hover {
+  background: rgba(255,255,255,0.06);
+}
+.buy-mode-btn.active {
+  background: rgba(255,255,255,0.12);
+  color: var(--text-main);
+  border-color: rgba(255,255,255,0.3);
+}
+
 .card-list {
   display: grid;
   gap: var(--space-sm);

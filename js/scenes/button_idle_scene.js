@@ -55,6 +55,7 @@
     let hasSeenStateLoad = false;
     let lastDisclosureLevel = -1;
     let lastEvoClass = '';
+    let buyMode = 1; // 1, 10, or 'max'
 
     const handlers = {
       mainButtonPointerdown: null,
@@ -589,23 +590,63 @@ function completeIdleGame() {
       return s.presses - cost >= -computed.debtLimit;
     }
 
+    /** Buy one or more of an upgrade based on the current buyMode (x1, x10, max). */
     function buyUpgrade(id) {
       const s = state();
       const upgrade = CONFIG.upgrades.find((u) => u.id === id);
       if (!upgrade) return;
 
-      const cost = getUpgradeCost(upgrade);
-      if (!canAfford(cost)) return;
+      const count = getBuyCount(upgrade);
+      if (count <= 0) return;
 
-      s.presses -= cost;
-      s.upgrades[id] = (s.upgrades[id] || 0) + 1;
+      let totalCost = 0;
+      for (let i = 0; i < count; i++) {
+        const owned = (s.upgrades[id] || 0) + i;
+        totalCost += Math.ceil(upgrade.baseCost * Math.pow(upgrade.costMult, owned) * getComputed().costMult);
+      }
+
+      if (!canAfford(totalCost)) return;
+
+      s.presses -= totalCost;
+      s.upgrades[id] = (s.upgrades[id] || 0) + count;
       if (s.presses < 0) s.debt = Math.max(s.debt, -s.presses);
 
-      logMessage(`Bought ${upgrade.name} for ${format(cost)} presses.`, 'good');
-      s.autonomy = clamp(s.autonomy + 0.25, 0, 100);
+      const label = count > 1 ? `${count}x ${upgrade.name}` : upgrade.name;
+      logMessage(`Bought ${label} for ${format(totalCost)} presses.`, 'good');
+      s.autonomy = clamp(s.autonomy + 0.25 * count, 0, 100);
 
       saveNow();
       render();
+    }
+
+    /** Calculate how many of an upgrade the player can buy in the current buyMode. */
+    function getBuyCount(upgrade) {
+      const s = state();
+      const computed = getComputed();
+      const owned = s.upgrades[upgrade.id] || 0;
+
+      if (buyMode === 1) return canAfford(getUpgradeCost(upgrade, owned)) ? 1 : 0;
+
+      if (buyMode === 10) {
+        let affordable = 0;
+        let budget = computed.allowDebt ? s.presses + computed.debtLimit : s.presses;
+        for (let i = 0; i < 10; i++) {
+          const cost = Math.ceil(upgrade.baseCost * Math.pow(upgrade.costMult, owned + i) * computed.costMult);
+          if (budget >= cost) { budget -= cost; affordable++; }
+          else break;
+        }
+        return affordable;
+      }
+
+      // max mode
+      let affordable = 0;
+      let budget = computed.allowDebt ? s.presses + computed.debtLimit : s.presses;
+      for (let i = 0; i < 1000; i++) {
+        const cost = Math.ceil(upgrade.baseCost * Math.pow(upgrade.costMult, owned + i) * computed.costMult);
+        if (budget >= cost) { budget -= cost; affordable++; }
+        else break;
+      }
+      return affordable;
     }
 
     function toggleModule(id) {
@@ -1547,8 +1588,22 @@ function completeIdleGame() {
 
           const owned = s.upgrades[upgrade.id] || 0;
           const cost = getUpgradeCost(upgrade, owned);
-          const affordable = canAfford(cost);
+          const count = getBuyCount(upgrade);
+          const affordable = count > 0;
           const branch = upgrade.branch || null;
+
+          // Calculate total cost for the displayed buy count
+          let displayCost = cost;
+          if (count > 1) {
+            displayCost = 0;
+            for (let i = 0; i < count; i++) {
+              displayCost += Math.ceil(upgrade.baseCost * Math.pow(upgrade.costMult, owned + i) * computed.costMult);
+            }
+          }
+
+          const btnLabel = buyMode === 'max'
+            ? (count > 0 ? `Buy ${count}` : 'Buy')
+            : (buyMode === 10 ? `Buy ${count > 0 ? count : 10}` : 'Buy');
 
           html += `
             <div class="card ${affordable ? '' : 'locked'}">
@@ -1563,9 +1618,9 @@ function completeIdleGame() {
               </div>
               <div class="tag-row">
                 <span class="tag">+${format(upgrade.pps)} pps each</span>
-                <span class="tag">Cost: ${format(cost)}</span>
+                <span class="tag">Cost: ${format(displayCost)}</span>
               </div>
-              <button ${affordable ? '' : 'disabled'} data-buy-upgrade="${upgrade.id}">Buy</button>
+              <button ${affordable ? '' : 'disabled'} data-buy-upgrade="${upgrade.id}">${btnLabel}</button>
             </div>
           `;
         }
@@ -2239,6 +2294,19 @@ function completeIdleGame() {
       }
 
       document.addEventListener('mousemove', handlers.documentMousemove);
+
+      // Buy-mode toggle (x1 / x10 / max)
+      if (elements.buyModeBar) {
+        elements.buyModeBar.addEventListener('click', (e) => {
+          const btn = e.target.closest('[data-buy-mode]');
+          if (!btn) return;
+          const mode = btn.dataset.buyMode;
+          buyMode = mode === 'max' ? 'max' : parseInt(mode, 10);
+          elements.buyModeBar.querySelectorAll('.buy-mode-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          renderUpgradeList();
+        });
+      }
     }
 
     function detachEvents() {

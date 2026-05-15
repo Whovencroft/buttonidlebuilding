@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Button That Learns To Press Itself</title>
     <link rel="stylesheet" href="./css/styles.css" />
     <link rel="stylesheet" href="./css/mud.css" />
@@ -100,6 +100,12 @@
               <div class="small" id="automationSummary">0 owned</div>
             </div>
             <div class="panel-body">
+              <div class="buy-mode-bar" id="buyModeBar">
+                <span class="small">Buy:</span>
+                <button class="buy-mode-btn active" data-buy-mode="1">x1</button>
+                <button class="buy-mode-btn" data-buy-mode="10">x10</button>
+                <button class="buy-mode-btn" data-buy-mode="max">Max</button>
+              </div>
               <div class="card-list" id="upgradeList"></div>
             </div>
           </div>
@@ -894,6 +900,7 @@
   <script src="./js/scenes/mud/mud_suppress.js?v=121"></script>
   <script src="./js/scenes/mud/mud_titles.js?v=121"></script>
   <script src="./js/scenes/mud/mud_training_rooms.js?v=121"></script>
+  <script src="./js/scenes/mud/mud_trainers.js?v=121"></script>
   <script src="./js/scenes/mud/mud_echoes.js?v=121"></script>
   <script src="./js/scenes/mud/mud_boss_counter.js?v=121"></script>
   <script src="./js/scenes/mud/mud_secret_classes.js?v=121"></script>

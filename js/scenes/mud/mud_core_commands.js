@@ -426,6 +426,60 @@
           return result;
         }
       }
+      ,{
+        name: 'progress',
+        aliases: ['story', 'puzzles'],
+        category: 'Progression',
+        help: 'View story progress, puzzles solved, and marble trail clues',
+        usage: 'progress',
+        handler: () => {
+          const p = engine._internals.player;
+          const flags = p.worldFlags || {};
+          const output = [{ type: 'info', text: '--- Story Progress ---' }];
+
+          // Puzzle completion by zone
+          const puzzles = [
+            { zone: 1, flag: 'zone_1_puzzle_complete', name: 'The Nexus: Statue Alignment' },
+            { zone: 2, flag: 'zone_2_biometric_unlocked', name: 'Neon Sprawl: Biometric Scanner' },
+            { zone: 3, flag: 'zone_3_safe_opened', name: 'Undercity: Safe Cracking' },
+            { zone: 4, flag: 'zone_4_launch_aborted', name: 'Iron Wastes: Launch Abort' },
+            { zone: 5, flag: 'zone_5_braziers_lit', name: 'Void Reach: Brazier Ritual' },
+            { zone: 6, flag: 'zone_6_mechanism_opened', name: 'Temporal Rift: Mechanism' },
+            { zone: 7, flag: 'zone_7_organ_played', name: 'Shadow Market: Pipe Organ' },
+            { zone: 8, flag: 'zone_8_mirrors_aligned', name: 'Training Grounds: Gravity Mirrors' },
+            { zone: 9, flag: 'zone_9_hourglass_turned', name: 'Ancient Ruins: Hourglass' },
+            { zone: 10, flag: 'zone_10_obelisk_activated', name: 'Wizard Tower: Obelisk' },
+            { zone: 11, flag: 'zone_11_void_anchored', name: 'Edge of the Void: Anchor' }
+          ];
+
+          const solved = puzzles.filter(pz => flags[pz.flag]);
+          output.push({ type: 'info', text: `  Puzzles Solved: ${solved.length}/${puzzles.length}` });
+          for (const pz of puzzles) {
+            const mark = flags[pz.flag] ? '[x]' : '[ ]';
+            output.push({ type: flags[pz.flag] ? 'success' : 'info', text: `    ${mark} ${pz.name}` });
+          }
+
+          // Marble trail clues
+          output.push({ type: 'info', text: '' });
+          const clues = flags.meta_clues || [];
+          const totalClues = 11;
+          output.push({ type: 'info', text: `  Marble Trail: ${clues.length}/${totalClues} traces found` });
+          if (flags.marble_confrontation_unlocked) {
+            output.push({ type: 'success', text: '  *** The path to the marble is OPEN ***' });
+          } else if (clues.length > 0) {
+            output.push({ type: 'info', text: '  Keep exploring to find more traces of the marble\'s passage.' });
+          } else {
+            output.push({ type: 'info', text: '  You have not yet found any sign of the marble.' });
+          }
+
+          // Overall stats
+          output.push({ type: 'info', text: '' });
+          output.push({ type: 'info', text: '--- Summary ---' });
+          output.push({ type: 'info', text: `  Power: ${p.power}  |  Quests Done: ${(p.completedQuests || []).length}  |  Deaths: ${p.deaths || 0}` });
+
+          return output;
+        }
+      }
     ]);
 
     // ─── Social ─────────────────────────────────────────────────────────

@@ -845,7 +845,8 @@
       }
     ],
     "flags": [
-      "npc"
+      "npc",
+      "trainer"
     ],
     "keywords": [
       "hermit",
@@ -855,33 +856,35 @@
     "sayResponses": [
       {
         "keywords": [
-          "help",
-          "advice"
+          "marble",
+          "sphere",
+          "orb"
         ],
-        "text": "The kingdom has seen better days. Beware the deeper halls."
+        "text": "I saw it. Years ago. It rolled through the Crown like it was searching for something. Left cracks in the cobblestones."
       },
       {
         "keywords": [
-          "danger",
-          "warning"
+          "train",
+          "teach",
+          "stronger"
         ],
-        "text": "Dark things stir in the lower levels. Steel yourself."
+        "text": "I can push you beyond what the regular trainers offer. But it'll cost you Quest Points."
       },
       {
         "keywords": [
-          "quest",
-          "task",
-          "job"
+          "secret",
+          "hidden",
+          "know"
         ],
-        "text": "The crown's agents post bounties at the tavern board."
+        "text": "Every zone has something hidden. Look for rooms that don't appear on any map. Sometimes you need to speak the right word."
       },
       {
         "keywords": [
-          "king",
-          "kingdom",
-          "crown"
+          "crown",
+          "city",
+          "kingdom"
         ],
-        "text": "The king hasn't been seen in months. Some say the throne room is sealed."
+        "text": "The Crown was once a great kingdom. Now it's just bones and ghosts. But the bones remember."
       }
     ]
   },
@@ -1855,10 +1858,43 @@
         "keywords": [
           "marble",
           "sphere",
-          "orb",
-          "anomaly"
+          "orb"
         ],
-        "text": "You're asking about the anomaly? That data costs extra. ...Fine. Grid sensors picked up an unidentified object moving through Sector 7 at impossible speed three cycles ago. Mass readings were contradictory \u2014 simultaneously registering as negligible and infinite. Corporate's trying to suppress the footage, but I've got a copy. For the right price."
+        "text": "Saw something weird on the security feeds last month. A round object moving through the lower levels at impossible speed. Want the footage? It'll cost you."
+      },
+      {
+        "keywords": [
+          "neon",
+          "sprawl",
+          "city",
+          "district"
+        ],
+        "text": "The Sprawl never sleeps. Good for business, bad for your health. Watch the back alleys."
+      },
+      {
+        "keywords": [
+          "danger",
+          "safe",
+          "warning"
+        ],
+        "text": "Stay out of the deep Sprawl unless you can handle power level 200+. The gangs down there don't negotiate."
+      },
+      {
+        "keywords": [
+          "info",
+          "rumor",
+          "news",
+          "gossip"
+        ],
+        "text": "Word on the wire is something big is moving through the zones. Leaving a trail of broken walls and confused guards."
+      },
+      {
+        "keywords": [
+          "buy",
+          "sell",
+          "trade"
+        ],
+        "text": "I deal in information, not goods. But the Vendor down the street can help you with equipment."
       }
     ],
     "keywords": [
@@ -1935,33 +1971,26 @@
     "sayResponses": [
       {
         "keywords": [
-          "help",
-          "advice"
+          "marble",
+          "sphere",
+          "orb"
         ],
-        "text": "Keep your firmware updated and watch for rogue subroutines."
+        "text": "We've had reports of structural damage consistent with a high-velocity spherical object. Case is still open."
       },
       {
         "keywords": [
           "danger",
-          "warning"
+          "warning",
+          "crime"
         ],
-        "text": "The deeper network nodes are corrupted. Proceed with caution."
+        "text": "Stay on the main grid paths. The alleys are unpatrolled and the gangs know it."
       },
       {
         "keywords": [
-          "quest",
-          "task",
-          "job"
+          "help",
+          "assist"
         ],
-        "text": "Check the job board on the main terminal."
-      },
-      {
-        "keywords": [
-          "hack",
-          "system",
-          "network"
-        ],
-        "text": "The network's been unstable since the AI fragmented."
+        "text": "If you see anything suspicious, report it. We're stretched thin as it is."
       }
     ]
   },
@@ -5590,12 +5619,46 @@
       }
     ],
     "flags": [
-      "npc"
+      "npc",
+      "trainer"
     ],
     "keywords": [
       "gladiator trainer",
       "trainer",
       "gladiator"
+    ],
+    "sayResponses": [
+      {
+        "keywords": [
+          "marble",
+          "sphere"
+        ],
+        "text": "In the arena, we once had a contestant bring a strange sphere. It rolled through the gates and crushed three fighters before vanishing."
+      },
+      {
+        "keywords": [
+          "train",
+          "teach",
+          "stronger"
+        ],
+        "text": "I train warriors. Bring me Quest Points and I'll push your body beyond its limits."
+      },
+      {
+        "keywords": [
+          "arena",
+          "fight",
+          "combat"
+        ],
+        "text": "The arena tests your mettle. Only the strong survive here. Come ready or don't come at all."
+      },
+      {
+        "keywords": [
+          "time",
+          "temporal",
+          "rift"
+        ],
+        "text": "Time moves strangely in this zone. Sometimes I remember training you before you've even arrived."
+      }
     ]
   },
   "1701": {
@@ -6432,12 +6495,46 @@
       }
     ],
     "flags": [
-      "npc"
+      "npc",
+      "trainer"
     ],
     "keywords": [
       "training",
       "master",
       "training master"
+    ],
+    "sayResponses": [
+      {
+        "keywords": [
+          "marble",
+          "sphere"
+        ],
+        "text": "The monks speak of a sphere that passed through the monastery garden. It left a perfect circle of dead grass that never grew back."
+      },
+      {
+        "keywords": [
+          "train",
+          "teach",
+          "learn"
+        ],
+        "text": "I teach all four disciplines: Vigor, Precision, Grit, and Instinct. Bring Quest Points and dedication."
+      },
+      {
+        "keywords": [
+          "meditation",
+          "focus",
+          "calm"
+        ],
+        "text": "Focus is the bridge between body and mind. The Meditation Guide can help you expand your reserves."
+      },
+      {
+        "keywords": [
+          "monastery",
+          "monk",
+          "order"
+        ],
+        "text": "We preserve the old ways. Combat as art, not brutality. Though sometimes brutality is necessary."
+      }
     ]
   },
   "1812": {
@@ -6464,12 +6561,45 @@
       }
     ],
     "flags": [
-      "npc"
+      "npc",
+      "trainer"
     ],
     "keywords": [
       "meditation guide",
       "meditation",
       "guide"
+    ],
+    "sayResponses": [
+      {
+        "keywords": [
+          "marble",
+          "sphere"
+        ],
+        "text": "I felt it pass. A disturbance in the flow of energy. Something ancient and hungry."
+      },
+      {
+        "keywords": [
+          "focus",
+          "meditation",
+          "energy"
+        ],
+        "text": "Your Focus pool grows with Instinct and Vigor. I can help sharpen your Instinct through training."
+      },
+      {
+        "keywords": [
+          "train",
+          "teach"
+        ],
+        "text": "I specialize in Instinct and Precision. The subtle arts. Bring Quest Points when you're ready."
+      },
+      {
+        "keywords": [
+          "void",
+          "darkness",
+          "end"
+        ],
+        "text": "The Void at the edge of everything... something waits there. I can feel it pulling."
+      }
     ]
   },
   "1901": {
@@ -6973,7 +7103,8 @@
       }
     ],
     "flags": [
-      "npc"
+      "npc",
+      "trainer"
     ],
     "keywords": [
       "spirit healer",
@@ -6983,33 +7114,43 @@
     "sayResponses": [
       {
         "keywords": [
-          "help",
-          "advice"
+          "marble",
+          "sphere",
+          "orb"
         ],
-        "text": "The old ones left warnings carved in stone. Heed them."
+        "text": "The spirits whisper of it. A sphere that devours power. It has been rolling since before memory."
       },
       {
         "keywords": [
-          "danger",
-          "warning"
+          "train",
+          "teach",
+          "stronger"
         ],
-        "text": "The deeper chambers hold things that should stay buried."
+        "text": "I can train you beyond mortal limits. The spirits guide my hand. Bring Quest Points."
       },
       {
         "keywords": [
-          "quest",
-          "task",
-          "job"
+          "spirit",
+          "ghost",
+          "dead"
         ],
-        "text": "The relics call to those who seek them."
+        "text": "The dead see more than the living. They watch the marble's path and tremble."
       },
       {
         "keywords": [
-          "ruin",
-          "ancient",
-          "old"
+          "heal",
+          "restore",
+          "help"
         ],
-        "text": "This place is older than memory. Older than names."
+        "text": "Rest here. The spirits will mend what is broken. But some wounds only time can heal."
+      },
+      {
+        "keywords": [
+          "secret",
+          "hidden",
+          "truth"
+        ],
+        "text": "The marble seeks power. Every zone it passes through, it grows stronger. You must find it before it finds everything."
       }
     ]
   },
@@ -7338,7 +7479,8 @@
     ],
     "flags": [
       "npc",
-      "boss"
+      "boss",
+      "trainer"
     ],
     "keywords": [
       "kael",
@@ -7348,25 +7490,52 @@
     "sayResponses": [
       {
         "keywords": [
-          "help",
-          "advice"
+          "marble",
+          "sphere",
+          "orb"
         ],
-        "text": "Take your time exploring. There's no rush here."
+        "text": "A marble? I've heard whispers of something rolling through the lower tunnels. It left a trail of destruction."
+      },
+      {
+        "keywords": [
+          "power",
+          "strength",
+          "stronger"
+        ],
+        "text": "Power comes from worthy opponents. Seek creatures near your own strength for the best growth."
+      },
+      {
+        "keywords": [
+          "zone",
+          "area",
+          "where",
+          "explore"
+        ],
+        "text": "Beyond the tower lies the Shattered Crown to the east, and the Neon Sprawl further south. Both are more dangerous than here."
+      },
+      {
+        "keywords": [
+          "class",
+          "specialization",
+          "spec"
+        ],
+        "text": "Your specialization defines your path. If you want to change, seek the Respec Token from the Quest Shop."
+      },
+      {
+        "keywords": [
+          "puzzle",
+          "statue",
+          "riddle"
+        ],
+        "text": "The statues in the lower hall hold a secret. Align them correctly and the way forward opens."
       },
       {
         "keywords": [
           "danger",
-          "warning"
+          "warning",
+          "careful"
         ],
-        "text": "Stick to the well-lit paths until you're stronger."
-      },
-      {
-        "keywords": [
-          "quest",
-          "task",
-          "job"
-        ],
-        "text": "Speak to the instructors \u2014 they always need capable hands."
+        "text": "Never fight something more than twice your power. You'll gain nothing but a quick death."
       }
     ]
   },
@@ -7405,6 +7574,38 @@
       "quartermaster pip",
       "pip",
       "quartermaster"
+    ],
+    "sayResponses": [
+      {
+        "keywords": [
+          "marble",
+          "sphere"
+        ],
+        "text": "Something crashed through the storeroom last week. Left a perfectly round hole in the wall."
+      },
+      {
+        "keywords": [
+          "quest",
+          "points",
+          "qp"
+        ],
+        "text": "Complete quests to earn Quest Points. The harder the quest, the more QP you'll get. First completions pay double!"
+      },
+      {
+        "keywords": [
+          "respec",
+          "token",
+          "change"
+        ],
+        "text": "The Respec Token costs 50 QP. It lets you choose a new specialization while keeping your old abilities."
+      },
+      {
+        "keywords": [
+          "map",
+          "treasure"
+        ],
+        "text": "The Treasure Map reveals hidden rooms in your current zone. Very useful for finding secrets!"
+      }
     ]
   },
   "1200": {
@@ -7431,58 +7632,40 @@
         "keywords": [
           "marble",
           "sphere",
-          "orb",
-          "ball",
-          "round"
+          "orb"
         ],
-        "text": "Aldric's eyes go wide. \"You've SEEN it? The sphere? It came through here three days ago \u2014 punched clean through my wards like they were tissue paper. Forty years of protective enchantments, gone in an instant. I've been studying the residual energy signatures. Whatever that thing is, it exists in multiple planes simultaneously. My instruments can't even measure its full mass \u2014 the readings just say UNDEFINED.\""
-      },
-      {
-        "keywords": [
-          "help",
-          "quest",
-          "task",
-          "need"
-        ],
-        "text": "Aldric runs a hand through his singed hair. \"Help? I need... I need to understand what happened here. My planar resonance detector is still picking up traces of the sphere's energy. If you encounter any more signs of its passage \u2014 impact sites, temporal distortions, gravitational anomalies \u2014 please, come tell me. Every data point brings me closer to understanding what we're dealing with.\""
-      },
-      {
-        "keywords": [
-          "research",
-          "notes",
-          "study",
-          "findings",
-          "theory"
-        ],
-        "text": "Aldric shuffles through his papers excitedly. \"My working theory? It's not from this plane. The energy signature is consistent with extra-dimensional origin \u2014 something that slipped through a crack between worlds. But here's what terrifies me: the trajectory analysis suggests it's not random. It's CHOOSING where to go. It changed direction mid-flight inside my tower. That implies intelligence, or at least intent.\""
+        "text": "That... THING. It came through my tower like a cannonball. Decades of research, scattered! I'm still picking up the pieces."
       },
       {
         "keywords": [
           "tower",
-          "damage",
-          "destruction",
-          "ruins"
+          "research",
+          "study"
         ],
-        "text": "Aldric gestures at the devastation around him with barely contained frustration. \"Forty years I spent building this tower. Forty years of wards, enchantments, protective circles. It punched through ALL of them without even slowing down. The entry hole is three inches across \u2014 perfectly circular. But look at the trajectory between entry and exit. It CURVED. Inside my tower. As if it was... exploring.\""
+        "text": "My tower stood for two hundred years before that cursed sphere knocked it sideways. I've been trying to rebuild ever since."
+      },
+      {
+        "keywords": [
+          "help",
+          "assist",
+          "need"
+        ],
+        "text": "If you find any of my scattered notes in the ruins below, I'd be grateful. They're bound in blue leather."
+      },
+      {
+        "keywords": [
+          "power",
+          "magic",
+          "spell"
+        ],
+        "text": "Magic is just understanding the rules and bending them. The marble... it doesn't bend rules. It breaks them."
       },
       {
         "keywords": [
           "danger",
-          "warning",
-          "safe",
-          "careful"
+          "warning"
         ],
-        "text": "Aldric grabs your arm, his grip surprisingly strong. \"Listen to me carefully. My instruments measured the energy output of that sphere. It's... I don't have a word for it. My scales go to ten. The readings were at infinity. DO NOT try to stop it. Do not try to contain it. If you find it, observe from a distance. And if it starts moving toward you?\" He pauses. \"Run. Run and don't look back.\""
-      },
-      {
-        "keywords": [
-          "magic",
-          "ward",
-          "spell",
-          "enchantment",
-          "arcane"
-        ],
-        "text": "Aldric laughs bitterly. \"Magic? Against THAT? My wards were the strongest in the kingdom \u2014 layered enchantments, planar anchors, temporal locks. It went through them like they didn't exist. No, whatever that sphere is, it operates on principles beyond our understanding of magic. It's not anti-magic either \u2014 my detection spells work fine around the impact sites. It simply... doesn't care about our rules.\""
+        "text": "Whatever you do, don't try to stop the marble by force. It absorbs energy. The more you hit it, the stronger it gets."
       }
     ],
     "keywords": [
@@ -7504,11 +7687,45 @@
     "flags": [
       "npc",
       "merchant",
-      "stationary"
+      "stationary",
+      "trainer"
     ],
     "dialogue": {
       "greeting": "Need supplies for your training? I've got the good stuff."
-    }
+    },
+    "sayResponses": [
+      {
+        "keywords": [
+          "marble",
+          "sphere"
+        ],
+        "text": "Our gravity sensors went haywire when that thing passed through. It has its own gravitational field. Impossible, but the data doesn't lie."
+      },
+      {
+        "keywords": [
+          "gravity",
+          "chamber",
+          "train"
+        ],
+        "text": "The chamber amplifies gravitational force. Training here builds Vigor and Grit faster than anywhere else."
+      },
+      {
+        "keywords": [
+          "technology",
+          "science",
+          "machine"
+        ],
+        "text": "We're pushing the boundaries of physics here. The chamber can simulate up to 50x normal gravity."
+      },
+      {
+        "keywords": [
+          "danger",
+          "warning",
+          "careful"
+        ],
+        "text": "Don't push past your limits in the chamber. I've seen people crushed by their own ambition."
+      }
+    ]
   },
   "9010": {
     "name": "Spectral Vendor",

@@ -324,11 +324,47 @@
         if (item) return [{ type: 'info', text: item.description }];
       }
 
-      // Look at a mob
+      // Look at a mob -- show description, relative power, and equipment
       const mobVnum = findMobByKeyword(target);
       if (mobVnum !== null) {
         const mob = mobs[mobVnum];
-        if (mob) return [{ type: 'info', text: mob.description }];
+        if (mob) {
+          const output = [];
+          output.push({ type: 'info', text: `--- ${mob.name} ---` });
+          output.push({ type: 'info', text: mob.description || 'You see nothing remarkable.' });
+          // Relative power assessment
+          const mobPow = getCreaturePower(mob);
+          const ratio = mobPow / Math.max(player.power, 1);
+          let assessment;
+          if (ratio < 0.25) assessment = 'looks utterly harmless to you.';
+          else if (ratio < 0.5) assessment = 'looks weak compared to you.';
+          else if (ratio < 0.8) assessment = 'looks slightly weaker than you.';
+          else if (ratio < 1.2) assessment = 'looks about your equal.';
+          else if (ratio < 2.0) assessment = 'looks stronger than you.';
+          else if (ratio < 4.0) assessment = 'looks much stronger than you.';
+          else assessment = 'radiates overwhelming power.';
+          output.push({ type: 'info', text: `${mob.name} ${assessment}` });
+          // Show equipment if any
+          if (mob.equipment && Object.keys(mob.equipment).length > 0) {
+            const equipped = Object.entries(mob.equipment)
+              .map(([slot, vnum]) => {
+                const item = items[vnum];
+                return item ? `  ${slot}: ${item.name}` : null;
+              })
+              .filter(Boolean);
+            if (equipped.length > 0) {
+              output.push({ type: 'info', text: 'Wielding/Wearing:' });
+              equipped.forEach(line => output.push({ type: 'info', text: line }));
+            }
+          }
+          // Show flags of interest
+          const flags = mob.flags || [];
+          if (flags.includes('elite')) output.push({ type: 'info', text: '(Elite)' });
+          if (flags.includes('boss')) output.push({ type: 'info', text: '(Boss)' });
+          if (flags.includes('merchant')) output.push({ type: 'info', text: 'This creature appears to be a merchant.' });
+          if (flags.includes('trainer')) output.push({ type: 'info', text: 'This creature appears to be a trainer.' });
+          return output;
+        }
       }
 
       return [{ type: 'error', text: `You don't see '${target}' here.` }];
@@ -731,6 +767,12 @@
         return [{ type: 'error', text: "You aren't in combat." }];
       }
 
+      // Only 1 flee attempt per combat round
+      if (combatState.fleeAttempted) {
+        return [{ type: 'combat', text: 'You already tried to flee this round. Wait for the next opening.' }];
+      }
+      combatState.fleeAttempted = true;
+
       // 50% chance to flee
       if (Math.random() < 0.5) {
         const room = currentRoom();
@@ -928,6 +970,94 @@
     }
 
     // ─── Ability System ────────────────────────────────────────────────────────
+
+    /**
+     * Determine what abilities a mob can use in combat.
+     * Boss mobs get 2-3 abilities, elite (aggressive) mobs get 1-2.
+     * Returns an array of ability definitions.
+     */
+    function getMobAbilities(mob) {
+      const flags = mob.flags || [];
+      const isBoss = flags.includes('boss');
+      const isElite = flags.includes('aggressive');
+      if (!isBoss && !isElite) return [];
+
+      const mobPower = (mob.stats?.hp || 0) + (mob.stats?.attack || 0) * 3;
+      const abilities = [];
+
+      // Boss mobs get a heavy attack, a buff, and optionally a heal
+      if (isBoss) {
+        abilities.push({
+          id: 'mob_heavy_strike', name: 'Heavy Strike', type: 'attack',
+          multiplier: 2.0, cooldown: 3,
+          desc: 'A devastating blow.'
+        });
+        abilities.push({
+          id: 'mob_enrage', name: 'Enrage', type: 'buff',
+          atkMod: 1.5, duration: 3, cooldown: 6,
+          desc: 'The creature flies into a rage.'
+        });
+        if (mobPower > 500) {
+          abilities.push({
+            id: 'mob_regenerate', name: 'Regenerate', type: 'heal',
+            healPercent: 0.15, cooldown: 8,
+            desc: 'The creature mends its wounds.'
+          });
+        }
+      } else {
+        // Elite mobs get a single strong attack
+        abilities.push({
+          id: 'mob_power_attack', name: 'Power Attack', type: 'attack',
+          multiplier: 1.6, cooldown: 4,
+          desc: 'A focused strike.'
+        });
+      }
+      return abilities;
+    }
+
+    /**
+     * Attempt to use a mob ability. Returns true if an ability was used.
+     * Mobs use abilities based on cooldowns and a random chance (30% per round).
+     */
+    function tryMobAbility(mob, output) {
+      if (!combatState.mobAbilities || combatState.mobAbilities.length === 0) return false;
+
+      // 30% chance per round to attempt an ability (adds unpredictability)
+      if (Math.random() > 0.3) return false;
+
+      const cooldowns = combatState.mobAbilityCooldowns;
+      const round = combatState.combatRound;
+
+      // Find an available ability (not on cooldown)
+      const available = combatState.mobAbilities.filter(a => {
+        const lastUsed = cooldowns[a.id] || 0;
+        return (round - lastUsed) >= a.cooldown;
+      });
+
+      if (available.length === 0) return false;
+
+      // Pick a random available ability
+      const ability = available[Math.floor(Math.random() * available.length)];
+      cooldowns[ability.id] = round;
+
+      if (ability.type === 'attack') {
+        const mobAtk = mob.stats.attack || 10;
+        const dmg = Math.max(1, Math.floor(mobAtk * ability.multiplier) - Math.floor(player.defense / 3));
+        player.hp -= dmg;
+        output.push({ type: 'combat', text: `${mob.name} uses ${ability.name}! ${dmg} damage! [HP: ${player.hp}/${player.maxHp}]` });
+      } else if (ability.type === 'buff') {
+        // Apply a temporary buff to the mob (tracked as a combat state modifier)
+        if (!combatState.mobBuffs) combatState.mobBuffs = [];
+        combatState.mobBuffs.push({ ...ability, expiresRound: round + ability.duration });
+        output.push({ type: 'combat', text: `${mob.name} uses ${ability.name}! ${ability.desc}` });
+      } else if (ability.type === 'heal') {
+        const heal = Math.floor(combatState.mobMaxHp * ability.healPercent);
+        combatState.mobHp = Math.min(combatState.mobMaxHp, combatState.mobHp + heal);
+        output.push({ type: 'combat', text: `${mob.name} uses ${ability.name}! Heals ${heal} HP. [Mob HP: ${combatState.mobHp}/${combatState.mobMaxHp}]` });
+      }
+
+      return true;
+    }
 
     /**
      * Calculate creature power from its stats (hp + attack*3 + defense*2).
@@ -1160,6 +1290,29 @@
      * Requires power threshold met + costs QP.
      */
     function doTrain(target) {
+      // Check for trainer NPC in the room first (stat training)
+      if (window.MudTrainers) {
+        const room = currentRoom();
+        const aliveMobs = getAliveMobsInRoom(room);
+        const trainerVnum = window.MudTrainers.findTrainerInRoom(aliveMobs);
+        if (trainerVnum) {
+          // If no target or target is 'list', show the trainer menu
+          if (!target || target === 'list') {
+            const menu = window.MudTrainers.getTrainingMenu(trainerVnum, player);
+            return menu.output;
+          }
+          // Check if target matches a trainable stat
+          const validStats = ['vigor', 'precision', 'grit', 'instinct'];
+          const stat = target.toLowerCase();
+          if (validStats.includes(stat)) {
+            const result = window.MudTrainers.trainStat(trainerVnum, stat, player);
+            if (result.success) recalcStats();
+            return result.output;
+          }
+          // If target doesn't match a stat, fall through to ability training
+        }
+      }
+
       const TRAINING_ROOM = 8;
       if (player.currentRoom !== TRAINING_ROOM) {
         return [{ type: 'error', text: 'You must be in the Training Hall to learn new abilities.' }];
@@ -1844,7 +1997,11 @@
         mobMaxHp: mob.stats.max_hp || mob.stats.hp,
         // Boss counter state
         isBoss,
-        bossCounter: isBoss ? window.MudBossCounter?.createBossCounterState() : null
+        bossCounter: isBoss ? window.MudBossCounter?.createBossCounterState() : null,
+        // Mob ability tracking
+        mobAbilities: getMobAbilities(mob),
+        mobAbilityCooldowns: {},
+        combatRound: 0
       };
       combatTimer = 0;
 
@@ -2256,6 +2413,15 @@
         }
       }
 
+      // Track combat rounds for mob ability cooldowns
+      combatState.combatRound = (combatState.combatRound || 0) + 1;
+      combatState.fleeAttempted = false; // Reset flee attempt for new round
+
+      // ─── Mob Ability Usage (elite/boss only) ────────────────────────
+      const mobAbilityResult = tryMobAbility(mob, output);
+      if (mobAbilityResult) {
+        // Mob used an ability instead of basic attack this round
+      } else {
       // Mob attacks player (with dodge, big-hit reduction, stat growth)
       // Roll for dodge (Instinct)
       if (window.MudStats && window.MudStats.rollDodge(derived)) {
@@ -2305,6 +2471,8 @@
           if (gResult.output.length > 0) output.push(...gResult.output);
         }
       }
+
+      } // end of basic attack else-branch
 
       // Check player death
       if (player.hp <= 0) {

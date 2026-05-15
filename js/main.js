@@ -202,6 +202,7 @@
     dumbDownDesc: $('dumbDownDesc'),
     larcenyValue: $('larcenyValue'),
     upgradeList: $('upgradeList'),
+    buyModeBar: $('buyModeBar'),
     moduleList: $('moduleList'),
     activeLoadoutList: $('activeLoadoutList'),
     comboList: $('comboList'),
