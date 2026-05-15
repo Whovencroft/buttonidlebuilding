@@ -980,7 +980,13 @@
       "blacksmith apprentice",
       "blacksmith",
       "apprentice"
-    ]
+    ],
+    "sayResponses": {
+      "forge": "Master says I'll be ready to forge on my own in a year. I think he's optimistic.",
+      "weapons": "I can sharpen blades and repair dents. Full forging is above my skill still.",
+      "rumors": "The dungeon below has dwarven metalwork. Master says it's the finest he's ever seen.",
+      "help": "If you need repairs, I can handle basic work. Anything complex, wait for the master."
+    }
   },
   "1134": {
     "vnum": 1134,
@@ -1934,7 +1940,13 @@
       "street doc",
       "street",
       "doc"
-    ]
+    ],
+    "sayResponses": {
+      "heal": "Chrome rejection, bullet wounds, neural burnout. I've seen it all. Sit down.",
+      "chrome": "I can install basic implants. Nothing fancy, but it won't kill you. Probably.",
+      "rumors": "Something's been frying people's neural links in sector 7. Avoid that area.",
+      "cost": "Fifty gold for patching. Hundred for implant work. Thousand for the experimental stuff."
+    }
   },
   "1227": {
     "vnum": 1227,
@@ -2649,7 +2661,13 @@
       "jazz",
       "club",
       "singer"
-    ]
+    ],
+    "sayResponses": {
+      "music": "I sing the blues because the city gives me plenty of material.",
+      "club": "This place has been here since prohibition. The walls have stories.",
+      "rumors": "The Syndicate boss comes here on Fridays. Always sits in the back. Never tips.",
+      "marble": "I wrote a song about it. 'The Rolling Stone.' Nobody gets the reference."
+    }
   },
   "1320": {
     "vnum": 1320,
@@ -2681,7 +2699,13 @@
       "eye",
       "private",
       "private eye"
-    ]
+    ],
+    "sayResponses": {
+      "case": "I'm between cases right now. Got something that needs investigating?",
+      "hire": "My rates are reasonable. Results guaranteed. Methods... flexible.",
+      "syndicate": "The Syndicate runs half this city. The other half just doesn't know it yet.",
+      "marble": "A client mentioned something like that. Trail went cold at the docks."
+    }
   },
   "1321": {
     "vnum": 1321,
@@ -2713,7 +2737,13 @@
       "boy",
       "newspaper",
       "newspaper boy"
-    ]
+    ],
+    "sayResponses": {
+      "news": "Extra! Extra! Read all about it! Strange disturbances reported citywide!",
+      "paper": "Two gold for today's edition. All the news that's fit to print. And some that isn't.",
+      "rumors": "The morning edition had a story about something smashing through the warehouse district.",
+      "help": "I know every street in this city. Need directions? Ask away."
+    }
   },
   "1322": {
     "vnum": 1322,
@@ -2989,7 +3019,13 @@
       "dockside fence",
       "fence",
       "dockside"
-    ]
+    ],
+    "sayResponses": {
+      "buy": "I don't sell. I acquire. There's a difference. Legally.",
+      "sell": "Bring me anything interesting. I know people who want things.",
+      "docks": "The docks are my territory. Nothing moves through here without my knowledge.",
+      "rumors": "A crate washed up last week. Something inside it had already broken out. Round hole in the side."
+    }
   },
   "1401": {
     "vnum": 1401,
@@ -3727,7 +3763,13 @@
       "combat medic",
       "medic",
       "combat"
-    ]
+    ],
+    "sayResponses": {
+      "heal": "Hold still. This'll sting. Actually, it'll hurt a lot. Hold still anyway.",
+      "war": "Three tours. Seen things that'd turn your hair white. Still here though.",
+      "wounded": "We're losing more people to whatever's in the eastern sector than to the enemy.",
+      "marble": "A private in my unit described something. Round, fast, unstoppable. I thought he was shell-shocked."
+    }
   },
   "1428": {
     "vnum": 1428,
@@ -3759,7 +3801,13 @@
       "war correspondent",
       "correspondent",
       "war"
-    ]
+    ],
+    "sayResponses": {
+      "story": "I'm documenting everything. Someone needs to tell the truth about what's happening here.",
+      "war": "This isn't just a war. Something else is going on. Something the brass won't talk about.",
+      "rumors": "My sources say the enemy isn't fighting us. They're running from something.",
+      "marble": "I have photographs. Something round, moving at impossible speed. My editor won't publish them."
+    }
   },
   "1429": {
     "vnum": 1429,
@@ -3789,7 +3837,13 @@
     ],
     "keywords": [
       "refugee"
-    ]
+    ],
+    "sayResponses": {
+      "home": "Our village is gone. Destroyed in a single night. Not by soldiers.",
+      "help": "We need food, water, medicine. Anything you can spare.",
+      "south": "Don't go south. There's nothing left. Just craters and silence.",
+      "marble": "The children saw it first. A ball of light, rolling through the fields. Then everything was gone."
+    }
   },
   "1430": {
     "vnum": 1430,
@@ -5902,6 +5956,12 @@
     ],
     "dialogue": {
       "greeting": "Got something to sell? Or looking to buy? I've got... things."
+    },
+    "sayResponses": {
+      "buy": "Everything here has a history. Most of those histories involve theft. You want it or not?",
+      "sell": "I'll take anything that isn't cursed. Had a bad experience with cursed items.",
+      "undercity": "Down here, we make our own rules. Surface laws don't apply.",
+      "rumors": "Something collapsed tunnel seven last week. Perfectly round hole. Nobody goes near it now."
     }
   },
   "1711": {
@@ -6223,7 +6283,13 @@
       "mushroom",
       "farmer",
       "mushroom farmer"
-    ]
+    ],
+    "sayResponses": {
+      "mushrooms": "I grow seventeen varieties. Some heal, some harm, some do things I can't explain.",
+      "farm": "The conditions down here are perfect. Dark, damp, and nobody bothers me.",
+      "sell": "I sell to the pawnbroker mostly. He doesn't ask questions about the glowing ones.",
+      "marble": "My largest crop was destroyed overnight. Something rolled through my growing beds. Perfect furrow."
+    }
   },
   "1801": {
     "vnum": 1801,
@@ -7045,7 +7111,13 @@
       "judge's",
       "judge's scribe",
       "scribe"
-    ]
+    ],
+    "sayResponses": {
+      "judgment": "I record every soul's deeds. Every kindness. Every cruelty. The ledger never lies.",
+      "records": "Billions of entries. Each one a life. Each one matters.",
+      "afterlife": "The worthy pass to the halls of rest. The unworthy... well. Best not to dwell on it.",
+      "marble": "I have no entry for the Sphere. It has no soul. It has no deeds. It simply... is."
+    }
   },
   "1918": {
     "vnum": 1918,
@@ -7077,7 +7149,13 @@
       "ferryman",
       "afterlife",
       "afterlife ferryman"
-    ]
+    ],
+    "sayResponses": {
+      "passage": "One gold for the crossing. No gold, no crossing. Simple as that.",
+      "river": "The river separates the living world from the dead. I am the bridge between them.",
+      "return": "Some souls try to swim back. The current always takes them. Always.",
+      "marble": "It crossed my river without a boat. Without payment. I could not stop it. Nothing can."
+    }
   },
   "1919": {
     "vnum": 1919,
@@ -7742,6 +7820,12 @@
     ],
     "dialogue": {
       "greeting": "Even the dead need supplies... browse freely, traveler."
+    },
+    "sayResponses": {
+      "buy": "I trade in memories and echoes. Gold works too, if you prefer the mundane.",
+      "sell": "Bring me artifacts from the living world. They hold great value here.",
+      "afterlife": "Commerce persists even in death. Some habits are eternal.",
+      "marble": "I have seen it pass through the veil between life and death. It belongs to neither realm."
     }
   },
   "8099": {
@@ -7761,6 +7845,12 @@
     ],
     "dialogue": {
       "telegraph": "The Sentinel compresses space around its fist..."
+    },
+    "sayResponses": {
+      "facility": "This facility operates at 99.7% efficiency. Anomalies are being contained.",
+      "gravity": "Gravitational flux detected in sectors 3 through 7. Exercise caution.",
+      "threat": "Current threat level: ELEVATED. Unknown spherical object detected on long-range sensors.",
+      "marble": "OBJECT ANALYSIS: Mass variable. Velocity variable. Gravitational signature: IMPOSSIBLE. Recommend avoidance."
     }
   },
   "9099": {
@@ -7780,6 +7870,1113 @@
     ],
     "dialogue": {
       "telegraph": "The Hollow King raises his scepter, drawing power from the void..."
+    }
+  },
+  "50": {
+    "name": "Old Gregor",
+    "description": "A weathered man in faded robes who seems to know more than he lets on.",
+    "room": 10,
+    "power": 5,
+    "hp": 15,
+    "attack": 1,
+    "defense": 1,
+    "flags": [
+      "no_attack"
+    ],
+    "dialogue": "Welcome, traveler. This hall has seen many pass through. Few return.",
+    "sayResponses": {
+      "help": "Type 'look' to see your surroundings, 'go' to move, and 'attack' to fight. Simple enough.",
+      "marble": "A marble? I've heard whispers of something rolling through the tunnels below. Couldn't say more.",
+      "training": "The tower to the east will test your mettle. Start at the bottom and work your way up.",
+      "rumors": "They say the bazaar merchants have seen strange things. Talk to them if you dare."
+    }
+  },
+  "51": {
+    "name": "Sister Mara",
+    "description": "A calm woman in white robes, her hands glowing faintly with restorative energy.",
+    "room": 11,
+    "power": 5,
+    "hp": 15,
+    "attack": 1,
+    "defense": 1,
+    "flags": [
+      "no_attack",
+      "healer"
+    ],
+    "dialogue": "Rest here, traveler. Your wounds will mend in time.",
+    "sayResponses": {
+      "heal": "I can ease your pain, but true strength comes from within. Rest and recover.",
+      "death": "Death is not the end here. You will return, weakened but wiser.",
+      "help": "If you fall in battle, you will wake here. The weakness fades with time.",
+      "marble": "Something passed through here once. Left a mark on the stones. I cleaned it, but the stain remains."
+    }
+  },
+  "52": {
+    "name": "Hargrim the Smith",
+    "description": "A broad-shouldered dwarf hammering at a glowing blade. Sparks fly with each strike.",
+    "room": 14,
+    "power": 8,
+    "hp": 24,
+    "attack": 1,
+    "defense": 1,
+    "flags": [
+      "no_attack",
+      "merchant"
+    ],
+    "dialogue": "Need something forged? I work with what I have. Browse if you like.",
+    "sayResponses": {
+      "buy": "Take a look at what I've got. Type 'buy' to purchase.",
+      "forge": "I've been smithing since before this tower stood. Every blade tells a story.",
+      "armor": "Good armor saves lives. Bad armor just delays the inevitable.",
+      "rumors": "The tower guardian on the top floor? Nasty piece of work. Bring a good weapon."
+    }
+  },
+  "53": {
+    "name": "Zara the Peddler",
+    "description": "A quick-eyed woman with a cart overflowing with trinkets and oddities.",
+    "room": 8,
+    "power": 4,
+    "hp": 12,
+    "attack": 1,
+    "defense": 1,
+    "flags": [
+      "no_attack",
+      "merchant"
+    ],
+    "dialogue": "Looking to buy? I've got a bit of everything. Mostly junk, but useful junk.",
+    "sayResponses": {
+      "buy": "Browse my wares. Everything has a price, and most of it is reasonable.",
+      "sell": "I'll take what you don't need. Fair prices, more or less.",
+      "rumors": "Word is something crashed through the eastern zones. Left a trail of destruction.",
+      "marble": "A marble? Like a toy? No... wait. Someone mentioned something like that. Rolled right through the bazaar one night."
+    }
+  },
+  "54": {
+    "name": "Finn the Bookkeeper",
+    "description": "A thin man with spectacles perched on his nose, surrounded by ledgers.",
+    "room": 9,
+    "power": 3,
+    "hp": 9,
+    "attack": 1,
+    "defense": 1,
+    "flags": [
+      "no_attack"
+    ],
+    "dialogue": "I keep records of everything that passes through. Everything.",
+    "sayResponses": {
+      "records": "Every traveler, every trade, every death. It's all in the books.",
+      "help": "Need directions? The tower is east, the bazaar is here, and danger is everywhere else.",
+      "marble": "In my records... yes. An anomalous entry. Something moved through here at impossible speed. No mass, no sound. Just... gone.",
+      "quest": "Check the bulletin board to the north. Jobs posted daily."
+    }
+  },
+  "1050": {
+    "name": "Barkeep Roderick",
+    "description": "A burly man polishing a mug behind a stained oak counter. The inn smells of ale and woodsmoke.",
+    "room": 1022,
+    "power": 30,
+    "hp": 90,
+    "attack": 6,
+    "defense": 3,
+    "flags": [
+      "no_attack"
+    ],
+    "dialogue": "What'll it be? Ale's cheap, information costs more.",
+    "sayResponses": {
+      "ale": "One gold gets you a mug. Two gets you the good stuff.",
+      "rumors": "The bandits to the north have been getting bolder. Their leader has some kind of enchanted blade.",
+      "inn": "Rooms upstairs if you need rest. Safe enough, long as you don't mind the rats.",
+      "marble": "Something smashed through my wall last month. Round. Fast. Fixed the wall, but the dent in the floor won't come out.",
+      "castle": "The king hasn't been seen in weeks. Guards are nervous. Something's wrong up there."
+    }
+  },
+  "1051": {
+    "name": "Elara the Alchemist",
+    "description": "A young woman surrounded by bubbling flasks and dried herbs. Her eyes are slightly different colors.",
+    "room": 1023,
+    "power": 25,
+    "hp": 75,
+    "attack": 5,
+    "defense": 3,
+    "flags": [
+      "no_attack",
+      "merchant"
+    ],
+    "dialogue": "Potions, salves, and the occasional explosive. What do you need?",
+    "sayResponses": {
+      "buy": "I have healing draughts, focus tonics, and a few... experimental mixtures.",
+      "potions": "Healing potions restore your body. Focus tonics sharpen your mind. Simple as that.",
+      "experiment": "I'm working on something new. A potion that lets you see through walls. Not ready yet.",
+      "marble": "I detected a massive energy signature pass through here. My instruments went haywire. Whatever it was, it wasn't natural."
+    }
+  },
+  "1052": {
+    "name": "Market Crier",
+    "description": "A loud man in a colorful vest, shouting about daily deals to anyone who will listen.",
+    "room": 1026,
+    "power": 15,
+    "hp": 45,
+    "attack": 3,
+    "defense": 1,
+    "flags": [
+      "no_attack"
+    ],
+    "dialogue": "FRESH GOODS! BEST PRICES! Step right up!",
+    "sayResponses": {
+      "deals": "The alchemist has potions on sale. The smith is offering blade sharpening for half price!",
+      "news": "The castle guards doubled their patrols. Something spooked them good.",
+      "rumors": "I heard the dwarven ruins to the south have treasure. Also death. Mostly death.",
+      "marble": "You're not the first to ask about that. Something rolled through market street at dawn. Knocked over three carts."
+    }
+  },
+  "1053": {
+    "name": "Priestess Solara",
+    "description": "A serene woman in golden robes, standing before a sunlit altar. Light seems to bend toward her.",
+    "room": 1029,
+    "power": 40,
+    "hp": 120,
+    "attack": 8,
+    "defense": 5,
+    "flags": [
+      "no_attack"
+    ],
+    "dialogue": "The dawn brings renewal. May its light guide your path.",
+    "sayResponses": {
+      "blessing": "I can offer prayers for your safety, but the gods help those who help themselves.",
+      "temple": "This temple has stood for a thousand years. It will stand a thousand more.",
+      "undead": "The graveyard to the east is restless. The dead do not sleep easily here.",
+      "marble": "I have seen it in visions. A sphere of terrible purpose, rolling through the world, gathering power. It must be stopped.",
+      "heal": "Rest here and your wounds will close. The dawn's light mends all."
+    }
+  },
+  "1054": {
+    "name": "One-Eyed Jack",
+    "description": "A scarred man nursing a drink in the corner. His one good eye misses nothing.",
+    "room": 1033,
+    "power": 35,
+    "hp": 105,
+    "attack": 7,
+    "defense": 4,
+    "flags": [
+      "no_attack"
+    ],
+    "dialogue": "You look like trouble. Good. I like trouble.",
+    "sayResponses": {
+      "work": "I might have a job for someone who doesn't ask too many questions.",
+      "bandits": "The camp to the north? I used to run with them. Left when their leader went mad.",
+      "rumors": "The castle armory has a blade that can cut through anything. Getting to it is the hard part.",
+      "marble": "I saw it. Years ago. Rolling through the forest at night. Thought I was drunk. Maybe I was. But it was real.",
+      "fight": "You want to test yourself? The arena in the castle courtyard is always looking for fresh meat."
+    }
+  },
+  "1055": {
+    "name": "Gate Sergeant Brynn",
+    "description": "A stern woman in dented plate armor, watching the road with practiced vigilance.",
+    "room": 1038,
+    "power": 45,
+    "hp": 135,
+    "attack": 9,
+    "defense": 5,
+    "flags": [
+      "no_attack"
+    ],
+    "dialogue": "State your business. The south road is dangerous.",
+    "sayResponses": {
+      "south": "Dwarven ruins that way. Undead, traps, and worse. Don't go alone.",
+      "guard": "I've held this gate for twelve years. Nothing gets through without my say-so.",
+      "castle": "The king's orders are clear. No one enters the castle without authorization.",
+      "rumors": "Something hit the south wall last week. Left a perfectly round hole. Engineers can't explain it."
+    }
+  },
+  "1056": {
+    "name": "Chamberlain Aldous",
+    "description": "A thin man in fine but dusty clothes, wringing his hands nervously.",
+    "room": 1041,
+    "power": 20,
+    "hp": 60,
+    "attack": 4,
+    "defense": 2,
+    "flags": [
+      "no_attack"
+    ],
+    "dialogue": "The king is... indisposed. State your business quickly.",
+    "sayResponses": {
+      "king": "His majesty has not been well. The physicians are baffled. Please, do not press further.",
+      "castle": "The great hall was once full of life. Now it echoes with silence.",
+      "help": "If you could clear the undead from the graveyard, the king might grant you an audience.",
+      "marble": "The king's illness began the night something crashed through the east tower. Coincidence? I think not."
+    }
+  },
+  "1057": {
+    "name": "Master-at-Arms Voss",
+    "description": "A grizzled veteran surrounded by racks of weapons. Every blade is perfectly maintained.",
+    "room": 1044,
+    "power": 55,
+    "hp": 165,
+    "attack": 11,
+    "defense": 6,
+    "flags": [
+      "no_attack",
+      "merchant"
+    ],
+    "dialogue": "The armory is open to those who've earned it. What do you need?",
+    "sayResponses": {
+      "buy": "I sell to warriors, not tourists. But your gold is good enough.",
+      "weapons": "Blades, maces, bows. Each has its purpose. Choose wisely.",
+      "training": "I can show you a few tricks if you've got the time. Practice makes perfect.",
+      "castle": "The guards are on edge. Something in the lower levels has them spooked."
+    }
+  },
+  "1058": {
+    "name": "Sage Meridian",
+    "description": "An elderly figure hunched over ancient texts, muttering to themselves.",
+    "room": 1046,
+    "power": 30,
+    "hp": 90,
+    "attack": 6,
+    "defense": 3,
+    "flags": [
+      "no_attack"
+    ],
+    "dialogue": "Hmm? Oh, a visitor. Don't touch anything. These texts are older than this castle.",
+    "sayResponses": {
+      "books": "History, magic theory, cartography. All here, all fragile. Handle with care.",
+      "magic": "Magic is simply will made manifest. The stronger the will, the stronger the effect.",
+      "marble": "I've found references in three separate texts. An object of immense kinetic potential. It predates recorded history.",
+      "ruins": "The ancient ruins south of here were built by a civilization that understood forces we've forgotten.",
+      "research": "I'm close to a breakthrough. Something about resonance frequencies and spherical motion..."
+    }
+  },
+  "1141": {
+    "name": "Prisoner Giles",
+    "description": "A haggard man chained to the wall, barely conscious but still aware.",
+    "room": 1101,
+    "power": 10,
+    "hp": 30,
+    "attack": 2,
+    "defense": 1,
+    "flags": [
+      "no_attack"
+    ],
+    "dialogue": "You... you're not one of them. Please, help me.",
+    "sayResponses": {
+      "help": "The key is with the guard captain. Deeper in the dungeon. If you find it...",
+      "dungeon": "They brought me here weeks ago. The dwarven ruins below are crawling with undead.",
+      "escape": "There's a passage behind the forge. The dwarves built escape routes everywhere.",
+      "rumors": "I heard something rolling through the tunnels at night. The guards are terrified of it."
+    }
+  },
+  "1142": {
+    "name": "Ghost of Forgemaster Durin",
+    "description": "A translucent dwarf standing before the cold forge, forever reaching for his hammer.",
+    "room": 1120,
+    "power": 60,
+    "hp": 180,
+    "attack": 12,
+    "defense": 7,
+    "flags": [
+      "no_attack"
+    ],
+    "dialogue": "The forge... it must burn again. The runes... they must be relit...",
+    "sayResponses": {
+      "forge": "This forge once crafted weapons that could split mountains. Now it is cold and dead.",
+      "dwarves": "My people fell to darkness. Something came through. Fast. Unstoppable. It cracked the foundation.",
+      "runes": "The runes of power are scattered through these halls. Find them, and the forge may live again.",
+      "marble": "I SAW IT. The sphere of ruin. It tore through our deepest vault like paper. We never recovered."
+    }
+  },
+  "2050": {
+    "name": "Reception AI",
+    "description": "A holographic woman behind a desk, her smile frozen in corporate perfection.",
+    "room": 2001,
+    "power": 50,
+    "hp": 150,
+    "attack": 10,
+    "defense": 6,
+    "flags": [
+      "no_attack"
+    ],
+    "dialogue": "Welcome to MegaCorp Tower. How may I direct your inquiry?",
+    "sayResponses": {
+      "megacorp": "MegaCorp Industries: Building tomorrow, today. Our CEO is currently unavailable.",
+      "elevator": "Floors 1-30 are public access. Higher floors require clearance.",
+      "help": "I can provide directions, corporate history, or emergency services. Which do you prefer?",
+      "marble": "I have no record of that object in our database. However, security footage from last month shows an anomaly on floor 47."
+    }
+  },
+  "2051": {
+    "name": "Noodle Chef Tanaka",
+    "description": "A sweating man working three woks simultaneously, flames leaping with each toss.",
+    "room": 2010,
+    "power": 20,
+    "hp": 60,
+    "attack": 4,
+    "defense": 2,
+    "flags": [
+      "no_attack"
+    ],
+    "dialogue": "Sit! Eat! Best noodles on floor 47. Maybe all of Neo-City.",
+    "sayResponses": {
+      "food": "Ramen, udon, yakisoba. All synthetic protein, but I make it taste real.",
+      "rumors": "The underground market has black-market chrome. Dangerous stuff, but powerful.",
+      "megacorp": "They own everything. Even this noodle bar. I just rent the space.",
+      "marble": "My security camera caught something last week. Round, fast, smashed through the window and out the other side. Insurance won't cover it."
+    }
+  },
+  "2052": {
+    "name": "Chrome Dealer Vex",
+    "description": "A woman with more metal than skin, her eyes cycling through colors as she scans you.",
+    "room": 2013,
+    "power": 60,
+    "hp": 180,
+    "attack": 12,
+    "defense": 7,
+    "flags": [
+      "no_attack",
+      "merchant"
+    ],
+    "dialogue": "Looking for upgrades? I've got the best chrome this side of the firewall.",
+    "sayResponses": {
+      "buy": "Implants, boosters, neural links. All top quality. Mostly.",
+      "chrome": "Cybernetics aren't just fashion. They're survival. The streets eat the unaugmented.",
+      "underground": "The real market is below. Way below. But you need connections to get in.",
+      "marble": "A client mentioned something. An object that moves on its own. Said it fried every sensor it passed. Interesting."
+    }
+  },
+  "2053": {
+    "name": "Street Prophet",
+    "description": "A man covered in glowing tattoos, standing at the crossroads muttering prophecies.",
+    "room": 2022,
+    "power": 15,
+    "hp": 45,
+    "attack": 3,
+    "defense": 1,
+    "flags": [
+      "no_attack"
+    ],
+    "dialogue": "The convergence approaches. All paths lead to the sphere.",
+    "sayResponses": {
+      "prophecy": "The sphere rolls through all worlds. It gathers what it needs. Soon it will be complete.",
+      "crossroads": "Every choice leads somewhere. Most lead to death. Choose wisely.",
+      "marble": "I have SEEN it. In my visions. A perfect sphere of absolute purpose. It does not think. It does not feel. It simply IS.",
+      "help": "Go north for the corporate sector. South for the underground. East for the junkyard. West for the slums."
+    }
+  },
+  "2054": {
+    "name": "Junkyard Boss Krill",
+    "description": "A massive man made mostly of salvaged parts, sitting on a throne of scrap metal.",
+    "room": 2030,
+    "power": 70,
+    "hp": 210,
+    "attack": 14,
+    "defense": 8,
+    "flags": [
+      "no_attack"
+    ],
+    "dialogue": "This is MY junkyard. You want to scavenge, you pay the toll.",
+    "sayResponses": {
+      "toll": "Ten gold gets you an hour. Find what you can carry. Touch my personal stash and I break you.",
+      "scrap": "Everything here was something once. Drones, bots, vehicles. All broken. All useful.",
+      "underground": "The tunnels under the junk lead to the underground market. If you can find the entrance.",
+      "marble": "Something rolled through here three days ago. Crushed a stack of cars flat. Left a perfect tunnel through the scrap."
+    }
+  },
+  "2055": {
+    "name": "The Broker",
+    "description": "A figure in a hooded coat, face hidden behind a featureless mask. Their voice is synthesized.",
+    "room": 2033,
+    "power": 80,
+    "hp": 240,
+    "attack": 16,
+    "defense": 10,
+    "flags": [
+      "no_attack",
+      "merchant"
+    ],
+    "dialogue": "You found the market. Good. Keep your voice down and your credits ready.",
+    "sayResponses": {
+      "buy": "I deal in things that don't officially exist. Weapons, data, identities.",
+      "sell": "I'll take anything valuable. No questions asked. No receipts given.",
+      "information": "Information is my real trade. Ask the right question and I might have an answer.",
+      "marble": "That object has passed through seventeen known dimensions. I have the tracking data. It's not cheap.",
+      "underground": "This market exists because MegaCorp can't reach here. Keep it that way."
+    }
+  },
+  "2056": {
+    "name": "Doc Patches",
+    "description": "A woman in a bloodstained lab coat, her cybernetic hands twitching with precision.",
+    "room": 2035,
+    "power": 40,
+    "hp": 120,
+    "attack": 8,
+    "defense": 5,
+    "flags": [
+      "no_attack",
+      "healer"
+    ],
+    "dialogue": "Bullet holes, blade wounds, or bad chrome? I fix it all. No insurance needed.",
+    "sayResponses": {
+      "heal": "Sit down, shut up, and let me work. You'll be fine in an hour.",
+      "chrome": "I can install implants too. Cheaper than the dealer, but... less warranty.",
+      "clinic": "This clinic serves the underground. MegaCorp doesn't know it exists. Keep it that way.",
+      "rumors": "A patient came in last week with burns in a perfect circle. Said something rolled over him. Never seen anything like it."
+    }
+  },
+  "2057": {
+    "name": "Mama Chen",
+    "description": "An old woman selling synthetic vegetables from a rickety stall. Her eyes are sharp despite her age.",
+    "room": 2053,
+    "power": 10,
+    "hp": 30,
+    "attack": 2,
+    "defense": 1,
+    "flags": [
+      "no_attack"
+    ],
+    "dialogue": "Fresh produce! Well, fresh-ish. Better than the protein bars.",
+    "sayResponses": {
+      "food": "Tomatoes, peppers, mushrooms. All grown in my hydro-garden. Real organic.",
+      "shantytown": "We built this place from nothing. MegaCorp tried to bulldoze us twice. We rebuilt.",
+      "rumors": "The children say they saw a ball of light in the tunnels. I told them to stay away.",
+      "marble": "My grandmother told stories of a rolling stone that never stopped. I thought it was a fairy tale."
+    }
+  },
+  "3050": {
+    "name": "Building Super",
+    "description": "A grumpy man in overalls, jangling a ring of keys.",
+    "room": 3017,
+    "power": 20,
+    "hp": 60,
+    "attack": 4,
+    "defense": 2,
+    "flags": [
+      "no_attack"
+    ],
+    "dialogue": "Third floor, office 3B. That's the PI. Don't track mud on my floors.",
+    "sayResponses": {
+      "office": "The detective upstairs? Good at finding things. Bad at paying rent.",
+      "building": "Built in '42. Survived two fires and a flood. Tough old girl.",
+      "rumors": "Something smashed through the basement wall last month. Round hole. Perfect circle. Cops couldn't explain it."
+    }
+  },
+  "3051": {
+    "name": "Detective Morrison",
+    "description": "A tired man in a rumpled suit, cigarette smoke curling around his fedora. Files cover every surface.",
+    "room": 3018,
+    "power": 45,
+    "hp": 135,
+    "attack": 9,
+    "defense": 5,
+    "flags": [
+      "no_attack"
+    ],
+    "dialogue": "Another case? Pull up a chair. I charge by the hour.",
+    "sayResponses": {
+      "case": "Missing persons, stolen goods, cheating spouses. I handle it all.",
+      "hire": "Fifty gold retainer, plus expenses. I'm worth it.",
+      "docks": "The docks are mob territory. The Syndicate runs everything south of the bridge.",
+      "marble": "A client hired me to track something. Round, fast, leaves destruction in its wake. Trail went cold at the cemetery.",
+      "chinatown": "Good food, bad people. The triads run that neighborhood. Tread carefully."
+    }
+  },
+  "3052": {
+    "name": "Old Man Wei",
+    "description": "An ancient man sitting behind a counter of dried herbs and strange artifacts.",
+    "room": 3022,
+    "power": 30,
+    "hp": 90,
+    "attack": 6,
+    "defense": 3,
+    "flags": [
+      "no_attack",
+      "merchant"
+    ],
+    "dialogue": "Welcome, welcome. You seek something? Everyone who comes here seeks something.",
+    "sayResponses": {
+      "buy": "Herbs, charms, remedies. Ancient wisdom for modern problems.",
+      "chinatown": "My family has been here for five generations. We remember what others forget.",
+      "temple": "The temple next door holds secrets. The monks there know things about the old world.",
+      "marble": "In our tradition, we call it the Wandering Stone. It has passed through this world many times before."
+    }
+  },
+  "3053": {
+    "name": "Monk Liang",
+    "description": "A bald man in saffron robes, sitting in perfect stillness before a smoking incense burner.",
+    "room": 3023,
+    "power": 50,
+    "hp": 150,
+    "attack": 10,
+    "defense": 6,
+    "flags": [
+      "no_attack"
+    ],
+    "dialogue": "Stillness reveals truth. Sit, if you wish.",
+    "sayResponses": {
+      "meditate": "Close your eyes. Breathe. The answers you seek are already within you.",
+      "temple": "This temple predates the city. It was here when the land was wild.",
+      "marble": "We have records of the Sphere in our oldest scrolls. It moves in cycles. This cycle is nearly complete.",
+      "wisdom": "Strength without wisdom is a blade without a handle. It cuts the wielder."
+    }
+  },
+  "3054": {
+    "name": "Dockmaster Hank",
+    "description": "A weathered man with a clipboard, shouting orders at longshoremen.",
+    "room": 3024,
+    "power": 35,
+    "hp": 105,
+    "attack": 7,
+    "defense": 4,
+    "flags": [
+      "no_attack"
+    ],
+    "dialogue": "You ain't on my manifest. State your business or get off my docks.",
+    "sayResponses": {
+      "docks": "Cargo in, cargo out. That's all I care about. What's in the crates ain't my problem.",
+      "ships": "Three ships in port today. The Maiden's Tear, the Iron Wake, and one with no name. Suspicious.",
+      "syndicate": "I don't know nothing about no syndicate. And neither do you, if you're smart.",
+      "rumors": "A crate came in last week. Heavy. Round. Nobody ordered it. It was gone by morning."
+    }
+  },
+  "3055": {
+    "name": "Fishmonger Pete",
+    "description": "A man in a stained apron, gutting fish with mechanical efficiency.",
+    "room": 3028,
+    "power": 15,
+    "hp": 45,
+    "attack": 3,
+    "defense": 1,
+    "flags": [
+      "no_attack"
+    ],
+    "dialogue": "Fresh catch! Well, fresh-ish. The harbor ain't what it used to be.",
+    "sayResponses": {
+      "fish": "Cod, mackerel, and whatever that thing is. Five gold a pound.",
+      "docks": "I've worked these docks thirty years. Seen things. Heard things. Mostly I keep quiet.",
+      "rumors": "The warehouse at the end of the row? Don't go there at night. The Syndicate uses it.",
+      "marble": "I was fishing at dawn when something shot out of the water. Round. Fast. Skipped across the harbor like a stone."
+    }
+  },
+  "4050": {
+    "name": "Quartermaster Hayes",
+    "description": "A no-nonsense woman behind a cage of weapons and supplies.",
+    "room": 4002,
+    "power": 60,
+    "hp": 180,
+    "attack": 12,
+    "defense": 7,
+    "flags": [
+      "no_attack",
+      "merchant"
+    ],
+    "dialogue": "Requisition form or gold. Either works. What do you need?",
+    "sayResponses": {
+      "buy": "Weapons, ammo, rations. Standard military issue. Nothing fancy, but it works.",
+      "armory": "Everything here is accounted for. Don't even think about stealing.",
+      "war": "We've been fighting for three years. Nobody remembers what started it anymore.",
+      "rumors": "Something hit the eastern trench last week. Not a shell. Something round. Left a perfect tunnel."
+    }
+  },
+  "4051": {
+    "name": "Sergeant Major Cole",
+    "description": "A scarred man sitting on a bunk, cleaning his rifle with practiced hands.",
+    "room": 4003,
+    "power": 70,
+    "hp": 210,
+    "attack": 14,
+    "defense": 8,
+    "flags": [
+      "no_attack"
+    ],
+    "dialogue": "New recruit? You look green. Try not to die on your first patrol.",
+    "sayResponses": {
+      "patrol": "North perimeter at dawn, east at noon, south at dusk. Miss your shift and I'll have your hide.",
+      "war": "The enemy is dug in deep. We push, they push back. Stalemate for months.",
+      "training": "Hit the range. Practice until your hands bleed. Then practice more.",
+      "rumors": "Something crossed no-man's-land last night. Set off every mine. Didn't slow down."
+    }
+  },
+  "4052": {
+    "name": "Cook Ramirez",
+    "description": "A heavyset man stirring a massive pot of something that might be stew.",
+    "room": 4004,
+    "power": 25,
+    "hp": 75,
+    "attack": 5,
+    "defense": 3,
+    "flags": [
+      "no_attack"
+    ],
+    "dialogue": "Chow's on. Eat it or don't. Next meal's in six hours.",
+    "sayResponses": {
+      "food": "It's nutritious. That's the best I can say. Taste is a luxury we can't afford.",
+      "mess": "Three meals a day, every day, for two hundred soldiers. I don't sleep much.",
+      "rumors": "The refugees from the south camp say something destroyed their village. Not bombs. Something else.",
+      "morale": "Morale is low. We need a win. Any win."
+    }
+  },
+  "4053": {
+    "name": "Refugee Elder Miriam",
+    "description": "An old woman wrapped in blankets, eyes hollow but determined.",
+    "room": 4032,
+    "power": 10,
+    "hp": 30,
+    "attack": 2,
+    "defense": 1,
+    "flags": [
+      "no_attack"
+    ],
+    "dialogue": "We came from the south. There is nothing left there.",
+    "sayResponses": {
+      "south": "Our village was destroyed in a single night. Not by soldiers. By something... round.",
+      "refugees": "Forty of us made it. The rest... I don't know.",
+      "help": "We need food, medicine, and safety. Can you help?",
+      "marble": "I saw it with my own eyes. A sphere of terrible power. It rolled through our homes like they were paper."
+    }
+  },
+  "4054": {
+    "name": "Field Medic Torres",
+    "description": "A young woman with blood on her hands, working frantically on a wounded soldier.",
+    "room": 4033,
+    "power": 35,
+    "hp": 105,
+    "attack": 7,
+    "defense": 4,
+    "flags": [
+      "no_attack",
+      "healer"
+    ],
+    "dialogue": "If you're not bleeding, get out. If you are, sit down.",
+    "sayResponses": {
+      "heal": "I'll patch you up. Don't expect miracles. I'm a medic, not a wizard.",
+      "wounded": "We get a dozen casualties a day. I do what I can.",
+      "camp": "The refugees need more help than I can give. We need supplies.",
+      "rumors": "A soldier came in with burns in a perfect circle. Said something rolled over his foxhole."
+    }
+  },
+  "4055": {
+    "name": "Arms Dealer Vasquez",
+    "description": "A man in a leather jacket, surrounded by crates of weapons from a dozen different armies.",
+    "room": 4050,
+    "power": 75,
+    "hp": 225,
+    "attack": 15,
+    "defense": 9,
+    "flags": [
+      "no_attack",
+      "merchant"
+    ],
+    "dialogue": "No flags, no loyalties. Just business. What are you buying?",
+    "sayResponses": {
+      "buy": "Rifles, grenades, armor. All surplus. All functional. Mostly.",
+      "sell": "I'll take anything that shoots. Fair prices for fair goods.",
+      "war": "War is good for business. Peace is bad for business. I prefer war.",
+      "marble": "A client wanted me to find a weapon that could stop a sphere. I told him no weapon can stop what doesn't think."
+    }
+  },
+  "5050": {
+    "name": "The Librarian",
+    "description": "A being of pure light, hovering between shelves of crystallized knowledge.",
+    "room": 5005,
+    "power": 100,
+    "hp": 300,
+    "attack": 20,
+    "defense": 12,
+    "flags": [
+      "no_attack"
+    ],
+    "dialogue": "Knowledge persists even when reality fractures. Ask, and I may answer.",
+    "sayResponses": {
+      "knowledge": "Each crystal contains a lifetime of learning. Handle them carefully.",
+      "fracture": "This realm shattered when the Sphere passed through. Reality could not contain its momentum.",
+      "marble": "The Sphere has passed through this shard seventeen times. Each passage fractures reality further.",
+      "bridge": "The vine bridges connect the shards. They grow where reality is thinnest."
+    }
+  },
+  "5051": {
+    "name": "Shard Merchant Opal",
+    "description": "A crystalline humanoid whose body refracts light into rainbows. Their voice chimes like glass.",
+    "room": 5014,
+    "power": 90,
+    "hp": 270,
+    "attack": 18,
+    "defense": 11,
+    "flags": [
+      "no_attack",
+      "merchant"
+    ],
+    "dialogue": "Trade in fragments of reality. Each shard holds value beyond gold.",
+    "sayResponses": {
+      "buy": "I deal in essence, not objects. But gold translates well enough.",
+      "sell": "Bring me curiosities from other shards. I pay well for the unusual.",
+      "marketplace": "This shard stabilized around commerce. Even fractured reality needs an economy.",
+      "marble": "The Sphere's passage created these shards. In a way, it created me. I owe it my existence."
+    }
+  },
+  "5052": {
+    "name": "Forge Spirit",
+    "description": "A being of molten metal and flame, hammering at an anvil that floats in empty space.",
+    "room": 5024,
+    "power": 110,
+    "hp": 330,
+    "attack": 22,
+    "defense": 13,
+    "flags": [
+      "no_attack",
+      "merchant"
+    ],
+    "dialogue": "The forge burns eternal. Bring materials and I will shape them.",
+    "sayResponses": {
+      "forge": "I craft from the essence of shattered reality. Each weapon is unique.",
+      "buy": "Bring gold and I will arm you. My creations are without equal.",
+      "shard": "This shard remembers being a mountain. The forge remembers being its heart.",
+      "marble": "It passed through here like a meteor. The heat of its passage ignited my forge. I have burned ever since."
+    }
+  },
+  "6050": {
+    "name": "Roman Announcer",
+    "description": "A man in a toga, his voice trained to carry across the colosseum.",
+    "room": 6003,
+    "power": 40,
+    "hp": 120,
+    "attack": 8,
+    "defense": 5,
+    "flags": [
+      "no_attack"
+    ],
+    "dialogue": "Welcome to the arena! Today's matches promise blood and glory!",
+    "sayResponses": {
+      "arena": "Gladiators fight for honor, freedom, or gold. Which drives you?",
+      "fights": "The champion is undefeated. Many have tried. All have fallen.",
+      "rome": "The Empire is eternal. Or so they tell us.",
+      "marble": "During last week's match, something rolled across the arena floor. Killed two gladiators. The crowd thought it was part of the show."
+    }
+  },
+  "6051": {
+    "name": "Egyptian Merchant Khufu",
+    "description": "A man in white linen, his stall covered in golden trinkets and papyrus scrolls.",
+    "room": 6008,
+    "power": 45,
+    "hp": 135,
+    "attack": 9,
+    "defense": 5,
+    "flags": [
+      "no_attack",
+      "merchant"
+    ],
+    "dialogue": "Treasures of the pharaohs! Genuine artifacts! Mostly genuine.",
+    "sayResponses": {
+      "buy": "Amulets, scrolls, sacred oils. All blessed by the priests of Ra.",
+      "temple": "The Temple of Ra stands to the north. The priests there hold great power.",
+      "egypt": "The Nile provides. The pharaoh protects. The gods watch.",
+      "marble": "The priests speak of a sacred sphere that rolls through the underworld. They fear it."
+    }
+  },
+  "6052": {
+    "name": "High Priest Amenhotep",
+    "description": "A tall man with a golden headdress, his eyes lined with kohl. Power radiates from him.",
+    "room": 6009,
+    "power": 80,
+    "hp": 240,
+    "attack": 16,
+    "defense": 10,
+    "flags": [
+      "no_attack"
+    ],
+    "dialogue": "You stand in the house of Ra. Show respect.",
+    "sayResponses": {
+      "ra": "Ra is the sun. The sun is life. All power flows from his light.",
+      "blessing": "Kneel and I may grant you Ra's favor. Stand and you receive nothing.",
+      "marble": "The sacred texts speak of the Rolling Darkness. It devours the light of Ra wherever it passes. We have prepared wards.",
+      "pharaoh": "The pharaoh rests in his tomb. His spirit watches over Egypt still."
+    }
+  },
+  "6053": {
+    "name": "Viking Shipwright Bjorn",
+    "description": "A massive man with a braided beard, carving a dragon prow from a single log.",
+    "room": 6022,
+    "power": 55,
+    "hp": 165,
+    "attack": 11,
+    "defense": 6,
+    "flags": [
+      "no_attack"
+    ],
+    "dialogue": "A good ship is worth more than gold. She carries you to glory or Valhalla.",
+    "sayResponses": {
+      "ships": "I build longships. Fastest on the water. Strong enough for any storm.",
+      "docks": "Three ships ready to sail. We raid at dawn.",
+      "viking": "We are the wolves of the sea. Fear us or join us.",
+      "marble": "Something punched through the hull of my best ship. Round hole. Perfect circle. The sea rushed in. We barely saved her."
+    }
+  },
+  "6054": {
+    "name": "Skald Ingrid",
+    "description": "A woman with wild red hair, singing tales of battle over a horn of mead.",
+    "room": 6023,
+    "power": 35,
+    "hp": 105,
+    "attack": 7,
+    "defense": 4,
+    "flags": [
+      "no_attack"
+    ],
+    "dialogue": "Sit! Drink! Let me sing you the saga of Ragnar the Bold!",
+    "sayResponses": {
+      "saga": "Every warrior deserves a saga. Fight well and I will compose yours.",
+      "mead": "The mead flows freely in the hall. Drink deep, for tomorrow we may die.",
+      "odin": "The All-Father watches from his throne. He chooses who lives and who falls.",
+      "marble": "In the old songs, they speak of Odin's Eye -- a sphere that rolls between worlds. Perhaps it is the same."
+    }
+  },
+  "6055": {
+    "name": "Viking Smith Thorvald",
+    "description": "A soot-covered man hammering a blade on a rune-carved anvil.",
+    "room": 6024,
+    "power": 60,
+    "hp": 180,
+    "attack": 12,
+    "defense": 7,
+    "flags": [
+      "no_attack",
+      "merchant"
+    ],
+    "dialogue": "Iron and fire. That's all a warrior needs. And maybe a good axe.",
+    "sayResponses": {
+      "buy": "Axes, swords, shields. All forged with runes of power.",
+      "forge": "My anvil was blessed by Thor himself. Or so my grandfather claimed.",
+      "runes": "The runes hold power. Carve them right and a blade cuts twice as deep.",
+      "marble": "Something struck my anvil in the night. Left a dent I cannot hammer out. The metal around it hums."
+    }
+  },
+  "6056": {
+    "name": "Aztec Trader Itzel",
+    "description": "A woman in feathered garments, her stall displaying obsidian blades and jade ornaments.",
+    "room": 6035,
+    "power": 50,
+    "hp": 150,
+    "attack": 10,
+    "defense": 6,
+    "flags": [
+      "no_attack",
+      "merchant"
+    ],
+    "dialogue": "The gods demand tribute. Perhaps you have something worthy?",
+    "sayResponses": {
+      "buy": "Obsidian blades, jade amulets, feathered armor. All sacred. All deadly.",
+      "temple": "The temple summit is where the priests commune with the gods. Do not go uninvited.",
+      "gods": "Quetzalcoatl watches. Huitzilopochtli hungers. Appease them or suffer.",
+      "marble": "The priests call it the Heart of Tezcatlipoca. A sphere of obsidian that rolls through the world, bringing change."
+    }
+  },
+  "6057": {
+    "name": "Sheriff Hawkins",
+    "description": "A lean man with a star pinned to his vest, a revolver on each hip.",
+    "room": 6041,
+    "power": 55,
+    "hp": 165,
+    "attack": 11,
+    "defense": 6,
+    "flags": [
+      "no_attack"
+    ],
+    "dialogue": "I keep the peace in this town. Break it and we'll have words.",
+    "sayResponses": {
+      "town": "Small place. Honest folk, mostly. The trouble comes from outside.",
+      "outlaws": "Bandits to the east. Been raiding the supply wagons. I need deputies.",
+      "law": "My law is simple. Don't steal. Don't kill. Don't cause trouble.",
+      "marble": "Something rolled through main street last Tuesday. Spooked every horse in town. Left a furrow in the dirt a foot deep."
+    }
+  },
+  "6058": {
+    "name": "Stablehand Eli",
+    "description": "A young man mucking out stalls, whistling tunelessly.",
+    "room": 6042,
+    "power": 15,
+    "hp": 45,
+    "attack": 3,
+    "defense": 1,
+    "flags": [
+      "no_attack"
+    ],
+    "dialogue": "Need a horse? They're spooked today. Something's got 'em nervous.",
+    "sayResponses": {
+      "horses": "We got three available. The bay is fast, the roan is strong, the paint is smart.",
+      "stable": "I keep 'em fed and brushed. They keep me employed. Fair trade.",
+      "spooked": "Started last week. Something came through at night. Horses won't go near the east road now.",
+      "marble": "I didn't see it, but I heard it. Like thunder rolling along the ground. Horses went crazy."
+    }
+  },
+  "6150": {
+    "name": "Atlantean Merchant Nereus",
+    "description": "A being with iridescent scales and webbed fingers, displaying wares on a coral counter.",
+    "room": 6101,
+    "power": 90,
+    "hp": 270,
+    "attack": 18,
+    "defense": 11,
+    "flags": [
+      "no_attack",
+      "merchant"
+    ],
+    "dialogue": "Surface dweller. Our goods are superior to anything your world produces.",
+    "sayResponses": {
+      "buy": "Coral armor, trident blades, pressure suits. All crafted in the deep.",
+      "atlantis": "We sank beneath the waves by choice, not catastrophe. The surface was too chaotic.",
+      "marble": "The Sphere passed through our dome three centuries ago. We repaired the breach, but the memory remains.",
+      "poseidon": "The temple to the north honors our patron. He protects us still."
+    }
+  },
+  "6151": {
+    "name": "Atlantean Herald",
+    "description": "A tall figure in flowing robes of living water, their voice echoing with authority.",
+    "room": 6102,
+    "power": 70,
+    "hp": 210,
+    "attack": 14,
+    "defense": 8,
+    "flags": [
+      "no_attack"
+    ],
+    "dialogue": "Welcome to the Central Plaza of Atlantis. Conduct yourself with dignity.",
+    "sayResponses": {
+      "plaza": "This is the heart of our city. Commerce, governance, and culture converge here.",
+      "rules": "Violence is forbidden in the plaza. Violators are expelled to the surface.",
+      "atlantis": "Our civilization has endured for ten thousand years. We intend to endure ten thousand more.",
+      "marble": "Our seers track the Sphere's movements. It approaches again. We are prepared this time."
+    }
+  },
+  "6152": {
+    "name": "Atlantean Archivist",
+    "description": "A hunched figure surrounded by floating tablets of compressed water, each containing text.",
+    "room": 6104,
+    "power": 60,
+    "hp": 180,
+    "attack": 12,
+    "defense": 7,
+    "flags": [
+      "no_attack"
+    ],
+    "dialogue": "The archives contain all knowledge of the deep. What do you seek?",
+    "sayResponses": {
+      "knowledge": "Ask a question and I will search the archives. Most answers exist here.",
+      "history": "Atlantis was founded when the first people chose the sea over the land. We never looked back.",
+      "marble": "I have seventeen entries regarding the Sphere. Its trajectory is predictable. Its purpose is not.",
+      "surface": "The surface world is chaotic and brief. We observe but do not interfere. Usually."
+    }
+  },
+  "6153": {
+    "name": "Golden Guardian",
+    "description": "A statue of pure gold that moves with fluid grace. Its eyes burn with ancient fire.",
+    "room": 6108,
+    "power": 120,
+    "hp": 360,
+    "attack": 24,
+    "defense": 15,
+    "flags": [
+      "no_attack"
+    ],
+    "dialogue": "Only the worthy may enter El Dorado. Prove your worth or turn back.",
+    "sayResponses": {
+      "worth": "Bring gold equal to your weight. Or defeat me in single combat. Your choice.",
+      "eldorado": "The city of gold has stood since before memory. Its treasures are beyond counting.",
+      "marble": "The Sphere came here once. It took nothing. Left nothing. Simply passed through. Even gold could not tempt it.",
+      "treasure": "The gold here is not mere metal. It is crystallized sunlight. It holds power."
+    }
+  },
+  "7050": {
+    "name": "Undercity Fence",
+    "description": "A hunched figure in the shadows, eyes gleaming with avarice.",
+    "room": 7018,
+    "power": 65,
+    "hp": 195,
+    "attack": 13,
+    "defense": 8,
+    "flags": [
+      "no_attack",
+      "merchant"
+    ],
+    "dialogue": "You found the market. Good. Everything here fell off a cart. Understand?",
+    "sayResponses": {
+      "buy": "Weapons, potions, information. All at reasonable prices. No questions.",
+      "sell": "I'll take anything of value. The more questionable its origin, the better the price.",
+      "undercity": "This place exists because the surface doesn't want us. Their loss.",
+      "marble": "Something rolled through the tunnels last month. Collapsed two passages. The diggers are still clearing rubble."
+    }
+  },
+  "8100": {
+    "name": "Archivist Unit 7",
+    "description": "A floating mechanical sphere covered in lenses and data ports. It hums with stored information.",
+    "room": 8025,
+    "power": 150,
+    "hp": 450,
+    "attack": 30,
+    "defense": 18,
+    "flags": [
+      "no_attack"
+    ],
+    "dialogue": "QUERY RECEIVED. STATE YOUR INFORMATION REQUEST.",
+    "sayResponses": {
+      "records": "This facility contains 47,000 years of gravitational research data. Specify your query.",
+      "gravity": "Gravity is not a force. It is a curvature of spacetime. This facility manipulates that curvature.",
+      "marble": "OBJECT DESIGNATION: UNKNOWN SPHERE. Gravitational signature: anomalous. Mass: variable. Trajectory: unpredictable. THREAT LEVEL: MAXIMUM.",
+      "facility": "This facility was constructed to study and contain gravitational anomalies. It has failed at the latter."
+    }
+  },
+  "9100": {
+    "name": "Gatekeeper Anubis",
+    "description": "A towering figure with the head of a jackal, holding golden scales in one hand.",
+    "room": 9001,
+    "power": 200,
+    "hp": 600,
+    "attack": 40,
+    "defense": 25,
+    "flags": [
+      "no_attack"
+    ],
+    "dialogue": "Your heart will be weighed. Your deeds will be measured. Enter.",
+    "sayResponses": {
+      "judgment": "All souls are judged. The worthy pass on. The unworthy are consumed.",
+      "afterlife": "Beyond these gates lie the realms of the dead. Heroes, villains, and all between.",
+      "marble": "The Sphere does not belong here. It is not alive, not dead. It simply passes through, and we cannot stop it.",
+      "return": "The living may visit, but they may not stay. Your time here is limited."
+    }
+  },
+  "9101": {
+    "name": "Spirit of Valor",
+    "description": "A luminous warrior in ancient armor, their form flickering between a dozen different faces.",
+    "room": 9006,
+    "power": 180,
+    "hp": 540,
+    "attack": 36,
+    "defense": 22,
+    "flags": [
+      "no_attack"
+    ],
+    "dialogue": "Welcome, living one. The heroes rest here. Their stories echo eternally.",
+    "sayResponses": {
+      "heroes": "Every great warrior who ever lived rests in this hall. Their deeds are remembered.",
+      "training": "Even in death, we train. The spirit grows stronger without the body's limits.",
+      "marble": "Some heroes here fell to the Sphere. They bear no shame. Nothing could have stopped it.",
+      "valor": "True valor is not the absence of fear. It is action in spite of it."
+    }
+  },
+  "9102": {
+    "name": "Judge of Souls",
+    "description": "A robed figure whose face is hidden behind a featureless golden mask. They radiate absolute authority.",
+    "room": 9007,
+    "power": 250,
+    "hp": 750,
+    "attack": 50,
+    "defense": 31,
+    "flags": [
+      "no_attack"
+    ],
+    "dialogue": "Step forward. Your deeds will be read aloud. Do not lie. I will know.",
+    "sayResponses": {
+      "judgment": "I weigh every action. Every choice. Every moment of cowardice and courage.",
+      "mercy": "Mercy is earned, not given. Show me why you deserve it.",
+      "marble": "The Sphere has no soul to judge. It is beyond my authority. This troubles me greatly.",
+      "pass": "If you are judged worthy, you may pass deeper into the afterlife. If not... you will not enjoy what follows."
     }
   }
 }
