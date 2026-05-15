@@ -1,5 +1,54 @@
-/* ─── MUD Full-Screen Mode ───────────────────────────────────────────────── */
-/* Mirror marble-mode exactly: collapse the app grid, hide chrome, fill viewport. */
+/* ─── DESIGN.md Token Layer ──────────────────────────────────────────────── */
+/* All values sourced from DESIGN.md YAML front matter.                      */
+/* Override these properties to theme the MUD terminal without editing rules. */
+
+:root {
+  /* Colors */
+  --mud-primary:        #0F172A;
+  --mud-primary-muted:  #1E293B;
+  --mud-secondary:      #334155;
+  --mud-tertiary:       #7C3AED;
+  --mud-accent:         #F59E0B;
+  --mud-surface:        #FFFFFF;
+  --mud-surface-muted:  #F1F5F9;
+  --mud-surface-raised: #E2E8F0;
+  --mud-surface-inverse:#020617;
+  --mud-on-primary:     #F8FAFC;
+  --mud-on-accent:      #111827;
+  --mud-on-surface:     #0F172A;
+  --mud-on-muted:       #475569;
+  --mud-on-inverse:     #E2E8F0;
+  --mud-success:        #166534;
+  --mud-warning:        #B45309;
+  --mud-error:          #B91C1C;
+  --mud-info:           #2563EB;
+  --mud-focus:          #2563EB;
+  --mud-border-subtle:  #CBD5E1;
+  --mud-border-strong:  #64748B;
+
+  /* Typography */
+  --mud-font-body:  "Inter", system-ui, sans-serif;
+  --mud-font-code:  "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* Spacing (8px rhythm) */
+  --mud-space-xxs:  2px;
+  --mud-space-xs:   4px;
+  --mud-space-sm:   8px;
+  --mud-space-md:   16px;
+  --mud-space-lg:   24px;
+
+  /* Shapes */
+  --mud-rounded-sm:    4px;
+  --mud-rounded-md:    8px;
+  --mud-rounded-lg:    12px;
+  --mud-rounded-panel: 20px;
+  --mud-rounded-full:  9999px;
+
+  /* Touch target */
+  --mud-touch-min: 44px;
+}
+
+/* ─── MUD Full-Screen Mode ──────────────────────────────────────────────── */
 
 .app.app-mud-mode {
   grid-template-rows: 1fr;
@@ -26,25 +75,18 @@
   min-height: 100dvh;
 }
 
-.app.app-mud-mode .content {
-  grid-template-columns: 1fr;
-}
-
-.app.app-mud-mode .game-grid {
-  grid-template-columns: 1fr;
-}
+.app.app-mud-mode .content { grid-template-columns: 1fr; }
+.app.app-mud-mode .game-grid { grid-template-columns: 1fr; }
 
 .app.app-mud-mode .panel {
-  background: #0a0a0a;
+  background: var(--mud-surface-inverse);
   border: 0;
   border-radius: 0;
   box-shadow: none;
   backdrop-filter: none;
 }
 
-.app.app-mud-mode .panel-header {
-  display: none;
-}
+.app.app-mud-mode .panel-header { display: none; }
 
 .app.app-mud-mode .panel-body {
   padding: 0;
@@ -62,113 +104,197 @@
   height: 100%;
 }
 
-/* ─── MUD Terminal ────────────────────────────────────────────────────────── */
+/* ─── MUD Terminal (game-hud-panel) ─────────────────────────────────────── */
 
 .mud-terminal {
   display: flex;
   flex-direction: column;
   width: 100%;
   height: 100%;
-  background: #0a0a0a;
-  color: #e0e0e0;
-  font-family: 'Courier New', Courier, monospace;
+  background: var(--mud-surface-inverse);
+  color: var(--mud-on-inverse);
+  font-family: var(--mud-font-code);
   font-size: 14px;
   line-height: 1.5;
+  letter-spacing: -0.01em;
   overflow: hidden;
 }
 
-/* ─── Log Area ────────────────────────────────────────────────────────────── */
+/* ─── Log Area ──────────────────────────────────────────────────────────── */
 
 .mud-log {
   flex: 1 1 0;
   min-height: 0;
   overflow-y: scroll;
-  padding: 12px;
+  padding: var(--mud-space-md);
 }
 
 .mud-line {
-  margin-bottom: 2px;
+  margin-bottom: var(--mud-space-xxs);
   white-space: pre-wrap;
   word-wrap: break-word;
 }
 
-.mud-line-room-name  { color: #ffd700; font-weight: bold; margin-top: 8px; }
-.mud-line-room-desc  { color: #c8c8c8; }
-.mud-line-exits      { color: #66ccff; }
-.mud-line-items      { color: #90ee90; }
-.mud-line-mobs       { color: #ff9966; }
-.mud-line-combat     { color: #ff4444; }
-.mud-line-success    { color: #44ff44; }
-.mud-line-error      { color: #ff6666; font-style: italic; }
-.mud-line-info       { color: #aaaaaa; }
-.mud-line-quest      { color: #dda0dd; font-weight: bold; }
-.mud-line-dialogue   { color: #87ceeb; font-style: italic; }
-.mud-line-input      { color: #888888; font-style: italic; }
+/* Line types — mapped to DESIGN.md semantic colors.                        */
+/* Color is reinforced with weight or style so it is never the sole cue.    */
 
-/* ─── Status Bar ──────────────────────────────────────────────────────────── */
+.mud-line-room-name {
+  color: var(--mud-accent);
+  font-weight: 700;
+  margin-top: var(--mud-space-sm);
+}
+
+.mud-line-room-desc  { color: var(--mud-on-inverse); }
+.mud-line-exits      { color: var(--mud-info); }
+
+.mud-line-items {
+  color: #86EFAC;                     /* green-300 — readable on inverse bg */
+}
+
+.mud-line-mobs {
+  color: #FDBA74;                     /* orange-300 — readable on inverse bg */
+}
+
+.mud-line-combat {
+  color: #FCA5A5;                     /* red-300 — readable on inverse bg */
+  font-weight: 650;
+}
+
+.mud-line-success {
+  color: #86EFAC;                     /* matches items for positive feedback */
+  font-weight: 650;
+}
+
+.mud-line-error {
+  color: #FCA5A5;                     /* matches combat for negative feedback */
+  font-style: italic;
+}
+
+.mud-line-info   { color: var(--mud-on-muted); }
+
+.mud-line-quest {
+  color: var(--mud-tertiary);
+  font-weight: 700;
+}
+
+.mud-line-dialogue {
+  color: #93C5FD;                     /* blue-300 — readable on inverse bg */
+  font-style: italic;
+}
+
+.mud-line-input {
+  color: var(--mud-border-strong);
+  font-style: italic;
+}
+
+/* ─── Status Bar (game-stat) ────────────────────────────────────────────── */
 
 .mud-status-bar {
   flex: 0 0 auto;
   display: flex;
-  justify-content: space-between;
-  padding: 4px 12px;
-  background: #1a1a1a;
-  border-top: 1px solid #333;
-  border-bottom: 1px solid #333;
+  align-items: center;
+  gap: var(--mud-space-sm);
+  padding: var(--mud-space-xs) var(--mud-space-md);
+  background: var(--mud-primary-muted);
+  border-top: 1px solid var(--mud-secondary);
+  border-bottom: 1px solid var(--mud-secondary);
+  font-family: var(--mud-font-code);
   font-size: 12px;
+  font-weight: 650;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
 }
 
-.mud-hp   { color: #ff4444; font-weight: bold; }
-.mud-room { color: #ffd700; text-align: right; }
+.mud-hp {
+  color: #FCA5A5;                     /* red-300 — HP always red-toned */
+}
 
-/* ─── Quick Action Buttons ────────────────────────────────────────────────── */
+.mud-focus {
+  color: #93C5FD;                     /* blue-300 — Focus = info-toned */
+}
+
+.mud-power {
+  color: var(--mud-accent);
+}
+
+.mud-stance {
+  color: var(--mud-tertiary);
+}
+
+.mud-momentum {
+  color: #FDBA74;                     /* orange-300 — warm momentum cue */
+}
+
+.mud-room {
+  color: var(--mud-accent);
+  margin-left: auto;
+  text-align: right;
+}
+
+/* ─── Quick Action Buttons ──────────────────────────────────────────────── */
 
 .mud-actions {
   flex: 0 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  padding: 6px 12px;
-  background: #111;
+  gap: var(--mud-space-xs);
+  padding: var(--mud-space-sm) var(--mud-space-md);
+  background: var(--mud-primary);
 }
 
 .mud-dir-buttons,
 .mud-ctx-buttons {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
+  gap: var(--mud-space-xs);
 }
 
 .mud-action-btn {
-  padding: 6px 12px;
-  background: #222;
-  color: #ccc;
-  border: 1px solid #444;
-  border-radius: 4px;
-  font-family: inherit;
-  font-size: 12px;
+  min-height: var(--mud-touch-min);
+  padding: var(--mud-space-sm) var(--mud-space-md);
+  background: var(--mud-primary-muted);
+  color: var(--mud-on-primary);
+  border: 1px solid var(--mud-secondary);
+  border-radius: var(--mud-rounded-md);
+  font-family: var(--mud-font-body);
+  font-size: 14px;
+  font-weight: 650;
+  letter-spacing: 0.02em;
   cursor: pointer;
   transition: background 0.15s, border-color 0.15s;
 }
 
-.mud-action-btn:hover  { background: #333; border-color: #666; color: #fff; }
-.mud-action-btn:active { background: #444; }
+.mud-action-btn:hover {
+  background: var(--mud-secondary);
+  border-color: var(--mud-border-strong);
+  color: var(--mud-on-primary);
+}
 
-/* ─── Input Row ───────────────────────────────────────────────────────────── */
+.mud-action-btn:active {
+  background: var(--mud-border-strong);
+}
+
+.mud-action-btn:focus-visible {
+  outline: 3px solid var(--mud-focus);
+  outline-offset: 2px;
+}
+
+/* ─── Input Row ─────────────────────────────────────────────────────────── */
 
 .mud-input-row {
   flex: 0 0 auto;
   display: flex;
   align-items: center;
-  padding: 8px 12px;
-  background: #0a0a0a;
-  border-top: 1px solid #333;
+  min-height: var(--mud-touch-min);
+  padding: var(--mud-space-sm) var(--mud-space-md);
+  background: var(--mud-surface-inverse);
+  border-top: 1px solid var(--mud-secondary);
 }
 
 .mud-prompt {
-  color: #66ccff;
-  margin-right: 8px;
-  font-weight: bold;
+  color: var(--mud-info);
+  margin-right: var(--mud-space-sm);
+  font-weight: 700;
 }
 
 .mud-input {
@@ -176,19 +302,31 @@
   background: transparent;
   border: none;
   outline: none;
-  color: #e0e0e0;
-  font-family: inherit;
+  color: var(--mud-on-inverse);
+  font-family: var(--mud-font-code);
   font-size: 14px;
-  caret-color: #66ccff;
+  line-height: 1.5;
+  caret-color: var(--mud-info);
 }
 
-.mud-input::placeholder { color: #555; }
+.mud-input::placeholder {
+  color: var(--mud-border-strong);
+}
 
-/* ─── Mobile ──────────────────────────────────────────────────────────────── */
+.mud-input:focus-visible {
+  outline: none;
+  box-shadow: inset 0 -2px 0 var(--mud-focus);
+}
+
+/* ─── Mobile ────────────────────────────────────────────────────────────── */
 
 @media (max-width: 760px) {
   .mud-terminal { font-size: 13px; }
-  .mud-action-btn { padding: 10px 14px; font-size: 14px; }
+  .mud-action-btn {
+    padding: 10px 14px;
+    font-size: 14px;
+    min-height: 48px;          /* larger touch target on mobile */
+  }
   .mud-input { font-size: 16px; }
-  .mud-log { padding: 8px; }
+  .mud-log { padding: var(--mud-space-sm); }
 }

@@ -44,17 +44,20 @@
       root.innerHTML = `
         <div class="mud-terminal">
           <div class="mud-log" id="mudLog"></div>
-          <div class="mud-status-bar" id="mudStatusBar">
-            <span class="mud-hp" id="mudHpBar">HP: --/--</span>
-            <span class="mud-focus" id="mudFocusBar">Focus: --/--</span>
-            <span class="mud-power" id="mudPowerBar">Power: --</span>
-            <span class="mud-room" id="mudRoomName">Unknown</span>
+          <div class="mud-status-bar" id="mudStatusBar" role="status" aria-label="Player status">
+            <span class="mud-hp" id="mudHpBar" aria-label="Hit points">HP: --/--</span>
+            <span class="mud-focus" id="mudFocusBar" aria-label="Focus">Focus: --/--</span>
+            <span class="mud-power" id="mudPowerBar" aria-label="Power level">Power: --</span>
+            <span class="mud-stance" id="mudStance" aria-label="Stance"></span>
+            <span class="mud-momentum" id="mudMomentum" aria-label="Momentum"></span>
+            <span class="mud-room" id="mudRoomName" aria-label="Current room">Unknown</span>
           </div>
           <div class="mud-actions" id="mudActions"></div>
           <div class="mud-input-row">
             <span class="mud-prompt">&gt;</span>
             <input type="text" class="mud-input" id="mudInput"
                    placeholder="Type a command... (Tab to complete)"
+                   aria-label="Command input"
                    autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
           </div>
         </div>
@@ -326,15 +329,32 @@
     function updateContext(ctx) {
       if (!ctx) return;
 
-      // Update status bar
+      // Update status bar — game-stat: current/max format, monospaced
       const hpEl = root.querySelector('#mudHpBar');
       const focusEl = root.querySelector('#mudFocusBar');
       const powerEl = root.querySelector('#mudPowerBar');
+      const stanceEl = root.querySelector('#mudStance');
+      const momentumEl = root.querySelector('#mudMomentum');
       const roomEl = root.querySelector('#mudRoomName');
 
       if (hpEl) hpEl.textContent = `HP: ${ctx.hp}/${ctx.maxHp}`;
       if (focusEl) focusEl.textContent = `Focus: ${ctx.focus ?? '--'}/${ctx.maxFocus ?? '--'}`;
       if (powerEl) powerEl.textContent = `Power: ${ctx.power ?? '--'}`;
+      if (stanceEl) {
+        const s = ctx.stance;
+        stanceEl.textContent = s ? s.charAt(0).toUpperCase() + s.slice(1) : '';
+        stanceEl.style.display = s ? '' : 'none';
+      }
+      if (momentumEl) {
+        const m = ctx.momentum;
+        if (m != null) {
+          const label = m >= 8 ? 'High' : m <= 2 ? 'Low' : '';
+          momentumEl.textContent = label ? `Mom: ${label}` : '';
+          momentumEl.style.display = label ? '' : 'none';
+        } else {
+          momentumEl.style.display = 'none';
+        }
+      }
       if (roomEl) roomEl.textContent = ctx.roomName;
 
       if (!actionsEl) return;
