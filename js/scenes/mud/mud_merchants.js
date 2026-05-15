@@ -251,7 +251,10 @@
   function registerPurchasedItem(def, itemsMap) {
     const vnum = nextPurchaseVnum++;
     def.vnum = vnum;
-    if (itemsMap) itemsMap[vnum] = def;
+    if (itemsMap) {
+      itemsMap[vnum] = def;          // Numeric key for direct lookups
+      itemsMap[String(vnum)] = def;  // String key for JSON-loaded consistency
+    }
     return vnum;
   }
 
@@ -266,8 +269,16 @@
     for (const entry of purchasedItems) {
       if (!entry) continue;
       if (entry.vnum != null) {
-        itemsMap[entry.vnum] = entry;
+        // Use String key for consistency with JSON-loaded items map
+        itemsMap[String(entry.vnum)] = entry;
+        itemsMap[entry.vnum] = entry; // Also set numeric key for direct lookups
         if (entry.vnum >= nextPurchaseVnum) nextPurchaseVnum = entry.vnum + 1;
+      } else if (entry.name) {
+        // Old-format entry without vnum — assign one now
+        const vnum = nextPurchaseVnum++;
+        entry.vnum = vnum;
+        itemsMap[String(vnum)] = entry;
+        itemsMap[vnum] = entry;
       }
     }
   }

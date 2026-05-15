@@ -278,6 +278,10 @@
           if (itemDef.slot) {
             out.push({ type: 'info', text: `  Slot: ${itemDef.slot}` });
           }
+          if (itemDef.weapon_category) {
+            const cat = itemDef.weapon_category.charAt(0).toUpperCase() + itemDef.weapon_category.slice(1);
+            out.push({ type: 'info', text: `  Weapon Type: ${cat}` });
+          }
           // Display stats
           if (itemDef.stats && typeof itemDef.stats === 'object') {
             const statLines = [];

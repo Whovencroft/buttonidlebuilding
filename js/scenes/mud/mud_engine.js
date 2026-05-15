@@ -975,10 +975,14 @@
       const output = [{ type: 'info', text: '─── Abilities ───' }];
       for (const abilityId of player.abilities) {
         const def = window.MudAbilities?.getAbilityById(abilityId);
-        if (!def) continue;
         const cd = player.abilityCooldowns[abilityId] || 0;
         const cdText = cd > 0 ? ` [CD: ${cd} rounds]` : ' [READY]';
-        output.push({ type: 'info', text: `  ${def.name} — ${def.desc}${cdText}` });
+        if (def) {
+          output.push({ type: 'info', text: `  ${def.name} — ${def.desc}${cdText}` });
+        } else {
+          // Fallback: show the raw ID so abilities are never silently hidden
+          output.push({ type: 'info', text: `  ${abilityId}${cdText}` });
+        }
       }
       output.push({ type: 'info', text: '' });
       output.push({ type: 'info', text: `  Focus: ${player.focus}/${player.maxFocus}` });
