@@ -76,7 +76,7 @@
           if (!mob) continue;
           const cp = getCreaturePower(mob);
           const { label, type } = comparePower(cp, player.power);
-          output.push({ type, text: `  ${mob.name} — ${label}` });
+          output.push({ type, text: `  ${mob.name} - ${label}` });
         }
       }
 
@@ -100,7 +100,7 @@
               if (!mob) continue;
               const cp = getCreaturePower(mob);
               const { label, type } = comparePower(cp, player.power);
-              output.push({ type, text: `  [${dir}] ${mob.name} — ${label}` });
+              output.push({ type, text: `  [${dir}] ${mob.name} - ${label}` });
             }
           }
         }

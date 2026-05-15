@@ -161,7 +161,7 @@
           atkMod: 2.0,
           defMod: 1.8,
           focusCostPerTick: 4,
-          aura: 'Sage Mode activated! Your eyes change — you see everything!',
+          aura: 'Sage Mode activated! Your eyes change - you see everything!',
           deactivate: 'Sage Mode fades. The world dulls.',
           ability: { id: 'rasenshuriken', name: 'Rasenshuriken', type: 'attack', desc: 'Spiraling sphere of nature energy. 480% damage.', multiplier: 4.8, cooldown: 7, chargeRounds: 2 }
         },
@@ -196,7 +196,7 @@
           atkMod: 1.3,
           defMod: 1.6,
           focusCostPerTick: 2,
-          aura: 'HENSHIN! Light engulfs you — armor materializes!',
+          aura: 'HENSHIN! Light engulfs you - armor materializes!',
           deactivate: 'The armor dissolves into motes of light.',
           ability: { id: 'rider_kick', name: 'Rider Kick', type: 'attack', desc: 'Signature flying kick. 250% damage.', multiplier: 2.5, cooldown: 4 }
         },
@@ -218,7 +218,7 @@
           atkMod: 2.5,
           defMod: 3.0,
           focusCostPerTick: 7,
-          aura: 'ULTIMATE FORM! Wings of light unfurl — you are the shield of all!',
+          aura: 'ULTIMATE FORM! Wings of light unfurl - you are the shield of all!',
           deactivate: 'The wings shatter. You return to mortal form.',
           ability: { id: 'final_justice', name: 'Final Justice', type: 'attack', desc: 'Orbital dive. 800% damage + heal 50% HP.', multiplier: 8.0, healPercent: 0.5, cooldown: 99, chargeRounds: 2 }
         }
@@ -453,7 +453,7 @@
       output.push({ type: unlocked ? 'success' : 'info', text: `${prefix}${t.name} (Power: ${t.powerRequired})` });
       output.push({ type: 'info', text: `      ATK ×${t.atkMod} | DEF ×${t.defMod} | Drain: ${t.focusCostPerTick}/tick` });
       if (t.ability) {
-        output.push({ type: 'items', text: `      Ability: ${t.ability.name} — ${t.ability.desc}` });
+        output.push({ type: 'items', text: `      Ability: ${t.ability.name} - ${t.ability.desc}` });
       }
     }
 

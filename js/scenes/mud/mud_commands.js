@@ -279,7 +279,7 @@
       for (const cmd of cmds) {
         const usage = cmd.usage || cmd.name;
         const pad = ' '.repeat(Math.max(1, 20 - usage.length));
-        output.push({ type: 'info', text: `  ${usage}${pad}— ${cmd.help}` });
+        output.push({ type: 'info', text: `  ${usage}${pad}- ${cmd.help}` });
       }
     }
 

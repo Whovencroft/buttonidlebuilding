@@ -45,29 +45,26 @@
     <div class="tabs" id="tabs" data-disclosure="4"></div>
 
     <div class="content">
+      <!-- ═══ PLAY TAB: Centered button only ═══ -->
       <section class="tab-panel active" data-tab="play">
-        <div class="game-grid" id="playGameGrid">
-          <div class="panel">
+        <div class="game-grid game-grid--centered" id="playGameGrid">
+          <div class="panel panel--button-focus">
             <div class="panel-header" data-disclosure="3">
-             <h2>Main Button</h2>
-             <div class="panel-tools">
+              <h2>Main Button</h2>
+              <div class="panel-tools">
                 <div class="small" id="buttonModeLabel">Mode: Manual humiliation</div>
-               <div class="scene-switcher">
-                 <button class="mini-btn active" id="switchButtonSceneBtn">Button Scene</button>
-                 <button class="mini-btn" id="switchMarbleSceneBtn">Marble Test</button>
-               </div>
               </div>
             </div>
-           <div class="panel-body">
-             <div class="scene-host" id="sceneHost">
-               <div class="scene-root scene-root-dom" id="buttonIdleSceneRoot" data-scene-id="button_idle">
-                 <div class="button-stage">
-                   <div class="button-sandbox" id="buttonSandbox">
+            <div class="panel-body">
+              <div class="scene-host" id="sceneHost">
+                <div class="scene-root scene-root-dom" id="buttonIdleSceneRoot" data-scene-id="button_idle">
+                  <div class="button-stage">
+                    <div class="button-sandbox" id="buttonSandbox">
                       <button class="big-button" id="mainButton">Press Me</button>
-                     <div class="button-center-note" id="buttonNote">I built a game about not playing a game; it feels like self indulgence, or maybe self flagellation.</div>
-                     <div class="minimal-press-counter" id="minimalPressCounter">0</div>
-                     <div class="particle-layer" id="particleLayer"></div>
-                     <div id="fakeButtonLayer"></div>
+                      <div class="button-center-note" id="buttonNote">I built a game about not playing a game; it feels like self indulgence, or maybe self flagellation.</div>
+                      <div class="minimal-press-counter" id="minimalPressCounter">0</div>
+                      <div class="particle-layer" id="particleLayer"></div>
+                      <div id="fakeButtonLayer"></div>
                     </div>
                     <div class="popup-zone" id="popupZone"></div>
                     <div class="ending-modal" id="autonomyEndingModal" hidden>
@@ -85,77 +82,46 @@
                     </div>
                   </div>
                 </div>
-
-      <div class="scene-root scene-root-canvas" id="marbleSceneRoot" data-scene-id="marble"></div>
-      <div class="scene-root scene-root-dom" id="mudSceneRoot" data-scene-id="mud"></div>
-      <div class="scene-root scene-root-title" id="titleSceneRoot" data-scene-id="title"></div>
-    </div>
-  </div>
-</div>
-
-          <div class="column-stack button-only-pane" data-disclosure="2">
-            <div class="panel">
-              <div class="panel-header">
-                <h2>Automation</h2>
-                <div class="small" id="automationSummary">0 owned</div>
-              </div>
-              <div class="panel-body">
-                <div class="card-list" id="upgradeList"></div>
+                <div class="scene-root scene-root-canvas" id="marbleSceneRoot" data-scene-id="marble"></div>
+                <div class="scene-root scene-root-dom" id="mudSceneRoot" data-scene-id="mud"></div>
+                <div class="scene-root scene-root-title" id="titleSceneRoot" data-scene-id="title"></div>
               </div>
             </div>
           </div>
+        </div>
+      </section>
 
-          <div class="column-stack button-only-pane" data-disclosure="3">
+      <!-- ═══ AUTOMATION TAB ═══ -->
+      <section class="tab-panel" data-tab="automation">
+        <div class="grid-2" style="min-height: 0;">
+          <div class="panel">
+            <div class="panel-header">
+              <h2>Automation</h2>
+              <div class="small" id="automationSummary">0 owned</div>
+            </div>
+            <div class="panel-body">
+              <div class="card-list" id="upgradeList"></div>
+            </div>
+          </div>
+          <div class="column-stack">
             <div class="panel">
               <div class="panel-header">
-                <h2>Situation</h2>
-                <div class="small">The game remains extremely stupid.</div>
+                <h2>Automation Reappropriation</h2>
+                <div class="small">The button is watching.</div>
               </div>
               <div class="panel-body">
-                <div class="card-list">
-                  <div class="card">
-                    <div class="card-row">
-                      <div>
-                        <div class="card-title">Efficiency</div>
-                        <div class="card-desc">Each source of presses is multiplied by a stack of increasingly questionable decisions.</div>
-                      </div>
-                      <div class="good nowrap" id="efficiencyValue">x1.00</div>
-                    </div>
-                    <div class="formula" id="formulaEfficiency"></div>
-                  </div>
-                  <div class="card">
-                    <div class="card-row">
-                      <div>
-                        <div class="card-title">Inflation</div>
-                        <div class="card-desc">Prices climb because the button industry is overheated.</div>
-                      </div>
-                      <div class="warn nowrap" id="inflationValue">x1.00</div>
-                    </div>
-                    <div class="formula" id="formulaInflation"></div>
-                  </div>
-                  <div class="card">
-                    <div class="card-title">Idle Exploitation</div>
-                    <div class="card-desc" id="idleDesc">Being absent is slowly becoming optimal, which feels disrespectful.</div>
-                    <div class="meter"><span id="idleMeter"></span></div>
-                    <div class="small" id="idleStatus">Idle bonus: x1.00</div>
-                  </div>
-                  <div class="card">
-                    <div class="card-row">
-                     <div>
-                      <div class="card-title">Automation Reappropriation</div>
+                <div class="card">
+                  <div class="card-row">
+                    <div>
+                      <div class="card-title">Dumb the Button Down</div>
                       <div class="card-desc" id="dumbDownDesc">
                         Strip some autonomy away for a rising cost. The button is watching.
                       </div>
                     </div>
-                   <div class="warn nowrap" id="larcenyValue">Larceny 0</div>
-                   </div>
-                    <div class="formula" id="dumbDownFormula"></div>
-                    <button class="action-btn" id="dumbDownBtn">Dumb the Button Down</button>
+                    <div class="warn nowrap" id="larcenyValue">Larceny 0</div>
                   </div>
-                  <div class="card">
-                    <div class="card-title">Recent Log</div>
-                    <div class="log-box" id="recentLog"></div>
-                  </div>
+                  <div class="formula" id="dumbDownFormula"></div>
+                  <button class="action-btn" id="dumbDownBtn">Dumb the Button Down</button>
                 </div>
               </div>
             </div>
@@ -231,6 +197,59 @@
         </div>
       </section>
 
+      <!-- ═══ DETAILS TAB: Situation metrics moved here ═══ -->
+      <section class="tab-panel" data-tab="details">
+        <div class="grid-2" style="min-height: 0;">
+          <div class="panel">
+            <div class="panel-header">
+              <h2>Economy</h2>
+              <div class="small">The game remains extremely stupid.</div>
+            </div>
+            <div class="panel-body">
+              <div class="card-list">
+                <div class="card">
+                  <div class="card-row">
+                    <div>
+                      <div class="card-title">Efficiency</div>
+                      <div class="card-desc">Each source of presses is multiplied by a stack of increasingly questionable decisions.</div>
+                    </div>
+                    <div class="good nowrap" id="efficiencyValue">x1.00</div>
+                  </div>
+                  <div class="formula" id="formulaEfficiency"></div>
+                </div>
+                <div class="card">
+                  <div class="card-row">
+                    <div>
+                      <div class="card-title">Inflation</div>
+                      <div class="card-desc">Prices climb because the button industry is overheated.</div>
+                    </div>
+                    <div class="warn nowrap" id="inflationValue">x1.00</div>
+                  </div>
+                  <div class="formula" id="formulaInflation"></div>
+                </div>
+                <div class="card">
+                  <div class="card-title">Idle Exploitation</div>
+                  <div class="card-desc" id="idleDesc">Being absent is slowly becoming optimal, which feels disrespectful.</div>
+                  <div class="meter"><span id="idleMeter"></span></div>
+                  <div class="small" id="idleStatus">Idle bonus: x1.00</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="column-stack">
+            <div class="panel">
+              <div class="panel-header">
+                <h2>Recent Log</h2>
+                <div class="small">What just happened</div>
+              </div>
+              <div class="panel-body">
+                <div class="log-box" id="recentLog"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section class="tab-panel" data-tab="save">
         <div class="grid-2" style="min-height: 0;">
           <div class="column-stack">
@@ -300,8 +319,10 @@
     },
     "tabs": [
       { "id": "play", "label": "Game" },
+      { "id": "automation", "label": "Automation" },
       { "id": "rules", "label": "Rules" },
       { "id": "layers", "label": "Layers" },
+      { "id": "details", "label": "Details" },
       { "id": "save", "label": "Save / Config" }
     ],
     "buttonNames": [
@@ -852,15 +873,16 @@
   <script src="./js/scenes/mud/mud_abilities.js?v=121"></script>
   <script src="./js/scenes/mud/mud_glimmer.js?v=121"></script>
   <script src="./js/scenes/mud/mud_filter.js?v=121"></script>
-  <!-- MUD Input System (loaded before engine so registry is available) -->
+
   <script src="./js/scenes/mud/mud_stats.js?v=121"></script>
   <script src="./js/scenes/mud/mud_commands.js?v=121"></script>
   <script src="./js/scenes/mud/mud_parser.js?v=121"></script>
+  <script src="./js/scenes/mud/mud_meta_puzzle.js?v=121"></script>
   <script src="./js/scenes/mud/mud_engine.js?v=121"></script>
   <script src="./js/scenes/mud/mud_merchants.js?v=121"></script>
   <script src="./js/scenes/mud/mud_npc_say.js?v=121"></script>
   <script src="./js/scenes/mud/mud_core_commands.js?v=121"></script>
-  <!-- MUD Enhancement Systems (loaded after engine, before integration) -->
+
   <script src="./js/scenes/mud/mud_combat_systems.js?v=121"></script>
   <script src="./js/scenes/mud/mud_sense.js?v=121"></script>
   <script src="./js/scenes/mud/mud_rest.js?v=121"></script>

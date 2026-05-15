@@ -51,9 +51,9 @@
     { name: 'Scroll of Recall',     vnum: 263, cost: 3,  desc: 'Teleport to your recall point.' },
 
     // ─── Special ───
-    { name: 'Respec Token',         vnum: 270, cost: 20, desc: 'Reset your specialization.' },
-    { name: 'XP Tome',              vnum: 271, cost: 15, desc: 'Gain a burst of stat XP.' },
-    { name: 'Treasure Map',         vnum: 272, cost: 10, desc: 'Reveals a hidden room in a random zone.' }
+    { name: 'Respec Token',         vnum: 9901, cost: 20, desc: 'Reset your specialization. Use from inventory.', category: 'Special' },
+    { name: 'XP Tome',              vnum: 9902, cost: 15, desc: 'Gain +5 to all core stats. Use from inventory.', category: 'Special' },
+    { name: 'Treasure Map',         vnum: 9903, cost: 10, desc: 'Reveals a hidden room in a random zone. Use from inventory.', category: 'Special' }
   ];
 
   /**
@@ -71,13 +71,13 @@
     let lastCategory = '';
     for (let i = 0; i < CATALOG.length; i++) {
       const item = CATALOG[i];
-      // Infer category from vnum ranges
+      // Infer category from vnum ranges (or use explicit category)
       let cat;
-      if (item.vnum < 220) cat = 'Weapons';
+      if (item.category) cat = item.category;
+      else if (item.vnum < 220) cat = 'Weapons';
       else if (item.vnum < 240) cat = 'Armor';
       else if (item.vnum < 260) cat = 'Accessories';
-      else if (item.vnum < 270) cat = 'Consumables';
-      else cat = 'Special';
+      else cat = 'Consumables';
 
       if (cat !== lastCategory) {
         output.push({ type: 'info', text: `  ─── ${cat} ───` });
@@ -87,7 +87,7 @@
       const affordable = (playerQP || 0) >= item.cost;
       output.push({
         type: affordable ? 'items' : 'info',
-        text: `  ${i + 1}. ${item.name} — ${item.cost} QP${affordable ? '' : ' (not enough QP)'}`
+        text: `  ${i + 1}. ${item.name} - ${item.cost} QP${affordable ? '' : ' (not enough QP)'}`
       });
       output.push({ type: 'info', text: `     ${item.desc}` });
     }

@@ -33,12 +33,19 @@
       'Recover the {item}',
       'Salvage Request: {item}',
       'Retrieve: {item}'
+    ],
+    defend: [
+      'Hold the Line: {room}',
+      'Defend {room}',
+      'Last Stand at {room}',
+      'Protect {room}'
     ]
   };
 
   const QUEST_DESCS = {
     hunt: 'Track down and defeat {mob}. {hint} Return to the Bulletin Board when done.',
-    fetch: 'Find the lost {item}. {hint} Bring it back to the Bulletin Board.'
+    fetch: 'Find the lost {item}. {hint} Bring it back to the Bulletin Board.',
+    defend: 'Travel to {room} and survive {waves} waves of attackers. Stay in the room until all waves are defeated.'
   };
 
   /* ─── Zone / area hint helpers ──────────────────────────────────────────── */
@@ -89,10 +96,13 @@
   function generateQuest(mobs, rooms, items, playerPower, completedIds = []) {
     const roll = Math.random();
 
-    if (roll < 0.55) {
+    if (roll < 0.45) {
       return generateHuntQuest(mobs, rooms, playerPower, completedIds);
     }
-    return generateFetchQuest(items, rooms, playerPower, completedIds);
+    if (roll < 0.75) {
+      return generateFetchQuest(items, rooms, playerPower, completedIds);
+    }
+    return generateDefendQuest(mobs, rooms, playerPower, completedIds);
   }
 
   /**
@@ -201,6 +211,61 @@
     };
   }
 
+  /**
+   * Generate a defend quest — survive X waves of mobs in a specific room.
+   * Waves spawn automatically when the player enters the defend room.
+   */
+  function generateDefendQuest(mobs, rooms, playerPower, completedIds) {
+    // Pick a room that has hostile mobs nearby (same zone)
+    const roomCandidates = Object.entries(rooms).filter(([rvnum, room]) => {
+      const v = Number(rvnum);
+      return v > 115 && v !== 150 && room.name;
+    });
+    if (roomCandidates.length === 0) return generateHuntQuest(mobs, rooms, playerPower, completedIds);
+
+    const [roomVnum, room] = roomCandidates[Math.floor(Math.random() * roomCandidates.length)];
+    const zone = Math.floor(Number(roomVnum) / 100);
+
+    // Find hostile mobs in the same zone for wave spawns
+    const zoneMobs = Object.entries(mobs).filter(([vnum, mob]) => {
+      if (!mob.stats) return false;
+      const cp = (mob.stats.hp || 0) + (mob.stats.attack || 0) * 3 + (mob.stats.defense || 0) * 2;
+      return cp >= Math.max(1, playerPower * 0.3) && cp <= playerPower * 2;
+    });
+    if (zoneMobs.length === 0) return generateHuntQuest(mobs, rooms, playerPower, completedIds);
+
+    const waves = 3 + Math.floor(Math.random() * 3); // 3-5 waves
+    const waveMobs = [];
+    for (let w = 0; w < waves; w++) {
+      const [mv] = zoneMobs[Math.floor(Math.random() * zoneMobs.length)];
+      waveMobs.push(Number(mv));
+    }
+
+    const nameTemplates = QUEST_NAMES.defend;
+    const name = nameTemplates[Math.floor(Math.random() * nameTemplates.length)]
+      .replace('{room}', room.name);
+    const desc = QUEST_DESCS.defend
+      .replace('{room}', room.name)
+      .replace('{waves}', String(waves));
+
+    return {
+      id: `quest_defend_${Date.now()}_${roomVnum}`,
+      type: 'defend',
+      name,
+      description: desc,
+      targetRoomVnum: Number(roomVnum),
+      targetRoomName: room.name,
+      waveMobs,
+      totalWaves: waves,
+      currentWave: 0,
+      rewards: {
+        qp: 3 + waves,
+        gold: 20 * waves
+      },
+      createdAt: Date.now()
+    };
+  }
+
   /* ─── Quest progression ─────────────────────────────────────────────────── */
 
   /**
@@ -231,6 +296,38 @@
       text: `  [Quest] ${activeQuest.name}: ${activeQuest.killsProgress}/${activeQuest.killsRequired}`
     });
     return { updated: true, completed: false, messages };
+  }
+
+  /**
+   * Progress a defend quest when a wave mob is killed.
+   * Called after each combat victory while in the defend room.
+   * @param {object|null} activeQuest - The player's current quest
+   * @param {number} playerRoomVnum   - Current room vnum
+   * @returns {{ updated: boolean, completed: boolean, messages: Array, nextMob: number|null }}
+   */
+  function progressDefend(activeQuest, playerRoomVnum) {
+    if (!activeQuest || activeQuest.type !== 'defend') {
+      return { updated: false, completed: false, messages: [], nextMob: null };
+    }
+    if (activeQuest.targetRoomVnum !== playerRoomVnum) {
+      return { updated: false, completed: false, messages: [], nextMob: null };
+    }
+
+    activeQuest.currentWave += 1;
+    const messages = [];
+
+    if (activeQuest.currentWave >= activeQuest.totalWaves) {
+      messages.push({ type: 'quest', text: `Quest Complete: ${activeQuest.name}!` });
+      messages.push({ type: 'success', text: "  All waves defeated! Return to the Bulletin Board to claim your reward." });
+      return { updated: true, completed: true, messages, nextMob: null };
+    }
+
+    const nextMob = activeQuest.waveMobs[activeQuest.currentWave] || null;
+    messages.push({
+      type: 'quest',
+      text: `  Wave ${activeQuest.currentWave}/${activeQuest.totalWaves} cleared! Next wave incoming...`
+    });
+    return { updated: true, completed: false, messages, nextMob };
   }
 
   /**
@@ -298,15 +395,19 @@
 
     if (activeQuest) {
       const isHunt = activeQuest.type === 'hunt';
-      const isComplete = isHunt
-        ? (activeQuest.killsProgress >= activeQuest.killsRequired)
-        : activeQuest.collected;
+      const isDefend = activeQuest.type === 'defend';
+      let isComplete;
+      if (isHunt) isComplete = activeQuest.killsProgress >= activeQuest.killsRequired;
+      else if (isDefend) isComplete = activeQuest.currentWave >= activeQuest.totalWaves;
+      else isComplete = activeQuest.collected;
 
       output.push({ type: 'info', text: 'Current Quest:' });
       if (isComplete) {
         output.push({ type: 'success', text: `  [COMPLETE] ${activeQuest.name}` });
       } else if (isHunt) {
         output.push({ type: 'quest', text: `  [${activeQuest.killsProgress}/${activeQuest.killsRequired}] ${activeQuest.name}` });
+      } else if (isDefend) {
+        output.push({ type: 'quest', text: `  [Wave ${activeQuest.currentWave}/${activeQuest.totalWaves}] ${activeQuest.name}` });
       } else {
         output.push({ type: 'quest', text: `  [In Progress] ${activeQuest.name}` });
       }
@@ -335,6 +436,7 @@
     generateQuest,
     progressHunt,
     progressFetch,
+    progressDefend,
     claimQuest,
     displayBoard
   };

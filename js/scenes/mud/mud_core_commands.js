@@ -161,11 +161,26 @@
         name: 'say',
         aliases: ['shout', 'yell'],
         category: 'Interaction',
-        help: 'Say something aloud — NPCs may respond to keywords',
+        help: 'Say something aloud - NPCs may respond to keywords',
         usage: 'say <message>',
         handler: (parsed) => {
           const msg = parsed.raw.replace(/^(say|shout|yell)\s*/i, '');
           if (!msg) return [{ type: 'info', text: 'Say what?' }];
+
+          // Check for password-gated rooms (say the word to enter)
+          if (engine._internals) {
+            const room = engine._internals.rooms[engine._internals.player.currentRoom];
+            if (room && room.password && msg.toLowerCase().trim() === room.password.toLowerCase()) {
+              const dest = room.password_destination;
+              if (dest && engine._internals.rooms[dest]) {
+                const output = [{ type: 'success', text: `You speak the word: "${msg}"` }];
+                output.push({ type: 'info', text: 'The way opens before you...' });
+                output.push(...engine._internals.moveToRoom(dest));
+                return output;
+              }
+            }
+          }
+
           // Use NPC response system if available
           if (window.MudNpcSay && engine._internals) {
             const room = engine._internals.rooms[engine._internals.player.currentRoom];
@@ -651,10 +666,10 @@
         }
         output.push({ type: 'info', text: '' });
         output.push({ type: 'info', text: '─── Shortcuts ───' });
-        output.push({ type: 'info', text: '  n/s/e/w/u/d          — Move in that direction' });
-        output.push({ type: 'info', text: '  l                    — Look around' });
-        output.push({ type: 'info', text: '  i                    — Inventory' });
-        output.push({ type: 'info', text: '  eq                   — Equipment' });
+        output.push({ type: 'info', text: '  n/s/e/w/u/d          - Move in that direction' });
+        output.push({ type: 'info', text: '  l                    - Look around' });
+        output.push({ type: 'info', text: '  i                    - Inventory' });
+        output.push({ type: 'info', text: '  eq                   - Equipment' });
         output.push({ type: 'info', text: '' });
         output.push({ type: 'info', text: "  Type 'help <command>' for details on a specific command." });
         output.push({ type: 'info', text: '  Type an ability name to use it in combat.' });

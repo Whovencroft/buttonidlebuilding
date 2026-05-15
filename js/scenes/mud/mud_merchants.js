@@ -145,6 +145,9 @@
     { min: 4000, max: 4199, sector: 'forgotten_epoch' },
   ];
 
+  /** Rotation interval in milliseconds (6 hours). */
+  const ROTATION_INTERVAL_MS = 6 * 60 * 60 * 1000;
+
   /**
    * Determine which sector a room vnum belongs to.
    * @param {number} vnum - Room vnum
@@ -158,22 +161,86 @@
   }
 
   /**
+   * Seeded pseudo-random number generator (mulberry32).
+   * Used to deterministically generate rotating inventories.
+   * @param {number} seed - Integer seed
+   * @returns {function} Returns a function that yields 0-1 floats
+   */
+  function seededRng(seed) {
+    return function () {
+      seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+      let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+  }
+
+  /**
+   * Get the current rotation epoch (changes every ROTATION_INTERVAL_MS).
+   * @returns {number} Integer epoch index
+   */
+  function getRotationEpoch() {
+    return Math.floor(Date.now() / ROTATION_INTERVAL_MS);
+  }
+
+  /**
+   * Generate a unique rotating inventory for a specific merchant.
+   * Each merchant gets a different seed (based on mob vnum + epoch),
+   * producing a unique subset of items from their sector template.
+   * @param {number} mobVnum - The merchant's vnum (used as seed component)
+   * @param {string} sector - The sector key for item templates
+   * @returns {object} Shop data: { markup, items, refreshesAt }
+   */
+  function generateRotatingInventory(mobVnum, sector) {
+    const epoch = getRotationEpoch();
+    const seed = (mobVnum * 7919) ^ (epoch * 104729);
+    const rng = seededRng(seed);
+    const template = SECTOR_SHOPS[sector] || SECTOR_SHOPS.nexus;
+    const allItems = [...template.items];
+
+    // Each merchant carries 3-5 items from their sector pool (shuffled)
+    const count = 3 + Math.floor(rng() * 3); // 3-5 items
+    // Fisher-Yates shuffle with seeded rng
+    for (let i = allItems.length - 1; i > 0; i--) {
+      const j = Math.floor(rng() * (i + 1));
+      [allItems[i], allItems[j]] = [allItems[j], allItems[i]];
+    }
+    const selected = allItems.slice(0, Math.min(count, allItems.length));
+
+    // Apply per-merchant price variance (±15%)
+    const items = selected.map((item, idx) => {
+      const variance = 0.85 + rng() * 0.30;
+      return {
+        id: idx + 1,
+        ...item,
+        price: Math.max(1, Math.round(item.price * template.markup * variance))
+      };
+    });
+
+    // Calculate when this stock refreshes
+    const refreshesAt = (epoch + 1) * ROTATION_INTERVAL_MS;
+
+    return { markup: template.markup, items, refreshesAt };
+  }
+
+  /**
    * Get the shop inventory for a merchant mob.
-   * Uses explicit shop data if available, otherwise generates
-   * a default inventory based on the sector the merchant is in.
+   * Each merchant carries a unique, rotating subset of sector items
+   * that refreshes every 6 hours.
    * @param {object} mob - The mob object
    * @param {number} roomVnum - The room the merchant is in
-   * @returns {object|null} Shop data: { markup, items }
+   * @param {number} [mobVnum] - The mob's vnum (for rotation seed)
+   * @returns {object|null} Shop data: { markup, items, refreshesAt }
    */
-  function getShopForMerchant(mob, roomVnum) {
+  function getShopForMerchant(mob, roomVnum, mobVnum) {
     if (!mob) return null;
     const isMerchant = (mob.flags || []).includes('merchant') ||
                        (mob.flags || []).includes('npc') && mob.shop;
-    // Explicit shop data on the mob
+    // Explicit shop data on the mob (overrides rotation)
     if (mob.shop && mob.shop.items && mob.shop.items.length > 0) {
       return mob.shop;
     }
-    // Only generate default shops for mobs flagged as merchants or
+    // Only generate shops for mobs flagged as merchants or
     // NPCs whose name/keywords suggest they sell things
     const merchantNames = ['merchant', 'vendor', 'shopkeeper', 'trader',
       'peddler', 'dealer', 'hawker', 'seller', 'smith', 'blacksmith',
@@ -182,16 +249,10 @@
     const nameLC = (mob.name || '').toLowerCase();
     const isMerchantByName = merchantNames.some(n => nameLC.includes(n));
     if (!isMerchant && !isMerchantByName) return null;
-    // Generate default inventory from sector
+    // Generate rotating inventory unique to this merchant
     const sector = getSectorForRoom(roomVnum);
-    const template = SECTOR_SHOPS[sector] || SECTOR_SHOPS.nexus;
-    return {
-      markup: template.markup,
-      items: template.items.map((item, idx) => ({
-        id: idx + 1,
-        ...item
-      }))
-    };
+    const vnum = mobVnum || roomVnum; // fallback seed if no mob vnum
+    return generateRotatingInventory(vnum, sector);
   }
 
   /**
@@ -210,11 +271,18 @@
       const num = i + 1;
       const affordable = playerGold >= item.price ? '' : ' [cannot afford]';
       const typeTag = item.type === 'equipment' ? ` [${item.slot}]` : '';
-      output.push({ type: 'info', text: `  [${num}] ${item.name}${typeTag} — ${item.price} gold${affordable}` });
+      output.push({ type: 'info', text: `  [${num}] ${item.name}${typeTag} - ${item.price} gold${affordable}` });
       output.push({ type: 'info', text: `       ${item.desc}` });
     }
     output.push({ type: 'info', text: '' });
     output.push({ type: 'info', text: `  Your gold: ${playerGold}` });
+    // Show rotation timer if available
+    if (shop.refreshesAt) {
+      const remaining = Math.max(0, shop.refreshesAt - Date.now());
+      const hrs = Math.floor(remaining / 3600000);
+      const mins = Math.floor((remaining % 3600000) / 60000);
+      output.push({ type: 'info', text: `  Stock refreshes in: ${hrs}h ${mins}m` });
+    }
     output.push({ type: 'info', text: `  Type 'buy <number>' or 'buy <name>' to purchase.` });
     output.push({ type: 'info', text: `  Type 'sell <item>' to sell from your inventory.` });
     return output;
@@ -231,8 +299,8 @@
     for (const vnum of roomMobVnums) {
       const mob = allMobs[vnum];
       if (!mob) continue;
-      const shop = getShopForMerchant(mob, roomVnum);
-      if (shop) return { mob, shop };
+      const shop = getShopForMerchant(mob, roomVnum, vnum);
+      if (shop) return { mob, shop, mobVnum: vnum };
     }
     return null;
   }
@@ -414,6 +482,8 @@
     processSell,
     restorePurchasedItems,
     getSectorForRoom,
+    getRotationEpoch,
+    generateRotatingInventory,
     SECTOR_SHOPS
   };
 })();

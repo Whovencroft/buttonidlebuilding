@@ -42,6 +42,9 @@
     },
     "mob_spawns": [
       1907
+    ],
+    "mobs": [
+      9010
     ]
   },
   "9004": {
@@ -87,6 +90,9 @@
         ],
         "description": "The circle of clarity is about three feet across. Within it, you can see the ground with perfect, almost painful sharpness \u2014 every grain of dirt, every blade of grass rendered in impossible detail. The ghosts whisper that something 'too real' passed through here, burning away the veil between life and death. One ghost keeps repeating: 'Round. It was round. And it was ANGRY.'"
       }
+    ],
+    "initial_items": [
+      9003
     ]
   },
   "9006": {
@@ -188,9 +194,9 @@
   },
   "9012": {
     "vnum": 9012,
-    "zone": 0,
-    "name": "The Crossroads of Souls",
-    "description": "Where paths diverge. Up leads to light. Down leads to shadow. Sideways leads to rebirth.",
+    "zone": "hollow_king_domain",
+    "name": "Hall of the Hourglass",
+    "description": "An enormous hourglass stands in the center of the room, completely empty. Time moves strangely here \u2014 your shadow arrives before you do.",
     "exits": {
       "north": 9007,
       "south": 9016,
@@ -203,7 +209,8 @@
     },
     "mob_spawns": [
       1916
-    ]
+    ],
+    "puzzle_action": "use_hourglass"
   },
   "9013": {
     "vnum": 9013,
@@ -223,6 +230,9 @@
     "mob_spawns": [
       1901,
       1902
+    ],
+    "initial_items": [
+      3019
     ]
   },
   "9014": {
@@ -256,7 +266,8 @@
     },
     "mob_spawns": [
       1907
-    ]
+    ],
+    "meta_clue": "marble_passage_9"
   },
   "9016": {
     "vnum": 9016,
@@ -318,7 +329,10 @@
       "east": 9020,
       "northeast": 9016,
       "southeast": 9022
-    }
+    },
+    "initial_items": [
+      3006
+    ]
   },
   "9020": {
     "vnum": 9020,
@@ -362,6 +376,9 @@
     },
     "flags": [
       "safe"
+    ],
+    "initial_items": [
+      6014
     ]
   },
   "4001": {
@@ -623,7 +640,7 @@
     "exits": {
       "north": 4009,
       "south": 4022,
-      "east": 4016,
+      "east": 4098,
       "west": 4014,
       "northeast": 4010,
       "northwest": 4008,
@@ -709,7 +726,12 @@
     "description": "The village square. A fountain with no water. A clock tower with no hands. A massive impact crater dominates the landscape here. Unlike the bomb craters nearby, this one is perfectly spherical, and the ground at its center has been compressed into a mirror-smooth surface.",
     "exits": {
       "north": 4013,
-      "south": 4026,
+      "south": {
+        "target_vnum": 4099,
+        "locked": true,
+        "key_vnum": 9812,
+        "description": "A locked door blocks the way."
+      },
       "east": 4021,
       "west": 4019,
       "northeast": 4014,
@@ -919,7 +941,8 @@
     "mob_spawns": [
       1421,
       1420
-    ]
+    ],
+    "meta_clue": "marble_passage_4"
   },
   "4031": {
     "vnum": 4031,
@@ -1067,6 +1090,9 @@
     },
     "mob_spawns": [
       1419
+    ],
+    "initial_items": [
+      1007
     ]
   },
   "4039": {
@@ -1355,6 +1381,9 @@
     "flags": [
       "indoors",
       "dark"
+    ],
+    "initial_items": [
+      4004
     ]
   },
   "4104": {
@@ -1523,6 +1552,9 @@
     "flags": [
       "indoors",
       "dark"
+    ],
+    "initial_items": [
+      3008
     ]
   },
   "4112": {
@@ -1586,6 +1618,9 @@
     "flags": [
       "indoors",
       "dark"
+    ],
+    "initial_items": [
+      1006
     ]
   },
   "4115": {
@@ -1632,6 +1667,9 @@
       1410,
       1418,
       1411
+    ],
+    "initial_items": [
+      1014
     ]
   },
   "4117": {
@@ -1776,6 +1814,9 @@
     },
     "flags": [
       "safe"
+    ],
+    "initial_items": [
+      2002
     ]
   },
   "5006": {
@@ -1841,6 +1882,9 @@
         ],
         "description": "The gravitational distortion is fading but still measurable. Whatever caused it had the mass of a small planet compressed into a space no larger than your fist. The light-bending pattern is spherical \u2014 a perfect lens effect. Crystallized fragments of spacetime float nearby, each one containing a frozen image of a luminous sphere."
       }
+    ],
+    "initial_items": [
+      2014
     ]
   },
   "5009": {
@@ -1912,6 +1956,9 @@
     "mob_spawns": [
       1514,
       1516
+    ],
+    "initial_items": [
+      5012
     ]
   },
   "5013": {
@@ -1969,6 +2016,9 @@
     },
     "mob_spawns": [
       1506
+    ],
+    "initial_items": [
+      285
     ]
   },
   "5016": {
@@ -1988,6 +2038,9 @@
     },
     "mob_spawns": [
       1513
+    ],
+    "initial_items": [
+      282
     ]
   },
   "5017": {
@@ -2048,7 +2101,12 @@
       "north": 5013,
       "south": 5026,
       "east": 5021,
-      "west": 5019,
+      "west": {
+        "target_vnum": 5099,
+        "locked": true,
+        "key_vnum": 9813,
+        "description": "A locked door blocks the way."
+      },
       "northeast": 5014,
       "northwest": 5012,
       "southeast": 5027
@@ -2187,6 +2245,9 @@
     },
     "mob_spawns": [
       1510
+    ],
+    "initial_items": [
+      2011
     ]
   },
   "5028": {
@@ -2208,6 +2269,9 @@
       1519,
       1502,
       1509
+    ],
+    "initial_items": [
+      1011
     ]
   },
   "5029": {
@@ -2245,7 +2309,8 @@
     },
     "mob_spawns": [
       1507
-    ]
+    ],
+    "meta_clue": "marble_passage_5"
   },
   "5031": {
     "vnum": 5031,
@@ -2407,6 +2472,9 @@
     },
     "mob_spawns": [
       1512
+    ],
+    "initial_items": [
+      2
     ]
   },
   "5040": {
@@ -2425,6 +2493,9 @@
     "mob_spawns": [
       1511,
       1502
+    ],
+    "initial_items": [
+      2006
     ]
   },
   "5041": {
@@ -2440,6 +2511,9 @@
     },
     "mob_spawns": [
       1517
+    ],
+    "initial_items": [
+      6017
     ]
   },
   "5042": {
@@ -2543,6 +2617,9 @@
       1512,
       1510,
       1514
+    ],
+    "initial_items": [
+      284
     ]
   },
   "5101": {
@@ -2580,6 +2657,9 @@
     "mob_spawns": [
       1519,
       1514
+    ],
+    "initial_items": [
+      6012
     ]
   },
   "5103": {
@@ -2661,6 +2741,9 @@
     ],
     "flags": [
       "dark"
+    ],
+    "initial_items": [
+      5011
     ]
   },
   "5107": {
@@ -2683,6 +2766,9 @@
     ],
     "flags": [
       "dark"
+    ],
+    "initial_items": [
+      5006
     ]
   },
   "5108": {
@@ -2726,6 +2812,9 @@
     ],
     "flags": [
       "dark"
+    ],
+    "initial_items": [
+      2020
     ]
   },
   "5110": {
@@ -2744,6 +2833,9 @@
     ],
     "flags": [
       "dark"
+    ],
+    "initial_items": [
+      3017
     ]
   },
   "5111": {
@@ -3012,7 +3104,7 @@
       "north": 6005,
       "south": 6017,
       "east": 6011,
-      "west": 6009,
+      "west": 6098,
       "northeast": 6006,
       "northwest": 6004,
       "southeast": 6018,
@@ -3125,6 +3217,9 @@
         ],
         "description": "The glass bamboo is warm and vibrating at a frequency you can feel in your teeth. Looking closely, you can see layers of time compressed within it \u2014 seasons changing in frozen cross-section. Something with immense temporal energy passed through here, dragging time with it. The spiral pattern suggests it was rolling."
       }
+    ],
+    "initial_items": [
+      4005
     ]
   },
   "6016": {
@@ -3409,7 +3504,8 @@
     "flags": [
       "safe",
       "indoors"
-    ]
+    ],
+    "meta_clue": "marble_passage_6"
   },
   "6031": {
     "vnum": 6031,
@@ -3425,6 +3521,9 @@
     },
     "mob_spawns": [
       1626
+    ],
+    "initial_items": [
+      2008
     ]
   },
   "6032": {
@@ -3477,6 +3576,9 @@
     "mob_spawns": [
       1608,
       1622
+    ],
+    "initial_items": [
+      2007
     ]
   },
   "6035": {
@@ -3499,6 +3601,9 @@
     ],
     "flags": [
       "shop"
+    ],
+    "initial_items": [
+      1003
     ]
   },
   "6036": {
@@ -3593,6 +3698,9 @@
     "flags": [
       "safe",
       "indoors"
+    ],
+    "initial_items": [
+      5019
     ]
   },
   "6041": {
@@ -3684,6 +3792,9 @@
     "flags": [
       "safe",
       "indoors"
+    ],
+    "initial_items": [
+      281
     ]
   },
   "6046": {
@@ -3719,6 +3830,9 @@
     },
     "mob_spawns": [
       1605
+    ],
+    "initial_items": [
+      5015
     ]
   },
   "6048": {
@@ -3735,6 +3849,9 @@
     "mob_spawns": [
       1603,
       1608
+    ],
+    "initial_items": [
+      1017
     ]
   },
   "6049": {
@@ -3926,6 +4043,9 @@
     "mob_spawns": [
       1628,
       1616
+    ],
+    "initial_items": [
+      1004
     ]
   },
   "6107": {
@@ -3979,6 +4099,9 @@
     },
     "mob_spawns": [
       1606
+    ],
+    "initial_items": [
+      3009
     ]
   },
   "6110": {
@@ -4085,6 +4208,9 @@
     },
     "flags": [
       "safe"
+    ],
+    "initial_items": [
+      1005
     ]
   },
   "6116": {
@@ -4122,6 +4248,9 @@
     "mob_spawns": [
       1601,
       1602
+    ],
+    "initial_items": [
+      5007
     ]
   },
   "6118": {
@@ -4522,7 +4651,12 @@
     "exits": {
       "north": 3013,
       "south": 3026,
-      "east": 3021,
+      "east": {
+        "target_vnum": 3099,
+        "locked": true,
+        "key_vnum": 9811,
+        "description": "A locked door blocks the way."
+      },
       "west": 3019,
       "northeast": 3014,
       "northwest": 3012,
@@ -4638,7 +4772,8 @@
     "mob_spawns": [
       1307,
       1311
-    ]
+    ],
+    "meta_clue": "marble_passage_3"
   },
   "3026": {
     "vnum": 3026,
@@ -4676,6 +4811,9 @@
     },
     "mob_spawns": [
       1308
+    ],
+    "initial_items": [
+      1015
     ]
   },
   "3028": {
@@ -4697,6 +4835,9 @@
       1310,
       1312,
       1313
+    ],
+    "initial_items": [
+      3
     ]
   },
   "3029": {
@@ -5161,6 +5302,9 @@
     ],
     "flags": [
       "dark"
+    ],
+    "initial_items": [
+      4009
     ]
   },
   "3105": {
@@ -5265,6 +5409,9 @@
       1312,
       1304,
       1303
+    ],
+    "initial_items": [
+      4020
     ]
   },
   "3110": {
@@ -5311,6 +5458,9 @@
     ],
     "flags": [
       "dark"
+    ],
+    "initial_items": [
+      2009
     ]
   },
   "3112": {
@@ -5333,6 +5483,9 @@
     "mob_spawns": [
       1311,
       1304
+    ],
+    "initial_items": [
+      5018
     ]
   },
   "3113": {
@@ -5486,6 +5639,9 @@
     },
     "mob_spawns": [
       1202
+    ],
+    "initial_items": [
+      4014
     ]
   },
   "2002": {
@@ -5588,6 +5744,9 @@
     },
     "mob_spawns": [
       1217
+    ],
+    "initial_items": [
+      5003
     ]
   },
   "2008": {
@@ -5721,6 +5880,9 @@
     },
     "mob_spawns": [
       1204
+    ],
+    "initial_items": [
+      3018
     ]
   },
   "2015": {
@@ -5729,7 +5891,7 @@
     "name": "Neon Street \u2014 Central",
     "description": "The busiest intersection. Crowds flow around you like water. A street preacher screams about the singularity. One of the public data terminals is cycling through corrupted output \u2014 streams of numbers that resolve briefly into a perfect sphere before dissolving back into static.",
     "exits": {
-      "north": 2009,
+      "north": 2098,
       "south": 2022,
       "east": 2016,
       "west": 2014,
@@ -5835,7 +5997,12 @@
     "name": "The Byte Club",
     "description": "A underground fight club. Augmented fighters trade blows in a cage. The crowd roars.",
     "exits": {
-      "north": 2013,
+      "north": {
+        "target_vnum": 2099,
+        "locked": true,
+        "key_vnum": 9810,
+        "description": "A locked door blocks the way."
+      },
       "south": 2026,
       "east": 2021,
       "west": 2019,
@@ -5865,6 +6032,9 @@
     },
     "mob_spawns": [
       1204
+    ],
+    "initial_items": [
+      1020
     ]
   },
   "2022": {
@@ -5884,6 +6054,9 @@
     },
     "mob_spawns": [
       1203
+    ],
+    "initial_items": [
+      5008
     ]
   },
   "2023": {
@@ -5923,6 +6096,9 @@
     },
     "mob_spawns": [
       1221
+    ],
+    "initial_items": [
+      6015
     ]
   },
   "2025": {
@@ -6035,7 +6211,11 @@
     "mob_spawns": [
       1230,
       1202
-    ]
+    ],
+    "initial_items": [
+      5013
+    ],
+    "meta_clue": "marble_passage_2"
   },
   "2031": {
     "vnum": 2031,
@@ -6621,6 +6801,9 @@
     "mob_spawns": [
       1223,
       1202
+    ],
+    "initial_items": [
+      4019
     ]
   },
   "2108": {
@@ -6715,6 +6898,9 @@
       1202,
       1204,
       1229
+    ],
+    "initial_items": [
+      2013
     ]
   },
   "2113": {
@@ -7408,6 +7594,9 @@
     "mob_spawns": [
       1104,
       1117
+    ],
+    "initial_items": [
+      1010
     ]
   },
   "1007": {
@@ -7593,6 +7782,9 @@
     ],
     "mob_spawns": [
       1112
+    ],
+    "initial_items": [
+      6020
     ]
   },
   "1016": {
@@ -7785,6 +7977,9 @@
     "mob_spawns": [
       1119,
       1105
+    ],
+    "initial_items": [
+      2001
     ]
   },
   "1026": {
@@ -7868,6 +8063,9 @@
     "flags": [
       "safe",
       "indoors"
+    ],
+    "initial_items": [
+      283
     ]
   },
   "1030": {
@@ -8153,6 +8351,9 @@
     "mob_spawns": [
       1115,
       1116
+    ],
+    "initial_items": [
+      1019
     ]
   },
   "1045": {
@@ -8177,6 +8378,9 @@
     ],
     "flags": [
       "indoors"
+    ],
+    "initial_items": [
+      1008
     ]
   },
   "1046": {
@@ -8260,6 +8464,9 @@
       1101,
       1116,
       1114
+    ],
+    "initial_items": [
+      4013
     ]
   },
   "1050": {
@@ -8283,7 +8490,8 @@
     "mob_spawns": [
       1116,
       1102
-    ]
+    ],
+    "meta_clue": "marble_passage_1"
   },
   "1051": {
     "vnum": 1051,
@@ -8394,6 +8602,9 @@
     "mob_spawns": [
       1120,
       1136
+    ],
+    "initial_items": [
+      6011
     ]
   },
   "1057": {
@@ -8427,6 +8638,9 @@
     "mob_spawns": [
       1115,
       1104
+    ],
+    "initial_items": [
+      6009
     ]
   },
   "1059": {
@@ -8520,6 +8734,9 @@
       "The scent of old parchment and candle wax lingers here.",
       "A faint glow pulses from runes etched into the walls.",
       "The wind carries the distant clash of steel."
+    ],
+    "initial_items": [
+      6018
     ]
   },
   "1103": {
@@ -8865,6 +9082,9 @@
       "A raven caws from a crumbling battlement above.",
       "The wind carries the distant clash of steel.",
       "Moss creeps along ancient stonework, reclaiming what was built."
+    ],
+    "initial_items": [
+      3007
     ]
   },
   "1119": {
@@ -9020,6 +9240,9 @@
     "flags": [
       "safe",
       "train"
+    ],
+    "mobs": [
+      8020
     ]
   },
   "8003": {
@@ -9068,6 +9291,9 @@
     },
     "flags": [
       "train"
+    ],
+    "initial_items": [
+      8003
     ]
   },
   "8006": {
@@ -9162,7 +9388,7 @@
     "description": "A perfectly silent room. Cushions on the floor. The walls absorb all sound and distraction.",
     "exits": {
       "north": 8005,
-      "south": 8015,
+      "south": 8098,
       "west": 8009,
       "northwest": 8004,
       "southwest": 8014
@@ -9192,9 +9418,9 @@
   },
   "8012": {
     "vnum": 8012,
-    "zone": 8,
-    "name": "Weights Room",
-    "description": "Racks of increasingly absurd weights. The heaviest ones have dents in the floor beneath them.",
+    "zone": "gravity_wells",
+    "name": "Mirror Chamber",
+    "description": "Gravity mirrors float at odd angles, scattering beams of light in every direction. If only they could be focused...",
     "exits": {
       "north": 8007,
       "south": 8016,
@@ -9206,7 +9432,8 @@
     },
     "flags": [
       "train"
-    ]
+    ],
+    "puzzle_action": "use_mirror"
   },
   "8013": {
     "vnum": 8013,
@@ -9248,7 +9475,8 @@
     ],
     "flags": [
       "train"
-    ]
+    ],
+    "meta_clue": "marble_passage_8"
   },
   "8015": {
     "vnum": 8015,
@@ -9592,9 +9820,9 @@
   },
   "7008": {
     "vnum": 7008,
-    "zone": 9,
-    "name": "Mushroom Cavern",
-    "description": "A natural cave where bioluminescent mushrooms grow in clusters. The air is thick with spores.",
+    "zone": "undercity",
+    "name": "Chapel Nave",
+    "description": "Stained glass windows line the walls. They depict four notes in sequence: C (red), E (blue), G (green), B (gold). The colors match something...",
     "exits": {
       "north": 7003,
       "south": 7014,
@@ -9608,7 +9836,8 @@
       1301,
       1311,
       1310
-    ]
+    ],
+    "on_visit_flag": "zone_7_saw_windows"
   },
   "7009": {
     "vnum": 7009,
@@ -9662,6 +9891,12 @@
         ],
         "description": "The tunnel is exactly three inches in diameter, bored through solid stone with no debris whatsoever. The walls are polished smooth. At the end, the bore turns sharply upward through the ceiling \u2014 the transition is impossibly sharp, a perfect right angle. Whatever made this didn't slow down, didn't turn gradually. It just... changed direction. Instantly."
       }
+    ],
+    "mobs": [
+      1710
+    ],
+    "initial_items": [
+      6010
     ]
   },
   "7011": {
@@ -9681,13 +9916,16 @@
       1311,
       1302,
       1310
+    ],
+    "initial_items": [
+      5020
     ]
   },
   "7012": {
     "vnum": 7012,
-    "zone": 9,
-    "name": "Forgotten Cistern",
-    "description": "A massive water storage chamber. Empty now. Echoes last forever in here.",
+    "zone": "undercity",
+    "name": "Cathedral Organ Loft",
+    "description": "A grand pipe organ dominates the loft. Its keys are colored: red, blue, green, gold. The stained glass windows below depicted a sequence...",
     "exits": {
       "west": 7011,
       "northwest": 7006,
@@ -9695,7 +9933,8 @@
     },
     "mob_spawns": [
       1301
-    ]
+    ],
+    "puzzle_action": "use_pipe_organ"
   },
   "7013": {
     "vnum": 7013,
@@ -9749,7 +9988,8 @@
     },
     "mob_spawns": [
       1715
-    ]
+    ],
+    "meta_clue": "marble_passage_7"
   },
   "7016": {
     "vnum": 7016,
@@ -9834,7 +10074,12 @@
     "name": "Cultist Hideout",
     "description": "Robed figures gather around symbols drawn in chalk. They stop chanting when you enter.",
     "exits": {
-      "north": 7016,
+      "north": {
+        "target_vnum": 7099,
+        "locked": true,
+        "key_vnum": 9814,
+        "description": "A locked door blocks the way."
+      },
       "south": 7024,
       "east": 7021,
       "west": 7019,
@@ -10324,5 +10569,190 @@
       "A faint glow pulses from runes etched into the walls.",
       "A raven caws from a crumbling battlement above."
     ]
+  },
+  "2099": {
+    "name": "Restricted Server Room",
+    "description": "Banks of humming servers line the walls, their LEDs blinking in hypnotic patterns. Valuable data cores are scattered on a workbench.",
+    "zone": "neon_district",
+    "exits": {
+      "south": 2020
+    }
+  },
+  "3099": {
+    "name": "Smuggler's Cache",
+    "description": "A hidden room behind the dock wall. Crates of contraband are stacked to the ceiling.",
+    "zone": "docks",
+    "exits": {
+      "west": 3020
+    }
+  },
+  "4099": {
+    "name": "Armory Vault",
+    "description": "A reinforced vault containing military-grade equipment. Most of it is still functional.",
+    "zone": "warzone",
+    "exits": {
+      "north": 4020
+    }
+  },
+  "5099": {
+    "name": "Astral Sanctum",
+    "description": "A pocket of concentrated astral energy. The air shimmers with raw power.",
+    "zone": "astral_plane",
+    "exits": {
+      "east": 5020
+    }
+  },
+  "7099": {
+    "name": "Undercity Treasury",
+    "description": "A forgotten vault beneath the city. Gold coins and strange artifacts fill ancient coffers.",
+    "zone": "undercity",
+    "exits": {
+      "south": 7020
+    }
+  },
+  "2098": {
+    "name": "The Whispering Terminal",
+    "description": "A dead-end corridor with a blank screen. Faint text flickers: 'SPEAK THE LANGUAGE OF MACHINES'. The walls seem to listen. Perhaps the word 'binary' would mean something here.",
+    "zone": "neon_district",
+    "password": "binary",
+    "password_destination": 2097,
+    "exits": {
+      "south": 2015
+    }
+  },
+  "2097": {
+    "name": "Digital Sanctum",
+    "description": "A hidden server room accessible only to those who speak the machine tongue. Holographic data streams cascade from ceiling to floor.",
+    "zone": "neon_district",
+    "hidden": true,
+    "exits": {
+      "out": 2098
+    }
+  },
+  "4098": {
+    "name": "The Sealed Bunker Door",
+    "description": "A massive blast door with a voice-activated lock. A faded sign reads: 'AUTHORIZATION REQUIRED \u2014 STATE THE WATCHWORD'. Scratched into the frame: 'What keeps soldiers alive? Their...' The answer seems to be 'discipline'.",
+    "zone": "warzone",
+    "password": "discipline",
+    "password_destination": 4097,
+    "exits": {
+      "west": 4015
+    }
+  },
+  "4097": {
+    "name": "Command Bunker",
+    "description": "A fortified underground command center. Maps and battle plans cover every surface. A cache of supplies sits in the corner.",
+    "zone": "warzone",
+    "hidden": true,
+    "exits": {
+      "out": 4098
+    }
+  },
+  "6098": {
+    "name": "The Timeless Arch",
+    "description": "An ancient stone archway covered in temporal runes. The inscription reads: 'SPEAK WHAT FLOWS BUT CANNOT BE HELD'. The answer to this riddle is surely 'time'.",
+    "zone": "forgotten_epoch",
+    "password": "time",
+    "password_destination": 6097,
+    "exits": {
+      "east": 6010
+    }
+  },
+  "6097": {
+    "name": "Temporal Vault",
+    "description": "A chamber outside of time itself. Objects from different eras float suspended in amber light. A clock with no hands ticks backwards.",
+    "zone": "forgotten_epoch",
+    "hidden": true,
+    "exits": {
+      "out": 6098
+    }
+  },
+  "8098": {
+    "name": "Gravitational Anomaly",
+    "description": "Space warps around a shimmering point. A plaque reads: 'NAME THE FORCE THAT BINDS ALL THINGS'. The fundamental force is 'gravity'.",
+    "zone": "gravity_wells",
+    "password": "gravity",
+    "password_destination": 8097,
+    "exits": {
+      "north": 8010
+    }
+  },
+  "8097": {
+    "name": "Zero-Point Chamber",
+    "description": "A room where gravity has no dominion. Everything floats \u2014 including you. Ancient technology hums with impossible energy.",
+    "zone": "gravity_wells",
+    "hidden": true,
+    "exits": {
+      "out": 8098
+    }
+  },
+  "10098": {
+    "name": "The Final Gate",
+    "description": "A door of pure light. Etched in the frame: 'WHAT DO ALL SEEKERS PURSUE?' The answer that resonates is 'truth'.",
+    "zone": "shattered_realm",
+    "password": "truth",
+    "password_destination": 10097,
+    "exits": {
+      "south": 10010
+    }
+  },
+  "10097": {
+    "name": "Chamber of Revelations",
+    "description": "A pristine white room. In the center, a pedestal holds a fragment of something familiar \u2014 round, smooth, impossibly dense. A marble fragment.",
+    "zone": "shattered_realm",
+    "hidden": true,
+    "exits": {
+      "out": 10098
+    },
+    "meta_clue": "marble_fragment_11"
+  },
+  "10012": {
+    "name": "The Cracked Obelisk",
+    "description": "A massive obelisk stands fractured and dark. Cracks run through it like veins. It once held reality together in this place.",
+    "zone": "shattered_realm",
+    "puzzle_action": "use_obelisk",
+    "exits": {
+      "south": 10010
+    },
+    "meta_clue": "marble_passage_10"
+  },
+  "11012": {
+    "name": "Edge of the Void",
+    "description": "Beyond this point, there is nothing. Not darkness \u2014 nothing. The void stretches in every direction without end.",
+    "zone": "the_void",
+    "puzzle_action": "use_void_anchor",
+    "exits": {
+      "north": 11010,
+      "down": {
+        "target_vnum": 11099,
+        "locked": true,
+        "key_vnum": null,
+        "description": "The void stretches below, but you sense nothing to anchor to. Perhaps if you had followed every trace of the marble..."
+      }
+    }
+  },
+  "10005": {
+    "name": "Zone 1 Area",
+    "zone": 100,
+    "exits": {},
+    "initial_items": [
+      10003
+    ]
+  },
+  "11005": {
+    "name": "Zone 1 Area",
+    "zone": 110,
+    "exits": {},
+    "initial_items": [
+      11003
+    ]
+  },
+  "11099": {
+    "name": "The Heart of Everything",
+    "description": "You stand in a space that is not a space. The marble floats before you \u2014 impossibly small, impossibly dense, impossibly aware. It has been waiting. Not for you specifically, but for anyone persistent enough to follow its trail across eleven zones, through locked doors and hidden passages, past puzzles and guardians. It pulses once. The pulse says: 'You found me.' The world holds its breath.",
+    "zone": "the_void",
+    "hidden": true,
+    "final_confrontation": true,
+    "exits": {}
   }
 }

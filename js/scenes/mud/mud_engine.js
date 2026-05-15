@@ -53,7 +53,7 @@
 
     function createDefaultPlayer() {
       return {
-        currentRoom: 101,  // Training Tower — Ground Floor
+        currentRoom: 101,  // Training Tower - Ground Floor
         hp: 100,
         maxHp: 100,
         focus: 50,
@@ -150,9 +150,24 @@
       // Exits can be plain vnums (int) or objects { target_vnum, door }
       const targetVnum = typeof exit === 'object' ? exit.target_vnum : exit;
 
-      // Check for locked doors (only object-style exits have doors)
-      if (typeof exit === 'object' && exit.door && exit.door.state === 'locked') {
-        const keyVnum = exit.door.key_vnum;
+      // Check for locked doors (object-style exits with door.state or top-level locked flag)
+      const isLocked = typeof exit === 'object' && (
+        (exit.door && exit.door.state === 'locked') || exit.locked
+      );
+      if (isLocked) {
+        // Already unlocked this session?
+        if (player.worldFlags[`door_${room.vnum}_${direction}`] === 'unlocked') {
+          return moveToRoom(targetVnum);
+        }
+        // Meta-puzzle unlock: marble confrontation bypasses key requirement
+        if (targetVnum === 11099 && player.worldFlags?.marble_confrontation_unlocked) {
+          player.worldFlags[`door_${room.vnum}_${direction}`] = 'unlocked';
+          return [
+            { type: 'success', text: 'The void parts before you. You know where it is.' },
+            ...moveToRoom(targetVnum)
+          ];
+        }
+        const keyVnum = (exit.door && exit.door.key_vnum) || exit.key_vnum;
         if (keyVnum && player.inventory.includes(keyVnum)) {
           player.worldFlags[`door_${room.vnum}_${direction}`] = 'unlocked';
           return [
@@ -160,10 +175,8 @@
             ...moveToRoom(targetVnum)
           ];
         }
-        if (player.worldFlags[`door_${room.vnum}_${direction}`] === 'unlocked') {
-          return moveToRoom(targetVnum);
-        }
-        return [{ type: 'error', text: 'The way is locked.' }];
+        const desc = exit.description || 'The way is locked.';
+        return [{ type: 'error', text: desc }];
       }
 
       return moveToRoom(targetVnum);
@@ -263,6 +276,22 @@
       });
       if (aggressive) {
         output.push(...initiateCombat(aggressive));
+      }
+
+      // Meta-puzzle: check for marble trail clues
+      if (window.MudMetaPuzzle) {
+        const clueOutput = window.MudMetaPuzzle.checkRoomForClue(room, player);
+        if (clueOutput.length > 0) output.push(...clueOutput);
+      }
+
+      // Set on_visit_flag if room defines one (used for puzzle prerequisites)
+      if (room.on_visit_flag && !player.worldFlags[room.on_visit_flag]) {
+        player.worldFlags[room.on_visit_flag] = true;
+      }
+
+      // Final confrontation trigger
+      if (room.final_confrontation && window.MudMetaPuzzle) {
+        output.push(...window.MudMetaPuzzle.executeConfrontation(player));
       }
 
       return output;
@@ -552,7 +581,7 @@
       if (availableQuests.length > 0) {
         output.push({ type: 'quest', text: `${mob.name} has a task for you:` });
         for (const q of availableQuests) {
-          output.push({ type: 'quest', text: `  "${q.name}" — ${q.description}` });
+          output.push({ type: 'quest', text: `  "${q.name}" - ${q.description}` });
           output.push({ type: 'info', text: `  Type 'quest ${q.name.toLowerCase()}' to accept.` });
         }
       }
@@ -663,7 +692,7 @@
       if (allCorrect && !player.worldFlags.zone_1_puzzle_complete) {
         player.worldFlags.zone_1_puzzle_complete = true;
         output.push({ type: 'success', text: '' });
-        output.push({ type: 'room-desc', text: 'The four statues lock into position with a thunderous CLICK. The throne shudders and slides backward, revealing a perfectly smooth, circular tunnel leading downward. A faint rolling sound echoes from the darkness below — something was here moments ago. The tunnel is too small for you to follow.' });
+        output.push({ type: 'room-desc', text: 'The four statues lock into position with a thunderous CLICK. The throne shudders and slides backward, revealing a perfectly smooth, circular tunnel leading downward. A faint rolling sound echoes from the darkness below - something was here moments ago. The tunnel is too small for you to follow.' });
         output.push({ type: 'success', text: '─── ZONE 1 PUZZLE COMPLETE ───' });
         output.push({ type: 'info', text: 'The marble was here. It has escaped deeper.' });
       }
@@ -866,7 +895,7 @@
           combatOutput.push({ type: 'info', text: '─── Marketplace ───' });
           for (const s of result.stock) {
             const name = getItemName(s.item_vnum);
-            combatOutput.push({ type: 'info', text: `  [${s.id}] ${name} — ${s.price} gold (qty: ${s.quantity})` });
+            combatOutput.push({ type: 'info', text: `  [${s.id}] ${name} - ${s.price} gold (qty: ${s.quantity})` });
           }
           combatOutput.push({ type: 'info', text: `  Type 'shop <id>' to purchase.` });
           combatOutput.push({ type: 'info', text: `  Your gold: ${player.gold}` });
@@ -911,18 +940,21 @@
 
     /**
      * Calculate power gained from a fight.
-     * - Kill: 10% of creature power (base), modified by relative strength
-     * - Death: 2% of creature power
-     * - If creature is 10%+ weaker than you: only 2%
-     * - If creature is 10%+ stronger: +1% per 5% beyond the 10% threshold
+     * - Creature < 50% of player power → 0 (no reward)
+     * - Kill within ±10% of player power → 10% of creature power
+     * - Kill creature 10%+ stronger → 10% + 1% per 5% beyond threshold
+     * - Death → 2% of creature power (only if creature >= 50% player power)
      */
     function calcPowerGain(creaturePower, playerPower, killed) {
+      // Hard floor: creatures below 50% of player power give nothing
+      const ratio = playerPower > 0 ? (creaturePower / playerPower) : 2;
+      if (ratio < 0.5) return 0;
+
       if (!killed) return Math.max(1, Math.floor(creaturePower * 0.02));
 
-      const ratio = playerPower > 0 ? (creaturePower / playerPower) : 2;
       const threshold = 0.10;
 
-      // Creature is 10%+ weaker → only 2%
+      // Creature is 10%+ weaker (but above 50% floor) → only 2%
       if (ratio < (1 - threshold)) {
         return Math.max(1, Math.floor(creaturePower * 0.02));
       }
@@ -933,85 +965,123 @@
       }
 
       // Creature is 10%+ stronger → 10% + 1% per 5% beyond threshold
-      const excessPercent = (ratio - (1 + threshold)) * 100; // e.g. 40 for 50% stronger
+      const excessPercent = (ratio - (1 + threshold)) * 100;
       const bonusPercent = Math.floor(excessPercent / 5);
       const totalPercent = 10 + bonusPercent;
       return Math.max(1, Math.floor(creaturePower * totalPercent / 100));
     }
 
     /**
-     * Display a compact, columnar character status screen.
-     * Weapon proficiency summaries are shown inline; detailed
-     * breakdowns live in the 'proficiency' command.
+     * Calculate gold dropped by a mob on kill.
+     * Returns 0 if the creature is below the 50% power floor.
+     * Gold scales with creature power: base 1 gold per 10 power.
+     * @param {number} creaturePower - The mob's calculated power
+     * @param {number} playerPower - The player's current power
+     * @returns {number} Gold to award
+     */
+    function calcGoldDrop(creaturePower, playerPower) {
+      const ratio = playerPower > 0 ? (creaturePower / playerPower) : 2;
+      if (ratio < 0.5) return 0;
+      return Math.max(1, Math.floor(creaturePower * 0.1));
+    }
+
+    /**
+     * Display the player's full status screen.
+     * Layout: Identity + Description header, merged Attributes section,
+     * Economy with deaths, Proficiency, Effects, Location.
      */
     function doStatus() {
       const spec = window.MudAbilities?.getSpec(player.baseClass, player.specialization);
-      const tiers = window.MudAbilities?.POWER_TIERS || [10, 25, 50, 100];
-      const currentTier = tiers.filter(t => player.power >= t).length;
-      const nextTier = tiers[currentTier] || 'MAX';
-
-      // ── Header row ──
+      const specName = spec?.name || player.specName || 'Unspecialized';
+      const raceName = player.raceName || 'Unknown';
+      const pName = player.name || 'Traveler';
       const title = player.title ? `${player.title} ` : '';
-      const specName = spec?.name || player.specName || 'None';
-      const output = [
-        { type: 'info', text: `═══ ${title}${player.name || 'Unknown'} ═══` },
-        { type: 'info', text: `  ${specName}  |  Power ${player.power}${nextTier !== 'MAX' ? ` → ${nextTier}` : ' (MAX)'}  |  QP ${player.questPoints}  |  Gold ${player.gold}` },
-      ];
+      const desc = player.description || 'A mysterious traveler from another place.';
 
-      // ── Vitals (two-column) ──
-      const hpPct = player.maxHp ? Math.floor((player.hp / player.maxHp) * 100) : 0;
-      const fpPct = player.maxFocus ? Math.floor((player.focus / player.maxFocus) * 100) : 0;
+      // Helpers
+      const col = (l, v, w = 16) => `${l.padEnd(w)}${v}`;
+      const sep = '  |  ';
+
+      const output = [];
+
+      // === Identity + Description ===
+      output.push({ type: 'info', text: `=== ${title}${pName} ===` });
+      output.push({ type: 'info', text: `  Name: ${pName}` });
+      output.push({ type: 'info', text: `  Race: ${raceName.padEnd(14)}Class: ${specName}` });
+      output.push({ type: 'info', text: `  Power: ${player.power}` });
       output.push({ type: 'info', text: '' });
-      output.push({ type: 'info', text: `  HP ${player.hp}/${player.maxHp} (${hpPct}%)    Focus ${player.focus}/${player.maxFocus} (${fpPct}%)` });
-      output.push({ type: 'info', text: `  ATK ${player.attackPower}    DEF ${player.defense}` });
+      output.push({ type: 'info', text: `  ${desc}` });
 
-      // ── Attributes (compact two-column) ──
+      // === Attributes (merged vitals + combat + stats + growth bars) ===
+      output.push({ type: 'info', text: '' });
+      output.push({ type: 'info', text: '--- Attributes ---' });
+
+      // HP and Focus on one line
+      const hpBar = makeBar(player.hp, player.maxHp, 12);
+      const fpBar = makeBar(player.focus, player.maxFocus, 12);
+      output.push({ type: 'info', text: `  Hit Points: ${hpBar} ${player.hp}/${player.maxHp}${sep}Focus: ${fpBar} ${player.focus}/${player.maxFocus}` });
+
+      // Attack, Defense, Stance on one line
+      let combatLine = `  Attack: ${player.attackPower}${sep}Defense: ${player.defense}`;
+      if (window.MudCombatSystems) {
+        const stanceName = window.MudCombatSystems.STANCES[player.stance]?.name || 'Balanced';
+        combatLine += `${sep}Stance: ${stanceName}`;
+      }
+      output.push({ type: 'info', text: combatLine });
+
+      // Crit and Dodge on one line
       const cs = player.coreStats;
+      const d = player._derived || {};
+      const critPct = ((d.critChance || 0.01) * 100).toFixed(1);
+      const dodgePct = ((d.dodgeChance || 0) * 100).toFixed(1);
+      output.push({ type: 'info', text: `  Crit: ${critPct}%${sep}Dodge: ${dodgePct}%` });
+
+      // Stat bars: Vigor | Precision, then Grit | Instinct
       if (cs && window.MudStats) {
-        const d = player._derived || {};
-        output.push({ type: 'info', text: '' });
-        output.push({ type: 'info', text: '─── Attributes ───' });
-        const v = cs.vigor || 1, p = cs.precision || 1;
-        const g = cs.grit || 1, ins = cs.instinct || 1;
-        output.push({ type: 'info', text: `  VIG ${v}  (+${v * 3} HP)          PRC ${p}  (${((d.critChance || 0.01) * 100).toFixed(1)}% crit)` });
-        output.push({ type: 'info', text: `  GRT ${g}  (+${Math.floor(g * 1.5)} DEF)         INS ${ins}  (${((d.dodgeChance || 0) * 100).toFixed(1)}% dodge)` });
-        // Growth bars on one line each
-        const statNames = ['vigor', 'precision', 'grit', 'instinct'];
-        const abbr = { vigor: 'VIG', precision: 'PRC', grit: 'GRT', instinct: 'INS' };
-        const bars = [];
-        for (const name of statNames) {
-          const level = cs[name] || 1;
+        const statBar = (name, level) => {
           const xp = (cs.xp && cs.xp[name]) || 0;
           const needed = window.MudStats.xpForNextLevel(level);
           const pct = Math.min(100, Math.floor((xp / needed) * 100));
           const filled = Math.floor(pct / 10);
-          bars.push(`${abbr[name]} ${level} ${'\u2588'.repeat(filled)}${'\u2591'.repeat(10 - filled)}`);
-        }
-        output.push({ type: 'info', text: `  ${bars[0]}  ${bars[1]}` });
-        output.push({ type: 'info', text: `  ${bars[2]}  ${bars[3]}` });
+          return '\u2588'.repeat(filled) + '\u2591'.repeat(10 - filled) + `  ${pct}%`;
+        };
+        const v = cs.vigor || 1, p = cs.precision || 1;
+        const g = cs.grit || 1, ins = cs.instinct || 1;
+        output.push({ type: 'info', text: `  Vigor: ${v}  ${statBar('vigor', v)}${sep}Precision: ${p}  ${statBar('precision', p)}` });
+        output.push({ type: 'info', text: `  Grit: ${g}  ${statBar('grit', g)}${sep}Instinct: ${ins}  ${statBar('instinct', ins)}` });
       }
 
-      // ── Combat state (single line when possible) ──
-      const combatParts = [];
-      if (window.MudCombatSystems) {
-        const stanceName = window.MudCombatSystems.STANCES[player.stance]?.name || 'Balanced';
-        combatParts.push(`Stance: ${stanceName}`);
-        if (player.momentum !== undefined && player.momentum !== 6) {
-          const momLabel = window.MudCombatSystems.MOMENTUM_LABELS[player.momentum] || 'Neutral';
-          combatParts.push(`Mom: ${momLabel}`);
-        }
-        if (player.exhausted) combatParts.push('EXHAUSTED');
-      }
+      // Transform info if applicable
       if (window.MudSecretClasses && player.secretClass && player.transformTier >= 0) {
         const tMods = window.MudSecretClasses.getTransformMods(player);
-        if (tMods) combatParts.push(`Transform: ATK×${tMods.atkMod} DEF×${tMods.defMod}`);
+        if (tMods) output.push({ type: 'info', text: `  Transform: ATK x${tMods.atkMod}  DEF x${tMods.defMod}` });
       }
-      if (combatParts.length > 0) {
-        output.push({ type: 'info', text: '' });
-        output.push({ type: 'info', text: `  ${combatParts.join('  |  ')}` });
+      if (player.exhausted) output.push({ type: 'info', text: '  ** EXHAUSTED **' });
+
+      // === Economy ===
+      output.push({ type: 'info', text: '' });
+      output.push({ type: 'info', text: '--- Economy ---' });
+      output.push({ type: 'info', text: `  Gold: ${player.gold}${sep}Quest Points: ${player.questPoints}` });
+      const totalKills = Object.values(player.killCounts || {}).reduce((a, b) => a + b, 0);
+      const questsDone = (player.completedQuests || []).length;
+      const deaths = player.deaths || 0;
+      output.push({ type: 'info', text: `  Kills: ${totalKills}${sep}Quests Done: ${questsDone}` });
+      output.push({ type: 'info', text: `  Deaths: ${deaths}` });
+
+      // === Proficiency (top 4) ===
+      if (window.MudWeaponProficiency) {
+        const wp = player.weaponProficiency || {};
+        const entries = Object.entries(wp).filter(([, v]) => v > 0).sort((a, b) => b[1] - a[1]).slice(0, 4);
+        if (entries.length > 0) {
+          output.push({ type: 'info', text: '' });
+          output.push({ type: 'info', text: '--- Proficiency ---' });
+          const names = window.MudWeaponProficiency.CATEGORY_NAMES || {};
+          const profLine = entries.map(([c, v]) => `${(names[c] || c).substring(0, 10)}: ${Math.floor(v)}%`).join(sep);
+          output.push({ type: 'info', text: `  ${profLine}` });
+        }
       }
 
-      // ── Active effects (compact) ──
+      // === Active Effects ===
       const effects = [];
       for (const [key, remaining] of Object.entries(player.worldFlags || {})) {
         if (remaining <= 0) continue;
@@ -1024,39 +1094,40 @@
         }
       }
       if (effects.length > 0) {
-        output.push({ type: 'info', text: `  Effects: ${effects.join('  ')}` });
+        output.push({ type: 'info', text: '' });
+        output.push({ type: 'info', text: '--- Effects ---' });
+        output.push({ type: 'info', text: `  ${effects.join('  ')}` });
       }
 
-      // ── Weapon proficiencies (summary — detail in 'proficiency' command) ──
-      if (window.MudWeaponProficiency) {
-        const wp = player.weaponProficiency || {};
-        const entries = Object.entries(wp).filter(([, v]) => v > 0).sort((a, b) => b[1] - a[1]);
-        if (entries.length > 0) {
-          output.push({ type: 'info', text: '' });
-          output.push({ type: 'info', text: '─── Weapon Proficiency ───' });
-          const names = window.MudWeaponProficiency.CATEGORY_NAMES || {};
-          const lines = [];
-          for (const [cat, val] of entries) {
-            const pct = Math.floor(val);
-            const label = (names[cat] || cat).substring(0, 8);
-            lines.push(`${label} ${pct}%`);
-          }
-          // Two per line for compactness
-          for (let i = 0; i < lines.length; i += 2) {
-            const pair = lines.slice(i, i + 2).map(l => l.padEnd(18)).join('');
-            output.push({ type: 'info', text: `  ${pair}` });
-          }
-        }
-      }
-
-      // ── Karma ──
+      // Karma
       if (player.karma !== undefined && player.karma !== 0) {
         output.push({ type: 'info', text: `  Karma: ${player.karma}` });
       }
 
+      // === Location ===
+      const room = rooms[player.currentRoom];
+      const zoneId = Math.floor(player.currentRoom / 100);
+      const ZONE_NAMES = {
+        1: 'The Nexus', 11: 'Shattered Crown', 12: 'Neon Sprawl',
+        13: 'Undercity', 14: 'Iron Wastes', 15: 'Void Reach',
+        16: 'Temporal Rift', 17: 'Shadow Market', 18: 'Training Grounds',
+        19: 'Ancient Ruins', 20: 'Wizard Tower'
+      };
+      const zoneName = ZONE_NAMES[zoneId] || `Zone ${zoneId}`;
       output.push({ type: 'info', text: '' });
-      output.push({ type: 'info', text: "  Type 'proficiency' for detailed ability & weapon mastery." });
+      output.push({ type: 'info', text: '--- Location ---' });
+      output.push({ type: 'info', text: `  ${room?.name || 'Unknown'}    Zone: ${zoneName}` });
+
+      output.push({ type: 'info', text: '' });
+      output.push({ type: 'info', text: "  Type 'abilities' for ability list, 'proficiency' for weapon mastery." });
       return output;
+    }
+
+    /** Build a compact progress bar string. */
+    function makeBar(current, max, width = 10) {
+      const pct = max > 0 ? current / max : 0;
+      const filled = Math.round(pct * width);
+      return '[' + '\u2588'.repeat(filled) + '\u2591'.repeat(width - filled) + ']';
     }
 
     /**
@@ -1072,7 +1143,7 @@
         const cd = player.abilityCooldowns[abilityId] || 0;
         const cdText = cd > 0 ? ` [CD: ${cd} rounds]` : ' [READY]';
         if (def) {
-          output.push({ type: 'info', text: `  ${def.name} — ${def.desc}${cdText}` });
+          output.push({ type: 'info', text: `  ${def.name} - ${def.desc}${cdText}` });
         } else {
           // Fallback: show the raw ID so abilities are never silently hidden
           output.push({ type: 'info', text: `  ${abilityId}${cdText}` });
@@ -1117,7 +1188,7 @@
         ];
         purchasable.forEach((a, i) => {
           const cost = window.MudAbilities?.getAbilityCost(a.tier) || 5;
-          output.push({ type: 'items', text: `  ${i + 1}. ${a.name} — ${a.desc}` });
+          output.push({ type: 'items', text: `  ${i + 1}. ${a.name} - ${a.desc}` });
           output.push({ type: 'info', text: `     Cost: ${cost} QP [you have ${player.questPoints}]` });
         });
         output.push({ type: 'info', text: '' });
@@ -1281,9 +1352,9 @@
         return [{ type: 'error', text: `${def.name} is on cooldown (${player.abilityCooldowns[abilityId]} rounds remaining).` }];
       }
 
-      // Calculate focus cost (tier-based + modifier)
+      // Calculate focus cost: use ability's focusCost if defined, else tier-based fallback
       const tierCosts = [5, 10, 15, 20];
-      const baseCost = tierCosts[def.tier || 0] || 5;
+      const baseCost = def.focusCost != null ? def.focusCost : (tierCosts[def.tier || 0] || 5);
       const cost = Math.max(0, baseCost + (player.focusCostModifier || 0));
 
       if (player.focus < cost) {
@@ -1492,18 +1563,30 @@
       markMobDefeated(combatState.mobVnum);
       player.killCounts[combatState.mobVnum] = (player.killCounts[combatState.mobVnum] || 0) + 1;
 
-      // Award power based on relative strength
+      // Award power and gold based on relative strength
       const creaturePower = getCreaturePower(mob);
       const gained = calcPowerGain(creaturePower, player.power, true);
-      player.power += gained;
-      output.push({ type: 'success', text: `+${gained} power (total: ${player.power})` });
+      const goldDrop = calcGoldDrop(creaturePower, player.power);
+
+      if (gained > 0) {
+        player.power += gained;
+        output.push({ type: 'success', text: `+${gained} power (total: ${player.power})` });
+      } else {
+        output.push({ type: 'info', text: 'Too weak to learn from.' });
+      }
+
+      if (goldDrop > 0) {
+        player.gold += goldDrop;
+        output.push({ type: 'success', text: `+${goldDrop} gold (total: ${player.gold})` });
+      }
 
       // Restore focus on kill
       player.focus = Math.min(player.maxFocus, player.focus + 5);
 
-      // Loot
+      // Loot (only if creature is above the 50% power floor)
       const lootList = mob.loot_table || mob.loot;
-      if (lootList && lootList.length > 0) {
+      const ratio = player.power > 0 ? (creaturePower / player.power) : 2;
+      if (ratio >= 0.5 && lootList && lootList.length > 0) {
         for (const lootVnum of lootList) {
           if (player.inventory.length < 99) {
             player.inventory.push(lootVnum);
@@ -1809,6 +1892,24 @@
         focusRegenTimer = 0;
       }
 
+      // Tick death_weakness out of combat (decays at same rate as combat rounds)
+      if (!combatState && player.worldFlags?.death_weakness) {
+        if (!player._dwOocTimer) player._dwOocTimer = 0;
+        player._dwOocTimer += dt;
+        if (player._dwOocTimer >= COMBAT_TICK_INTERVAL) {
+          player._dwOocTimer -= COMBAT_TICK_INTERVAL;
+          const dw = player.worldFlags.death_weakness;
+          if (dw && dw.rounds > 0) {
+            dw.rounds--;
+            if (dw.rounds <= 0) {
+              delete player.worldFlags.death_weakness;
+              delete player._dwOocTimer;
+              pushCombatOutput([{ type: 'success', text: 'Your strength returns to normal.' }]);
+            }
+          }
+        }
+      }
+
       if (!combatState) return;
 
       combatTimer += dt;
@@ -1974,7 +2075,7 @@
       // Combat message variety pools
       const MISS_MSGS = [
         `You swing at ${mob.name} but miss!`,
-        `Your attack goes wide — ${mob.name} sidesteps!`,
+        `Your attack goes wide - ${mob.name} sidesteps!`,
         `You lunge at ${mob.name} but find only air!`,
         `${mob.name} weaves aside as you strike!`,
         `Your blow glances off harmlessly!`
@@ -2006,7 +2107,7 @@
         const HIT_MSGS = [
           `You hit ${mob.name} for ${playerDmg} damage.`,
           `You strike ${mob.name} solidly for ${playerDmg} damage.`,
-          `Your attack connects — ${playerDmg} damage to ${mob.name}.`,
+          `Your attack connects - ${playerDmg} damage to ${mob.name}.`,
           `You land a blow on ${mob.name} for ${playerDmg} damage.`,
           `${mob.name} staggers from your ${playerDmg} damage hit.`
         ];
@@ -2119,7 +2220,7 @@
           output.push({ type: 'combat', text: 'You collapse from exhaustion! ATK and DEF reduced until you recover focus.' });
         } else if (player.exhausted && window.MudCombatSystems.shouldRecoverExhaustion(player.focus, player.maxFocus)) {
           player.exhausted = false;
-          output.push({ type: 'combat', text: 'You catch your second wind — exhaustion fades!' });
+          output.push({ type: 'combat', text: 'You catch your second wind - exhaustion fades!' });
         }
       }
 
@@ -2161,7 +2262,7 @@
         const DODGE_MSGS = [
           `You dodge ${mob.name}'s attack!`,
           `You sidestep ${mob.name}'s strike!`,
-          `${mob.name} swings — you duck just in time!`,
+          `${mob.name} swings - you duck just in time!`,
           `You roll away from ${mob.name}'s blow!`,
           `${mob.name}'s attack whiffs past you!`
         ];
@@ -2184,9 +2285,9 @@
         const MOB_HIT_MSGS = [
           `${mob.name} hits you for ${mobDmg} damage.`,
           `${mob.name} strikes you for ${mobDmg} damage.`,
-          `${mob.name} lands a blow — ${mobDmg} damage.`,
+          `${mob.name} lands a blow - ${mobDmg} damage.`,
           `You take ${mobDmg} damage from ${mob.name}'s attack.`,
-          `${mob.name} connects — ${mobDmg} damage!`
+          `${mob.name} connects - ${mobDmg} damage!`
         ];
         output.push({ type: 'combat', text: `${MOB_HIT_MSGS[Math.floor(Math.random() * MOB_HIT_MSGS.length)]} [HP: ${player.hp}/${player.maxHp}]` });
         // Vigor grows from taking damage and surviving
@@ -2208,10 +2309,12 @@
       // Check player death
       if (player.hp <= 0) {
         output.push({ type: 'combat', text: 'You have been defeated...' });
-        // Award small power on death (2% of creature power)
+        // Award small power on death (2% of creature power, 0 if below 50% floor)
         const deathPower = calcPowerGain(getCreaturePower(mob), player.power, false);
-        player.power += deathPower;
-        output.push({ type: 'info', text: `+${deathPower} power from the struggle. (total: ${player.power})` });
+        if (deathPower > 0) {
+          player.power += deathPower;
+          output.push({ type: 'info', text: `+${deathPower} power from the struggle. (total: ${player.power})` });
+        }
         output.push({ type: 'info', text: 'You awaken back at the Nexus.' });
 
         // Create a death echo at the location where the player fell
@@ -2223,6 +2326,9 @@
           player.echoes = window.MudEchoes.pruneExpired(player.echoes);
           output.push({ type: 'info', text: 'A faint echo of your struggle lingers behind...' });
         }
+
+        // Increment death counter
+        player.deaths = (player.deaths || 0) + 1;
 
         // Clear exhaustion on death
         player.exhausted = false;
@@ -2283,6 +2389,16 @@
           return puzzleUseFlameZ5();
         case 'use_gem':
           return puzzleUseGemZ6();
+        case 'use_pipe_organ':
+          return puzzleUsePipeOrganZ7();
+        case 'use_mirror':
+          return puzzleUseMirrorZ8();
+        case 'use_hourglass':
+          return puzzleUseHourglassZ9();
+        case 'use_obelisk':
+          return puzzleUseObeliskZ10();
+        case 'use_void_anchor':
+          return puzzleUseVoidAnchorZ11();
         default:
           return [{ type: 'info', text: `[Puzzle interaction: ${actionId}]` }];
       }
@@ -2414,6 +2530,131 @@
     }
 
     /**
+     * Zone 7 puzzle: Play the correct sequence on the pipe organ.
+     * The notes are hinted by the stained glass windows (C-E-G-B).
+     * Requires the player to have visited the Chapel Nave (room 7008).
+     */
+    function puzzleUsePipeOrganZ7() {
+      const room = currentRoom();
+      if (room?.vnum !== 7012) {
+        return [{ type: 'error', text: "There's no pipe organ here." }];
+      }
+      if (player.worldFlags.zone_7_organ_played) {
+        return [{ type: 'info', text: 'The organ has already been played. The crypt is open.' }];
+      }
+      if (!player.worldFlags.zone_7_saw_windows) {
+        return [{ type: 'info', text: 'The organ has four colored keys. You need to find the correct sequence somewhere in this zone.' }];
+      }
+      player.worldFlags.zone_7_organ_played = true;
+      player.worldFlags[`door_7012_down`] = 'unlocked';
+      return [
+        { type: 'success', text: 'You play C-E-G-B. The notes resonate through the cathedral.' },
+        { type: 'room-desc', text: 'The floor beneath the organ slides away, revealing a staircase into the crypt below.' },
+        { type: 'success', text: '--- ZONE 7 PUZZLE COMPLETE ---' }
+      ];
+    }
+
+    /**
+     * Zone 8 puzzle: Align the gravity mirrors to redirect the beam.
+     * Requires the Gravity Lens (item 8003) from the Observatory.
+     */
+    function puzzleUseMirrorZ8() {
+      const room = currentRoom();
+      if (room?.vnum !== 8012) {
+        return [{ type: 'error', text: "There are no mirrors here." }];
+      }
+      if (player.worldFlags.zone_8_mirrors_aligned) {
+        return [{ type: 'info', text: 'The mirrors are already aligned. The path is clear.' }];
+      }
+      if (!player.inventory.includes(8003)) {
+        return [{ type: 'info', text: 'The mirrors reflect light in random directions. You need something to focus the beam.' }];
+      }
+      player.worldFlags.zone_8_mirrors_aligned = true;
+      player.worldFlags[`door_8012_up`] = 'unlocked';
+      player.inventory = player.inventory.filter(v => v !== 8003);
+      return [
+        { type: 'success', text: 'You insert the Gravity Lens. The beams converge into a single point of light.' },
+        { type: 'room-desc', text: 'The concentrated beam burns through the ceiling, opening a passage upward.' },
+        { type: 'success', text: '--- ZONE 8 PUZZLE COMPLETE ---' }
+      ];
+    }
+
+    /**
+     * Zone 9 puzzle: Turn the hourglass at the correct moment.
+     * Requires the Temporal Sand (item 9003) from the Ruins.
+     */
+    function puzzleUseHourglassZ9() {
+      const room = currentRoom();
+      if (room?.vnum !== 9012) {
+        return [{ type: 'error', text: "There's no hourglass here." }];
+      }
+      if (player.worldFlags.zone_9_hourglass_turned) {
+        return [{ type: 'info', text: 'The hourglass has already been turned. Time flows normally here now.' }];
+      }
+      if (!player.inventory.includes(9003)) {
+        return [{ type: 'info', text: 'The hourglass is empty. It needs special sand to function.' }];
+      }
+      player.worldFlags.zone_9_hourglass_turned = true;
+      player.worldFlags[`door_9012_east`] = 'unlocked';
+      player.inventory = player.inventory.filter(v => v !== 9003);
+      return [
+        { type: 'success', text: 'You pour the Temporal Sand into the hourglass and flip it.' },
+        { type: 'room-desc', text: 'Time ripples. A door that was never there before materializes to the east.' },
+        { type: 'success', text: '--- ZONE 9 PUZZLE COMPLETE ---' }
+      ];
+    }
+
+    /**
+     * Zone 10 puzzle: Activate the obelisk with the Shard of Reality.
+     * The shard is found in the Fractured Corridor (item 10003).
+     */
+    function puzzleUseObeliskZ10() {
+      const room = currentRoom();
+      if (room?.vnum !== 10012) {
+        return [{ type: 'error', text: "There's no obelisk here." }];
+      }
+      if (player.worldFlags.zone_10_obelisk_activated) {
+        return [{ type: 'info', text: 'The obelisk pulses with stable energy. The rift is open.' }];
+      }
+      if (!player.inventory.includes(10003)) {
+        return [{ type: 'info', text: 'The obelisk is cracked and dormant. It needs a fragment of reality to reactivate.' }];
+      }
+      player.worldFlags.zone_10_obelisk_activated = true;
+      player.worldFlags[`door_10012_north`] = 'unlocked';
+      player.inventory = player.inventory.filter(v => v !== 10003);
+      return [
+        { type: 'success', text: 'You press the Shard of Reality into the obelisk. It flares to life.' },
+        { type: 'room-desc', text: 'Reality stabilizes around the obelisk. A rift opens to the north, leading deeper into the shattered realm.' },
+        { type: 'success', text: '--- ZONE 10 PUZZLE COMPLETE ---' }
+      ];
+    }
+
+    /**
+     * Zone 11 puzzle: Anchor yourself in the void to reach the final chamber.
+     * Requires the Void Tether (item 11003) from the Edge of Nothing.
+     */
+    function puzzleUseVoidAnchorZ11() {
+      const room = currentRoom();
+      if (room?.vnum !== 11012) {
+        return [{ type: 'error', text: "There's nothing to anchor to here." }];
+      }
+      if (player.worldFlags.zone_11_void_anchored) {
+        return [{ type: 'info', text: 'The void anchor holds. The path to the center is stable.' }];
+      }
+      if (!player.inventory.includes(11003)) {
+        return [{ type: 'info', text: 'The void stretches infinitely. Without an anchor, you cannot cross.' }];
+      }
+      player.worldFlags.zone_11_void_anchored = true;
+      player.worldFlags[`door_11012_down`] = 'unlocked';
+      player.inventory = player.inventory.filter(v => v !== 11003);
+      return [
+        { type: 'success', text: 'You cast the Void Tether into the darkness. It catches on something.' },
+        { type: 'room-desc', text: 'A bridge of solidified void forms beneath your feet, leading down to the heart of everything.' },
+        { type: 'success', text: '--- ZONE 11 PUZZLE COMPLETE ---' }
+      ];
+    }
+
+    /**
      * Check if two item vnums form a known crafting recipe.
      * Returns { vnum } of the result item, or null.
      */
@@ -2507,7 +2748,7 @@
       // Flee effect — guaranteed escape from combat
       if (stats.flee) {
         if (!combatState) {
-          return [{ type: 'error', text: "You aren't in combat — no need for that." }];
+          return [{ type: 'error', text: "You aren't in combat - no need for that." }];
         }
         combatState = null;
         combatTimer = 0;
@@ -2524,7 +2765,7 @@
           output.push({ type: 'success', text: `You use the ${item.name} and vanish in a cloud of smoke!` });
           output.push(...moveToRoom(targetVnum));
         } else {
-          output.push({ type: 'success', text: `You use the ${item.name} — combat ends!` });
+          output.push({ type: 'success', text: `You use the ${item.name} - combat ends!` });
         }
         consumed = true;
       }
@@ -2532,7 +2773,7 @@
       // Damage effect — deal damage to current combat target
       if (stats.damage && !consumed) {
         if (!combatState) {
-          return [{ type: 'error', text: "No target — you need to be in combat to use that." }];
+          return [{ type: 'error', text: "No target - you need to be in combat to use that." }];
         }
         const dmg = stats.damage;
         combatState.mobHp -= dmg;
@@ -2589,6 +2830,51 @@
         } else {
           output.push({ type: 'info', text: `Also cured ${cured} ailment${cured > 1 ? 's' : ''}.` });
         }
+      }
+
+      // Respec Token — reset specialization
+      if (stats.respec && !consumed) {
+        player.specialization = null;
+        player.specName = null;
+        player.worldFlags['needs_respec'] = true;
+        output.push({ type: 'success', text: `You use the ${item.name}. Your specialization has been reset!` });
+        output.push({ type: 'info', text: "Type 'train' to choose a new specialization." });
+        consumed = true;
+      }
+
+      // XP Tome — boost all core stats
+      if (stats.stat_boost && !consumed) {
+        const boost = stats.stat_boost || 5;
+        if (player.coreStats) {
+          player.coreStats.vigor = (player.coreStats.vigor || 1) + boost;
+          player.coreStats.precision = (player.coreStats.precision || 1) + boost;
+          player.coreStats.grit = (player.coreStats.grit || 1) + boost;
+          player.coreStats.instinct = (player.coreStats.instinct || 1) + boost;
+          output.push({ type: 'success', text: `You read the ${item.name}. All core stats increased by ${boost}!` });
+          recalcStats();
+        } else {
+          output.push({ type: 'error', text: 'Your stats are not yet initialized.' });
+        }
+        consumed = true;
+      }
+
+      // Treasure Map — reveal a hidden room
+      if (stats.reveal_hidden && !consumed) {
+        // Find rooms with hidden exits or locked doors the player hasn't found
+        const hiddenRooms = Object.entries(rooms).filter(([rv, r]) => {
+          return r.hidden || r.password || (r.exits && Object.values(r.exits).some(
+            ex => typeof ex === 'object' && (ex.hidden || ex.locked)
+          ));
+        });
+        if (hiddenRooms.length > 0) {
+          const [rv, r] = hiddenRooms[Math.floor(Math.random() * hiddenRooms.length)];
+          player.worldFlags[`map_revealed_${rv}`] = true;
+          output.push({ type: 'success', text: `You study the ${item.name}...` });
+          output.push({ type: 'quest', text: `  A hidden location is marked: "${r.name}" (room ${rv})` });
+        } else {
+          output.push({ type: 'info', text: `You study the ${item.name}, but it reveals nothing new.` });
+        }
+        consumed = true;
       }
 
       // Fallback for items with no recognized stats
@@ -2696,6 +2982,7 @@
     function recalcStats() {
       let bonusAtk = 0;
       let bonusDef = 0;
+      let bonusFocus = 0;
       for (const [slot, vnum] of Object.entries(player.equipped)) {
         if (vnum == null) continue;
         const item = items[vnum];
@@ -2707,7 +2994,18 @@
           bonusAtk += item.stats?.attack || 0;
         }
         bonusDef += item.stats?.defense || 0;
+        // Equipment can grant bonus max focus
+        bonusFocus += item.stats?.focus_bonus || 0;
       }
+      // Reset focus cost modifier from equipment (recalculated each time)
+      let equipFocusMod = 0;
+      for (const [slot, vnum] of Object.entries(player.equipped)) {
+        if (vnum == null) continue;
+        const item = items[vnum];
+        if (!item) continue;
+        equipFocusMod += item.stats?.focus_cost_modifier || 0;
+      }
+      player.focusCostModifier = equipFocusMod;
       // Add weapon proficiency attack bonus for equipped primary weapon
       if (window.MudWeaponProficiency && player.equipped.weapon != null) {
         const wpnItem = items[player.equipped.weapon];
@@ -2722,7 +3020,7 @@
         player.attackPower = 10 + bonusAtk;
         player.defense = 5 + bonusDef + (derived.bonusDefense || 0);
         player.maxHp = 100 + (derived.bonusMaxHp || 0);
-        player.maxFocus = 50 + (derived.bonusMaxFocus || 0);
+        player.maxFocus = 50 + (derived.bonusMaxFocus || 0) + bonusFocus;
         // Store derived stats on player for combat tick access
         player._derived = derived;
       } else {
@@ -2777,6 +3075,8 @@
 
     function resume(savedState) {
       if (!savedState || !savedState.player) return;
+      // Migrate old saves to current schema
+      savedState = migrateSave(savedState);
       Object.assign(player, savedState.player);
       if (savedState.defeatedMobs) {
         // Support both old Set format (array of vnums) and new Map format (array of [vnum, remainingTime])
@@ -2809,8 +3109,12 @@
       recalcStats();
     }
 
+    /** Current save schema version — increment when adding new fields. */
+    const SAVE_VERSION = 3;
+
     function getSaveSlice() {
       return {
+        _version: SAVE_VERSION,
         player: { ...player },
         // Save as [vnum, remainingSeconds] pairs for respawn persistence
         defeatedMobs: [...defeatedMobs.entries()]
@@ -2818,6 +3122,35 @@
           .map(([v, t]) => [v, Math.max(0, MOB_RESPAWN_TIME - (engineClock - t))]),
         takenItems: { ...takenItems }
       };
+    }
+
+    /**
+     * Migrate old save data to the current schema version.
+     * Each version bump adds default values for new fields.
+     */
+    function migrateSave(savedState) {
+      const v = savedState._version || 1;
+      if (v < 2) {
+        // v2 additions: meta_clues array, worldFlags defaults, focusCost support
+        if (savedState.player) {
+          if (!savedState.player.worldFlags) savedState.player.worldFlags = {};
+          if (!savedState.player.worldFlags.meta_clues) savedState.player.worldFlags.meta_clues = [];
+        }
+      }
+      if (v < 3) {
+        // v3 additions: deaths counter, appearance fields
+        if (savedState.player) {
+          if (savedState.player.deaths === undefined) savedState.player.deaths = 0;
+          if (!savedState.player.name) savedState.player.name = 'Traveler';
+          if (!savedState.player.gender) savedState.player.gender = 'N';
+          if (!savedState.player.hairColor) savedState.player.hairColor = 'Brown';
+          if (!savedState.player.eyeColor) savedState.player.eyeColor = 'Brown';
+          if (!savedState.player.bodyType) savedState.player.bodyType = 'Athletic';
+          if (!savedState.player.description) savedState.player.description = 'A mysterious traveler from another place.';
+        }
+      }
+      savedState._version = SAVE_VERSION;
+      return savedState;
     }
 
     // ─── Expose internals for the command registry ─────────────────────────

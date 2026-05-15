@@ -39,7 +39,7 @@
   const INVASION_MESSAGES = [
     'The air crackles with hostile energy. A ghost solidifies, eyes burning with malice!',
     'A shimmer in the air twists into something wrong. An echo turns hostile!',
-    'The temperature drops. A phantom takes form — and it wants blood.',
+    'The temperature drops. A phantom takes form - and it wants blood.',
     'Reality fractures. A corrupted echo steps through, weapon raised.',
     'A ghost\'s eyes snap open, glowing red. It lunges at you!'
   ];
@@ -272,7 +272,7 @@
     let itemDrop = null;
     if (echoMob.echoInventory && echoMob.echoInventory.length > 0 && Math.random() < ITEM_DROP_CHANCE) {
       itemDrop = echoMob.echoInventory[Math.floor(Math.random() * echoMob.echoInventory.length)];
-      output.push({ type: 'success', text: `Something falls from the fading echo — you snatch it before it vanishes!` });
+      output.push({ type: 'success', text: `Something falls from the fading echo - you snatch it before it vanishes!` });
     }
 
     return { output, powerGain, itemDrop };

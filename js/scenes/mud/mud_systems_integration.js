@@ -206,7 +206,7 @@
           const ctx = engine.getContext();
           return [
             { type: 'info', text: 'You reach out with your senses...' },
-            ...ctx.roomMobs.map(name => ({ type: 'info', text: `  ${name} — present` })),
+            ...ctx.roomMobs.map(name => ({ type: 'info', text: `  ${name} - present` })),
             ...(ctx.roomMobs.length === 0 ? [{ type: 'info', text: '  Nothing hostile nearby.' }] : [])
           ];
         }
@@ -280,7 +280,7 @@
             const output = [{ type: 'info', text: '─── Stances ───' }];
             for (const s of available) {
               const active = (playerState?.stance || 'balanced') === s.id;
-              output.push({ type: active ? 'success' : 'info', text: `  ${active ? '▶ ' : '  '}${s.name} — ${s.desc}` });
+              output.push({ type: active ? 'success' : 'info', text: `  ${active ? '▶ ' : '  '}${s.name} - ${s.desc}` });
             }
             output.push({ type: 'info', text: '' });
             output.push({ type: 'info', text: "  Type 'stance <name>' to switch." });

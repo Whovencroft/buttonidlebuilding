@@ -24,14 +24,14 @@
   function knightAbilities() {
     return [
       // ── Trainable (bought with QP) ──
-      { id: 'shield_wall', name: 'Shield Wall', tier: 0, type: 'buff', desc: 'Raise your shield. +50% defense for 3 rounds.', duration: 3, defMod: 1.5, cooldown: 5 },
-      { id: 'holy_strike', name: 'Holy Strike', tier: 0, type: 'attack', desc: 'A basic strike infused with holy light. 150% damage.', multiplier: 1.5, cooldown: 3 },
-      { id: 'rallying_cry', name: 'Rallying Cry', tier: 1, type: 'heal', desc: 'Shout to inspire, healing 30% of max HP.', healPercent: 0.3, cooldown: 5 },
-      { id: 'divine_charge', name: 'Divine Charge', tier: 1, type: 'attack', desc: 'Charge at the enemy with divine force. 250% damage.', multiplier: 2.5, cooldown: 4 },
-      { id: 'righteous_verdict', name: 'Righteous Verdict', tier: 2, type: 'attack', desc: 'Deliver a heavy blow of justice. 350% damage.', multiplier: 3.5, cooldown: 6 },
-      { id: 'aura_of_protection', name: 'Aura of Protection', tier: 2, type: 'buff', desc: 'Surround yourself with holy energy. +100% defense for 4 rounds.', duration: 4, defMod: 2.0, cooldown: 7 },
-      { id: 'lay_on_hands', name: 'Lay on Hands', tier: 3, type: 'heal', desc: 'Channel pure divine energy to heal 80% of max HP.', healPercent: 0.8, cooldown: 8 },
-      { id: 'heavens_wrath', name: 'Heaven\'s Wrath', tier: 3, type: 'attack', desc: 'Call down the wrath of the heavens. 500% damage.', multiplier: 5.0, cooldown: 10 },
+      { id: 'shield_wall', name: 'Shield Wall', tier: 0, focusCost: 3, type: 'buff', desc: 'Raise your shield. +50% defense for 3 rounds.', duration: 3, defMod: 1.5, cooldown: 5 },
+      { id: 'holy_strike', name: 'Holy Strike', tier: 0, focusCost: 5, type: 'attack', desc: 'A basic strike infused with holy light. 150% damage.', multiplier: 1.5, cooldown: 3 },
+      { id: 'rallying_cry', name: 'Rallying Cry', tier: 1, focusCost: 15, type: 'heal', desc: 'Shout to inspire, healing 30% of max HP.', healPercent: 0.3, cooldown: 5 },
+      { id: 'divine_charge', name: 'Divine Charge', tier: 1, focusCost: 12, type: 'attack', desc: 'Charge at the enemy with divine force. 250% damage.', multiplier: 2.5, cooldown: 4 },
+      { id: 'righteous_verdict', name: 'Righteous Verdict', tier: 2, focusCost: 18, type: 'attack', desc: 'Deliver a heavy blow of justice. 350% damage.', multiplier: 3.5, cooldown: 6 },
+      { id: 'aura_of_protection', name: 'Aura of Protection', tier: 2, focusCost: 16, type: 'buff', desc: 'Surround yourself with holy energy. +100% defense for 4 rounds.', duration: 4, defMod: 2.0, cooldown: 7 },
+      { id: 'lay_on_hands', name: 'Lay on Hands', tier: 3, focusCost: 28, type: 'heal', desc: 'Channel pure divine energy to heal 80% of max HP.', healPercent: 0.8, cooldown: 8 },
+      { id: 'heavens_wrath', name: 'Heaven\'s Wrath', tier: 3, focusCost: 25, type: 'attack', desc: 'Call down the wrath of the heavens. 500% damage.', multiplier: 5.0, cooldown: 10 },
       // ── Spec Glimmers (discovered mid-combat) ──
       { id: 'counter_bash', name: 'Counter Bash', type: 'attack', desc: 'Shield counter. 200% damage.', multiplier: 2.0, cooldown: 4, glimmer: true, sparkFrom: ['shield_wall'], sparkChance: 0.05 },
       { id: 'blinding_smite', name: 'Blinding Smite', type: 'debuff', desc: 'A strike that blinds the enemy. -40% enemy attack for 3 rounds.', duration: 3, atkMod: 0.6, cooldown: 6, glimmer: true, sparkFrom: ['holy_strike'], sparkChance: 0.06 },
@@ -65,14 +65,14 @@
   function commandoAbilities() {
     return [
       // ── Trainable (bought with QP) ──
-      { id: 'burst_fire', name: 'Burst Fire', tier: 0, type: 'attack', desc: 'A quick 3-round burst from your assault rifle.', multiplier: 1.5, cooldown: 3 },
-      { id: 'stim_pack', name: 'Stim Pack', tier: 0, type: 'heal', desc: 'Inject a rapid-healing stimulant.', healPercent: 0.3, cooldown: 5 },
-      { id: 'frag_grenade', name: 'Frag Grenade', tier: 1, type: 'attack', desc: 'Toss a fragmentation grenade at the enemy.', multiplier: 2.5, cooldown: 4 },
-      { id: 'combat_roll', name: 'Combat Roll', tier: 1, type: 'buff', desc: 'Roll into cover, increasing defense.', duration: 3, defMod: 1.5, cooldown: 5 },
-      { id: 'plasma_rifle', name: 'Plasma Rifle', tier: 2, type: 'attack', desc: 'Fire a searing bolt of superheated plasma.', multiplier: 3.5, cooldown: 6 },
-      { id: 'suppressive_fire', name: 'Suppressive Fire', tier: 2, type: 'debuff', desc: 'Pin the enemy down, reducing their attack.', duration: 3, atkMod: 0.6, cooldown: 6 },
-      { id: 'orbital_strike', name: 'Orbital Strike', tier: 3, type: 'attack', desc: 'Call down a devastating laser from orbit.', multiplier: 5.5, cooldown: 10 },
-      { id: 'nano_reconstruction', name: 'Nano Reconstruction', tier: 3, type: 'heal', desc: 'Deploy nanites to rapidly repair tissue damage.', healPercent: 0.8, cooldown: 8 },
+      { id: 'burst_fire', name: 'Burst Fire', tier: 0, focusCost: 5, type: 'attack', desc: 'A quick 3-round burst from your assault rifle.', multiplier: 1.5, cooldown: 3 },
+      { id: 'stim_pack', name: 'Stim Pack', tier: 0, focusCost: 8, type: 'heal', desc: 'Inject a rapid-healing stimulant.', healPercent: 0.3, cooldown: 5 },
+      { id: 'frag_grenade', name: 'Frag Grenade', tier: 1, focusCost: 12, type: 'attack', desc: 'Toss a fragmentation grenade at the enemy.', multiplier: 2.5, cooldown: 4 },
+      { id: 'combat_roll', name: 'Combat Roll', tier: 1, focusCost: 10, type: 'buff', desc: 'Roll into cover, increasing defense.', duration: 3, defMod: 1.5, cooldown: 5 },
+      { id: 'plasma_rifle', name: 'Plasma Rifle', tier: 2, focusCost: 18, type: 'attack', desc: 'Fire a searing bolt of superheated plasma.', multiplier: 3.5, cooldown: 6 },
+      { id: 'suppressive_fire', name: 'Suppressive Fire', tier: 2, focusCost: 17, type: 'debuff', desc: 'Pin the enemy down, reducing their attack.', duration: 3, atkMod: 0.6, cooldown: 6 },
+      { id: 'orbital_strike', name: 'Orbital Strike', tier: 3, focusCost: 25, type: 'attack', desc: 'Call down a devastating laser from orbit.', multiplier: 5.5, cooldown: 10 },
+      { id: 'nano_reconstruction', name: 'Nano Reconstruction', tier: 3, focusCost: 28, type: 'heal', desc: 'Deploy nanites to rapidly repair tissue damage.', healPercent: 0.8, cooldown: 8 },
       // ── Spec Glimmers (discovered mid-combat) ──
       { id: 'full_auto', name: 'Full Auto', type: 'attack', desc: 'Unload your entire magazine into the target.', multiplier: 2.8, cooldown: 5, glimmer: true, sparkFrom: ['burst_fire'], sparkChance: 0.08 },
       { id: 'adrenaline_surge', name: 'Adrenaline Surge', type: 'buff', desc: 'The stim pack triggers a massive adrenaline rush.', duration: 3, atkMod: 1.5, cooldown: 6, glimmer: true, sparkFrom: ['stim_pack'], sparkChance: 0.06 },
@@ -106,14 +106,14 @@
   function enforcerAbilities() {
     return [
       // ── Trainable (bought with QP) ──
-      { id: 'brass_knuckles', name: 'Brass Knuckles', tier: 0, type: 'attack', desc: 'A brutal punch with brass knuckles. 150% damage.', multiplier: 1.5, cooldown: 3 },
-      { id: 'intimidate', name: 'Intimidate', tier: 0, type: 'debuff', desc: 'Glare at the enemy, reducing their attack. -30% attack for 3 rounds.', duration: 3, atkMod: 0.7, cooldown: 5 },
-      { id: 'last_stand', name: 'Last Stand', tier: 1, type: 'buff', desc: 'Refuse to go down. +50% defense for 3 rounds.', duration: 3, defMod: 1.5, cooldown: 6 },
-      { id: 'executioner', name: 'Executioner', tier: 1, type: 'attack', desc: 'A ruthless strike meant to finish the job. 250% damage.', multiplier: 2.5, cooldown: 5 },
-      { id: 'shakedown', name: 'Shakedown', tier: 2, type: 'attack', desc: 'Rough up the target. 300% damage.', multiplier: 3.0, cooldown: 6 },
-      { id: 'concrete_shoes', name: 'Concrete Shoes', tier: 2, type: 'debuff', desc: 'Make them heavy. -50% defense for 3 rounds.', duration: 3, defMod: 0.5, cooldown: 7 },
-      { id: 'tommy_gun_sweep', name: 'Tommy Gun Sweep', tier: 3, type: 'attack', desc: 'Spray the area with lead. 450% damage.', multiplier: 4.5, cooldown: 8 },
-      { id: 'mob_boss_aura', name: 'Mob Boss Aura', tier: 3, type: 'buff', desc: 'Command respect. +100% attack for 4 rounds.', duration: 4, atkMod: 2.0, cooldown: 8 },
+      { id: 'brass_knuckles', name: 'Brass Knuckles', tier: 0, focusCost: 5, type: 'attack', desc: 'A brutal punch with brass knuckles. 150% damage.', multiplier: 1.5, cooldown: 3 },
+      { id: 'intimidate', name: 'Intimidate', tier: 0, focusCost: 4, type: 'debuff', desc: 'Glare at the enemy, reducing their attack. -30% attack for 3 rounds.', duration: 3, atkMod: 0.7, cooldown: 5 },
+      { id: 'last_stand', name: 'Last Stand', tier: 1, focusCost: 10, type: 'buff', desc: 'Refuse to go down. +50% defense for 3 rounds.', duration: 3, defMod: 1.5, cooldown: 6 },
+      { id: 'executioner', name: 'Executioner', tier: 1, focusCost: 12, type: 'attack', desc: 'A ruthless strike meant to finish the job. 250% damage.', multiplier: 2.5, cooldown: 5 },
+      { id: 'shakedown', name: 'Shakedown', tier: 2, focusCost: 18, type: 'attack', desc: 'Rough up the target. 300% damage.', multiplier: 3.0, cooldown: 6 },
+      { id: 'concrete_shoes', name: 'Concrete Shoes', tier: 2, focusCost: 17, type: 'debuff', desc: 'Make them heavy. -50% defense for 3 rounds.', duration: 3, defMod: 0.5, cooldown: 7 },
+      { id: 'tommy_gun_sweep', name: 'Tommy Gun Sweep', tier: 3, focusCost: 25, type: 'attack', desc: 'Spray the area with lead. 450% damage.', multiplier: 4.5, cooldown: 8 },
+      { id: 'mob_boss_aura', name: 'Mob Boss Aura', tier: 3, focusCost: 23, type: 'buff', desc: 'Command respect. +100% attack for 4 rounds.', duration: 4, atkMod: 2.0, cooldown: 8 },
       // ── Spec Glimmers (discovered mid-combat) ──
       { id: 'sucker_punch', name: 'Sucker Punch', type: 'attack', desc: 'A dirty hit when they aren\'t looking. 200% damage.', multiplier: 2.0, cooldown: 4, glimmer: true, sparkFrom: ['brass_knuckles'], sparkChance: 0.08 },
       { id: 'jawbreaker', name: 'Jawbreaker', type: 'attack', desc: 'A devastating uppercut. 350% damage.', multiplier: 3.5, cooldown: 6, glimmer: true, sparkFrom: ['sucker_punch'], sparkChance: 0.05 },
@@ -127,7 +127,7 @@
       { id: 'chicago_typewriter', name: 'Chicago Typewriter', type: 'attack', desc: 'Unload the entire drum. 550% damage.', multiplier: 5.5, cooldown: 9, glimmer: true, sparkFrom: ['tommy_gun_sweep'], sparkChance: 0.04 },
       // ── Scaling Chains (progressive multi-hit) ──
       { id: 'one_two_punch', name: 'One-Two Punch', type: 'attack', desc: 'A quick jab-cross. 170% damage.', multiplier: 1.7, cooldown: 3, glimmer: true, sparkFrom: ['brass_knuckles'], sparkChance: 0.06, chainFamily: 'combo_hits', chainRank: 1 },
-      { id: 'three_piece_combo', name: 'Three-Piece Combo', type: 'attack', desc: 'Jab, cross, hook — textbook. 229% damage.', multiplier: 2.3, cooldown: 4, glimmer: true, sparkFrom: ['one_two_punch'], sparkChance: 0.049999999999999996, chainFamily: 'combo_hits', chainRank: 2 },
+      { id: 'three_piece_combo', name: 'Three-Piece Combo', type: 'attack', desc: 'Jab, cross, hook - textbook. 229% damage.', multiplier: 2.3, cooldown: 4, glimmer: true, sparkFrom: ['one_two_punch'], sparkChance: 0.049999999999999996, chainFamily: 'combo_hits', chainRank: 2 },
       { id: 'five_hit_flurry', name: 'Five-Hit Flurry', type: 'attack', desc: 'A relentless five-hit barrage. 300% damage.', multiplier: 3.0, cooldown: 5, glimmer: true, sparkFrom: ['three_piece_combo'], sparkChance: 0.039999999999999994, chainFamily: 'combo_hits', chainRank: 3 },
       { id: 'seven_strike_rush', name: 'Seven-Strike Rush', type: 'attack', desc: 'Seven savage strikes, no mercy. 390% damage.', multiplier: 3.9, cooldown: 6, glimmer: true, sparkFrom: ['five_hit_flurry'], sparkChance: 0.03, chainFamily: 'combo_hits', chainRank: 4 },
       { id: 'beatdown', name: 'Beatdown', type: 'attack', desc: 'You don\'t stop hitting until they stop moving. 520% damage.', multiplier: 5.2, cooldown: 8, glimmer: true, sparkFrom: ['seven_strike_rush'], sparkChance: 0.03, chainFamily: 'combo_hits', chainRank: 5 },
@@ -147,14 +147,14 @@
   function mechpilotAbilities() {
     return [
       // ── Trainable (bought with QP) ──
-      { id: 'rocket_punch', name: 'Rocket Punch', tier: 0, type: 'attack', desc: 'Fire your mechanical fist at the enemy. 180% damage.', multiplier: 1.8, cooldown: 3 },
-      { id: 'armor_mode', name: 'Armor Mode', tier: 0, type: 'buff', desc: 'Engage heavy armor plating. +50% defense for 3 rounds.', duration: 3, defMod: 1.5, cooldown: 5 },
-      { id: 'missile_salvo', name: 'Missile Salvo', tier: 1, type: 'attack', desc: 'Unleash a barrage of micro-missiles. 250% damage.', multiplier: 2.5, cooldown: 5 },
-      { id: 'overdrive', name: 'Overdrive', tier: 1, type: 'buff', desc: 'Push the reactor past safe limits. +80% attack for 2 rounds.', duration: 2, atkMod: 1.8, cooldown: 6 },
-      { id: 'laser_cannon', name: 'Laser Cannon', tier: 2, type: 'attack', desc: 'Fire a concentrated beam of energy. 350% damage.', multiplier: 3.5, cooldown: 7 },
-      { id: 'repair_drones', name: 'Repair Drones', tier: 2, type: 'heal', desc: 'Deploy drones to patch hull damage. Restores 40% HP.', healPercent: 0.4, cooldown: 6 },
-      { id: 'orbital_strike', name: 'Orbital Strike', tier: 3, type: 'attack', desc: 'Call down a devastating laser from orbit. 550% damage.', multiplier: 5.5, cooldown: 10 },
-      { id: 'core_meltdown', name: 'Core Meltdown', tier: 3, type: 'debuff', desc: 'Vent radioactive plasma, melting enemy armor. -60% enemy defense for 3 rounds.', duration: 3, defMod: 0.4, cooldown: 8 },
+      { id: 'rocket_punch', name: 'Rocket Punch', tier: 0, focusCost: 5, type: 'attack', desc: 'Fire your mechanical fist at the enemy. 180% damage.', multiplier: 1.8, cooldown: 3 },
+      { id: 'armor_mode', name: 'Armor Mode', tier: 0, focusCost: 3, type: 'buff', desc: 'Engage heavy armor plating. +50% defense for 3 rounds.', duration: 3, defMod: 1.5, cooldown: 5 },
+      { id: 'missile_salvo', name: 'Missile Salvo', tier: 1, focusCost: 12, type: 'attack', desc: 'Unleash a barrage of micro-missiles. 250% damage.', multiplier: 2.5, cooldown: 5 },
+      { id: 'overdrive', name: 'Overdrive', tier: 1, focusCost: 10, type: 'buff', desc: 'Push the reactor past safe limits. +80% attack for 2 rounds.', duration: 2, atkMod: 1.8, cooldown: 6 },
+      { id: 'laser_cannon', name: 'Laser Cannon', tier: 2, focusCost: 18, type: 'attack', desc: 'Fire a concentrated beam of energy. 350% damage.', multiplier: 3.5, cooldown: 7 },
+      { id: 'repair_drones', name: 'Repair Drones', tier: 2, focusCost: 21, type: 'heal', desc: 'Deploy drones to patch hull damage. Restores 40% HP.', healPercent: 0.4, cooldown: 6 },
+      { id: 'orbital_strike', name: 'Orbital Strike', tier: 3, focusCost: 25, type: 'attack', desc: 'Call down a devastating laser from orbit. 550% damage.', multiplier: 5.5, cooldown: 10 },
+      { id: 'core_meltdown', name: 'Core Meltdown', tier: 3, focusCost: 24, type: 'debuff', desc: 'Vent radioactive plasma, melting enemy armor. -60% enemy defense for 3 rounds.', duration: 3, defMod: 0.4, cooldown: 8 },
       // ── Spec Glimmers (discovered mid-combat) ──
       { id: 'plasma_punch', name: 'Plasma Punch', type: 'attack', desc: 'Superheat the rocket fist before impact. 220% damage.', multiplier: 2.2, cooldown: 4, glimmer: true, sparkFrom: ['rocket_punch'], sparkChance: 0.06 },
       { id: 'gigaton_smash', name: 'Gigaton Smash', type: 'attack', desc: 'A devastating downward strike with maximum thrusters. 300% damage.', multiplier: 3.0, cooldown: 6, glimmer: true, sparkFrom: ['plasma_punch'], sparkChance: 0.04 },
@@ -188,14 +188,14 @@
   function samuraiAbilities() {
     return [
       // ── Trainable (bought with QP) ──
-      { id: 'quick_draw', name: 'Quick Draw', tier: 0, type: 'attack', desc: 'A lightning-fast unsheathing strike. 150% damage.', multiplier: 1.5, cooldown: 3 },
-      { id: 'honor_guard', name: 'Honor Guard', tier: 0, type: 'buff', desc: 'Assume a defensive stance. +50% defense for 3 rounds.', duration: 3, defMod: 1.5, cooldown: 5 },
-      { id: 'blade_dance', name: 'Blade Dance', tier: 1, type: 'attack', desc: 'A flurry of elegant slashes. 250% damage.', multiplier: 2.5, cooldown: 5 },
-      { id: 'wind_slash', name: 'Wind Slash', tier: 1, type: 'attack', desc: 'A ranged slash that cuts the air. 200% damage.', multiplier: 2.0, cooldown: 4 },
-      { id: 'spirit_focus', name: 'Spirit Focus', tier: 2, type: 'buff', desc: 'Channel your inner ki. +80% attack for 3 rounds.', duration: 3, atkMod: 1.8, cooldown: 6 },
-      { id: 'cherry_blossom_strike', name: 'Cherry Blossom Strike', tier: 2, type: 'attack', desc: 'A beautiful but deadly strike. 350% damage.', multiplier: 3.5, cooldown: 7 },
-      { id: 'final_form', name: 'Final Form', tier: 3, type: 'attack', desc: 'Awaken your true anime power and strike. 500% damage.', multiplier: 5.0, cooldown: 10 },
-      { id: 'thousand_cuts', name: 'Thousand Cuts', tier: 3, type: 'attack', desc: 'An imperceptible barrage of slashes. 600% damage.', multiplier: 6.0, cooldown: 12 },
+      { id: 'quick_draw', name: 'Quick Draw', tier: 0, focusCost: 5, type: 'attack', desc: 'A lightning-fast unsheathing strike. 150% damage.', multiplier: 1.5, cooldown: 3 },
+      { id: 'honor_guard', name: 'Honor Guard', tier: 0, focusCost: 3, type: 'buff', desc: 'Assume a defensive stance. +50% defense for 3 rounds.', duration: 3, defMod: 1.5, cooldown: 5 },
+      { id: 'blade_dance', name: 'Blade Dance', tier: 1, focusCost: 12, type: 'attack', desc: 'A flurry of elegant slashes. 250% damage.', multiplier: 2.5, cooldown: 5 },
+      { id: 'wind_slash', name: 'Wind Slash', tier: 1, focusCost: 12, type: 'attack', desc: 'A ranged slash that cuts the air. 200% damage.', multiplier: 2.0, cooldown: 4 },
+      { id: 'spirit_focus', name: 'Spirit Focus', tier: 2, focusCost: 16, type: 'buff', desc: 'Channel your inner ki. +80% attack for 3 rounds.', duration: 3, atkMod: 1.8, cooldown: 6 },
+      { id: 'cherry_blossom_strike', name: 'Cherry Blossom Strike', tier: 2, focusCost: 18, type: 'attack', desc: 'A beautiful but deadly strike. 350% damage.', multiplier: 3.5, cooldown: 7 },
+      { id: 'final_form', name: 'Final Form', tier: 3, focusCost: 25, type: 'attack', desc: 'Awaken your true anime power and strike. 500% damage.', multiplier: 5.0, cooldown: 10 },
+      { id: 'thousand_cuts', name: 'Thousand Cuts', tier: 3, focusCost: 25, type: 'attack', desc: 'An imperceptible barrage of slashes. 600% damage.', multiplier: 6.0, cooldown: 12 },
       // ── Spec Glimmers (discovered mid-combat) ──
       { id: 'iaijutsu', name: 'Iaijutsu', type: 'attack', desc: 'A perfected quick draw. 220% damage.', multiplier: 2.2, cooldown: 4, glimmer: true, sparkFrom: ['quick_draw'], sparkChance: 0.08 },
       { id: 'void_slash', name: 'Void Slash', type: 'attack', desc: 'A slash that cuts through space. 300% damage.', multiplier: 3.0, cooldown: 6, glimmer: true, sparkFrom: ['iaijutsu'], sparkChance: 0.05 },
@@ -229,14 +229,14 @@
   function gladiatorAbilities() {
     return [
       // ── Trainable (bought with QP) ──
-      { id: 'gladius_thrust', name: 'Gladius Thrust', tier: 0, type: 'attack', desc: 'A quick thrust with your short sword. 150% damage.', multiplier: 1.5, cooldown: 3 },
-      { id: 'crowd_roar', name: 'Crowd Roar', tier: 0, type: 'buff', desc: 'Play to the crowd. +20% attack for 3 rounds.', duration: 3, atkMod: 1.2, cooldown: 5 },
-      { id: 'net_and_trident', name: 'Net and Trident', tier: 1, type: 'debuff', desc: 'Entangle the foe. -30% enemy defense for 3 rounds.', duration: 3, defMod: 0.7, cooldown: 6 },
-      { id: 'arena_champion', name: 'Arena Champion', tier: 1, type: 'heal', desc: 'Bask in glory to recover health. Heals 30% HP.', healPercent: 0.3, cooldown: 5 },
-      { id: 'blood_on_the_sand', name: 'Blood on the Sand', tier: 2, type: 'attack', desc: 'A vicious strike meant to entertain. 300% damage.', multiplier: 3.0, cooldown: 6 },
-      { id: 'colosseum_glory', name: 'Colosseum Glory', tier: 2, type: 'buff', desc: 'Channel the spirit of the arena. +50% attack for 4 rounds.', duration: 4, atkMod: 1.5, cooldown: 7 },
-      { id: 'executioners_blow', name: 'Executioner\'s Blow', tier: 3, type: 'attack', desc: 'The final strike demanded by the emperor. 500% damage.', multiplier: 5.0, cooldown: 10 },
-      { id: 'immortal_victor', name: 'Immortal Victor', tier: 3, type: 'heal', desc: 'Refuse to fall before the crowd. Heals 80% HP.', healPercent: 0.8, cooldown: 9 },
+      { id: 'gladius_thrust', name: 'Gladius Thrust', tier: 0, focusCost: 5, type: 'attack', desc: 'A quick thrust with your short sword. 150% damage.', multiplier: 1.5, cooldown: 3 },
+      { id: 'crowd_roar', name: 'Crowd Roar', tier: 0, focusCost: 3, type: 'buff', desc: 'Play to the crowd. +20% attack for 3 rounds.', duration: 3, atkMod: 1.2, cooldown: 5 },
+      { id: 'net_and_trident', name: 'Net and Trident', tier: 1, focusCost: 11, type: 'debuff', desc: 'Entangle the foe. -30% enemy defense for 3 rounds.', duration: 3, defMod: 0.7, cooldown: 6 },
+      { id: 'arena_champion', name: 'Arena Champion', tier: 1, focusCost: 15, type: 'heal', desc: 'Bask in glory to recover health. Heals 30% HP.', healPercent: 0.3, cooldown: 5 },
+      { id: 'blood_on_the_sand', name: 'Blood on the Sand', tier: 2, focusCost: 18, type: 'attack', desc: 'A vicious strike meant to entertain. 300% damage.', multiplier: 3.0, cooldown: 6 },
+      { id: 'colosseum_glory', name: 'Colosseum Glory', tier: 2, focusCost: 16, type: 'buff', desc: 'Channel the spirit of the arena. +50% attack for 4 rounds.', duration: 4, atkMod: 1.5, cooldown: 7 },
+      { id: 'executioners_blow', name: 'Executioner\'s Blow', tier: 3, focusCost: 25, type: 'attack', desc: 'The final strike demanded by the emperor. 500% damage.', multiplier: 5.0, cooldown: 10 },
+      { id: 'immortal_victor', name: 'Immortal Victor', tier: 3, focusCost: 28, type: 'heal', desc: 'Refuse to fall before the crowd. Heals 80% HP.', healPercent: 0.8, cooldown: 9 },
       // ── Spec Glimmers (discovered mid-combat) ──
       { id: 'brutal_lunge', name: 'Brutal Lunge', type: 'attack', desc: 'A deeper thrust catching the enemy off guard. 200% damage.', multiplier: 2.0, cooldown: 4, glimmer: true, sparkFrom: ['gladius_thrust'], sparkChance: 0.06 },
       { id: 'heart_piercer', name: 'Heart Piercer', type: 'attack', desc: 'A lethal stab to the vitals. 350% damage.', multiplier: 3.5, cooldown: 7, glimmer: true, sparkFrom: ['brutal_lunge'], sparkChance: 0.04 },
@@ -271,14 +271,14 @@
   function sorcererAbilities() {
     return [
       // ── Trainable (bought with QP) ──
-      { id: 'fireball', name: 'Fireball', tier: 0, type: 'attack', desc: 'Hurl a ball of fire at the enemy. 150% damage.', multiplier: 1.5, cooldown: 3 },
-      { id: 'arcane_shield', name: 'Arcane Shield', tier: 0, type: 'buff', desc: 'Surround yourself with arcane energy. +20% defense for 3 rounds.', duration: 3, defMod: 1.2, cooldown: 5 },
-      { id: 'chain_lightning', name: 'Chain Lightning', tier: 1, type: 'attack', desc: 'Unleash a bolt of lightning that strikes the enemy. 250% damage.', multiplier: 2.5, cooldown: 5 },
-      { id: 'mana_drain', name: 'Mana Drain', tier: 1, type: 'debuff', desc: 'Siphon the enemy\'s magical essence. -30% attack for 3 rounds.', duration: 3, atkMod: 0.7, cooldown: 6 },
-      { id: 'meteor_storm', name: 'Meteor Storm', tier: 2, type: 'attack', desc: 'Call down flaming meteors from the sky. 400% damage.', multiplier: 4.0, cooldown: 8 },
-      { id: 'time_warp', name: 'Time Warp', tier: 2, type: 'buff', desc: 'Bend time to your advantage. +50% attack for 2 rounds.', duration: 2, atkMod: 1.5, cooldown: 7 },
-      { id: 'black_hole', name: 'Black Hole', tier: 3, type: 'attack', desc: 'Summon a singularity to crush the enemy. 600% damage.', multiplier: 6.0, cooldown: 12 },
-      { id: 'arcane_ascension', name: 'Arcane Ascension', tier: 3, type: 'buff', desc: 'Become a being of pure magic. +100% attack for 4 rounds.', duration: 4, atkMod: 2.0, cooldown: 8 },
+      { id: 'fireball', name: 'Fireball', tier: 0, focusCost: 5, type: 'attack', desc: 'Hurl a ball of fire at the enemy. 150% damage.', multiplier: 1.5, cooldown: 3 },
+      { id: 'arcane_shield', name: 'Arcane Shield', tier: 0, focusCost: 3, type: 'buff', desc: 'Surround yourself with arcane energy. +20% defense for 3 rounds.', duration: 3, defMod: 1.2, cooldown: 5 },
+      { id: 'chain_lightning', name: 'Chain Lightning', tier: 1, focusCost: 12, type: 'attack', desc: 'Unleash a bolt of lightning that strikes the enemy. 250% damage.', multiplier: 2.5, cooldown: 5 },
+      { id: 'mana_drain', name: 'Mana Drain', tier: 1, focusCost: 11, type: 'debuff', desc: 'Siphon the enemy\'s magical essence. -30% attack for 3 rounds.', duration: 3, atkMod: 0.7, cooldown: 6 },
+      { id: 'meteor_storm', name: 'Meteor Storm', tier: 2, focusCost: 18, type: 'attack', desc: 'Call down flaming meteors from the sky. 400% damage.', multiplier: 4.0, cooldown: 8 },
+      { id: 'time_warp', name: 'Time Warp', tier: 2, focusCost: 16, type: 'buff', desc: 'Bend time to your advantage. +50% attack for 2 rounds.', duration: 2, atkMod: 1.5, cooldown: 7 },
+      { id: 'black_hole', name: 'Black Hole', tier: 3, focusCost: 25, type: 'attack', desc: 'Summon a singularity to crush the enemy. 600% damage.', multiplier: 6.0, cooldown: 12 },
+      { id: 'arcane_ascension', name: 'Arcane Ascension', tier: 3, focusCost: 23, type: 'buff', desc: 'Become a being of pure magic. +100% attack for 4 rounds.', duration: 4, atkMod: 2.0, cooldown: 8 },
       // ── Spec Glimmers (discovered mid-combat) ──
       { id: 'pyroblast', name: 'Pyroblast', type: 'attack', desc: 'A massive sphere of intense fire. 220% damage.', multiplier: 2.2, cooldown: 4, glimmer: true, sparkFrom: ['fireball'], sparkChance: 0.06 },
       { id: 'inferno', name: 'Inferno', type: 'attack', desc: 'Engulf the enemy in an unquenchable blaze. 300% damage.', multiplier: 3.0, cooldown: 6, glimmer: true, sparkFrom: ['pyroblast'], sparkChance: 0.04 },
@@ -312,14 +312,14 @@
   function hackerAbilities() {
     return [
       // ── Trainable (bought with QP) ──
-      { id: 'data_spike', name: 'Data Spike', tier: 0, type: 'attack', desc: 'Inject malicious code into the target\'s neural port. 150% damage.', multiplier: 1.5, cooldown: 3 },
-      { id: 'firewall', name: 'Firewall', tier: 0, type: 'buff', desc: 'Erect a basic ICE barrier. +50% defense for 3 rounds.', duration: 3, defMod: 1.5, cooldown: 5 },
-      { id: 'logic_bomb', name: 'Logic Bomb', tier: 1, type: 'attack', desc: 'Plant a delayed execution script. 250% damage.', multiplier: 2.5, cooldown: 5 },
-      { id: 'ping_sweep', name: 'Ping Sweep', tier: 1, type: 'debuff', desc: 'Scan for vulnerabilities, reducing target defense. -30% defense for 3 rounds.', duration: 3, defMod: 0.7, cooldown: 6 },
-      { id: 'system_crash', name: 'System Crash', tier: 2, type: 'attack', desc: 'Overload the target\'s cybernetics. 400% damage.', multiplier: 4.0, cooldown: 8 },
-      { id: 'overclock', name: 'Overclock', tier: 2, type: 'buff', desc: 'Push your processors beyond safe limits. +100% attack for 2 rounds.', duration: 2, atkMod: 2.0, cooldown: 7 },
-      { id: 'neural_burnout', name: 'Neural Burnout', tier: 3, type: 'attack', desc: 'Fry the target\'s brain with raw data. 600% damage.', multiplier: 6.0, cooldown: 12 },
-      { id: 'root_access', name: 'Root Access', tier: 3, type: 'buff', desc: 'Gain ultimate control over the local subnet. +150% attack and defense for 4 rounds.', duration: 4, atkMod: 2.5, defMod: 2.5, cooldown: 10 },
+      { id: 'data_spike', name: 'Data Spike', tier: 0, focusCost: 5, type: 'attack', desc: 'Inject malicious code into the target\'s neural port. 150% damage.', multiplier: 1.5, cooldown: 3 },
+      { id: 'firewall', name: 'Firewall', tier: 0, focusCost: 3, type: 'buff', desc: 'Erect a basic ICE barrier. +50% defense for 3 rounds.', duration: 3, defMod: 1.5, cooldown: 5 },
+      { id: 'logic_bomb', name: 'Logic Bomb', tier: 1, focusCost: 12, type: 'attack', desc: 'Plant a delayed execution script. 250% damage.', multiplier: 2.5, cooldown: 5 },
+      { id: 'ping_sweep', name: 'Ping Sweep', tier: 1, focusCost: 11, type: 'debuff', desc: 'Scan for vulnerabilities, reducing target defense. -30% defense for 3 rounds.', duration: 3, defMod: 0.7, cooldown: 6 },
+      { id: 'system_crash', name: 'System Crash', tier: 2, focusCost: 18, type: 'attack', desc: 'Overload the target\'s cybernetics. 400% damage.', multiplier: 4.0, cooldown: 8 },
+      { id: 'overclock', name: 'Overclock', tier: 2, focusCost: 16, type: 'buff', desc: 'Push your processors beyond safe limits. +100% attack for 2 rounds.', duration: 2, atkMod: 2.0, cooldown: 7 },
+      { id: 'neural_burnout', name: 'Neural Burnout', tier: 3, focusCost: 25, type: 'attack', desc: 'Fry the target\'s brain with raw data. 600% damage.', multiplier: 6.0, cooldown: 12 },
+      { id: 'root_access', name: 'Root Access', tier: 3, focusCost: 23, type: 'buff', desc: 'Gain ultimate control over the local subnet. +150% attack and defense for 4 rounds.', duration: 4, atkMod: 2.5, defMod: 2.5, cooldown: 10 },
       // ── Spec Glimmers (discovered mid-combat) ──
       { id: 'trojan_horse', name: 'Trojan Horse', type: 'attack', desc: 'Sneak an attack past defenses. 200% damage.', multiplier: 2.0, cooldown: 4, glimmer: true, sparkFrom: ['data_spike'], sparkChance: 0.08 },
       { id: 'zero_day_exploit', name: 'Zero-Day Exploit', type: 'attack', desc: 'Unleash an unknown vulnerability. 350% damage.', multiplier: 3.5, cooldown: 6, glimmer: true, sparkFrom: ['trojan_horse'], sparkChance: 0.05 },
@@ -353,14 +353,14 @@
   function occultistAbilities() {
     return [
       // ── Trainable (bought with QP) ──
-      { id: 'hex_bolt', name: 'Hex Bolt', tier: 0, type: 'attack', desc: 'A basic bolt of dark energy. 150% damage.', multiplier: 1.5, cooldown: 3 },
-      { id: 'shadow_ward', name: 'Shadow Ward', tier: 0, type: 'buff', desc: 'Cloak yourself in shadows. +50% defense for 3 rounds.', duration: 3, defMod: 1.5, cooldown: 5 },
-      { id: 'soul_drain', name: 'Soul Drain', tier: 1, type: 'attack', desc: 'Drain the enemy\'s life force. 200% damage.', multiplier: 2.0, cooldown: 5 },
-      { id: 'eldritch_blast', name: 'Eldritch Blast', tier: 1, type: 'attack', desc: 'A powerful blast of otherworldly energy. 250% damage.', multiplier: 2.5, cooldown: 6 },
-      { id: 'creeping_dread', name: 'Creeping Dread', tier: 2, type: 'debuff', desc: 'Instill deep fear. -40% enemy attack for 3 rounds.', duration: 3, atkMod: 0.6, cooldown: 6 },
-      { id: 'abyssal_pact', name: 'Abyssal Pact', tier: 2, type: 'buff', desc: 'Make a dark pact. +80% attack for 3 rounds.', duration: 3, atkMod: 1.8, cooldown: 7 },
-      { id: 'void_eruption', name: 'Void Eruption', tier: 3, type: 'attack', desc: 'Unleash the void. 400% damage.', multiplier: 4.0, cooldown: 8 },
-      { id: 'dark_ritual', name: 'Dark Ritual', tier: 3, type: 'heal', desc: 'A forbidden healing ritual. Restores 60% HP.', healPercent: 0.6, cooldown: 8 },
+      { id: 'hex_bolt', name: 'Hex Bolt', tier: 0, focusCost: 5, type: 'attack', desc: 'A basic bolt of dark energy. 150% damage.', multiplier: 1.5, cooldown: 3 },
+      { id: 'shadow_ward', name: 'Shadow Ward', tier: 0, focusCost: 3, type: 'buff', desc: 'Cloak yourself in shadows. +50% defense for 3 rounds.', duration: 3, defMod: 1.5, cooldown: 5 },
+      { id: 'soul_drain', name: 'Soul Drain', tier: 1, focusCost: 12, type: 'attack', desc: 'Drain the enemy\'s life force. 200% damage.', multiplier: 2.0, cooldown: 5 },
+      { id: 'eldritch_blast', name: 'Eldritch Blast', tier: 1, focusCost: 12, type: 'attack', desc: 'A powerful blast of otherworldly energy. 250% damage.', multiplier: 2.5, cooldown: 6 },
+      { id: 'creeping_dread', name: 'Creeping Dread', tier: 2, focusCost: 17, type: 'debuff', desc: 'Instill deep fear. -40% enemy attack for 3 rounds.', duration: 3, atkMod: 0.6, cooldown: 6 },
+      { id: 'abyssal_pact', name: 'Abyssal Pact', tier: 2, focusCost: 16, type: 'buff', desc: 'Make a dark pact. +80% attack for 3 rounds.', duration: 3, atkMod: 1.8, cooldown: 7 },
+      { id: 'void_eruption', name: 'Void Eruption', tier: 3, focusCost: 25, type: 'attack', desc: 'Unleash the void. 400% damage.', multiplier: 4.0, cooldown: 8 },
+      { id: 'dark_ritual', name: 'Dark Ritual', tier: 3, focusCost: 28, type: 'heal', desc: 'A forbidden healing ritual. Restores 60% HP.', healPercent: 0.6, cooldown: 8 },
       // ── Spec Glimmers (discovered mid-combat) ──
       { id: 'curse_of_agony', name: 'Curse of Agony', type: 'debuff', desc: 'A lingering curse. -50% enemy defense for 3 rounds.', duration: 3, defMod: 0.5, cooldown: 6, glimmer: true, sparkFrom: ['hex_bolt'], sparkChance: 0.05 },
       { id: 'shadow_mantle', name: 'Shadow Mantle', type: 'buff', desc: 'A thicker cloak of shadows. +80% defense for 4 rounds.', duration: 4, defMod: 1.8, cooldown: 7, glimmer: true, sparkFrom: ['shadow_ward'], sparkChance: 0.05 },
@@ -394,14 +394,14 @@
   function demolitionsAbilities() {
     return [
       // ── Trainable (bought with QP) ──
-      { id: 'pipe_bomb', name: 'Pipe Bomb', tier: 0, type: 'attack', desc: 'Toss a crude explosive. 150% damage.', multiplier: 1.5, cooldown: 3 },
-      { id: 'blast_shield', name: 'Blast Shield', tier: 0, type: 'buff', desc: 'Deploy a portable shield. +50% defense for 3 rounds.', duration: 3, defMod: 1.5, cooldown: 5 },
-      { id: 'c4_charge', name: 'C4 Charge', tier: 1, type: 'attack', desc: 'Plant and detonate plastic explosives. 250% damage.', multiplier: 2.5, cooldown: 5 },
-      { id: 'flashbang', name: 'Flashbang', tier: 1, type: 'debuff', desc: 'Blind the enemy. -40% enemy attack for 2 rounds.', duration: 2, atkMod: 0.6, cooldown: 6 },
-      { id: 'cluster_grenade', name: 'Cluster Grenade', tier: 2, type: 'attack', desc: 'Throw a grenade that splits into smaller explosives. 350% damage.', multiplier: 3.5, cooldown: 7 },
-      { id: 'shaped_charge', name: 'Shaped Charge', tier: 2, type: 'attack', desc: 'A focused explosion that pierces armor. 400% damage.', multiplier: 4.0, cooldown: 8 },
-      { id: 'tactical_nuke', name: 'Tactical Nuke', tier: 3, type: 'attack', desc: 'Call in a devastating nuclear strike. 600% damage.', multiplier: 6.0, cooldown: 12 },
-      { id: 'bunker_buster', name: 'Bunker Buster', tier: 3, type: 'attack', desc: 'A massive earth-penetrating bomb. 550% damage.', multiplier: 5.5, cooldown: 10 },
+      { id: 'pipe_bomb', name: 'Pipe Bomb', tier: 0, focusCost: 5, type: 'attack', desc: 'Toss a crude explosive. 150% damage.', multiplier: 1.5, cooldown: 3 },
+      { id: 'blast_shield', name: 'Blast Shield', tier: 0, focusCost: 3, type: 'buff', desc: 'Deploy a portable shield. +50% defense for 3 rounds.', duration: 3, defMod: 1.5, cooldown: 5 },
+      { id: 'c4_charge', name: 'C4 Charge', tier: 1, focusCost: 12, type: 'attack', desc: 'Plant and detonate plastic explosives. 250% damage.', multiplier: 2.5, cooldown: 5 },
+      { id: 'flashbang', name: 'Flashbang', tier: 1, focusCost: 11, type: 'debuff', desc: 'Blind the enemy. -40% enemy attack for 2 rounds.', duration: 2, atkMod: 0.6, cooldown: 6 },
+      { id: 'cluster_grenade', name: 'Cluster Grenade', tier: 2, focusCost: 18, type: 'attack', desc: 'Throw a grenade that splits into smaller explosives. 350% damage.', multiplier: 3.5, cooldown: 7 },
+      { id: 'shaped_charge', name: 'Shaped Charge', tier: 2, focusCost: 18, type: 'attack', desc: 'A focused explosion that pierces armor. 400% damage.', multiplier: 4.0, cooldown: 8 },
+      { id: 'tactical_nuke', name: 'Tactical Nuke', tier: 3, focusCost: 25, type: 'attack', desc: 'Call in a devastating nuclear strike. 600% damage.', multiplier: 6.0, cooldown: 12 },
+      { id: 'bunker_buster', name: 'Bunker Buster', tier: 3, focusCost: 25, type: 'attack', desc: 'A massive earth-penetrating bomb. 550% damage.', multiplier: 5.5, cooldown: 10 },
       // ── Spec Glimmers (discovered mid-combat) ──
       { id: 'shrapnel_burst', name: 'Shrapnel Burst', type: 'attack', desc: 'A pipe bomb explosion that sends deadly shrapnel flying. 200% damage.', multiplier: 2.0, cooldown: 4, glimmer: true, sparkFrom: ['pipe_bomb'], sparkChance: 0.08 },
       { id: 'reactive_armor', name: 'Reactive Armor', type: 'buff', desc: 'Explosive plating that reinforces your shield. +80% defense for 3 rounds.', duration: 3, defMod: 1.8, cooldown: 6, glimmer: true, sparkFrom: ['blast_shield'], sparkChance: 0.06 },
@@ -435,14 +435,14 @@
   function elementalistAbilities() {
     return [
       // ── Trainable (bought with QP) ──
-      { id: 'flame_burst', name: 'Flame Burst', tier: 0, type: 'attack', desc: 'A basic burst of fire.', multiplier: 1.5, cooldown: 3 },
-      { id: 'mana_barrier', name: 'Mana Barrier', tier: 0, type: 'buff', desc: 'A basic mana shield.', duration: 3, defMod: 1.5, cooldown: 5 },
-      { id: 'thunder_call', name: 'Thunder Call', tier: 1, type: 'attack', desc: 'Call down lightning.', multiplier: 2.5, cooldown: 5 },
-      { id: 'spirit_bomb', name: 'Spirit Bomb', tier: 1, type: 'attack', desc: 'Gather energy for a big attack.', multiplier: 3.0, cooldown: 6 },
-      { id: 'glacial_spike', name: 'Glacial Spike', tier: 2, type: 'attack', desc: 'A massive spike of ice.', multiplier: 4.0, cooldown: 8 },
-      { id: 'elemental_overdrive', name: 'Elemental Overdrive', tier: 2, type: 'buff', desc: 'Overclock your magic circuits.', duration: 3, atkMod: 2.0, cooldown: 7 },
-      { id: 'meteor_strike', name: 'Meteor Strike', tier: 3, type: 'attack', desc: 'Summon a meteor from the heavens.', multiplier: 6.0, cooldown: 12 },
-      { id: 'absolute_zero', name: 'Absolute Zero', tier: 3, type: 'debuff', desc: 'Freeze the enemy to the core.', duration: 4, defMod: 0.4, cooldown: 8 },
+      { id: 'flame_burst', name: 'Flame Burst', tier: 0, focusCost: 5, type: 'attack', desc: 'A basic burst of fire.', multiplier: 1.5, cooldown: 3 },
+      { id: 'mana_barrier', name: 'Mana Barrier', tier: 0, focusCost: 3, type: 'buff', desc: 'A basic mana shield.', duration: 3, defMod: 1.5, cooldown: 5 },
+      { id: 'thunder_call', name: 'Thunder Call', tier: 1, focusCost: 12, type: 'attack', desc: 'Call down lightning.', multiplier: 2.5, cooldown: 5 },
+      { id: 'spirit_bomb', name: 'Spirit Bomb', tier: 1, focusCost: 12, type: 'attack', desc: 'Gather energy for a big attack.', multiplier: 3.0, cooldown: 6 },
+      { id: 'glacial_spike', name: 'Glacial Spike', tier: 2, focusCost: 18, type: 'attack', desc: 'A massive spike of ice.', multiplier: 4.0, cooldown: 8 },
+      { id: 'elemental_overdrive', name: 'Elemental Overdrive', tier: 2, focusCost: 16, type: 'buff', desc: 'Overclock your magic circuits.', duration: 3, atkMod: 2.0, cooldown: 7 },
+      { id: 'meteor_strike', name: 'Meteor Strike', tier: 3, focusCost: 25, type: 'attack', desc: 'Summon a meteor from the heavens.', multiplier: 6.0, cooldown: 12 },
+      { id: 'absolute_zero', name: 'Absolute Zero', tier: 3, focusCost: 24, type: 'debuff', desc: 'Freeze the enemy to the core.', duration: 4, defMod: 0.4, cooldown: 8 },
       // ── Spec Glimmers (discovered mid-combat) ──
       { id: 'crimson_flare', name: 'Crimson Flare', type: 'attack', desc: 'A hotter, redder flame.', multiplier: 2.0, cooldown: 4, glimmer: true, sparkFrom: ['flame_burst'], sparkChance: 0.08 },
       { id: 'prominence_burn', name: 'Prominence Burn', type: 'attack', desc: 'A devastating pillar of fire.', multiplier: 3.5, cooldown: 6, glimmer: true, sparkFrom: ['crimson_flare'], sparkChance: 0.05 },
@@ -476,14 +476,14 @@
   function oracleAbilities() {
     return [
       // ── Trainable (bought with QP) ──
-      { id: 'prophecy_bolt', name: 'Prophecy Bolt', tier: 0, type: 'attack', desc: 'A bolt of energy foreseen in ancient texts. 150% damage.', multiplier: 1.5, cooldown: 3 },
-      { id: 'fate_shield', name: 'Fate Shield', tier: 0, type: 'buff', desc: 'Bend fate to protect yourself. +30% defense for 3 rounds.', duration: 3, defMod: 1.3, cooldown: 5 },
-      { id: 'divine_wrath', name: 'Divine Wrath', tier: 1, type: 'attack', desc: 'Call down the anger of the gods. 250% damage.', multiplier: 2.5, cooldown: 5 },
-      { id: 'future_sight', name: 'Future Sight', tier: 1, type: 'buff', desc: 'See the enemy\'s moves before they happen. +50% attack for 3 rounds.', duration: 3, atkMod: 1.5, cooldown: 6 },
-      { id: 'apocalypse', name: 'Apocalypse', tier: 2, type: 'attack', desc: 'Unleash the foretold end times. 400% damage.', multiplier: 4.0, cooldown: 8 },
-      { id: 'doom_prophecy', name: 'Doom Prophecy', tier: 2, type: 'debuff', desc: 'Speak a prophecy of ruin. -40% enemy defense for 4 rounds.', duration: 4, defMod: 0.6, cooldown: 7 },
-      { id: 'timeline_collapse', name: 'Timeline Collapse', tier: 3, type: 'attack', desc: 'Crush the enemy with collapsing timelines. 600% damage.', multiplier: 6.0, cooldown: 12 },
-      { id: 'rewrite_destiny', name: 'Rewrite Destiny', tier: 3, type: 'heal', desc: 'Rewrite your fate to undo wounds. Restores 80% HP.', healPercent: 0.8, cooldown: 10 },
+      { id: 'prophecy_bolt', name: 'Prophecy Bolt', tier: 0, focusCost: 5, type: 'attack', desc: 'A bolt of energy foreseen in ancient texts. 150% damage.', multiplier: 1.5, cooldown: 3 },
+      { id: 'fate_shield', name: 'Fate Shield', tier: 0, focusCost: 3, type: 'buff', desc: 'Bend fate to protect yourself. +30% defense for 3 rounds.', duration: 3, defMod: 1.3, cooldown: 5 },
+      { id: 'divine_wrath', name: 'Divine Wrath', tier: 1, focusCost: 12, type: 'attack', desc: 'Call down the anger of the gods. 250% damage.', multiplier: 2.5, cooldown: 5 },
+      { id: 'future_sight', name: 'Future Sight', tier: 1, focusCost: 10, type: 'buff', desc: 'See the enemy\'s moves before they happen. +50% attack for 3 rounds.', duration: 3, atkMod: 1.5, cooldown: 6 },
+      { id: 'apocalypse', name: 'Apocalypse', tier: 2, focusCost: 18, type: 'attack', desc: 'Unleash the foretold end times. 400% damage.', multiplier: 4.0, cooldown: 8 },
+      { id: 'doom_prophecy', name: 'Doom Prophecy', tier: 2, focusCost: 17, type: 'debuff', desc: 'Speak a prophecy of ruin. -40% enemy defense for 4 rounds.', duration: 4, defMod: 0.6, cooldown: 7 },
+      { id: 'timeline_collapse', name: 'Timeline Collapse', tier: 3, focusCost: 25, type: 'attack', desc: 'Crush the enemy with collapsing timelines. 600% damage.', multiplier: 6.0, cooldown: 12 },
+      { id: 'rewrite_destiny', name: 'Rewrite Destiny', tier: 3, focusCost: 28, type: 'heal', desc: 'Rewrite your fate to undo wounds. Restores 80% HP.', healPercent: 0.8, cooldown: 10 },
       // ── Spec Glimmers (discovered mid-combat) ──
       { id: 'oracle_strike', name: 'Oracle Strike', type: 'attack', desc: 'A precise strike guided by visions. 200% damage.', multiplier: 2.0, cooldown: 4, glimmer: true, sparkFrom: ['prophecy_bolt'], sparkChance: 0.08 },
       { id: 'prophetic_blast', name: 'Prophetic Blast', type: 'attack', desc: 'A devastating blast of pure foresight. 300% damage.', multiplier: 3.0, cooldown: 6, glimmer: true, sparkFrom: ['oracle_strike'], sparkChance: 0.05 },
@@ -518,14 +518,14 @@
   function assassinAbilities() {
     return [
       // ── Trainable (bought with QP) ──
-      { id: 'backstab', name: 'Backstab', tier: 0, type: 'attack', desc: 'A quick strike from the shadows. 150% damage.', multiplier: 1.5, cooldown: 3 },
-      { id: 'smoke_bomb', name: 'Smoke Bomb', tier: 0, type: 'debuff', desc: 'Throw a smoke bomb to blind the enemy. -30% enemy attack for 2 rounds.', duration: 2, atkMod: 0.7, cooldown: 5 },
-      { id: 'poison_blade', name: 'Poison Blade', tier: 1, type: 'attack', desc: 'Coat your blade in poison before striking. 200% damage.', multiplier: 2.0, cooldown: 4 },
-      { id: 'shadow_step', name: 'Shadow Step', tier: 1, type: 'buff', desc: 'Step into the shadows, increasing evasion. +50% defense for 3 rounds.', duration: 3, defMod: 1.5, cooldown: 6 },
-      { id: 'death_mark', name: 'Death Mark', tier: 2, type: 'attack', desc: 'Mark the target for death and strike. 350% damage.', multiplier: 3.5, cooldown: 6 },
-      { id: 'throat_slit', name: 'Throat Slit', tier: 2, type: 'attack', desc: 'A lethal strike aimed at the neck. 400% damage.', multiplier: 4.0, cooldown: 7 },
-      { id: 'shadow_clone', name: 'Shadow Clone', tier: 3, type: 'attack', desc: 'Create a clone to strike simultaneously. 500% damage.', multiplier: 5.0, cooldown: 9 },
-      { id: 'phantom_assassination', name: 'Phantom Assassination', tier: 3, type: 'attack', desc: 'The ultimate shadow technique. 600% damage.', multiplier: 6.0, cooldown: 12 },
+      { id: 'backstab', name: 'Backstab', tier: 0, focusCost: 5, type: 'attack', desc: 'A quick strike from the shadows. 150% damage.', multiplier: 1.5, cooldown: 3 },
+      { id: 'smoke_bomb', name: 'Smoke Bomb', tier: 0, focusCost: 4, type: 'debuff', desc: 'Throw a smoke bomb to blind the enemy. -30% enemy attack for 2 rounds.', duration: 2, atkMod: 0.7, cooldown: 5 },
+      { id: 'poison_blade', name: 'Poison Blade', tier: 1, focusCost: 12, type: 'attack', desc: 'Coat your blade in poison before striking. 200% damage.', multiplier: 2.0, cooldown: 4 },
+      { id: 'shadow_step', name: 'Shadow Step', tier: 1, focusCost: 10, type: 'buff', desc: 'Step into the shadows, increasing evasion. +50% defense for 3 rounds.', duration: 3, defMod: 1.5, cooldown: 6 },
+      { id: 'death_mark', name: 'Death Mark', tier: 2, focusCost: 18, type: 'attack', desc: 'Mark the target for death and strike. 350% damage.', multiplier: 3.5, cooldown: 6 },
+      { id: 'throat_slit', name: 'Throat Slit', tier: 2, focusCost: 18, type: 'attack', desc: 'A lethal strike aimed at the neck. 400% damage.', multiplier: 4.0, cooldown: 7 },
+      { id: 'shadow_clone', name: 'Shadow Clone', tier: 3, focusCost: 25, type: 'attack', desc: 'Create a clone to strike simultaneously. 500% damage.', multiplier: 5.0, cooldown: 9 },
+      { id: 'phantom_assassination', name: 'Phantom Assassination', tier: 3, focusCost: 25, type: 'attack', desc: 'The ultimate shadow technique. 600% damage.', multiplier: 6.0, cooldown: 12 },
       // ── Spec Glimmers (discovered mid-combat) ──
       { id: 'eviscerate', name: 'Eviscerate', type: 'attack', desc: 'A brutal follow-up to a backstab. 250% damage.', multiplier: 2.5, cooldown: 4, glimmer: true, sparkFrom: ['backstab'], sparkChance: 0.08 },
       { id: 'blinding_powder', name: 'Blinding Powder', type: 'debuff', desc: 'A more potent blinding agent. -50% enemy attack for 3 rounds.', duration: 3, atkMod: 0.5, cooldown: 6, glimmer: true, sparkFrom: ['smoke_bomb'], sparkChance: 0.07 },
@@ -559,14 +559,14 @@
   function cyberthiefAbilities() {
     return [
       // ── Trainable (bought with QP) ──
-      { id: 'emp_dart', name: 'EMP Dart', tier: 0, type: 'attack', desc: 'Fires a small EMP dart. 150% damage.', multiplier: 1.5, cooldown: 3 },
-      { id: 'cloak_field', name: 'Cloak Field', tier: 0, type: 'buff', desc: 'Activates a personal cloaking field. +50% defense for 3 rounds.', duration: 3, defMod: 1.5, cooldown: 5 },
-      { id: 'neural_hack', name: 'Neural Hack', tier: 1, type: 'debuff', desc: 'Hacks the target\'s neural implants. -30% attack for 3 rounds.', duration: 3, atkMod: 0.7, cooldown: 6 },
-      { id: 'data_spike', name: 'Data Spike', tier: 1, type: 'attack', desc: 'Jams a data spike into the target\'s port. 250% damage.', multiplier: 2.5, cooldown: 5 },
-      { id: 'blackout_protocol', name: 'Blackout Protocol', tier: 2, type: 'attack', desc: 'Initiates a localized blackout, striking in the dark. 350% damage.', multiplier: 3.5, cooldown: 7 },
-      { id: 'ghost_in_the_shell', name: 'Ghost in the Shell', tier: 2, type: 'buff', desc: 'Uploads consciousness to evade attacks. +100% defense for 2 rounds.', duration: 2, defMod: 2.0, cooldown: 8 },
-      { id: 'system_crash', name: 'System Crash', tier: 3, type: 'debuff', desc: 'Causes a total system crash in the target. -60% defense for 4 rounds.', duration: 4, defMod: 0.4, cooldown: 8 },
-      { id: 'orbital_strike_designator', name: 'Orbital Strike Designator', tier: 3, type: 'attack', desc: 'Paints the target for an orbital kinetic strike. 600% damage.', multiplier: 6.0, cooldown: 12 },
+      { id: 'emp_dart', name: 'EMP Dart', tier: 0, focusCost: 5, type: 'attack', desc: 'Fires a small EMP dart. 150% damage.', multiplier: 1.5, cooldown: 3 },
+      { id: 'cloak_field', name: 'Cloak Field', tier: 0, focusCost: 3, type: 'buff', desc: 'Activates a personal cloaking field. +50% defense for 3 rounds.', duration: 3, defMod: 1.5, cooldown: 5 },
+      { id: 'neural_hack', name: 'Neural Hack', tier: 1, focusCost: 11, type: 'debuff', desc: 'Hacks the target\'s neural implants. -30% attack for 3 rounds.', duration: 3, atkMod: 0.7, cooldown: 6 },
+      { id: 'data_spike', name: 'Data Spike', tier: 1, focusCost: 12, type: 'attack', desc: 'Jams a data spike into the target\'s port. 250% damage.', multiplier: 2.5, cooldown: 5 },
+      { id: 'blackout_protocol', name: 'Blackout Protocol', tier: 2, focusCost: 18, type: 'attack', desc: 'Initiates a localized blackout, striking in the dark. 350% damage.', multiplier: 3.5, cooldown: 7 },
+      { id: 'ghost_in_the_shell', name: 'Ghost in the Shell', tier: 2, focusCost: 16, type: 'buff', desc: 'Uploads consciousness to evade attacks. +100% defense for 2 rounds.', duration: 2, defMod: 2.0, cooldown: 8 },
+      { id: 'system_crash', name: 'System Crash', tier: 3, focusCost: 24, type: 'debuff', desc: 'Causes a total system crash in the target. -60% defense for 4 rounds.', duration: 4, defMod: 0.4, cooldown: 8 },
+      { id: 'orbital_strike_designator', name: 'Orbital Strike Designator', tier: 3, focusCost: 25, type: 'attack', desc: 'Paints the target for an orbital kinetic strike. 600% damage.', multiplier: 6.0, cooldown: 12 },
       // ── Spec Glimmers (discovered mid-combat) ──
       { id: 'emp_burst', name: 'EMP Burst', type: 'attack', desc: 'Overloads the EMP dart into a burst. 200% damage.', multiplier: 2.0, cooldown: 4, glimmer: true, sparkFrom: ['emp_dart'], sparkChance: 0.08 },
       { id: 'emp_cascade', name: 'EMP Cascade', type: 'attack', desc: 'A cascading EMP wave. 300% damage.', multiplier: 3.0, cooldown: 6, glimmer: true, sparkFrom: ['emp_burst'], sparkChance: 0.05 },
@@ -600,14 +600,14 @@
   function detectiveAbilities() {
     return [
       // ── Trainable (bought with QP) ──
-      { id: 'sucker_punch', name: 'Sucker Punch', tier: 0, type: 'attack', desc: 'A quick, unexpected strike. 150% damage.', multiplier: 1.5, cooldown: 3 },
-      { id: 'trench_coat', name: 'Trench Coat', tier: 0, type: 'buff', desc: 'Blend into the shadows. +50% defense for 3 rounds.', duration: 3, defMod: 1.5, cooldown: 5 },
-      { id: 'expose_weakness', name: 'Expose Weakness', tier: 1, type: 'debuff', desc: 'Find a flaw in their guard. -30% enemy defense for 3 rounds.', duration: 3, defMod: 0.7, cooldown: 6 },
-      { id: 'rough_interrogation', name: 'Rough Interrogation', tier: 1, type: 'attack', desc: 'Beat the answers out of them. 250% damage.', multiplier: 2.5, cooldown: 5 },
-      { id: 'hard_boiled', name: 'Hard Boiled', tier: 2, type: 'heal', desc: 'Shrug off the pain. Restore 40% HP.', healPercent: 0.4, cooldown: 6 },
-      { id: 'smoke_screen', name: 'Smoke Screen', tier: 2, type: 'debuff', desc: 'Obscure vision. -40% enemy attack for 4 rounds.', duration: 4, atkMod: 0.6, cooldown: 7 },
-      { id: 'case_closed', name: 'Case Closed', tier: 3, type: 'attack', desc: 'The final blow. 500% damage.', multiplier: 5.0, cooldown: 10 },
-      { id: 'final_deduction', name: 'Final Deduction', tier: 3, type: 'buff', desc: 'See all the angles. +100% attack for 3 rounds.', duration: 3, atkMod: 2.0, cooldown: 8 },
+      { id: 'sucker_punch', name: 'Sucker Punch', tier: 0, focusCost: 5, type: 'attack', desc: 'A quick, unexpected strike. 150% damage.', multiplier: 1.5, cooldown: 3 },
+      { id: 'trench_coat', name: 'Trench Coat', tier: 0, focusCost: 3, type: 'buff', desc: 'Blend into the shadows. +50% defense for 3 rounds.', duration: 3, defMod: 1.5, cooldown: 5 },
+      { id: 'expose_weakness', name: 'Expose Weakness', tier: 1, focusCost: 11, type: 'debuff', desc: 'Find a flaw in their guard. -30% enemy defense for 3 rounds.', duration: 3, defMod: 0.7, cooldown: 6 },
+      { id: 'rough_interrogation', name: 'Rough Interrogation', tier: 1, focusCost: 12, type: 'attack', desc: 'Beat the answers out of them. 250% damage.', multiplier: 2.5, cooldown: 5 },
+      { id: 'hard_boiled', name: 'Hard Boiled', tier: 2, focusCost: 21, type: 'heal', desc: 'Shrug off the pain. Restore 40% HP.', healPercent: 0.4, cooldown: 6 },
+      { id: 'smoke_screen', name: 'Smoke Screen', tier: 2, focusCost: 17, type: 'debuff', desc: 'Obscure vision. -40% enemy attack for 4 rounds.', duration: 4, atkMod: 0.6, cooldown: 7 },
+      { id: 'case_closed', name: 'Case Closed', tier: 3, focusCost: 25, type: 'attack', desc: 'The final blow. 500% damage.', multiplier: 5.0, cooldown: 10 },
+      { id: 'final_deduction', name: 'Final Deduction', tier: 3, focusCost: 23, type: 'buff', desc: 'See all the angles. +100% attack for 3 rounds.', duration: 3, atkMod: 2.0, cooldown: 8 },
       // ── Spec Glimmers (discovered mid-combat) ──
       { id: 'cheap_shot', name: 'Cheap Shot', type: 'attack', desc: 'A dirty follow-up. 200% damage.', multiplier: 2.0, cooldown: 4, glimmer: true, sparkFrom: ['sucker_punch'], sparkChance: 0.08 },
       { id: 'brass_knuckles', name: 'Brass Knuckles', type: 'attack', desc: 'A brutal strike. 300% damage.', multiplier: 3.0, cooldown: 5, glimmer: true, sparkFrom: ['cheap_shot'], sparkChance: 0.05 },
@@ -641,14 +641,14 @@
   function infiltratorAbilities() {
     return [
       // ── Trainable (bought with QP) ──
-      { id: 'silenced_shot', name: 'Silenced Shot', tier: 0, type: 'attack', desc: 'A quiet, precise shot. 150% damage.', multiplier: 1.5, cooldown: 3 },
-      { id: 'tactical_cloak', name: 'Tactical Cloak', tier: 0, type: 'buff', desc: 'Engage optical camouflage. +50% defense for 3 rounds.', duration: 3, defMod: 1.5, cooldown: 5 },
-      { id: 'flashbang', name: 'Flashbang', tier: 1, type: 'debuff', desc: 'Blinds the enemy. -40% attack for 2 rounds.', duration: 2, atkMod: 0.6, cooldown: 6 },
-      { id: 'cqc_takedown', name: 'CQC Takedown', tier: 1, type: 'attack', desc: 'Close quarters combat strike. 250% damage.', multiplier: 2.5, cooldown: 5 },
-      { id: 'ghost_protocol', name: 'Ghost Protocol', tier: 2, type: 'attack', desc: 'Strike from the shadows. 400% damage.', multiplier: 4.0, cooldown: 8 },
-      { id: 'emp_grenade', name: 'EMP Grenade', tier: 2, type: 'debuff', desc: 'Disables enemy electronics and shields. -50% defense for 3 rounds.', duration: 3, defMod: 0.5, cooldown: 7 },
-      { id: 'orbital_strike_designator', name: 'Orbital Strike Designator', tier: 3, type: 'attack', desc: 'Paint the target for orbital bombardment. 600% damage.', multiplier: 6.0, cooldown: 12 },
-      { id: 'nanite_stim', name: 'Nanite Stim', tier: 3, type: 'heal', desc: 'Inject medical nanites. Restores 50% HP.', healPercent: 0.5, cooldown: 8 },
+      { id: 'silenced_shot', name: 'Silenced Shot', tier: 0, focusCost: 5, type: 'attack', desc: 'A quiet, precise shot. 150% damage.', multiplier: 1.5, cooldown: 3 },
+      { id: 'tactical_cloak', name: 'Tactical Cloak', tier: 0, focusCost: 3, type: 'buff', desc: 'Engage optical camouflage. +50% defense for 3 rounds.', duration: 3, defMod: 1.5, cooldown: 5 },
+      { id: 'flashbang', name: 'Flashbang', tier: 1, focusCost: 11, type: 'debuff', desc: 'Blinds the enemy. -40% attack for 2 rounds.', duration: 2, atkMod: 0.6, cooldown: 6 },
+      { id: 'cqc_takedown', name: 'CQC Takedown', tier: 1, focusCost: 12, type: 'attack', desc: 'Close quarters combat strike. 250% damage.', multiplier: 2.5, cooldown: 5 },
+      { id: 'ghost_protocol', name: 'Ghost Protocol', tier: 2, focusCost: 18, type: 'attack', desc: 'Strike from the shadows. 400% damage.', multiplier: 4.0, cooldown: 8 },
+      { id: 'emp_grenade', name: 'EMP Grenade', tier: 2, focusCost: 17, type: 'debuff', desc: 'Disables enemy electronics and shields. -50% defense for 3 rounds.', duration: 3, defMod: 0.5, cooldown: 7 },
+      { id: 'orbital_strike_designator', name: 'Orbital Strike Designator', tier: 3, focusCost: 25, type: 'attack', desc: 'Paint the target for orbital bombardment. 600% damage.', multiplier: 6.0, cooldown: 12 },
+      { id: 'nanite_stim', name: 'Nanite Stim', tier: 3, focusCost: 28, type: 'heal', desc: 'Inject medical nanites. Restores 50% HP.', healPercent: 0.5, cooldown: 8 },
       // ── Spec Glimmers (discovered mid-combat) ──
       { id: 'double_tap', name: 'Double Tap', type: 'attack', desc: 'Two quick shots to center mass. 220% damage.', multiplier: 2.2, cooldown: 4, glimmer: true, sparkFrom: ['silenced_shot'], sparkChance: 0.08 },
       { id: 'headshot', name: 'Headshot', type: 'attack', desc: 'A lethal shot to the head. 350% damage.', multiplier: 3.5, cooldown: 6, glimmer: true, sparkFrom: ['double_tap'], sparkChance: 0.05 },
@@ -682,14 +682,14 @@
   function ninjaAbilities() {
     return [
       // ── Trainable (bought with QP) ──
-      { id: 'shuriken_barrage', name: 'Shuriken Barrage', tier: 0, type: 'attack', desc: 'Throw a flurry of basic shurikens. 150% damage.', multiplier: 1.5, cooldown: 3 },
-      { id: 'shadow_step', name: 'Shadow Step', tier: 0, type: 'buff', desc: 'Melt into the shadows. +20% evasion for 3 rounds.', duration: 3, defMod: 1.2, cooldown: 5 },
-      { id: 'kunai_rain', name: 'Kunai Rain', tier: 1, type: 'attack', desc: 'Leap into the air and rain kunai down. 250% damage.', multiplier: 2.5, cooldown: 5 },
-      { id: 'smoke_bomb', name: 'Smoke Bomb', tier: 1, type: 'debuff', desc: 'Throw a smoke bomb to blind enemies. -30% enemy accuracy for 3 rounds.', duration: 3, atkMod: 0.7, cooldown: 6 },
-      { id: 'forbidden_jutsu', name: 'Forbidden Jutsu', tier: 2, type: 'attack', desc: 'Unleash a dark, forbidden technique. 400% damage.', multiplier: 4.0, cooldown: 8 },
-      { id: 'chakra_flow', name: 'Chakra Flow', tier: 2, type: 'heal', desc: 'Channel inner chakra to heal wounds. Restores 40% HP.', healPercent: 0.4, cooldown: 6 },
-      { id: 'demon_wind_shuriken', name: 'Demon Wind Shuriken', tier: 3, type: 'attack', desc: 'Hurl a massive, folding shuriken. 550% damage.', multiplier: 5.5, cooldown: 10 },
-      { id: 'susanoo_aura', name: 'Susanoo Aura', tier: 3, type: 'buff', desc: 'Manifest a spectral warrior aura. +100% defense for 4 rounds.', duration: 4, defMod: 2.0, cooldown: 8 },
+      { id: 'shuriken_barrage', name: 'Shuriken Barrage', tier: 0, focusCost: 5, type: 'attack', desc: 'Throw a flurry of basic shurikens. 150% damage.', multiplier: 1.5, cooldown: 3 },
+      { id: 'shadow_step', name: 'Shadow Step', tier: 0, focusCost: 3, type: 'buff', desc: 'Melt into the shadows. +20% evasion for 3 rounds.', duration: 3, defMod: 1.2, cooldown: 5 },
+      { id: 'kunai_rain', name: 'Kunai Rain', tier: 1, focusCost: 12, type: 'attack', desc: 'Leap into the air and rain kunai down. 250% damage.', multiplier: 2.5, cooldown: 5 },
+      { id: 'smoke_bomb', name: 'Smoke Bomb', tier: 1, focusCost: 11, type: 'debuff', desc: 'Throw a smoke bomb to blind enemies. -30% enemy accuracy for 3 rounds.', duration: 3, atkMod: 0.7, cooldown: 6 },
+      { id: 'forbidden_jutsu', name: 'Forbidden Jutsu', tier: 2, focusCost: 18, type: 'attack', desc: 'Unleash a dark, forbidden technique. 400% damage.', multiplier: 4.0, cooldown: 8 },
+      { id: 'chakra_flow', name: 'Chakra Flow', tier: 2, focusCost: 21, type: 'heal', desc: 'Channel inner chakra to heal wounds. Restores 40% HP.', healPercent: 0.4, cooldown: 6 },
+      { id: 'demon_wind_shuriken', name: 'Demon Wind Shuriken', tier: 3, focusCost: 25, type: 'attack', desc: 'Hurl a massive, folding shuriken. 550% damage.', multiplier: 5.5, cooldown: 10 },
+      { id: 'susanoo_aura', name: 'Susanoo Aura', tier: 3, focusCost: 23, type: 'buff', desc: 'Manifest a spectral warrior aura. +100% defense for 4 rounds.', duration: 4, defMod: 2.0, cooldown: 8 },
       // ── Spec Glimmers (discovered mid-combat) ──
       { id: 'phantom_shuriken', name: 'Phantom Shuriken', type: 'attack', desc: 'A shuriken that multiplies in mid-air. 200% damage.', multiplier: 2.0, cooldown: 4, glimmer: true, sparkFrom: ['shuriken_barrage'], sparkChance: 0.06 },
       { id: 'shadow_clone_strike', name: 'Shadow Clone Strike', type: 'attack', desc: 'Create clones to strike simultaneously. 300% damage.', multiplier: 3.0, cooldown: 6, glimmer: true, sparkFrom: ['phantom_shuriken'], sparkChance: 0.04 },
@@ -723,14 +723,14 @@
   function scavengerAbilities() {
     return [
       // ── Trainable (bought with QP) ──
-      { id: 'sling_shot', name: 'Sling Shot', tier: 0, type: 'attack', desc: 'Fire a makeshift projectile. 150% damage.', multiplier: 1.5, cooldown: 3 },
-      { id: 'makeshift_armor', name: 'Makeshift Armor', tier: 0, type: 'buff', desc: 'Strap on scrap metal. +50% defense for 3 rounds.', duration: 3, defMod: 1.5, cooldown: 5 },
-      { id: 'caltrops', name: 'Caltrops', tier: 1, type: 'debuff', desc: 'Scatter spikes. -20% attack and defense for 3 rounds.', duration: 3, atkMod: 0.8, defMod: 0.8, cooldown: 6 },
-      { id: 'salvage_strike', name: 'Salvage Strike', tier: 1, type: 'attack', desc: 'A vicious strike with a rusted blade. 250% damage.', multiplier: 2.5, cooldown: 5 },
-      { id: 'scavenged_stim', name: 'Scavenged Stim', tier: 2, type: 'heal', desc: 'Inject a questionable stimulant. Restores 40% HP.', healPercent: 0.4, cooldown: 6 },
-      { id: 'dirty_trick', name: 'Dirty Trick', tier: 2, type: 'debuff', desc: 'Fight dirty. -50% defense for 2 rounds.', duration: 2, defMod: 0.5, cooldown: 7 },
-      { id: 'survivalist_instinct', name: 'Survivalist Instinct', tier: 3, type: 'buff', desc: 'Tap into primal survival. +100% attack and defense for 4 rounds.', duration: 4, atkMod: 2.0, defMod: 2.0, cooldown: 8 },
-      { id: 'scrap_bomb', name: 'Scrap Bomb', tier: 3, type: 'attack', desc: 'Detonate a homemade explosive. 500% damage.', multiplier: 5.0, cooldown: 10 },
+      { id: 'sling_shot', name: 'Sling Shot', tier: 0, focusCost: 5, type: 'attack', desc: 'Fire a makeshift projectile. 150% damage.', multiplier: 1.5, cooldown: 3 },
+      { id: 'makeshift_armor', name: 'Makeshift Armor', tier: 0, focusCost: 3, type: 'buff', desc: 'Strap on scrap metal. +50% defense for 3 rounds.', duration: 3, defMod: 1.5, cooldown: 5 },
+      { id: 'caltrops', name: 'Caltrops', tier: 1, focusCost: 11, type: 'debuff', desc: 'Scatter spikes. -20% attack and defense for 3 rounds.', duration: 3, atkMod: 0.8, defMod: 0.8, cooldown: 6 },
+      { id: 'salvage_strike', name: 'Salvage Strike', tier: 1, focusCost: 12, type: 'attack', desc: 'A vicious strike with a rusted blade. 250% damage.', multiplier: 2.5, cooldown: 5 },
+      { id: 'scavenged_stim', name: 'Scavenged Stim', tier: 2, focusCost: 21, type: 'heal', desc: 'Inject a questionable stimulant. Restores 40% HP.', healPercent: 0.4, cooldown: 6 },
+      { id: 'dirty_trick', name: 'Dirty Trick', tier: 2, focusCost: 17, type: 'debuff', desc: 'Fight dirty. -50% defense for 2 rounds.', duration: 2, defMod: 0.5, cooldown: 7 },
+      { id: 'survivalist_instinct', name: 'Survivalist Instinct', tier: 3, focusCost: 23, type: 'buff', desc: 'Tap into primal survival. +100% attack and defense for 4 rounds.', duration: 4, atkMod: 2.0, defMod: 2.0, cooldown: 8 },
+      { id: 'scrap_bomb', name: 'Scrap Bomb', tier: 3, focusCost: 25, type: 'attack', desc: 'Detonate a homemade explosive. 500% damage.', multiplier: 5.0, cooldown: 10 },
       // ── Spec Glimmers (discovered mid-combat) ──
       { id: 'ricochet_shot', name: 'Ricochet Shot', type: 'attack', desc: 'Bounce a shot off the environment. 200% damage.', multiplier: 2.0, cooldown: 4, glimmer: true, sparkFrom: ['sling_shot'], sparkChance: 0.08 },
       { id: 'reinforced_plating', name: 'Reinforced Plating', type: 'buff', desc: 'Better scrap armor. +80% defense for 4 rounds.', duration: 4, defMod: 1.8, cooldown: 6, glimmer: true, sparkFrom: ['makeshift_armor'], sparkChance: 0.07 },
@@ -765,14 +765,14 @@
   function paladinAbilities() {
     return [
       // ── Trainable (bought with QP) ──
-      { id: 'lay_on_hands', name: 'Lay on Hands', tier: 0, type: 'heal', desc: 'Channel holy energy to restore minor wounds.', healPercent: 0.3, cooldown: 4 },
-      { id: 'smite', name: 'Smite', tier: 0, type: 'attack', desc: 'Strike the enemy with a burst of holy light.', multiplier: 1.8, cooldown: 3 },
-      { id: 'divine_shield', name: 'Divine Shield', tier: 1, type: 'buff', desc: 'Envelop yourself in a protective barrier of light.', duration: 3, defMod: 1.5, cooldown: 6 },
-      { id: 'holy_nova', name: 'Holy Nova', tier: 1, type: 'heal', desc: 'Release an explosion of divine energy to heal yourself.', healPercent: 0.5, cooldown: 6 },
-      { id: 'righteous_fury', name: 'Righteous Fury', tier: 2, type: 'buff', desc: 'Fill yourself with holy zeal, increasing attack power.', duration: 3, atkMod: 1.8, cooldown: 7 },
-      { id: 'hammer_of_justice', name: 'Hammer of Justice', tier: 2, type: 'attack', desc: 'Summon a massive ethereal hammer to crush the wicked.', multiplier: 3.5, cooldown: 6 },
-      { id: 'aura_of_devotion', name: 'Aura of Devotion', tier: 3, type: 'buff', desc: 'Project an aura of absolute protection.', duration: 4, defMod: 2.0, cooldown: 8 },
-      { id: 'resurrection_light', name: 'Resurrection Light', tier: 3, type: 'heal', desc: 'Call upon the ultimate light to fully restore vitality.', healPercent: 1.0, cooldown: 10 },
+      { id: 'lay_on_hands', name: 'Lay on Hands', tier: 0, focusCost: 8, type: 'heal', desc: 'Channel holy energy to restore minor wounds.', healPercent: 0.3, cooldown: 4 },
+      { id: 'smite', name: 'Smite', tier: 0, focusCost: 5, type: 'attack', desc: 'Strike the enemy with a burst of holy light.', multiplier: 1.8, cooldown: 3 },
+      { id: 'divine_shield', name: 'Divine Shield', tier: 1, focusCost: 10, type: 'buff', desc: 'Envelop yourself in a protective barrier of light.', duration: 3, defMod: 1.5, cooldown: 6 },
+      { id: 'holy_nova', name: 'Holy Nova', tier: 1, focusCost: 15, type: 'heal', desc: 'Release an explosion of divine energy to heal yourself.', healPercent: 0.5, cooldown: 6 },
+      { id: 'righteous_fury', name: 'Righteous Fury', tier: 2, focusCost: 16, type: 'buff', desc: 'Fill yourself with holy zeal, increasing attack power.', duration: 3, atkMod: 1.8, cooldown: 7 },
+      { id: 'hammer_of_justice', name: 'Hammer of Justice', tier: 2, focusCost: 18, type: 'attack', desc: 'Summon a massive ethereal hammer to crush the wicked.', multiplier: 3.5, cooldown: 6 },
+      { id: 'aura_of_devotion', name: 'Aura of Devotion', tier: 3, focusCost: 23, type: 'buff', desc: 'Project an aura of absolute protection.', duration: 4, defMod: 2.0, cooldown: 8 },
+      { id: 'resurrection_light', name: 'Resurrection Light', tier: 3, focusCost: 28, type: 'heal', desc: 'Call upon the ultimate light to fully restore vitality.', healPercent: 1.0, cooldown: 10 },
       // ── Spec Glimmers (discovered mid-combat) ──
       { id: 'flash_of_light', name: 'Flash of Light', type: 'heal', desc: 'A quick burst of healing energy.', healPercent: 0.4, cooldown: 4, glimmer: true, sparkFrom: ['lay_on_hands'], sparkChance: 0.08 },
       { id: 'blinding_light', name: 'Blinding Light', type: 'debuff', desc: 'A flash so bright it disorients the enemy.', duration: 2, atkMod: 0.6, cooldown: 5, glimmer: true, sparkFrom: ['smite'], sparkChance: 0.06 },
@@ -806,14 +806,14 @@
   function fieldmedicAbilities() {
     return [
       // ── Trainable (bought with QP) ──
-      { id: 'nano_heal', name: 'Nano Heal', tier: 0, type: 'heal', desc: 'Deploy nanobots to repair tissue. Restores 30% HP.', healPercent: 0.3, cooldown: 4 },
-      { id: 'energy_barrier', name: 'Energy Barrier', tier: 0, type: 'buff', desc: 'Project a hard-light shield. +50% defense for 3 rounds.', duration: 3, defMod: 1.5, cooldown: 5 },
-      { id: 'plasma_scalpel', name: 'Plasma Scalpel', tier: 1, type: 'attack', desc: 'A precise, superheated cut. 180% damage.', multiplier: 1.8, cooldown: 4 },
-      { id: 'stim_pack', name: 'Stim Pack', tier: 1, type: 'buff', desc: 'Inject combat stimulants. +40% attack for 3 rounds.', duration: 3, atkMod: 1.4, cooldown: 6 },
-      { id: 'full_restore', name: 'Full Restore', tier: 2, type: 'heal', desc: 'Advanced medical suite activation. Restores 80% HP.', healPercent: 0.8, cooldown: 8 },
-      { id: 'stasis_field', name: 'Stasis Field', tier: 2, type: 'debuff', desc: 'Trap the target in localized time dilation. -40% enemy attack for 3 rounds.', duration: 3, atkMod: 0.6, cooldown: 7 },
-      { id: 'orbital_strike', name: 'Orbital Strike', tier: 3, type: 'attack', desc: 'Call down a medical-grade laser bombardment. 400% damage.', multiplier: 4.0, cooldown: 10 },
-      { id: 'resurrection_protocol', name: 'Resurrection Protocol', tier: 3, type: 'heal', desc: 'Defibrillate and fully repair. Restores 100% HP.', healPercent: 1.0, cooldown: 10 },
+      { id: 'nano_heal', name: 'Nano Heal', tier: 0, focusCost: 8, type: 'heal', desc: 'Deploy nanobots to repair tissue. Restores 30% HP.', healPercent: 0.3, cooldown: 4 },
+      { id: 'energy_barrier', name: 'Energy Barrier', tier: 0, focusCost: 3, type: 'buff', desc: 'Project a hard-light shield. +50% defense for 3 rounds.', duration: 3, defMod: 1.5, cooldown: 5 },
+      { id: 'plasma_scalpel', name: 'Plasma Scalpel', tier: 1, focusCost: 12, type: 'attack', desc: 'A precise, superheated cut. 180% damage.', multiplier: 1.8, cooldown: 4 },
+      { id: 'stim_pack', name: 'Stim Pack', tier: 1, focusCost: 10, type: 'buff', desc: 'Inject combat stimulants. +40% attack for 3 rounds.', duration: 3, atkMod: 1.4, cooldown: 6 },
+      { id: 'full_restore', name: 'Full Restore', tier: 2, focusCost: 21, type: 'heal', desc: 'Advanced medical suite activation. Restores 80% HP.', healPercent: 0.8, cooldown: 8 },
+      { id: 'stasis_field', name: 'Stasis Field', tier: 2, focusCost: 17, type: 'debuff', desc: 'Trap the target in localized time dilation. -40% enemy attack for 3 rounds.', duration: 3, atkMod: 0.6, cooldown: 7 },
+      { id: 'orbital_strike', name: 'Orbital Strike', tier: 3, focusCost: 25, type: 'attack', desc: 'Call down a medical-grade laser bombardment. 400% damage.', multiplier: 4.0, cooldown: 10 },
+      { id: 'resurrection_protocol', name: 'Resurrection Protocol', tier: 3, focusCost: 28, type: 'heal', desc: 'Defibrillate and fully repair. Restores 100% HP.', healPercent: 1.0, cooldown: 10 },
       // ── Spec Glimmers (discovered mid-combat) ──
       { id: 'micro_bots', name: 'Micro Bots', type: 'heal', desc: 'Swarm of healing bots. Restores 45% HP.', healPercent: 0.45, cooldown: 5, glimmer: true, sparkFrom: ['nano_heal'], sparkChance: 0.06 },
       { id: 'cellular_regeneration', name: 'Cellular Regeneration', type: 'heal', desc: 'Rapid cell division. Restores 60% HP.', healPercent: 0.6, cooldown: 6, glimmer: true, sparkFrom: ['micro_bots'], sparkChance: 0.04 },
@@ -847,14 +847,14 @@
   function grifterAbilities() {
     return [
       // ── Trainable (bought with QP) ──
-      { id: 'snake_oil', name: 'Snake Oil', tier: 0, type: 'heal', desc: 'A dubious concoction that somehow knits wounds. Restores 20% HP.', healPercent: 0.2, cooldown: 4 },
-      { id: 'misdirection', name: 'Misdirection', tier: 0, type: 'debuff', desc: 'Distract the mark. -30% enemy attack for 2 rounds.', duration: 2, atkMod: 0.7, cooldown: 5 },
-      { id: 'loaded_dice', name: 'Loaded Dice', tier: 1, type: 'buff', desc: 'Tip the odds in your favor. +50% attack for 3 rounds.', duration: 3, atkMod: 1.5, cooldown: 6 },
-      { id: 'cheap_shot', name: 'Cheap Shot', tier: 1, type: 'attack', desc: 'A dirty strike when they aren\'t looking. 150% damage.', multiplier: 1.5, cooldown: 3 },
-      { id: 'ace_in_the_hole', name: 'Ace in the Hole', tier: 2, type: 'heal', desc: 'Reveal your hidden advantage. Restores 50% HP.', healPercent: 0.5, cooldown: 6 },
-      { id: 'smoke_and_mirrors', name: 'Smoke and Mirrors', tier: 2, type: 'debuff', desc: 'Confuse the enemy completely. -50% enemy defense for 3 rounds.', duration: 3, defMod: 0.5, cooldown: 6 },
-      { id: 'the_long_con', name: 'The Long Con', tier: 3, type: 'debuff', desc: 'The culmination of your scheme. -70% enemy attack and defense for 4 rounds.', duration: 4, atkMod: 0.3, defMod: 0.3, cooldown: 8 },
-      { id: 'payoff', name: 'Payoff', tier: 3, type: 'attack', desc: 'Cash in your chips for a massive strike. 400% damage.', multiplier: 4.0, cooldown: 8 },
+      { id: 'snake_oil', name: 'Snake Oil', tier: 0, focusCost: 8, type: 'heal', desc: 'A dubious concoction that somehow knits wounds. Restores 20% HP.', healPercent: 0.2, cooldown: 4 },
+      { id: 'misdirection', name: 'Misdirection', tier: 0, focusCost: 4, type: 'debuff', desc: 'Distract the mark. -30% enemy attack for 2 rounds.', duration: 2, atkMod: 0.7, cooldown: 5 },
+      { id: 'loaded_dice', name: 'Loaded Dice', tier: 1, focusCost: 10, type: 'buff', desc: 'Tip the odds in your favor. +50% attack for 3 rounds.', duration: 3, atkMod: 1.5, cooldown: 6 },
+      { id: 'cheap_shot', name: 'Cheap Shot', tier: 1, focusCost: 12, type: 'attack', desc: 'A dirty strike when they aren\'t looking. 150% damage.', multiplier: 1.5, cooldown: 3 },
+      { id: 'ace_in_the_hole', name: 'Ace in the Hole', tier: 2, focusCost: 21, type: 'heal', desc: 'Reveal your hidden advantage. Restores 50% HP.', healPercent: 0.5, cooldown: 6 },
+      { id: 'smoke_and_mirrors', name: 'Smoke and Mirrors', tier: 2, focusCost: 17, type: 'debuff', desc: 'Confuse the enemy completely. -50% enemy defense for 3 rounds.', duration: 3, defMod: 0.5, cooldown: 6 },
+      { id: 'the_long_con', name: 'The Long Con', tier: 3, focusCost: 24, type: 'debuff', desc: 'The culmination of your scheme. -70% enemy attack and defense for 4 rounds.', duration: 4, atkMod: 0.3, defMod: 0.3, cooldown: 8 },
+      { id: 'payoff', name: 'Payoff', tier: 3, focusCost: 25, type: 'attack', desc: 'Cash in your chips for a massive strike. 400% damage.', multiplier: 4.0, cooldown: 8 },
       // ── Spec Glimmers (discovered mid-combat) ──
       { id: 'miracle_cure', name: 'Miracle Cure', type: 'heal', desc: 'A surprisingly effective remedy. Restores 40% HP.', healPercent: 0.4, cooldown: 5, glimmer: true, sparkFrom: ['snake_oil'], sparkChance: 0.08 },
       { id: 'false_trail', name: 'False Trail', type: 'debuff', desc: 'Lead them down the wrong path. -40% enemy attack for 3 rounds.', duration: 3, atkMod: 0.6, cooldown: 6, glimmer: true, sparkFrom: ['misdirection'], sparkChance: 0.07 },
@@ -888,14 +888,14 @@
   function combatmedicAbilities() {
     return [
       // ── Trainable (bought with QP) ──
-      { id: 'field_patch', name: 'Field Patch', tier: 0, type: 'heal', desc: 'Quickly bandage wounds. Restores 30% HP.', healPercent: 0.3, cooldown: 4 },
-      { id: 'suppressive_fire', name: 'Suppressive Fire', tier: 0, type: 'debuff', desc: 'Pin down the enemy. -30% enemy attack for 2 rounds.', duration: 2, atkMod: 0.7, cooldown: 5 },
-      { id: 'combat_revive', name: 'Combat Revive', tier: 1, type: 'heal', desc: 'Shock a fallen ally back to life. Restores 50% HP.', healPercent: 0.5, cooldown: 8 },
-      { id: 'adrenaline_shot', name: 'Adrenaline Shot', tier: 1, type: 'buff', desc: 'Inject combat stimulants. +50% attack for 3 rounds.', duration: 3, atkMod: 1.5, cooldown: 6 },
-      { id: 'medevac', name: 'Medevac', tier: 2, type: 'heal', desc: 'Call in a medical evacuation chopper. Restores 80% HP.', healPercent: 0.8, cooldown: 10 },
-      { id: 'smoke_grenade', name: 'Smoke Grenade', tier: 2, type: 'debuff', desc: 'Obscure vision. -50% enemy defense for 3 rounds.', duration: 3, defMod: 0.5, cooldown: 6 },
-      { id: 'trauma_center', name: 'Trauma Center', tier: 3, type: 'heal', desc: 'Deploy a mobile hospital. Restores 100% HP.', healPercent: 1.0, cooldown: 10 },
-      { id: 'gunship_support', name: 'Gunship Support', tier: 3, type: 'attack', desc: 'Call in heavy air support. 500% damage.', multiplier: 5.0, cooldown: 12 },
+      { id: 'field_patch', name: 'Field Patch', tier: 0, focusCost: 8, type: 'heal', desc: 'Quickly bandage wounds. Restores 30% HP.', healPercent: 0.3, cooldown: 4 },
+      { id: 'suppressive_fire', name: 'Suppressive Fire', tier: 0, focusCost: 4, type: 'debuff', desc: 'Pin down the enemy. -30% enemy attack for 2 rounds.', duration: 2, atkMod: 0.7, cooldown: 5 },
+      { id: 'combat_revive', name: 'Combat Revive', tier: 1, focusCost: 15, type: 'heal', desc: 'Shock a fallen ally back to life. Restores 50% HP.', healPercent: 0.5, cooldown: 8 },
+      { id: 'adrenaline_shot', name: 'Adrenaline Shot', tier: 1, focusCost: 10, type: 'buff', desc: 'Inject combat stimulants. +50% attack for 3 rounds.', duration: 3, atkMod: 1.5, cooldown: 6 },
+      { id: 'medevac', name: 'Medevac', tier: 2, focusCost: 21, type: 'heal', desc: 'Call in a medical evacuation chopper. Restores 80% HP.', healPercent: 0.8, cooldown: 10 },
+      { id: 'smoke_grenade', name: 'Smoke Grenade', tier: 2, focusCost: 17, type: 'debuff', desc: 'Obscure vision. -50% enemy defense for 3 rounds.', duration: 3, defMod: 0.5, cooldown: 6 },
+      { id: 'trauma_center', name: 'Trauma Center', tier: 3, focusCost: 28, type: 'heal', desc: 'Deploy a mobile hospital. Restores 100% HP.', healPercent: 1.0, cooldown: 10 },
+      { id: 'gunship_support', name: 'Gunship Support', tier: 3, focusCost: 25, type: 'attack', desc: 'Call in heavy air support. 500% damage.', multiplier: 5.0, cooldown: 12 },
       // ── Spec Glimmers (discovered mid-combat) ──
       { id: 'rapid_patch', name: 'Rapid Patch', type: 'heal', desc: 'Apply bandages with lightning speed. Restores 40% HP.', healPercent: 0.4, cooldown: 4, glimmer: true, sparkFrom: ['field_patch'], sparkChance: 0.08 },
       { id: 'covering_fire', name: 'Covering Fire', type: 'attack', desc: 'Shoot while moving. 150% damage.', multiplier: 1.5, cooldown: 3, glimmer: true, sparkFrom: ['suppressive_fire'], sparkChance: 0.07 },
@@ -929,14 +929,14 @@
   function monkAbilities() {
     return [
       // ── Trainable (bought with QP) ──
-      { id: 'ki_heal', name: 'Ki Heal', tier: 0, type: 'heal', desc: 'Channel basic ki to restore health.', healPercent: 0.3, cooldown: 4 },
-      { id: 'iron_body', name: 'Iron Body', tier: 0, type: 'buff', desc: 'Harden your body with ki. +50% defense for 3 rounds.', duration: 3, defMod: 1.5, cooldown: 5 },
-      { id: 'pressure_point', name: 'Pressure Point', tier: 1, type: 'attack', desc: 'Strike a vital point. 200% damage.', multiplier: 2.0, cooldown: 4 },
-      { id: 'inner_peace', name: 'Inner Peace', tier: 1, type: 'heal', desc: 'Meditate to restore significant health.', healPercent: 0.5, cooldown: 6 },
-      { id: 'aura_blast', name: 'Aura Blast', tier: 2, type: 'attack', desc: 'Project your ki as a destructive wave. 350% damage.', multiplier: 3.5, cooldown: 6 },
-      { id: 'crippling_strike', name: 'Crippling Strike', tier: 2, type: 'debuff', desc: 'Strike nerves to weaken the enemy. -40% enemy attack for 3 rounds.', duration: 3, atkMod: 0.6, cooldown: 6 },
-      { id: 'thousand_fists', name: 'Thousand Fists', tier: 3, type: 'attack', desc: 'A blinding flurry of strikes. 550% damage.', multiplier: 5.5, cooldown: 10 },
-      { id: 'nirvana_rebirth', name: 'Nirvana Rebirth', tier: 3, type: 'heal', desc: 'Ultimate healing technique. Restores full health.', healPercent: 1.0, cooldown: 10 },
+      { id: 'ki_heal', name: 'Ki Heal', tier: 0, focusCost: 8, type: 'heal', desc: 'Channel basic ki to restore health.', healPercent: 0.3, cooldown: 4 },
+      { id: 'iron_body', name: 'Iron Body', tier: 0, focusCost: 3, type: 'buff', desc: 'Harden your body with ki. +50% defense for 3 rounds.', duration: 3, defMod: 1.5, cooldown: 5 },
+      { id: 'pressure_point', name: 'Pressure Point', tier: 1, focusCost: 12, type: 'attack', desc: 'Strike a vital point. 200% damage.', multiplier: 2.0, cooldown: 4 },
+      { id: 'inner_peace', name: 'Inner Peace', tier: 1, focusCost: 15, type: 'heal', desc: 'Meditate to restore significant health.', healPercent: 0.5, cooldown: 6 },
+      { id: 'aura_blast', name: 'Aura Blast', tier: 2, focusCost: 18, type: 'attack', desc: 'Project your ki as a destructive wave. 350% damage.', multiplier: 3.5, cooldown: 6 },
+      { id: 'crippling_strike', name: 'Crippling Strike', tier: 2, focusCost: 17, type: 'debuff', desc: 'Strike nerves to weaken the enemy. -40% enemy attack for 3 rounds.', duration: 3, atkMod: 0.6, cooldown: 6 },
+      { id: 'thousand_fists', name: 'Thousand Fists', tier: 3, focusCost: 25, type: 'attack', desc: 'A blinding flurry of strikes. 550% damage.', multiplier: 5.5, cooldown: 10 },
+      { id: 'nirvana_rebirth', name: 'Nirvana Rebirth', tier: 3, focusCost: 28, type: 'heal', desc: 'Ultimate healing technique. Restores full health.', healPercent: 1.0, cooldown: 10 },
       // ── Spec Glimmers (discovered mid-combat) ──
       { id: 'ki_wave', name: 'Ki Wave', type: 'attack', desc: 'A ranged ki attack. 250% damage.', multiplier: 2.5, cooldown: 5, glimmer: true, sparkFrom: ['pressure_point'], sparkChance: 0.06 },
       { id: 'diamond_body', name: 'Diamond Body', type: 'buff', desc: 'Perfected defensive stance. +100% defense for 4 rounds.', duration: 4, defMod: 2.0, cooldown: 7, glimmer: true, sparkFrom: ['iron_body'], sparkChance: 0.05 },
@@ -970,14 +970,14 @@
   function priestAbilities() {
     return [
       // ── Trainable (bought with QP) ──
-      { id: 'blessing', name: 'Blessing', tier: 0, type: 'heal', desc: 'A basic prayer that restores health.', healPercent: 0.3, cooldown: 4 },
-      { id: 'holy_strike', name: 'Holy Strike', tier: 0, type: 'attack', desc: 'Strike the enemy with holy power.', multiplier: 1.5, cooldown: 3 },
-      { id: 'sanctuary', name: 'Sanctuary', tier: 1, type: 'buff', desc: 'Create a safe haven. +50% defense for 3 rounds.', duration: 3, defMod: 1.5, cooldown: 5 },
-      { id: 'exorcism', name: 'Exorcism', tier: 1, type: 'attack', desc: 'Expel evil spirits, dealing heavy damage.', multiplier: 2.5, cooldown: 5 },
-      { id: 'miracle', name: 'Miracle', tier: 2, type: 'heal', desc: 'A miraculous healing that restores significant health.', healPercent: 0.6, cooldown: 6 },
-      { id: 'divine_ward', name: 'Divine Ward', tier: 2, type: 'buff', desc: 'A powerful ward. +80% defense for 4 rounds.', duration: 4, defMod: 1.8, cooldown: 7 },
-      { id: 'resurrection', name: 'Resurrection', tier: 3, type: 'heal', desc: 'Bring back from the brink of death. Fully restores health.', healPercent: 1.0, cooldown: 10 },
-      { id: 'wrath_of_god', name: 'Wrath of God', tier: 3, type: 'attack', desc: 'Unleash divine fury upon the enemy.', multiplier: 5.0, cooldown: 10 },
+      { id: 'blessing', name: 'Blessing', tier: 0, focusCost: 8, type: 'heal', desc: 'A basic prayer that restores health.', healPercent: 0.3, cooldown: 4 },
+      { id: 'holy_strike', name: 'Holy Strike', tier: 0, focusCost: 5, type: 'attack', desc: 'Strike the enemy with holy power.', multiplier: 1.5, cooldown: 3 },
+      { id: 'sanctuary', name: 'Sanctuary', tier: 1, focusCost: 10, type: 'buff', desc: 'Create a safe haven. +50% defense for 3 rounds.', duration: 3, defMod: 1.5, cooldown: 5 },
+      { id: 'exorcism', name: 'Exorcism', tier: 1, focusCost: 12, type: 'attack', desc: 'Expel evil spirits, dealing heavy damage.', multiplier: 2.5, cooldown: 5 },
+      { id: 'miracle', name: 'Miracle', tier: 2, focusCost: 21, type: 'heal', desc: 'A miraculous healing that restores significant health.', healPercent: 0.6, cooldown: 6 },
+      { id: 'divine_ward', name: 'Divine Ward', tier: 2, focusCost: 16, type: 'buff', desc: 'A powerful ward. +80% defense for 4 rounds.', duration: 4, defMod: 1.8, cooldown: 7 },
+      { id: 'resurrection', name: 'Resurrection', tier: 3, focusCost: 28, type: 'heal', desc: 'Bring back from the brink of death. Fully restores health.', healPercent: 1.0, cooldown: 10 },
+      { id: 'wrath_of_god', name: 'Wrath of God', tier: 3, focusCost: 25, type: 'attack', desc: 'Unleash divine fury upon the enemy.', multiplier: 5.0, cooldown: 10 },
       // ── Spec Glimmers (discovered mid-combat) ──
       { id: 'greater_blessing', name: 'Greater Blessing', type: 'heal', desc: 'An empowered blessing.', healPercent: 0.45, cooldown: 5, glimmer: true, sparkFrom: ['blessing'], sparkChance: 0.06 },
       { id: 'mass_blessing', name: 'Mass Blessing', type: 'heal', desc: 'A blessing that covers all allies.', healPercent: 0.6, cooldown: 7, glimmer: true, sparkFrom: ['greater_blessing'], sparkChance: 0.04 },

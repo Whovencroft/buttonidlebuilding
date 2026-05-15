@@ -403,10 +403,14 @@
     const marbleUnlocked = !!state.scenes.marble.unlocked;
 
     elements.playGameGrid.classList.toggle('scene-marble-active', isMarble);
-    elements.switchButtonSceneBtn.classList.toggle('active', activeSceneId === 'button_idle');
-    elements.switchMarbleSceneBtn.classList.toggle('active', activeSceneId === 'marble');
-    elements.switchMarbleSceneBtn.disabled = !marbleUnlocked;
-    elements.switchMarbleSceneBtn.textContent = marbleUnlocked ? 'Marble Game' : 'Marble Locked';
+    if (elements.switchButtonSceneBtn) {
+      elements.switchButtonSceneBtn.classList.toggle('active', activeSceneId === 'button_idle');
+    }
+    if (elements.switchMarbleSceneBtn) {
+      elements.switchMarbleSceneBtn.classList.toggle('active', activeSceneId === 'marble');
+      elements.switchMarbleSceneBtn.disabled = !marbleUnlocked;
+      elements.switchMarbleSceneBtn.textContent = marbleUnlocked ? 'Marble Game' : 'Marble Locked';
+    }
 
     const isMud = activeSceneId === 'mud';
 
@@ -830,22 +834,26 @@ try {
 }
 
   function attachShellEvents() {
-    elements.switchButtonSceneBtn.addEventListener('click', () => switchScene('button_idle', { force: true }));
-
-    elements.switchMarbleSceneBtn.addEventListener('click', () => {
-      switchScene('marble');
-    });
-
-  const prewarmMarble = () => {
-    if (!marbleScene) return;
-    if (!state.scenes.marble.unlocked) return;
-    if (typeof marbleScene.prepare === 'function') {
-      marbleScene.prepare(elements.sceneHost);
+    if (elements.switchButtonSceneBtn) {
+      elements.switchButtonSceneBtn.addEventListener('click', () => switchScene('button_idle', { force: true }));
     }
-  };
 
-    elements.switchMarbleSceneBtn.addEventListener('mouseenter', prewarmMarble);
-    elements.switchMarbleSceneBtn.addEventListener('focus', prewarmMarble);
+    if (elements.switchMarbleSceneBtn) {
+      elements.switchMarbleSceneBtn.addEventListener('click', () => {
+        switchScene('marble');
+      });
+
+      const prewarmMarble = () => {
+        if (!marbleScene) return;
+        if (!state.scenes.marble.unlocked) return;
+        if (typeof marbleScene.prepare === 'function') {
+          marbleScene.prepare(elements.sceneHost);
+        }
+      };
+
+      elements.switchMarbleSceneBtn.addEventListener('mouseenter', prewarmMarble);
+      elements.switchMarbleSceneBtn.addEventListener('focus', prewarmMarble);
+    }
 
     elements.saveBtn.addEventListener('click', () => saveGame(true));
     elements.exportBtn.addEventListener('click', exportSave);

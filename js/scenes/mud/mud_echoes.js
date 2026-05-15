@@ -134,7 +134,7 @@
     const echoes = getEchoesInRoom(allEchoes, roomVnum);
     if (echoes.length === 0) return null;
     if (echoes.length === 1) {
-      return `A faint shimmer lingers here — an echo of ${echoes[0].playerName}.`;
+      return `A faint shimmer lingers here - an echo of ${echoes[0].playerName}.`;
     }
     return `${echoes.length} faint echoes shimmer in the air.`;
   }

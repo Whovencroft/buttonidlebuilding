@@ -293,6 +293,21 @@
       commandQueue = [];
     }
 
+    // ─── Glimmer UI Glow ──────────────────────────────────────────────────
+
+    /**
+     * Trigger a smooth 2-second glow on the MUD container when a Glimmer sparks.
+     * Fades to a soft golden light and back to normal over 2 seconds total.
+     */
+    function triggerGlimmerGlow() {
+      const container = root;
+      if (!container) return;
+      // Avoid stacking multiple glows
+      if (container.classList.contains('glimmer-glow')) return;
+      container.classList.add('glimmer-glow');
+      setTimeout(() => container.classList.remove('glimmer-glow'), 2000);
+    }
+
     // ─── Output ───────────────────────────────────────────────────────────
 
     /**
@@ -301,6 +316,10 @@
      */
     function appendOutput(lines) {
       if (!logEl || !Array.isArray(lines)) return;
+
+      // Detect glimmer spark in output and trigger UI glow
+      const hasGlimmer = lines.some(l => l.text && l.text.includes('GLIMMER'));
+      if (hasGlimmer) triggerGlimmerGlow();
 
       for (const line of lines) {
         const div = document.createElement('div');

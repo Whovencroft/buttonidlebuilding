@@ -96,9 +96,9 @@
         { type: 'info', text: '' },
         { type: 'info', text: 'This world remembers those who name themselves.' },
         { type: 'info', text: '' },
-        { type: 'items', text: '  1. Login    — Return to a saved character' },
-        { type: 'items', text: '  2. Register — Create a new account' },
-        { type: 'items', text: '  3. Guest    — Play without saving' },
+        { type: 'items', text: '  1. Login    - Return to a saved character' },
+        { type: 'items', text: '  2. Register - Create a new account' },
+        { type: 'items', text: '  3. Guest    - Play without saving' },
         { type: 'info', text: '' },
         { type: 'success', text: 'Type 1, 2, or 3.' }
       ]);
@@ -330,7 +330,7 @@
         { type: 'info', text: 'Something is very wrong.' },
         { type: 'info', text: '' },
         { type: 'info', text: 'There is no ground beneath your feet, no sky above.' },
-        { type: 'info', text: 'Just an endless, formless dark — and the faintest pull,' },
+        { type: 'info', text: 'Just an endless, formless dark - and the faintest pull,' },
         { type: 'info', text: 'like a thread tugging at the center of your chest.' },
         { type: 'info', text: '' }
       ]);

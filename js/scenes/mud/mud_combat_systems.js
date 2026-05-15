@@ -213,10 +213,10 @@
   const FINISHING_TEMPLATES = {
     attack: [
       'With a devastating {ability}, you obliterate {mob}!',
-      'Your {ability} tears through {mob} — nothing remains!',
+      'Your {ability} tears through {mob} - nothing remains!',
       '{mob} crumbles under the force of your {ability}!',
       'A perfect {ability} ends {mob} in a flash of brilliance!',
-      'The final {ability} connects — {mob} is no more!'
+      'The final {ability} connects - {mob} is no more!'
     ],
     heal: [
       'As you recover, {mob} collapses from accumulated wounds!',
@@ -224,11 +224,11 @@
     ],
     buff: [
       'Empowered, you strike down {mob} with overwhelming force!',
-      'Your enhanced state proves too much — {mob} is finished!'
+      'Your enhanced state proves too much - {mob} is finished!'
     ],
     debuff: [
       'Weakened beyond recovery, {mob} collapses!',
-      'Your curse takes hold — {mob} falls lifeless!'
+      'Your curse takes hold - {mob} falls lifeless!'
     ]
   };
 

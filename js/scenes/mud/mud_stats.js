@@ -63,8 +63,8 @@
       hpRegenPerTick: 2 + Math.floor(v * 0.5),
       /** Exhaustion recovery speed multiplier (1.0 = normal). */
       exhaustionRecoveryMod: 1.0 + (v - 1) * 0.015,
-      /** Max Focus bonus: +1 per 5 Vigor. */
-      bonusMaxFocus: Math.floor(v / 5),
+      /** Max Focus bonus: +2 per 5 Vigor + 1 per 10 Instinct. */
+      bonusMaxFocus: Math.floor(v / 5) * 2 + Math.floor(i / 10),
 
       // ── Precision derivatives ──
       /** Damage consistency: reduces random variance. 0 = full variance, 1 = no variance. */
@@ -153,7 +153,7 @@
    * @returns {object|null} { stat: 'vigor', xp } or null
    */
   function onDamageTaken(damageTaken, maxHp, currentHp) {
-    if (currentHp <= 0) return null; // Died — no growth
+    if (currentHp <= 0) return null; // Died - no growth
     // More XP for bigger hits relative to max HP
     const ratio = Math.min(1.0, damageTaken / Math.max(1, maxHp));
     const xp = Math.max(1, Math.ceil(ratio * 8));

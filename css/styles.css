@@ -268,6 +268,25 @@ button, input, textarea, select { font: inherit; }
   min-height: 0;
 }
 
+/* Centered single-column layout for Play tab (button is the focus) */
+.game-grid.game-grid--centered {
+  grid-template-columns: 1fr;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.panel--button-focus {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.panel--button-focus .panel-body {
+  flex: 1;
+  display: flex;
+  align-items: stretch;
+}
+
 .scene-host {
   position: relative;
   min-height: 0;
@@ -807,11 +826,7 @@ button, input, textarea, select { font: inherit; }
    MARBLE LEVEL STRIP
    ============================================================ */
 .marble-level-strip {
-  display: flex;
-  gap: var(--space-sm);
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  pointer-events: auto;
+  display: none;
 }
 
 .marble-level-btn {

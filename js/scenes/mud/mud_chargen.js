@@ -3,12 +3,14 @@
  *
  * Flow:
  *  1. Pick race (12 options)
- *  2. Ultima-style tournament quiz (7 questions, 8 traits in bracket elimination)
+ *  2. Enter name
+ *  3. Choose appearance (gender, hair color, eye color, body type)
+ *  4. Ultima-style tournament quiz (7 questions, 8 traits in bracket elimination)
  *     - Round 1: 4 questions (each trait appears once) → 4 eliminated
  *     - Round 2: 2 questions (remaining 4 traits, each appears once) → 2 eliminated
  *     - Round 3: 1 final question between last 2 traits → winner determined
- *  3. Pick specialization from top 6 scoring results
- *  4. Confirm — race + specialization. Base class derived from spec.
+ *  5. Pick specialization from top 6 scoring results
+ *  6. Confirm — race + specialization + appearance. Base class derived from spec.
  *
  * 28 unique dilemma questions cover every possible trait pairing (8 choose 2).
  * Brackets are shuffled each playthrough for variety.
@@ -53,8 +55,7 @@
     rogue:   { hp: 5,  attack: 4, defense: 1 },
     cleric:  { hp: 10, attack: 1, defense: 4 }
   };
-
-  /* ─── Starting Abilities (one per base class) ───────────────────────────── */
+  /* --- Starting Abilities (one per base class) --- */
 
   const CLASS_STARTING_ABILITY = {
     fighter: 'power_strike',
@@ -63,7 +64,106 @@
     cleric:  'heal'
   };
 
-  /* ─── Specialization Flavor Text ────────────────────────────────────────── */
+  /* --- Appearance Options --- */
+
+  const HAIR_COLORS = ['Black', 'Brown', 'Blonde', 'Red', 'White', 'Silver', 'Blue', 'Green', 'Purple', 'Bald'];
+  const EYE_COLORS = ['Brown', 'Blue', 'Green', 'Hazel', 'Gray', 'Amber', 'Red', 'Violet', 'Gold', 'Black'];
+  const BODY_TYPES = ['Lean', 'Athletic', 'Stocky', 'Tall', 'Short', 'Heavy', 'Wiry', 'Broad'];
+
+  /** Class-flavor sentence fragments for the generated description. */
+  const CLASS_DESC_FLAVOR = {
+    knight:      'An aura of holy discipline surrounds them.',
+    commando:    'They carry themselves with military precision.',
+    enforcer:    'Scars and bruises mark a life of street violence.',
+    mechpilot:   'Faint hydraulic hums emanate from hidden augments.',
+    samurai:     'Every movement is deliberate, economical, lethal.',
+    gladiator:   'Their body is a map of arena victories.',
+    sorcerer:    'Arcane energy crackles faintly at their fingertips.',
+    hacker:      'Their eyes flicker with scrolling data feeds.',
+    occultist:   'Shadows cling to them like loyal pets.',
+    demolitions: 'The faint smell of cordite follows them everywhere.',
+    elementalist:'Elemental energy ripples across their skin.',
+    oracle:      'Their gaze seems fixed on something beyond the visible.',
+    assassin:    'They are difficult to look at directly, as if light avoids them.',
+    cyberthief:  'Fiber-optic threads glint beneath their skin.',
+    detective:   'Sharp eyes miss nothing; every detail is catalogued.',
+    infiltrator: 'They blend into any crowd without effort.',
+    ninja:       'Silence follows them like a second shadow.',
+    scavenger:   'Jury-rigged gear hangs from every available strap.',
+    paladin:     'A faint golden light outlines their silhouette.',
+    fieldmedic:  'Medical nanites shimmer across their hands.',
+    grifter:     'Their smile promises everything and guarantees nothing.',
+    combatmedic: 'Bandages and ammunition share equal pocket space.',
+    monk:        'Perfect stillness radiates outward from their center.',
+    priest:      'Whispered prayers trail behind them like incense.'
+  };
+
+  /**
+   * Build a character description from appearance choices and class.
+   * Returns a single descriptive sentence block.
+   */
+  function buildDescription(choices, specId) {
+    const genderWord = { M: 'male', F: 'female', N: '' };
+    const pronouns = { M: 'him', F: 'her', N: 'them' };
+    const race = RACES.find(r => r.id === choices.race);
+    const raceName = race?.name || 'being';
+    const g = genderWord[choices.gender] || '';
+    const hair = (choices.hairColor || 'dark').toLowerCase();
+    const eyes = (choices.eyeColor || 'dark').toLowerCase();
+    const body = (choices.bodyType || 'average').toLowerCase();
+    const hairDesc = hair === 'bald' ? 'a bald head' : `${hair} hair`;
+    const classFlavor = CLASS_DESC_FLAVOR[specId] || '';
+    return `A ${body} ${g} ${raceName} with ${hairDesc} and ${eyes} eyes. ${classFlavor}`.trim();
+  }
+
+  /** Show gender selection prompt. */
+  function showGenderChoice() {
+    return [
+      { type: 'room-name', text: '--- Appearance ---' },
+      { type: 'info', text: '' },
+      { type: 'items', text: '  1. Male' },
+      { type: 'items', text: '  2. Female' },
+      { type: 'items', text: '  3. Neutral' },
+      { type: 'info', text: '' },
+      { type: 'success', text: 'Choose your gender (1-3).' }
+    ];
+  }
+
+  /** Show hair color selection prompt. */
+  function showHairChoice() {
+    const lines = [
+      { type: 'room-name', text: '--- Hair Color ---' },
+      { type: 'info', text: '' }
+    ];
+    HAIR_COLORS.forEach((c, i) => lines.push({ type: 'items', text: `  ${i + 1}. ${c}` }));
+    lines.push({ type: 'info', text: '' });
+    lines.push({ type: 'success', text: `Choose 1-${HAIR_COLORS.length} or type a color.` });
+    return lines;
+  }
+
+  /** Show eye color selection prompt. */
+  function showEyeChoice() {
+    const lines = [
+      { type: 'room-name', text: '--- Eye Color ---' },
+      { type: 'info', text: '' }
+    ];
+    EYE_COLORS.forEach((c, i) => lines.push({ type: 'items', text: `  ${i + 1}. ${c}` }));
+    lines.push({ type: 'info', text: '' });
+    lines.push({ type: 'success', text: `Choose 1-${EYE_COLORS.length} or type a color.` });
+    return lines;
+  }
+
+  /** Show body type selection prompt. */
+  function showBodyChoice() {
+    const lines = [
+      { type: 'room-name', text: '--- Body Type ---' },
+      { type: 'info', text: '' }
+    ];
+    BODY_TYPES.forEach((b, i) => lines.push({ type: 'items', text: `  ${i + 1}. ${b}` }));
+    lines.push({ type: 'info', text: '' });
+    lines.push({ type: 'success', text: `Choose 1-${BODY_TYPES.length} or type a body type.` });
+    return lines;
+  } /* ─── Specialization Flavor Text ────────────────────────────────────────── */
 
   const SPEC_FLAVOR = {
     knight:      'Holy warrior. Heavy armor, radiant strikes, defensive mastery.',
@@ -385,7 +485,7 @@
    */
   function create({ onComplete, onOutput }) {
     let step = 'welcome';
-    let choices = { race: null, spec: null };
+    let choices = { race: null, spec: null, name: null, gender: null, hairColor: null, eyeColor: null, bodyType: null };
     let bracket = null;
     let currentDilemma = null;
     let topSpecs = [];  // the 6 spec ids presented to the player
@@ -402,7 +502,7 @@
         { type: 'info', text: '' },
         { type: 'info', text: 'You drift through formless space, drawn toward a distant light.' },
         { type: 'info', text: 'As you approach, the world takes shape around you.' },
-        { type: 'info', text: 'But first — who are you?' },
+        { type: 'info', text: 'But first - who are you?' },
         { type: 'info', text: '' },
         { type: 'success', text: 'Type "begin" to start character creation.' }
       ];
@@ -421,7 +521,7 @@
         if (s.attack)  mods.push(`ATK${s.attack > 0 ? '+' : ''}${s.attack}`);
         if (s.defense) mods.push(`DEF${s.defense > 0 ? '+' : ''}${s.defense}`);
         const statStr = mods.length ? ` [${mods.join(' ')}]` : '';
-        lines.push({ type: 'items', text: `  ${i + 1}. ${r.name}${statStr} — ${r.desc}` });
+        lines.push({ type: 'items', text: `  ${i + 1}. ${r.name}${statStr} - ${r.desc}` });
       });
       lines.push({ type: 'info', text: '' });
       lines.push({ type: 'success', text: 'Type the number or name of your choice.' });
@@ -433,7 +533,7 @@
       if (!currentDilemma) return [];
       const roundLabel = bracket.round === 1 ? 'I' : bracket.round === 2 ? 'II' : 'Final';
       return [
-        { type: 'room-name', text: `─── Round ${roundLabel} — Question ${bracket.questionNum + 1} of 7 ───` },
+        { type: 'room-name', text: `─── Round ${roundLabel} - Question ${bracket.questionNum + 1} of 7 ───` },
         { type: 'info', text: '' },
         { type: 'info', text: currentDilemma.text },
         { type: 'info', text: '' },
@@ -465,27 +565,31 @@
         const spec = window.MudAbilities?.getSpec(getClassForSpec(specId), specId);
         const name = spec?.name || specId.charAt(0).toUpperCase() + specId.slice(1);
         const flavor = SPEC_FLAVOR[specId] || '';
-        lines.push({ type: 'items', text: `  ${i + 1}. ${name} — ${flavor}` });
+        lines.push({ type: 'items', text: `  ${i + 1}. ${name} - ${flavor}` });
       });
       lines.push({ type: 'info', text: '' });
       lines.push({ type: 'success', text: 'Type the number or name of your choice.' });
       return lines;
     }
 
-    /** Show confirmation. */
+    /** Show confirmation with full appearance summary. */
     function showConfirm() {
       const race = RACES.find(r => r.id === choices.race);
       const specId = choices.spec;
       const cls = getClassForSpec(specId);
       const spec = window.MudAbilities?.getSpec(cls, specId);
       const specName = spec?.name || specId.charAt(0).toUpperCase() + specId.slice(1);
+      const desc = buildDescription(choices, specId);
 
       return [
-        { type: 'room-name', text: '─── Confirm Your Character ───' },
+        { type: 'room-name', text: '--- Confirm Your Character ---' },
         { type: 'info', text: '' },
+        { type: 'items', text: `  Name:  ${choices.name}` },
         { type: 'items', text: `  Race:  ${race.name}` },
         { type: 'items', text: `  Path:  ${specName}` },
         { type: 'items', text: `         ${SPEC_FLAVOR[specId] || ''}` },
+        { type: 'info', text: '' },
+        { type: 'info', text: `  ${desc}` },
         { type: 'info', text: '' },
         { type: 'success', text: 'Type "yes" to confirm or "restart" to start over.' }
       ];
@@ -497,7 +601,6 @@
       const specId = choices.spec;
       const baseClass = getClassForSpec(specId);
       const cStats = CLASS_STATS[baseClass];
-      // Get the tier 0 ability from the player's actual specialization
       const specAbilities = window.MudAbilities?.getSpecAbilities(baseClass, specId, 0) || [];
       const tier0 = specAbilities.find(a => a.tier === 0);
       const startAbility = tier0 ? tier0.id : null;
@@ -507,6 +610,12 @@
       const baseDef = 3;
 
       return {
+        name: choices.name,
+        gender: choices.gender,
+        hairColor: choices.hairColor,
+        eyeColor: choices.eyeColor,
+        bodyType: choices.bodyType,
+        description: buildDescription(choices, specId),
         race: race.id,
         raceName: race.name,
         baseClass: baseClass,
@@ -522,11 +631,12 @@
         focus: 50,
         maxFocus: 50,
         focusCostModifier: 0,
+        deaths: 0,
         abilities: startAbility ? [startAbility] : [],
         abilityCooldowns: {},
         inventory: [],
         equipped: {},
-        currentRoom: 101,  // Training Tower — Ground Floor
+        currentRoom: 101,
         visitedRooms: [],
         worldFlags: {},
         activeQuests: [],
@@ -569,12 +679,88 @@
           emit([
             { type: 'success', text: `You chose: ${race.name}` },
             { type: 'info', text: '' },
+            { type: 'info', text: 'A shape begins to form in the light. Your shape.' },
+            { type: 'info', text: '' },
+            { type: 'success', text: 'What is your name?' }
+          ]);
+          step = 'name';
+          return true;
+        }
+
+        case 'name': {
+          if (!input || input.length < 2 || input.length > 20) {
+            emit([{ type: 'error', text: 'Name must be 2-20 characters.' }]);
+            return true;
+          }
+          if (!/^[a-zA-Z][a-zA-Z0-9_ -]*$/.test(text.trim())) {
+            emit([{ type: 'error', text: 'Name must start with a letter. Letters, numbers, spaces, hyphens allowed.' }]);
+            return true;
+          }
+          choices.name = text.trim();
+          emit([
+            { type: 'success', text: `Name: ${choices.name}` },
+            { type: 'info', text: '' }
+          ]);
+          step = 'gender';
+          emit(showGenderChoice());
+          return true;
+        }
+
+        case 'gender': {
+          const gMap = { '1': 'M', '2': 'F', '3': 'N', 'm': 'M', 'f': 'F', 'n': 'N', 'male': 'M', 'female': 'F', 'neutral': 'N', 'nonbinary': 'N', 'non-binary': 'N' };
+          const g = gMap[input];
+          if (!g) {
+            emit([{ type: 'error', text: 'Choose 1 (Male), 2 (Female), or 3 (Neutral).' }]);
+            return true;
+          }
+          choices.gender = g;
+          step = 'hair';
+          emit(showHairChoice());
+          return true;
+        }
+
+        case 'hair': {
+          const hairIdx = parseInt(input, 10);
+          const hair = (hairIdx >= 1 && hairIdx <= HAIR_COLORS.length) ? HAIR_COLORS[hairIdx - 1] : HAIR_COLORS.find(h => h.toLowerCase() === input);
+          if (!hair) {
+            emit([{ type: 'error', text: `Choose 1-${HAIR_COLORS.length} or type a color name.` }]);
+            return true;
+          }
+          choices.hairColor = hair;
+          step = 'eyes';
+          emit(showEyeChoice());
+          return true;
+        }
+
+        case 'eyes': {
+          const eyeIdx = parseInt(input, 10);
+          const eye = (eyeIdx >= 1 && eyeIdx <= EYE_COLORS.length) ? EYE_COLORS[eyeIdx - 1] : EYE_COLORS.find(e => e.toLowerCase() === input);
+          if (!eye) {
+            emit([{ type: 'error', text: `Choose 1-${EYE_COLORS.length} or type a color name.` }]);
+            return true;
+          }
+          choices.eyeColor = eye;
+          step = 'body';
+          emit(showBodyChoice());
+          return true;
+        }
+
+        case 'body': {
+          const bodyIdx = parseInt(input, 10);
+          const body = (bodyIdx >= 1 && bodyIdx <= BODY_TYPES.length) ? BODY_TYPES[bodyIdx - 1] : BODY_TYPES.find(b => b.toLowerCase() === input);
+          if (!body) {
+            emit([{ type: 'error', text: `Choose 1-${BODY_TYPES.length} or type a body type.` }]);
+            return true;
+          }
+          choices.bodyType = body;
+          emit([
+            { type: 'success', text: `Appearance set.` },
+            { type: 'info', text: '' },
             { type: 'info', text: 'Before you stands a weathered woman at a crossroads.' },
-            { type: 'info', text: 'She deals no cards, reads no palms — only asks questions.' },
+            { type: 'info', text: 'She deals no cards, reads no palms. Only asks questions.' },
             { type: 'info', text: '"Answer honestly," she says. "There are no wrong answers."' },
             { type: 'info', text: '' }
           ]);
-          // Initialize the tournament bracket
           bracket = createBracket();
           currentDilemma = getDilemma(bracket.matchups[0][0], bracket.matchups[0][1]);
           step = 'quiz';
@@ -653,7 +839,7 @@
             onComplete(playerData);
             return false;
           } else if (['restart','no','n','nope','redo','back','reset','start over'].includes(input)) {
-            choices = { race: null, spec: null };
+            choices = { race: null, spec: null, name: null, gender: null, hairColor: null, eyeColor: null, bodyType: null };
             bracket = null;
             currentDilemma = null;
             topSpecs = [];

@@ -71,7 +71,7 @@
         }
         const output = [{ type: 'dialogue', text: `${mob.name} says: "I could use some help with something..."` }];
         for (const q of available) {
-          output.push({ type: 'quest', text: `  "${q.name}" — ${q.description}` });
+          output.push({ type: 'quest', text: `  "${q.name}" - ${q.description}` });
           output.push({ type: 'info', text: `  Type 'quest ${q.name.toLowerCase()}' to accept.` });
         }
         return output;

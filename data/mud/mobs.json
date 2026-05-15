@@ -802,7 +802,8 @@
       }
     ],
     "flags": [
-      "npc"
+      "npc",
+      "merchant"
     ],
     "sayResponses": [
       {
@@ -969,7 +970,8 @@
       }
     ],
     "flags": [
-      "npc"
+      "npc",
+      "merchant"
     ],
     "keywords": [
       "blacksmith apprentice",
@@ -1168,7 +1170,8 @@
     },
     "loot_table": [
       221,
-      286
+      286,
+      9810
     ],
     "respawn": 60,
     "dialogue": [],
@@ -1779,7 +1782,8 @@
       }
     ],
     "flags": [
-      "npc"
+      "npc",
+      "merchant"
     ],
     "keywords": [
       "neon district vendor",
@@ -1887,7 +1891,8 @@
       }
     ],
     "flags": [
-      "npc"
+      "npc",
+      "merchant"
     ],
     "keywords": [
       "street doc",
@@ -2302,7 +2307,8 @@
     },
     "loot_table": [
       233,
-      272
+      272,
+      9811
     ],
     "respawn": 20,
     "dialogue": [],
@@ -2704,7 +2710,8 @@
       }
     ],
     "flags": [
-      "npc"
+      "npc",
+      "merchant"
     ],
     "keywords": [
       "bartender"
@@ -2946,7 +2953,8 @@
       }
     ],
     "flags": [
-      "npc"
+      "npc",
+      "merchant"
     ],
     "keywords": [
       "dockside fence",
@@ -3359,7 +3367,8 @@
     },
     "loot_table": [
       209,
-      251
+      251,
+      9812
     ],
     "respawn": 60,
     "dialogue": [],
@@ -3642,7 +3651,8 @@
       }
     ],
     "flags": [
-      "npc"
+      "npc",
+      "merchant"
     ],
     "sayResponses": [
       {
@@ -3681,7 +3691,8 @@
       }
     ],
     "flags": [
-      "npc"
+      "npc",
+      "merchant"
     ],
     "keywords": [
       "combat medic",
@@ -3816,7 +3827,8 @@
     },
     "loot_table": [
       287,
-      211
+      211,
+      9813
     ],
     "respawn": 30,
     "dialogue": [],
@@ -4539,7 +4551,8 @@
       }
     ],
     "flags": [
-      "npc"
+      "npc",
+      "merchant"
     ],
     "keywords": [
       "astral merchant",
@@ -4590,7 +4603,9 @@
       "attack": 58,
       "defense": 38
     },
-    "loot_table": [],
+    "loot_table": [
+      2010
+    ],
     "respawn": 45,
     "dialogue": [],
     "flags": [
@@ -4613,7 +4628,9 @@
       "attack": 59,
       "defense": 53
     },
-    "loot_table": [],
+    "loot_table": [
+      5010
+    ],
     "respawn": 60,
     "dialogue": [],
     "flags": [
@@ -4636,7 +4653,9 @@
       "attack": 59,
       "defense": 40
     },
-    "loot_table": [],
+    "loot_table": [
+      1001
+    ],
     "respawn": 60,
     "dialogue": [],
     "flags": [
@@ -4737,7 +4756,9 @@
       "attack": 64,
       "defense": 34
     },
-    "loot_table": [],
+    "loot_table": [
+      3015
+    ],
     "respawn": 90,
     "dialogue": [],
     "flags": [
@@ -4808,7 +4829,9 @@
       "attack": 47,
       "defense": 18
     },
-    "loot_table": [],
+    "loot_table": [
+      201
+    ],
     "respawn": 20,
     "dialogue": [],
     "flags": [
@@ -4831,7 +4854,9 @@
       "attack": 48,
       "defense": 16
     },
-    "loot_table": [],
+    "loot_table": [
+      3016
+    ],
     "respawn": 15,
     "dialogue": [],
     "flags": [
@@ -4854,7 +4879,9 @@
       "attack": 51,
       "defense": 25
     },
-    "loot_table": [],
+    "loot_table": [
+      6005
+    ],
     "respawn": 25,
     "dialogue": [],
     "flags": [
@@ -4877,7 +4904,9 @@
       "attack": 51,
       "defense": 23
     },
-    "loot_table": [],
+    "loot_table": [
+      202
+    ],
     "respawn": 60,
     "dialogue": [],
     "flags": [
@@ -4900,7 +4929,9 @@
       "attack": 39,
       "defense": 49
     },
-    "loot_table": [],
+    "loot_table": [
+      240
+    ],
     "respawn": 60,
     "dialogue": [],
     "flags": [
@@ -4923,7 +4954,9 @@
       "attack": 48,
       "defense": 38
     },
-    "loot_table": [],
+    "loot_table": [
+      4006
+    ],
     "respawn": 90,
     "dialogue": [],
     "flags": [
@@ -4946,7 +4979,9 @@
       "attack": 53,
       "defense": 26
     },
-    "loot_table": [],
+    "loot_table": [
+      5009
+    ],
     "respawn": 75,
     "dialogue": [],
     "flags": [
@@ -5001,7 +5036,9 @@
       "attack": 52,
       "defense": 30
     },
-    "loot_table": [],
+    "loot_table": [
+      4003
+    ],
     "respawn": 75,
     "dialogue": [],
     "flags": [
@@ -5024,7 +5061,9 @@
       "attack": 63,
       "defense": 13
     },
-    "loot_table": [],
+    "loot_table": [
+      203
+    ],
     "respawn": 75,
     "dialogue": [],
     "flags": [
@@ -5045,7 +5084,9 @@
       "attack": 47,
       "defense": 35
     },
-    "loot_table": [],
+    "loot_table": [
+      4
+    ],
     "respawn": 45,
     "dialogue": [],
     "flags": [
@@ -5068,7 +5109,9 @@
       "attack": 52,
       "defense": 32
     },
-    "loot_table": [],
+    "loot_table": [
+      6013
+    ],
     "respawn": 90,
     "dialogue": [],
     "flags": [
@@ -5091,7 +5134,9 @@
       "attack": 47,
       "defense": 26
     },
-    "loot_table": [],
+    "loot_table": [
+      1013
+    ],
     "respawn": 75,
     "dialogue": [],
     "flags": [
@@ -5114,7 +5159,9 @@
       "attack": 52,
       "defense": 31
     },
-    "loot_table": [],
+    "loot_table": [
+      204
+    ],
     "respawn": 90,
     "dialogue": [],
     "flags": [
@@ -5138,7 +5185,9 @@
       "attack": 42,
       "defense": 48
     },
-    "loot_table": [],
+    "loot_table": [
+      4002
+    ],
     "respawn": 90,
     "dialogue": [],
     "flags": [
@@ -5161,7 +5210,9 @@
       "attack": 62,
       "defense": 16
     },
-    "loot_table": [],
+    "loot_table": [
+      5
+    ],
     "respawn": 90,
     "dialogue": [],
     "flags": [
@@ -5185,7 +5236,9 @@
       "attack": 43,
       "defense": 47
     },
-    "loot_table": [],
+    "loot_table": [
+      2019
+    ],
     "respawn": 75,
     "dialogue": [],
     "flags": [
@@ -5208,7 +5261,9 @@
       "attack": 54,
       "defense": 38
     },
-    "loot_table": [],
+    "loot_table": [
+      1009
+    ],
     "respawn": 120,
     "dialogue": [],
     "flags": [
@@ -5231,7 +5286,9 @@
       "attack": 53,
       "defense": 26
     },
-    "loot_table": [],
+    "loot_table": [
+      231
+    ],
     "respawn": 90,
     "dialogue": [],
     "flags": [
@@ -5286,7 +5343,9 @@
       "attack": 49,
       "defense": 36
     },
-    "loot_table": [],
+    "loot_table": [
+      3001
+    ],
     "respawn": 120,
     "dialogue": [],
     "flags": [
@@ -5309,7 +5368,9 @@
       "attack": 52,
       "defense": 38
     },
-    "loot_table": [],
+    "loot_table": [
+      5001
+    ],
     "respawn": 150,
     "dialogue": [],
     "flags": [
@@ -5364,7 +5425,9 @@
       "attack": 53,
       "defense": 27
     },
-    "loot_table": [],
+    "loot_table": [
+      4007
+    ],
     "respawn": 120,
     "dialogue": [],
     "flags": [
@@ -5398,7 +5461,8 @@
       }
     ],
     "flags": [
-      "npc"
+      "npc",
+      "merchant"
     ],
     "keywords": [
       "era",
@@ -5545,7 +5609,10 @@
       "attack": 16,
       "defense": 3
     },
-    "loot_table": [],
+    "loot_table": [
+      3010,
+      9814
+    ],
     "respawn": 30,
     "dialogue": [],
     "flags": [
@@ -5569,7 +5636,9 @@
       "attack": 24,
       "defense": 10
     },
-    "loot_table": [],
+    "loot_table": [
+      1002
+    ],
     "respawn": 60,
     "dialogue": [],
     "flags": [
@@ -5592,7 +5661,9 @@
       "attack": 19,
       "defense": 19
     },
-    "loot_table": [],
+    "loot_table": [
+      4018
+    ],
     "respawn": 60,
     "dialogue": [],
     "flags": [
@@ -5615,7 +5686,9 @@
       "attack": 30,
       "defense": 14
     },
-    "loot_table": [],
+    "loot_table": [
+      3011
+    ],
     "respawn": 90,
     "dialogue": [],
     "flags": [
@@ -5638,7 +5711,9 @@
       "attack": 38,
       "defense": 27
     },
-    "loot_table": [],
+    "loot_table": [
+      5005
+    ],
     "respawn": 120,
     "dialogue": [],
     "flags": [
@@ -5685,7 +5760,9 @@
       "attack": 8,
       "defense": 4
     },
-    "loot_table": [],
+    "loot_table": [
+      4008
+    ],
     "respawn": 10,
     "dialogue": [],
     "flags": [
@@ -5708,7 +5785,9 @@
       "attack": 9,
       "defense": 4
     },
-    "loot_table": [],
+    "loot_table": [
+      213
+    ],
     "respawn": 20,
     "dialogue": [],
     "flags": [
@@ -5731,7 +5810,9 @@
       "attack": 10,
       "defense": 2
     },
-    "loot_table": [],
+    "loot_table": [
+      5014
+    ],
     "respawn": 25,
     "dialogue": [],
     "flags": [
@@ -5744,27 +5825,21 @@
     ]
   },
   "1710": {
-    "vnum": 1710,
-    "name": "Mold Colony",
-    "description": "A patch of aggressive mold that launches spores at warm bodies.",
-    "hostile": true,
+    "name": "Undercity Pawnbroker",
+    "description": "A hunched figure behind a cage of rusted bars, appraising items with a jeweler's loupe.",
     "stats": {
-      "hp": 69,
-      "max_hp": 60,
-      "attack": 11,
-      "defense": 5
+      "hp": 100,
+      "attack": 1,
+      "defense": 50
     },
-    "loot_table": [],
-    "respawn": 30,
-    "dialogue": [],
     "flags": [
+      "npc",
+      "merchant",
       "stationary"
     ],
-    "keywords": [
-      "mold colony",
-      "mold",
-      "colony"
-    ]
+    "dialogue": {
+      "greeting": "Got something to sell? Or looking to buy? I've got... things."
+    }
   },
   "1711": {
     "vnum": 1711,
@@ -5777,7 +5852,9 @@
       "attack": 14,
       "defense": 2
     },
-    "loot_table": [],
+    "loot_table": [
+      6002
+    ],
     "respawn": 25,
     "dialogue": [],
     "flags": [
@@ -5800,7 +5877,9 @@
       "attack": 14,
       "defense": 4
     },
-    "loot_table": [],
+    "loot_table": [
+      5002
+    ],
     "respawn": 30,
     "dialogue": [],
     "flags": [
@@ -5823,7 +5902,9 @@
       "attack": 18,
       "defense": 14
     },
-    "loot_table": [],
+    "loot_table": [
+      6003
+    ],
     "respawn": 90,
     "dialogue": [],
     "flags": [
@@ -5846,7 +5927,9 @@
       "attack": 14,
       "defense": 10
     },
-    "loot_table": [],
+    "loot_table": [
+      206
+    ],
     "respawn": 60,
     "dialogue": [],
     "flags": [
@@ -5869,7 +5952,9 @@
       "attack": 17,
       "defense": 8
     },
-    "loot_table": [],
+    "loot_table": [
+      212
+    ],
     "respawn": 75,
     "dialogue": [],
     "flags": [
@@ -5892,7 +5977,9 @@
       "attack": 13,
       "defense": 5
     },
-    "loot_table": [],
+    "loot_table": [
+      214
+    ],
     "respawn": 45,
     "dialogue": [],
     "flags": [
@@ -5915,7 +6002,9 @@
       "attack": 16,
       "defense": 8
     },
-    "loot_table": [],
+    "loot_table": [
+      4001
+    ],
     "respawn": 75,
     "dialogue": [],
     "flags": [
@@ -5938,7 +6027,9 @@
       "attack": 14,
       "defense": 11
     },
-    "loot_table": [],
+    "loot_table": [
+      6016
+    ],
     "respawn": 75,
     "dialogue": [],
     "flags": [
@@ -5961,7 +6052,9 @@
       "attack": 16,
       "defense": 15
     },
-    "loot_table": [],
+    "loot_table": [
+      2003
+    ],
     "respawn": 120,
     "dialogue": [],
     "flags": [
@@ -6103,7 +6196,9 @@
       "attack": 15,
       "defense": 15
     },
-    "loot_table": [],
+    "loot_table": [
+      6001
+    ],
     "respawn": 30,
     "dialogue": [],
     "flags": [
@@ -6126,7 +6221,9 @@
       "attack": 25,
       "defense": 25
     },
-    "loot_table": [],
+    "loot_table": [
+      1012
+    ],
     "respawn": 60,
     "dialogue": [],
     "flags": [
@@ -6149,7 +6246,9 @@
       "attack": 1,
       "defense": 1
     },
-    "loot_table": [],
+    "loot_table": [
+      3003
+    ],
     "respawn": 120,
     "dialogue": [],
     "flags": [
@@ -6196,7 +6295,9 @@
       "attack": 5,
       "defense": 5
     },
-    "loot_table": [],
+    "loot_table": [
+      2012
+    ],
     "respawn": 30,
     "dialogue": [],
     "flags": [
@@ -6244,7 +6345,9 @@
       "attack": 20,
       "defense": 15
     },
-    "loot_table": [],
+    "loot_table": [
+      2005
+    ],
     "respawn": 45,
     "dialogue": [],
     "flags": [
@@ -6268,7 +6371,9 @@
       "attack": 1,
       "defense": 1
     },
-    "loot_table": [],
+    "loot_table": [
+      6004
+    ],
     "respawn": 120,
     "dialogue": [],
     "flags": [
@@ -6527,7 +6632,9 @@
       "attack": 71,
       "defense": 17
     },
-    "loot_table": [],
+    "loot_table": [
+      3002
+    ],
     "respawn": 15,
     "dialogue": [],
     "flags": [
@@ -6550,7 +6657,9 @@
       "attack": 62,
       "defense": 23
     },
-    "loot_table": [],
+    "loot_table": [
+      4017
+    ],
     "respawn": 25,
     "dialogue": [],
     "flags": [
@@ -6573,7 +6682,9 @@
       "attack": 67,
       "defense": 22
     },
-    "loot_table": [],
+    "loot_table": [
+      3005
+    ],
     "respawn": 30,
     "dialogue": [],
     "flags": [
@@ -6596,7 +6707,9 @@
       "attack": 66,
       "defense": 33
     },
-    "loot_table": [],
+    "loot_table": [
+      5004
+    ],
     "respawn": 45,
     "dialogue": [],
     "flags": [
@@ -6642,7 +6755,9 @@
       "attack": 70,
       "defense": 38
     },
-    "loot_table": [],
+    "loot_table": [
+      3004
+    ],
     "respawn": 60,
     "dialogue": [],
     "flags": [
@@ -7283,7 +7398,8 @@
       }
     ],
     "flags": [
-      "npc"
+      "npc",
+      "merchant"
     ],
     "keywords": [
       "quartermaster pip",
@@ -7302,7 +7418,9 @@
       "attack": 22,
       "defense": 15
     },
-    "loot_table": [],
+    "loot_table": [
+      241
+    ],
     "respawn": 0,
     "flags": [
       "no_attack",
@@ -7374,5 +7492,77 @@
       "aldric",
       "distraught"
     ]
+  },
+  "8020": {
+    "name": "Gravity Chamber Technician",
+    "description": "A wiry technician in a lab coat, surrounded by floating equipment modules.",
+    "stats": {
+      "hp": 200,
+      "attack": 1,
+      "defense": 80
+    },
+    "flags": [
+      "npc",
+      "merchant",
+      "stationary"
+    ],
+    "dialogue": {
+      "greeting": "Need supplies for your training? I've got the good stuff."
+    }
+  },
+  "9010": {
+    "name": "Spectral Vendor",
+    "description": "A translucent figure that flickers between planes, its wares hovering in mid-air.",
+    "stats": {
+      "hp": 300,
+      "attack": 1,
+      "defense": 100
+    },
+    "flags": [
+      "npc",
+      "merchant",
+      "stationary"
+    ],
+    "dialogue": {
+      "greeting": "Even the dead need supplies... browse freely, traveler."
+    }
+  },
+  "8099": {
+    "name": "Gravity Core Sentinel",
+    "description": "A towering construct of folded spacetime, its body rippling with gravitational distortions. The air around it bends light into prismatic halos.",
+    "stats": {
+      "hp": 3000,
+      "attack": 800,
+      "defense": 400
+    },
+    "flags": [
+      "boss",
+      "stationary"
+    ],
+    "loot_table": [
+      194
+    ],
+    "dialogue": {
+      "telegraph": "The Sentinel compresses space around its fist..."
+    }
+  },
+  "9099": {
+    "name": "The Hollow King",
+    "description": "A skeletal monarch wreathed in pale fire, seated on a throne of petrified screams. Its crown pulses with the memories of a thousand forgotten worlds.",
+    "stats": {
+      "hp": 5000,
+      "attack": 1200,
+      "defense": 600
+    },
+    "flags": [
+      "boss",
+      "stationary"
+    ],
+    "loot_table": [
+      195
+    ],
+    "dialogue": {
+      "telegraph": "The Hollow King raises his scepter, drawing power from the void..."
+    }
   }
 }

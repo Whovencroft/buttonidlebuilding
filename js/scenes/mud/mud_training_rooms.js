@@ -140,7 +140,7 @@
     }
 
     if (sessionCount + 1 >= DIMINISHING_THRESHOLD) {
-      output.push({ type: 'info', text: '  (Diminishing returns — consider resting or fighting instead.)' });
+      output.push({ type: 'info', text: '  (Diminishing returns - consider resting or fighting instead.)' });
     }
 
     trainingState.active = false;

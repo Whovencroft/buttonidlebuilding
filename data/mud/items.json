@@ -2453,5 +2453,131 @@
     "flags": [
       "quest_item"
     ]
+  },
+  "9901": {
+    "vnum": 9901,
+    "zone": 0,
+    "name": "Respec Token",
+    "description": "A shimmering token that hums with potential. Using it will reset your specialization, allowing you to choose a new path.",
+    "type": "consumable",
+    "stats": {
+      "respec": true
+    },
+    "rarity": "rare",
+    "value": 0
+  },
+  "9902": {
+    "vnum": 9902,
+    "zone": 0,
+    "name": "XP Tome",
+    "description": "A thick tome crackling with absorbed experience. Reading it floods your mind with insight, boosting all core stats.",
+    "type": "consumable",
+    "stats": {
+      "stat_boost": 5
+    },
+    "rarity": "rare",
+    "value": 0
+  },
+  "9903": {
+    "vnum": 9903,
+    "zone": 0,
+    "name": "Treasure Map",
+    "description": "A weathered parchment with cryptic markings. Using it reveals the location of a hidden room in a random zone.",
+    "type": "consumable",
+    "stats": {
+      "reveal_hidden": true
+    },
+    "rarity": "uncommon",
+    "value": 0
+  },
+  "9801": {
+    "vnum": 9801,
+    "zone": 0,
+    "name": "Tarnished Compass",
+    "description": "Points in no particular direction. Might be worth something to a collector.",
+    "type": "junk",
+    "value": 30,
+    "rarity": "common"
+  },
+  "9802": {
+    "vnum": 9802,
+    "zone": 0,
+    "name": "Cracked Prism",
+    "description": "Splits light into strange colors that don't exist. Worthless... probably.",
+    "type": "junk",
+    "value": 50,
+    "rarity": "uncommon"
+  },
+  "9803": {
+    "vnum": 9803,
+    "zone": 0,
+    "name": "Sealed Letter",
+    "description": "Addressed to someone who doesn't exist. The wax seal is unbreakable.",
+    "type": "junk",
+    "value": 40,
+    "rarity": "common"
+  },
+  "9804": {
+    "vnum": 9804,
+    "zone": 0,
+    "name": "Hollow Sphere",
+    "description": "Perfectly round, perfectly empty. It hums when you hold it to your ear.",
+    "type": "junk",
+    "value": 75,
+    "rarity": "uncommon"
+  },
+  "9805": {
+    "vnum": 9805,
+    "zone": 0,
+    "name": "Faded Blueprint",
+    "description": "Plans for something that was never built. Or was it?",
+    "type": "junk",
+    "value": 60,
+    "rarity": "uncommon"
+  },
+  "9810": {
+    "vnum": 9810,
+    "zone": 2,
+    "name": "Neon District Keycard",
+    "description": "A glowing keycard that unlocks restricted areas in the Neon District.",
+    "type": "key",
+    "value": 0,
+    "rarity": "uncommon"
+  },
+  "9811": {
+    "vnum": 9811,
+    "zone": 3,
+    "name": "Rusty Dock Key",
+    "description": "A corroded iron key. Opens something in the Docks.",
+    "type": "key",
+    "value": 0,
+    "rarity": "common"
+  },
+  "9812": {
+    "vnum": 9812,
+    "zone": 4,
+    "name": "Officer's Keyring",
+    "description": "A ring of military keys. Opens secured areas in the Warzone.",
+    "type": "key",
+    "value": 0,
+    "rarity": "uncommon"
+  },
+  "9813": {
+    "vnum": 9813,
+    "zone": 5,
+    "name": "Astral Shard Key",
+    "description": "A crystallized key that resonates with astral energy.",
+    "type": "key",
+    "value": 0,
+    "rarity": "rare"
+  },
+  "9814": {
+    "vnum": 9814,
+    "zone": 7,
+    "name": "Undercity Skeleton Key",
+    "description": "A thin bone key that fits most locks in the Undercity.",
+    "type": "key",
+    "value": 0,
+    "rarity": "rare"
   }
 }

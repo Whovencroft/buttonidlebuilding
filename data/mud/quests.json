@@ -25,7 +25,8 @@
     ],
     "rewards": {
       "gold": 25,
-      "message": "Vex nods approvingly. 'Good. You know the lay of the land now.'"
+      "message": "Vex nods approvingly. 'Good. You know the lay of the land now.'",
+      "qp": 6
     }
   },
   "q_hub_02": {
@@ -45,7 +46,8 @@
     "give_on_accept": 50,
     "rewards": {
       "gold": 15,
-      "message": "The Archivist takes the package. 'Ah, the texts I ordered. Thank you.'"
+      "message": "The Archivist takes the package. 'Ah, the texts I ordered. Thank you.'",
+      "qp": 2
     }
   },
   "q_hub_03": {
@@ -65,7 +67,8 @@
     "rewards": {
       "gold": 20,
       "item": 52,
-      "message": "'My grandmother's pendant! Thank you so much. Please, take this charm.'"
+      "message": "'My grandmother's pendant! Thank you so much. Please, take this charm.'",
+      "qp": 2
     },
     "red_herring": false
   },
@@ -87,7 +90,8 @@
     "rewards": {
       "gold": 30,
       "attack_bonus": 1,
-      "message": "'Fine pelts! Here's your payment, and I've reinforced your grip \u2014 you'll hit harder now.'"
+      "message": "'Fine pelts! Here's your payment, and I've reinforced your grip \u2014 you'll hit harder now.'",
+      "qp": 2
     }
   },
   "q_z1_02": {
@@ -108,7 +112,8 @@
     "rewards": {
       "gold": 20,
       "heal_bonus": 5,
-      "message": "'Wonderful! These will save lives. Here \u2014 I've brewed you a tonic that permanently strengthens your constitution.'"
+      "message": "'Wonderful! These will save lives. Here \u2014 I've brewed you a tonic that permanently strengthens your constitution.'",
+      "qp": 2
     }
   },
   "q_z1_03": {
@@ -132,7 +137,8 @@
     ],
     "rewards": {
       "gold": 0,
-      "message": "'Ha! You actually followed it? That compass doesn't point anywhere. Consider it a lesson in skepticism, friend.'"
+      "message": "'Ha! You actually followed it? That compass doesn't point anywhere. Consider it a lesson in skepticism, friend.'",
+      "qp": 4
     },
     "red_herring": true
   },
@@ -154,7 +160,8 @@
     "rewards": {
       "gold": 50,
       "item": 1051,
-      "message": "'The roads are safer now. Take this \u2014 we found it in their loot pile.'"
+      "message": "'The roads are safer now. Take this \u2014 we found it in their loot pile.'",
+      "qp": 2
     }
   },
   "q_z1_05": {
@@ -178,7 +185,8 @@
     ],
     "rewards": {
       "gold": 5,
-      "message": "'Hmm, it doesn't sing for you either? Perhaps it only sings for round things. Interesting...'"
+      "message": "'Hmm, it doesn't sing for you either? Perhaps it only sings for round things. Interesting...'",
+      "qp": 4
     },
     "red_herring": true
   },
@@ -200,7 +208,8 @@
     "rewards": {
       "gold": 35,
       "defense_bonus": 1,
-      "message": "'Bless you, traveler. The stars will watch over you now.'"
+      "message": "'Bless you, traveler. The stars will watch over you now.'",
+      "qp": 2
     }
   },
   "q_z2_01": {
@@ -220,7 +229,8 @@
     "give_on_accept": 2050,
     "rewards": {
       "gold": 40,
-      "message": "'Clean delivery. You're good at this. Here's your cut.'"
+      "message": "'Clean delivery. You're good at this. Here's your cut.'",
+      "qp": 2
     }
   },
   "q_z2_02": {
@@ -241,7 +251,8 @@
     "rewards": {
       "gold": 45,
       "item": 2051,
-      "message": "'Beautiful. These processors are worth a fortune. Here \u2014 I modded something for you.'"
+      "message": "'Beautiful. These processors are worth a fortune. Here \u2014 I modded something for you.'",
+      "qp": 2
     }
   },
   "q_z2_03": {
@@ -265,7 +276,8 @@
     ],
     "rewards": {
       "gold": 10,
-      "message": "'The fragment is corrupted. It just keeps repeating coordinates that don't exist. Dead end. Sorry, choom.'"
+      "message": "'The fragment is corrupted. It just keeps repeating coordinates that don't exist. Dead end. Sorry, choom.'",
+      "qp": 4
     },
     "red_herring": true
   },
@@ -287,7 +299,8 @@
     "rewards": {
       "gold": 55,
       "attack_bonus": 1,
-      "message": "'They won't bother me again. You're a lifesaver. Take this \u2014 military-grade stim.'"
+      "message": "'They won't bother me again. You're a lifesaver. Take this \u2014 military-grade stim.'",
+      "qp": 2
     }
   },
   "q_z2_05": {
@@ -316,7 +329,8 @@
     ],
     "rewards": {
       "gold": 35,
-      "message": "'The signal was just an old automated ad loop. Decades old. Nothing useful. But hey, you mapped those towers for me.'"
+      "message": "'The signal was just an old automated ad loop. Decades old. Nothing useful. But hey, you mapped those towers for me.'",
+      "qp": 6
     },
     "red_herring": true
   },
@@ -341,7 +355,8 @@
     ],
     "rewards": {
       "gold": 40,
-      "message": "'He was hiding from his gambling debts? That fool. Thank you, detective.'"
+      "message": "'He was hiding from his gambling debts? That fool. Thank you, detective.'",
+      "qp": 4
     }
   },
   "q_z3_02": {
@@ -362,7 +377,8 @@
     "rewards": {
       "gold": 25,
       "item": 3050,
-      "message": "'Drinks are on the house tonight. And take this \u2014 found it in the rat nest.'"
+      "message": "'Drinks are on the house tonight. And take this \u2014 found it in the rat nest.'",
+      "qp": 2
     }
   },
   "q_z3_03": {
@@ -391,7 +407,8 @@
     ],
     "rewards": {
       "gold": 5,
-      "message": "'Turns out it was just a ball bearing from a busted machine. The informant sends his apologies. And his bar tab.'"
+      "message": "'Turns out it was just a ball bearing from a busted machine. The informant sends his apologies. And his bar tab.'",
+      "qp": 6
     },
     "red_herring": true
   },
@@ -417,7 +434,8 @@
     "rewards": {
       "gold": 60,
       "defense_bonus": 1,
-      "message": "'This is enough to put him away. The city owes you. Here \u2014 bulletproof vest, courtesy of the department.'"
+      "message": "'This is enough to put him away. The city owes you. Here \u2014 bulletproof vest, courtesy of the department.'",
+      "qp": 4
     }
   },
   "q_z3_05": {
@@ -436,7 +454,8 @@
     ],
     "rewards": {
       "gold": 0,
-      "message": "'There's no ghost. Just pigeons and a broken window that makes weird sounds. Classic misdirection.'"
+      "message": "'There's no ghost. Just pigeons and a broken window that makes weird sounds. Classic misdirection.'",
+      "qp": 2
     },
     "red_herring": true
   },
@@ -457,7 +476,8 @@
     "rewards": {
       "gold": 50,
       "attack_bonus": 2,
-      "message": "'Hell yeah! Now we're talking. Take one for yourself \u2014 you earned it, soldier.'"
+      "message": "'Hell yeah! Now we're talking. Take one for yourself \u2014 you earned it, soldier.'",
+      "qp": 2
     }
   },
   "q_z4_02": {
@@ -486,7 +506,8 @@
     ],
     "rewards": {
       "gold": 65,
-      "message": "'BOOM! Beautiful. Three for three. Here's your hazard pay.'"
+      "message": "'BOOM! Beautiful. Three for three. Here's your hazard pay.'",
+      "qp": 6
     }
   },
   "q_z4_03": {
@@ -505,7 +526,8 @@
     ],
     "rewards": {
       "gold": 10,
-      "message": "'The map shows... supply routes. That's it. The defector was wrong. Or lying. Probably lying.'"
+      "message": "'The map shows... supply routes. That's it. The defector was wrong. Or lying. Probably lying.'",
+      "qp": 2
     },
     "red_herring": true
   },
@@ -527,7 +549,8 @@
     "rewards": {
       "gold": 55,
       "defense_bonus": 2,
-      "message": "'You saved our boys. The brass is impressed. Take this armor upgrade \u2014 you'll need it.'"
+      "message": "'You saved our boys. The brass is impressed. Take this armor upgrade \u2014 you'll need it.'",
+      "qp": 2
     }
   },
   "q_z4_05": {
@@ -547,7 +570,8 @@
     "rewards": {
       "gold": 45,
       "item": 4053,
-      "message": "'The black box is secure. Intel says there's something interesting in the flight data. Here \u2014 take these night-vision goggles.'"
+      "message": "'The black box is secure. Intel says there's something interesting in the flight data. Here \u2014 take these night-vision goggles.'",
+      "qp": 2
     }
   },
   "q_z5_01": {
@@ -568,7 +592,8 @@
     "rewards": {
       "gold": 40,
       "attack_bonus": 1,
-      "message": "'The spirits are at peace. Your ki grows stronger with each act of compassion.'"
+      "message": "'The spirits are at peace. Your ki grows stronger with each act of compassion.'",
+      "qp": 2
     }
   },
   "q_z5_02": {
@@ -589,7 +614,8 @@
     "rewards": {
       "gold": 30,
       "heal_bonus": 10,
-      "message": "'Exquisite. Drink this tea \u2014 it will permanently fortify your body.'"
+      "message": "'Exquisite. Drink this tea \u2014 it will permanently fortify your body.'",
+      "qp": 2
     }
   },
   "q_z5_03": {
@@ -618,7 +644,8 @@
     ],
     "rewards": {
       "gold": 5,
-      "message": "'The dragon whispers... nothing about a marble. It just complains about the weather. Dragons are like that.'"
+      "message": "'The dragon whispers... nothing about a marble. It just complains about the weather. Dragons are like that.'",
+      "qp": 6
     },
     "red_herring": true
   },
@@ -653,7 +680,8 @@
       "gold": 80,
       "attack_bonus": 2,
       "item": 5051,
-      "message": "'You are the new champion! Take this legendary blade \u2014 you've earned it.'"
+      "message": "'You are the new champion! Take this legendary blade \u2014 you've earned it.'",
+      "qp": 6
     }
   },
   "q_z5_05": {
@@ -672,7 +700,8 @@
     ],
     "rewards": {
       "gold": 0,
-      "message": "'The painting shows... a peach. She painted a peach. It's a very nice peach, but it's not a marble.'"
+      "message": "'The painting shows... a peach. She painted a peach. It's a very nice peach, but it's not a marble.'",
+      "qp": 2
     },
     "red_herring": true
   },
@@ -694,7 +723,8 @@
     "rewards": {
       "gold": 50,
       "defense_bonus": 2,
-      "message": "'The crowd loves you! Here \u2014 gladiator's armor. You've earned the right to wear it.'"
+      "message": "'The crowd loves you! Here \u2014 gladiator's armor. You've earned the right to wear it.'",
+      "qp": 2
     }
   },
   "q_z6_02": {
@@ -714,7 +744,8 @@
     ],
     "rewards": {
       "gold": 35,
-      "message": "'Fascinating! These describe trade routes from a thousand years ago. Here's your fee.'"
+      "message": "'Fascinating! These describe trade routes from a thousand years ago. Here's your fee.'",
+      "qp": 2
     }
   },
   "q_z6_03": {
@@ -733,7 +764,8 @@
     ],
     "rewards": {
       "gold": 0,
-      "message": "'The Oracle's visions are... unreliable. The tomb held only dust and bones. She apologizes. Sort of.'"
+      "message": "'The Oracle's visions are... unreliable. The tomb held only dust and bones. She apologizes. Sort of.'",
+      "qp": 2
     },
     "red_herring": true
   },
@@ -755,7 +787,8 @@
     "rewards": {
       "gold": 45,
       "attack_bonus": 1,
-      "message": "'Good iron. The smiths will put it to use. And here \u2014 a blade forged from the last batch.'"
+      "message": "'Good iron. The smiths will put it to use. And here \u2014 a blade forged from the last batch.'",
+      "qp": 2
     }
   },
   "q_z6_05": {
@@ -776,7 +809,8 @@
     "rewards": {
       "gold": 55,
       "item": 6052,
-      "message": "'Safe passage! The merchants are grateful. Take this rare artifact they found on the road.'"
+      "message": "'Safe passage! The merchants are grateful. Take this rare artifact they found on the road.'",
+      "qp": 2
     }
   },
   "wizard_research": {
@@ -804,7 +838,10 @@
     "rewards": {
       "qp": 15,
       "gold": 200,
-      "power": 5
+      "power": 5,
+      "flags": [
+        "marble_clue"
+      ]
     },
     "repeat_rewards": {
       "qp": 3,
@@ -816,5 +853,113 @@
     ],
     "giver_vnum": 1200,
     "giver_room_vnum": 1125
+  },
+  "rh_compass": {
+    "name": "The Lost Navigator",
+    "description": "A ghost in the Docks claims their compass was stolen. Find it in the Neon District.",
+    "zone": 3,
+    "giver_mob": 1322,
+    "objectives": [
+      {
+        "type": "visit",
+        "target": 2028
+      },
+      {
+        "type": "has_item",
+        "target": 9801
+      }
+    ],
+    "rewards": {
+      "qp": 3,
+      "item": 9801,
+      "gold": 0,
+      "message": "The ghost takes one look at the compass and fades away without a word. Odd."
+    },
+    "red_herring": true
+  },
+  "rh_prism": {
+    "name": "Prismatic Research",
+    "description": "A researcher needs a cracked prism from the Astral Plane for their experiments.",
+    "zone": 5,
+    "giver_mob": 1525,
+    "objectives": [
+      {
+        "type": "visit",
+        "target": 5046
+      },
+      {
+        "type": "has_item",
+        "target": 9802
+      }
+    ],
+    "rewards": {
+      "qp": 4,
+      "item": 9802,
+      "gold": 0,
+      "message": "The researcher examines the prism, shrugs, and hands it back. 'Not what I needed after all.'"
+    },
+    "red_herring": true
+  },
+  "rh_letter": {
+    "name": "Undeliverable Mail",
+    "description": "The Bartender found a sealed letter behind the bar. Deliver it to room 3033.",
+    "zone": 3,
+    "giver_mob": 1322,
+    "objectives": [
+      {
+        "type": "visit",
+        "target": 3033
+      }
+    ],
+    "rewards": {
+      "qp": 2,
+      "item": 9803,
+      "gold": 0,
+      "message": "Nobody here knows who this letter is for. You keep it."
+    },
+    "red_herring": true
+  },
+  "rh_sphere": {
+    "name": "The Hollow Prize",
+    "description": "Legends speak of a hollow sphere hidden in the Forgotten Epoch. Find it.",
+    "zone": 6,
+    "giver_mob": 1630,
+    "objectives": [
+      {
+        "type": "visit",
+        "target": 4033
+      },
+      {
+        "type": "kill_count",
+        "target": 1601,
+        "count": 2
+      }
+    ],
+    "rewards": {
+      "qp": 5,
+      "item": 9804,
+      "gold": 0,
+      "message": "You found it. It's... hollow. Completely hollow. A merchant might pay for it though."
+    },
+    "red_herring": true
+  },
+  "rh_blueprint": {
+    "name": "Architect's Folly",
+    "description": "An old blueprint was spotted in the Warzone. Retrieve it before it's destroyed.",
+    "zone": 4,
+    "giver_mob": 1426,
+    "objectives": [
+      {
+        "type": "visit",
+        "target": 4014
+      }
+    ],
+    "rewards": {
+      "qp": 3,
+      "item": 9805,
+      "gold": 0,
+      "message": "The blueprint depicts a building that defies physics. Interesting, but useless."
+    },
+    "red_herring": true
   }
 }
