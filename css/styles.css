@@ -642,6 +642,17 @@ button, input, textarea, select { font: inherit; }
   line-height: 1.4;
 }
 
+.card-synergy {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #7cfc7c;
+  margin-top: var(--space-xs);
+  padding: 2px 6px;
+  background: rgba(124, 252, 124, 0.1);
+  border-radius: 3px;
+  display: inline-block;
+}
+
 .tag-row {
   display: flex;
   flex-wrap: wrap;

@@ -236,6 +236,18 @@
       output.push({ type: 'room-name', text: room.name });
       output.push({ type: 'room-desc', text: room.description });
 
+      // Show current weather if not clear
+      const currentWeather = zoneWeather[room.zone] || 'clear';
+      if (currentWeather !== 'clear') {
+        const weatherDesc = {
+          overcast: 'The sky is overcast, casting everything in muted grey.',
+          rain: 'Rain falls steadily here.',
+          fog: 'A thick fog limits visibility.',
+          storm: 'A storm rages overhead.'
+        };
+        output.push({ type: 'info', text: weatherDesc[currentWeather] });
+      }
+
       // List exits (only show directions that lead to valid rooms)
       const exits = Object.keys(room.exits || {}).filter(dir => {
         const ex = room.exits[dir];
@@ -281,6 +293,12 @@
       });
       if (aggressive) {
         output.push(...initiateCombat(aggressive));
+      }
+
+      // Meta-puzzle: one-time marble sighting (fires before clue discovery)
+      if (window.MudMetaPuzzle) {
+        const sightingOutput = window.MudMetaPuzzle.checkMarbleSighting(room, player);
+        if (sightingOutput.length > 0) output.push(...sightingOutput);
       }
 
       // Meta-puzzle: check for marble trail clues
@@ -831,6 +849,23 @@
     }
 
     /**
+     * Show current weather conditions in the player's zone.
+     */
+    function doWeather() {
+      const room = currentRoom();
+      if (!room) return [{ type: 'error', text: 'You cannot sense the weather here.' }];
+      const weather = zoneWeather[room.zone] || 'clear';
+      const descriptions = {
+        clear: 'The sky is clear. Visibility is excellent.',
+        overcast: 'Heavy clouds blanket the sky, but no rain falls yet.',
+        rain: 'Steady rain falls, slicking every surface. (-3% defense in combat)',
+        fog: 'Dense fog obscures the distance. (-5% accuracy for all combatants)',
+        storm: 'A violent storm rages. Lightning splits the sky. (+10% damage dealt and received)'
+      };
+      return [{ type: 'info', text: descriptions[weather] }];
+    }
+
+     /**
      * Dynamic help  -  pulls from the command registry if available,
      * otherwise shows a static fallback.
      */
@@ -855,6 +890,14 @@
     const AUTO_SAVE_INTERVAL = 60;
     let focusRegenTimer = 0;
     const FOCUS_REGEN_INTERVAL = 5; // seconds between passive focus ticks
+
+    // --- Weather system ---
+    // Cycles per zone every 5-10 minutes; affects ambient flavor and minor combat mods
+    const WEATHER_STATES = ['clear', 'overcast', 'rain', 'fog', 'storm'];
+    const WEATHER_CYCLE_MIN = 300;  // 5 minutes minimum
+    const WEATHER_CYCLE_MAX = 600;  // 10 minutes maximum
+    let weatherTimer = Math.random() * WEATHER_CYCLE_MIN;
+    let zoneWeather = {};  // { zoneId: 'rain', ... }
 
     /**
      * Write a note in the current room (max 280 chars).
@@ -2044,6 +2087,32 @@
         ambientTimer = 0;
       }
 
+      // Weather cycling - advance weather per zone periodically
+      weatherTimer += dt;
+      if (weatherTimer >= WEATHER_CYCLE_MIN) {
+        weatherTimer = -(Math.random() * (WEATHER_CYCLE_MAX - WEATHER_CYCLE_MIN));
+        const room = currentRoom();
+        if (room) {
+          const zone = room.zone;
+          const prev = zoneWeather[zone] || 'clear';
+          // Pick a new weather state different from current
+          let next;
+          do {
+            next = WEATHER_STATES[Math.floor(Math.random() * WEATHER_STATES.length)];
+          } while (next === prev && WEATHER_STATES.length > 1);
+          zoneWeather[zone] = next;
+          // Announce weather change
+          const weatherMessages = {
+            clear: 'The sky clears. Visibility improves.',
+            overcast: 'Clouds gather overhead, dimming the light.',
+            rain: 'Rain begins to fall, pattering against every surface.',
+            fog: 'A thick fog rolls in, obscuring the distance.',
+            storm: 'Thunder rumbles. A storm breaks overhead.'
+          };
+          pushCombatOutput([{ type: 'info', text: weatherMessages[next] }]);
+        }
+      }
+
       // Passive focus regen when out of combat
       if (!combatState && player.focus < player.maxFocus) {
         focusRegenTimer += dt;
@@ -2214,6 +2283,22 @@
           if (dw && dw.atkMod) buffAtkMod *= dw.atkMod;
           if (dw && dw.defMod) buffDefMod *= dw.defMod;
         }
+      }
+
+      // Weather combat modifiers
+      const room = currentRoom();
+      const weather = room ? (zoneWeather[room.zone] || 'clear') : 'clear';
+      if (weather === 'fog') {
+        // Fog: -5% accuracy for both sides (reduces effective attack)
+        buffAtkMod *= 0.95;
+        debuffMobAtkMod *= 0.95;
+      } else if (weather === 'storm') {
+        // Storm: +10% damage dealt and received (volatile combat)
+        buffAtkMod *= 1.10;
+        debuffMobAtkMod *= 1.10;
+      } else if (weather === 'rain') {
+        // Rain: -3% defense (slippery footing)
+        buffDefMod *= 0.97;
       }
 
       // Player attacks mob (with stat-derived variance, crit, initiative)
@@ -3376,7 +3461,10 @@
       set chargeState(v) { chargeState = v; },
       /** Pending system output queue (stat growth, etc.). */
       get pendingSystemOutput() { return pendingSystemOutput; },
-      set pendingSystemOutput(v) { pendingSystemOutput = v; }
+      set pendingSystemOutput(v) { pendingSystemOutput = v; },
+      /** Current zone weather state lookup. */
+      get zoneWeather() { return zoneWeather; },
+      doWeather
     };
 
     return {

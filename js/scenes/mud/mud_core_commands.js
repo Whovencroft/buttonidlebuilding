@@ -731,6 +731,16 @@
       }
     });
 
+    // ─── Weather ────────────────────────────────────────────────────────
+    window.MudCommands.register({
+      name: 'weather',
+      aliases: ['forecast', 'sky'],
+      category: 'Information',
+      help: 'Check current weather conditions',
+      usage: 'weather',
+      handler: () => fn.doWeather()
+    });
+
     // ─── Character Reset ──────────────────────────────────────────────
     window.MudCommands.register({
       name: 'reset',

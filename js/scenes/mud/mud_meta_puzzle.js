@@ -125,13 +125,60 @@
     ];
   }
 
-  /* ─── Public API ────────────────────────────────────────────────────────── */
+  /**
+   * One-time marble sighting messages per clue room.
+   * Each fires only on the player's FIRST visit to that room, before the
+   * clue discovery message. Uses worldFlags.marble_seen_<vnum> to track.
+   */
+  const MARBLE_SIGHTINGS = {
+    1050: 'Something small and luminous rolls across the tower floor and vanishes over the edge.',
+    2030: 'A flash of light catches your eye - something round ricochets off the junkyard gate and disappears into the scrap.',
+    3025: 'For an instant, you see it - a perfect sphere skipping across the water before sinking without a ripple.',
+    4030: 'A glint of impossible light arcs over the bunker wall. By the time you look up, it is gone.',
+    5030: 'The gravity well pulses once. At its center, something round and bright winks out of existence.',
+    6030: 'A sphere of light rolls down the chapel aisle and passes through the far wall as if it were not there.',
+    7015: 'In the darkness of the chamber, something perfectly round catches the faintest light - then it is swallowed by shadow.',
+    8014: 'A target downrange shatters. You glimpse something small and round embedded in the wall before it dissolves.',
+    9015: 'The pool ripples. For one heartbeat, you see a marble resting at the bottom. Then the water goes still and it is gone.',
+    10012: 'The obelisk cracks further. Through the gap, you see a sphere of pure light roll away into the void.',
+    10097: 'The chamber hums. A marble-sized point of light hovers at eye level for a single breath, then blinks away.'
+  };
+
+  /**
+   * Check if a marble sighting should fire for this room.
+   * Only triggers once per room, only in meta-clue rooms.
+   * @param {object} room   - Room data
+   * @param {object} player - Player state (worldFlags mutated)
+   * @returns {Array} Output messages (empty if no sighting or already seen)
+   */
+  function checkMarbleSighting(room, player) {
+    if (!room || !room.meta_clue) return [];
+    const vnum = room.vnum || 0;
+    const sightingText = MARBLE_SIGHTINGS[vnum];
+    if (!sightingText) return [];
+
+    if (!player.worldFlags) player.worldFlags = {};
+    const flag = `marble_seen_${vnum}`;
+    if (player.worldFlags[flag]) return [];
+
+    // Mark as seen - this will never fire again
+    player.worldFlags[flag] = true;
+
+    return [
+      { type: 'info', text: '' },
+      { type: 'quest', text: sightingText },
+      { type: 'info', text: '' }
+    ];
+  }
+
+  /* ─── Public API ──────────────────────────────────────────────────────────── */
 
   window.MudMetaPuzzle = {
     TOTAL_CLUES,
     CONFRONTATION_ROOM,
     ALL_CLUE_IDS,
     checkRoomForClue,
+    checkMarbleSighting,
     getProgress,
     canConfront,
     executeConfrontation

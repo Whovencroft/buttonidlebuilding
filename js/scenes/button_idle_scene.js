@@ -505,6 +505,20 @@ function completeIdleGame() {
 
 
 
+      // --- Upgrade synergy bonuses ---
+      // Pairs of upgrades that grant bonus multipliers when both are owned
+      let upgradeSynergyPassive = 1.0;
+      let upgradeSynergyManual = 1.0;
+      const activeSynergies = [];
+      for (const syn of (CONFIG.upgradeSynergies || [])) {
+        const [a, b] = syn.pair;
+        if ((s.upgrades[a] || 0) > 0 && (s.upgrades[b] || 0) > 0) {
+          if (syn.bonus.passiveMult) upgradeSynergyPassive *= syn.bonus.passiveMult;
+          if (syn.bonus.manualMult) upgradeSynergyManual *= syn.bonus.manualMult;
+          activeSynergies.push(syn);
+        }
+      }
+
       const autonomyFactor = 1 + s.autonomy / 100;
       const efficiency =
         passiveMult *
@@ -513,7 +527,7 @@ function completeIdleGame() {
         regretBoost *
         derivativeBoost *
         idleBonus *
-        1;
+        upgradeSynergyPassive;
 
       // Sum manual bonus from Human-branch upgrades
       let manualBase = 1;
@@ -528,7 +542,8 @@ function completeIdleGame() {
         manualMult *
         (1 + s.metaPresses * 0.02) *
         regretBoost *
-        larcenyManualBoost;
+        larcenyManualBoost *
+        upgradeSynergyManual;
 
       const effectivePps = basePps * efficiency * autonomyFactor * larcenyAutonomyRegret * synergyBonus * antiSynergyPenalty;
 
@@ -566,7 +581,10 @@ function completeIdleGame() {
         antiSynergyPenalty,
         overclockProtocolActive,
         prestigePpsFloor,
-        pressDrain
+        pressDrain,
+        activeSynergies,
+        upgradeSynergyPassive,
+        upgradeSynergyManual
       };
     }
 
@@ -1615,6 +1633,10 @@ function completeIdleGame() {
                   </div>
                   <div class="card-desc">${escapeHtml(upgrade.description)}</div>
                   ${owned > 0 && upgrade.flavor ? `<div class="card-flavor">${escapeHtml(upgrade.flavor)}</div>` : ''}
+                  ${(() => {
+                    const syn = computed.activeSynergies.find(s => s.pair.includes(upgrade.id));
+                    return syn ? `<div class="card-synergy">Synergy: ${escapeHtml(syn.label)}</div>` : '';
+                  })()}
                 </div>
                 <div class="small">Owned: ${owned}</div>
               </div>
