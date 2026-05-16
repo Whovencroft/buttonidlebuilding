@@ -1614,6 +1614,7 @@ function completeIdleGame() {
                     ${branch ? `<span class="branch-badge ${branchColors[branch]}">${branchLabels[branch]}</span>` : ''}
                   </div>
                   <div class="card-desc">${escapeHtml(upgrade.description)}</div>
+                  ${owned > 0 && upgrade.flavor ? `<div class="card-flavor">${escapeHtml(upgrade.flavor)}</div>` : ''}
                 </div>
                 <div class="small">Owned: ${owned}</div>
               </div>

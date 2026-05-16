@@ -12,6 +12,12 @@
     },
     "flags": [
       "safe"
+    ],
+    "ambient": [
+      "The robed figure at the gates mutters something about quotas.",
+      "A faint breeze carries the scent of incense and old paper.",
+      "You hear distant chanting, just below the threshold of understanding.",
+      "Somewhere beyond the gates, a bell tolls once."
     ]
   },
   "9002": {
@@ -25,7 +31,11 @@
       "northeast": 9001,
       "southeast": 9007,
       "southwest": 9005
-    }
+    },
+    "ambient": [
+      "A wisp of golden light drifts past, then fades.",
+      "The robed figure at the gates mutters something about quotas."
+    ]
   },
   "9003": {
     "vnum": 9003,
@@ -45,6 +55,12 @@
     ],
     "mobs": [
       9010
+    ],
+    "ambient": [
+      "The robed figure at the gates mutters something about quotas.",
+      "You hear distant chanting, just below the threshold of understanding.",
+      "The air here feels heavier than it should.",
+      "The list the gatekeeper holds seems to grow longer as you watch."
     ]
   },
   "9004": {
@@ -61,6 +77,10 @@
     },
     "mob_spawns": [
       1907
+    ],
+    "ambient": [
+      "The air here feels heavier than it should.",
+      "A faint breeze carries the scent of incense and old paper."
     ]
   },
   "9005": {
@@ -93,6 +113,10 @@
     ],
     "initial_items": [
       9003
+    ],
+    "ambient": [
+      "The robed figure at the gates mutters something about quotas.",
+      "A moth circles the nearest lantern, casting erratic shadows."
     ]
   },
   "9006": {
@@ -111,6 +135,10 @@
     },
     "flags": [
       "safe"
+    ],
+    "ambient": [
+      "A faint breeze carries the scent of incense and old paper.",
+      "The list the gatekeeper holds seems to grow longer as you watch."
     ]
   },
   "9007": {
@@ -127,7 +155,11 @@
       "northwest": 9002,
       "southeast": 9013,
       "southwest": 9011
-    }
+    },
+    "ambient": [
+      "The air here feels heavier than it should.",
+      "The robed figure at the gates mutters something about quotas."
+    ]
   },
   "9008": {
     "vnum": 9008,
@@ -142,7 +174,12 @@
       "northwest": 9003,
       "southeast": 9014,
       "southwest": 9012
-    }
+    },
+    "ambient": [
+      "The list the gatekeeper holds seems to grow longer as you watch.",
+      "The air here feels heavier than it should.",
+      "A faint breeze carries the scent of incense and old paper."
+    ]
   },
   "9009": {
     "vnum": 9009,
@@ -157,6 +194,10 @@
     },
     "mob_spawns": [
       1908
+    ],
+    "ambient": [
+      "The air here feels heavier than it should.",
+      "Somewhere beyond the gates, a bell tolls once."
     ]
   },
   "9010": {
@@ -172,6 +213,11 @@
     },
     "flags": [
       "safe"
+    ],
+    "ambient": [
+      "Somewhere beyond the gates, a bell tolls once.",
+      "The robed figure at the gates mutters something about quotas.",
+      "A moth circles the nearest lantern, casting erratic shadows."
     ]
   },
   "9011": {
@@ -190,6 +236,10 @@
     },
     "mob_spawns": [
       1906
+    ],
+    "ambient": [
+      "The robed figure at the gates mutters something about quotas.",
+      "A wisp of golden light drifts past, then fades."
     ]
   },
   "9012": {
@@ -210,7 +260,11 @@
     "mob_spawns": [
       1916
     ],
-    "puzzle_action": "use_hourglass"
+    "puzzle_action": "use_hourglass",
+    "ambient": [
+      "Time holds its breath here.",
+      "The empty hourglass watches you with the patience of eternity."
+    ]
   },
   "9013": {
     "vnum": 9013,
@@ -233,6 +287,12 @@
     ],
     "initial_items": [
       3019
+    ],
+    "ambient": [
+      "The list the gatekeeper holds seems to grow longer as you watch.",
+      "The air here feels heavier than it should.",
+      "A faint breeze carries the scent of incense and old paper.",
+      "A wisp of golden light drifts past, then fades."
     ]
   },
   "9014": {
@@ -249,6 +309,12 @@
     },
     "flags": [
       "safe"
+    ],
+    "ambient": [
+      "The robed figure at the gates mutters something about quotas.",
+      "A wisp of golden light drifts past, then fades.",
+      "A faint breeze carries the scent of incense and old paper.",
+      "The list the gatekeeper holds seems to grow longer as you watch."
     ]
   },
   "9015": {
@@ -267,7 +333,12 @@
     "mob_spawns": [
       1907
     ],
-    "meta_clue": "marble_passage_9"
+    "meta_clue": "marble_passage_9",
+    "ambient": [
+      "You hear distant chanting, just below the threshold of understanding.",
+      "The list the gatekeeper holds seems to grow longer as you watch.",
+      "The robed figure at the gates mutters something about quotas."
+    ]
   },
   "9016": {
     "vnum": 9016,
@@ -286,6 +357,12 @@
     },
     "mob_spawns": [
       1917
+    ],
+    "ambient": [
+      "The robed figure at the gates mutters something about quotas.",
+      "A faint breeze carries the scent of incense and old paper.",
+      "You hear distant chanting, just below the threshold of understanding.",
+      "A moth circles the nearest lantern, casting erratic shadows."
     ]
   },
   "9017": {
@@ -301,7 +378,12 @@
       "northeast": 9014,
       "northwest": 9012,
       "southwest": 9020
-    }
+    },
+    "ambient": [
+      "The robed figure at the gates mutters something about quotas.",
+      "The air here feels heavier than it should.",
+      "A moth circles the nearest lantern, casting erratic shadows."
+    ]
   },
   "9018": {
     "vnum": 9018,
@@ -317,6 +399,10 @@
     "mob_spawns": [
       1917,
       1909
+    ],
+    "ambient": [
+      "The air here feels heavier than it should.",
+      "Somewhere beyond the gates, a bell tolls once."
     ]
   },
   "9019": {
@@ -332,6 +418,11 @@
     },
     "initial_items": [
       3006
+    ],
+    "ambient": [
+      "You hear distant chanting, just below the threshold of understanding.",
+      "The robed figure at the gates mutters something about quotas.",
+      "Somewhere beyond the gates, a bell tolls once."
     ]
   },
   "9020": {
@@ -349,6 +440,11 @@
     },
     "flags": [
       "safe"
+    ],
+    "ambient": [
+      "A wisp of golden light drifts past, then fades.",
+      "You hear distant chanting, just below the threshold of understanding.",
+      "Somewhere beyond the gates, a bell tolls once."
     ]
   },
   "9021": {
@@ -362,7 +458,13 @@
       "northeast": 9018,
       "northwest": 9016,
       "southwest": 9022
-    }
+    },
+    "ambient": [
+      "The robed figure at the gates mutters something about quotas.",
+      "The list the gatekeeper holds seems to grow longer as you watch.",
+      "You hear distant chanting, just below the threshold of understanding.",
+      "A moth circles the nearest lantern, casting erratic shadows."
+    ]
   },
   "9022": {
     "vnum": 9022,
@@ -379,6 +481,12 @@
     ],
     "initial_items": [
       6014
+    ],
+    "ambient": [
+      "A wisp of golden light drifts past, then fades.",
+      "The robed figure at the gates mutters something about quotas.",
+      "A moth circles the nearest lantern, casting erratic shadows.",
+      "You hear distant chanting, just below the threshold of understanding."
     ]
   },
   "4001": {
@@ -396,6 +504,11 @@
     "mob_spawns": [
       1404,
       1428
+    ],
+    "ambient": [
+      "A dog tag glints in the mud, half-buried.",
+      "Boots thud somewhere nearby \u2014 a patrol passing through.",
+      "Shell casings roll underfoot with a metallic whisper."
     ]
   },
   "4002": {
@@ -412,6 +525,10 @@
     "flags": [
       "safe",
       "indoors"
+    ],
+    "ambient": [
+      "Boots thud somewhere nearby \u2014 a patrol passing through.",
+      "A distant explosion shakes dust from the ceiling."
     ]
   },
   "4003": {
@@ -429,6 +546,11 @@
     "flags": [
       "safe",
       "indoors"
+    ],
+    "ambient": [
+      "Someone is shouting orders in the distance, barely audible.",
+      "A helicopter passes overhead, its searchlight sweeping the ground.",
+      "Radio static crackles from a forgotten handset."
     ]
   },
   "4004": {
@@ -448,6 +570,10 @@
     "flags": [
       "safe",
       "indoors"
+    ],
+    "ambient": [
+      "Barbed wire creaks in the wind.",
+      "Shell casings roll underfoot with a metallic whisper."
     ]
   },
   "4005": {
@@ -467,6 +593,10 @@
     "flags": [
       "safe",
       "indoors"
+    ],
+    "ambient": [
+      "The ground trembles from artillery fire to the north.",
+      "Someone is shouting orders in the distance, barely audible."
     ]
   },
   "4006": {
@@ -483,6 +613,12 @@
     "flags": [
       "safe",
       "indoors"
+    ],
+    "ambient": [
+      "The ground trembles from artillery fire to the north.",
+      "The smell of cordite and diesel hangs in the air.",
+      "A helicopter passes overhead, its searchlight sweeping the ground.",
+      "Radio static crackles from a forgotten handset."
     ]
   },
   "4007": {
@@ -501,6 +637,10 @@
       1402,
       1401,
       1410
+    ],
+    "ambient": [
+      "A dog tag glints in the mud, half-buried.",
+      "Barbed wire creaks in the wind."
     ]
   },
   "4008": {
@@ -519,6 +659,11 @@
     },
     "mob_spawns": [
       1402
+    ],
+    "ambient": [
+      "Barbed wire creaks in the wind.",
+      "Someone is shouting orders in the distance, barely audible.",
+      "A dog tag glints in the mud, half-buried."
     ]
   },
   "4009": {
@@ -538,6 +683,11 @@
     },
     "mob_spawns": [
       1401
+    ],
+    "ambient": [
+      "Boots thud somewhere nearby \u2014 a patrol passing through.",
+      "The smell of cordite and diesel hangs in the air.",
+      "The ground trembles from artillery fire to the north."
     ]
   },
   "4010": {
@@ -558,6 +708,10 @@
     "mob_spawns": [
       1422,
       1430
+    ],
+    "ambient": [
+      "A distant explosion shakes dust from the ceiling.",
+      "Radio static crackles from a forgotten handset."
     ]
   },
   "4011": {
@@ -576,6 +730,10 @@
     "mob_spawns": [
       1421,
       1412
+    ],
+    "ambient": [
+      "The smell of cordite and diesel hangs in the air.",
+      "Someone is shouting orders in the distance, barely audible."
     ]
   },
   "4012": {
@@ -591,6 +749,12 @@
     },
     "mob_spawns": [
       1409
+    ],
+    "ambient": [
+      "Radio static crackles from a forgotten handset.",
+      "Someone is shouting orders in the distance, barely audible.",
+      "A dog tag glints in the mud, half-buried.",
+      "A helicopter passes overhead, its searchlight sweeping the ground."
     ]
   },
   "4013": {
@@ -610,6 +774,11 @@
     "mob_spawns": [
       1429,
       1420
+    ],
+    "ambient": [
+      "A dog tag glints in the mud, half-buried.",
+      "A helicopter passes overhead, its searchlight sweeping the ground.",
+      "A distant explosion shakes dust from the ceiling."
     ]
   },
   "4014": {
@@ -630,6 +799,12 @@
     "mob_spawns": [
       1427,
       1423
+    ],
+    "ambient": [
+      "Radio static crackles from a forgotten handset.",
+      "A dog tag glints in the mud, half-buried.",
+      "A helicopter passes overhead, its searchlight sweeping the ground.",
+      "Someone is shouting orders in the distance, barely audible."
     ]
   },
   "4015": {
@@ -649,6 +824,12 @@
     },
     "mob_spawns": [
       1416
+    ],
+    "ambient": [
+      "Shell casings roll underfoot with a metallic whisper.",
+      "Radio static crackles from a forgotten handset.",
+      "A helicopter passes overhead, its searchlight sweeping the ground.",
+      "Boots thud somewhere nearby \u2014 a patrol passing through."
     ]
   },
   "4016": {
@@ -669,6 +850,10 @@
     "mob_spawns": [
       1413,
       1413
+    ],
+    "ambient": [
+      "The ground trembles from artillery fire to the north.",
+      "A distant explosion shakes dust from the ceiling."
     ]
   },
   "4017": {
@@ -687,6 +872,12 @@
     },
     "mob_spawns": [
       1418
+    ],
+    "ambient": [
+      "A helicopter passes overhead, its searchlight sweeping the ground.",
+      "A dog tag glints in the mud, half-buried.",
+      "The smell of cordite and diesel hangs in the air.",
+      "Barbed wire creaks in the wind."
     ]
   },
   "4018": {
@@ -702,6 +893,10 @@
     },
     "mob_spawns": [
       1402
+    ],
+    "ambient": [
+      "A helicopter passes overhead, its searchlight sweeping the ground.",
+      "A dog tag glints in the mud, half-buried."
     ]
   },
   "4019": {
@@ -717,6 +912,12 @@
     },
     "mob_spawns": [
       1421
+    ],
+    "ambient": [
+      "Boots thud somewhere nearby \u2014 a patrol passing through.",
+      "The smell of cordite and diesel hangs in the air.",
+      "Shell casings roll underfoot with a metallic whisper.",
+      "Someone is shouting orders in the distance, barely audible."
     ]
   },
   "4020": {
@@ -753,6 +954,10 @@
         ],
         "description": "The crater is too perfect to be a weapon impact. The compressed earth at the center reflects your face like polished glass. Radiation readings are off the charts \u2014 but it's not nuclear radiation. It's something else entirely. A nearby soldier's journal, half-buried in ash, contains a final entry: 'Saw it fall from the sky. Round. Perfect. Alive.'"
       }
+    ],
+    "ambient": [
+      "A dog tag glints in the mud, half-buried.",
+      "Barbed wire creaks in the wind."
     ]
   },
   "4021": {
@@ -774,6 +979,10 @@
       1414,
       1402,
       1412
+    ],
+    "ambient": [
+      "Barbed wire creaks in the wind.",
+      "Shell casings roll underfoot with a metallic whisper."
     ]
   },
   "4022": {
@@ -794,6 +1003,11 @@
     "mob_spawns": [
       1418,
       1413
+    ],
+    "ambient": [
+      "A distant explosion shakes dust from the ceiling.",
+      "Radio static crackles from a forgotten handset.",
+      "Shell casings roll underfoot with a metallic whisper."
     ]
   },
   "4023": {
@@ -813,6 +1027,11 @@
     },
     "mob_spawns": [
       1401
+    ],
+    "ambient": [
+      "Boots thud somewhere nearby \u2014 a patrol passing through.",
+      "A distant explosion shakes dust from the ceiling.",
+      "Barbed wire creaks in the wind."
     ]
   },
   "4024": {
@@ -831,6 +1050,12 @@
     },
     "mob_spawns": [
       1409
+    ],
+    "ambient": [
+      "Radio static crackles from a forgotten handset.",
+      "Barbed wire creaks in the wind.",
+      "The ground trembles from artillery fire to the north.",
+      "Someone is shouting orders in the distance, barely audible."
     ]
   },
   "4025": {
@@ -846,6 +1071,10 @@
     },
     "mob_spawns": [
       1425
+    ],
+    "ambient": [
+      "A dog tag glints in the mud, half-buried.",
+      "The smell of cordite and diesel hangs in the air."
     ]
   },
   "4026": {
@@ -864,6 +1093,10 @@
     "mob_spawns": [
       1421,
       1415
+    ],
+    "ambient": [
+      "The ground trembles from artillery fire to the north.",
+      "A dog tag glints in the mud, half-buried."
     ]
   },
   "4027": {
@@ -883,6 +1116,10 @@
     },
     "mob_spawns": [
       1421
+    ],
+    "ambient": [
+      "A helicopter passes overhead, its searchlight sweeping the ground.",
+      "A dog tag glints in the mud, half-buried."
     ]
   },
   "4028": {
@@ -903,6 +1140,12 @@
     "mob_spawns": [
       1415,
       1428
+    ],
+    "ambient": [
+      "Someone is shouting orders in the distance, barely audible.",
+      "Boots thud somewhere nearby \u2014 a patrol passing through.",
+      "A dog tag glints in the mud, half-buried.",
+      "Shell casings roll underfoot with a metallic whisper."
     ]
   },
   "4029": {
@@ -923,6 +1166,11 @@
     "mob_spawns": [
       1406,
       1403
+    ],
+    "ambient": [
+      "Someone is shouting orders in the distance, barely audible.",
+      "Shell casings roll underfoot with a metallic whisper.",
+      "The ground trembles from artillery fire to the north."
     ]
   },
   "4030": {
@@ -942,7 +1190,13 @@
       1421,
       1420
     ],
-    "meta_clue": "marble_passage_4"
+    "meta_clue": "marble_passage_4",
+    "ambient": [
+      "The ground trembles from artillery fire to the north.",
+      "Radio static crackles from a forgotten handset.",
+      "Boots thud somewhere nearby \u2014 a patrol passing through.",
+      "A dog tag glints in the mud, half-buried."
+    ]
   },
   "4031": {
     "vnum": 4031,
@@ -958,6 +1212,10 @@
     },
     "mob_spawns": [
       1409
+    ],
+    "ambient": [
+      "Shell casings roll underfoot with a metallic whisper.",
+      "A distant explosion shakes dust from the ceiling."
     ]
   },
   "4032": {
@@ -977,6 +1235,12 @@
     },
     "mob_spawns": [
       1414
+    ],
+    "ambient": [
+      "A dog tag glints in the mud, half-buried.",
+      "Boots thud somewhere nearby \u2014 a patrol passing through.",
+      "Barbed wire creaks in the wind.",
+      "A distant explosion shakes dust from the ceiling."
     ]
   },
   "4033": {
@@ -997,6 +1261,10 @@
     "mob_spawns": [
       1410,
       1426
+    ],
+    "ambient": [
+      "A distant explosion shakes dust from the ceiling.",
+      "Boots thud somewhere nearby \u2014 a patrol passing through."
     ]
   },
   "4034": {
@@ -1018,6 +1286,10 @@
       1401,
       1414,
       1409
+    ],
+    "ambient": [
+      "A distant explosion shakes dust from the ceiling.",
+      "Shell casings roll underfoot with a metallic whisper."
     ]
   },
   "4035": {
@@ -1036,6 +1308,10 @@
       1419,
       1414,
       1412
+    ],
+    "ambient": [
+      "A dog tag glints in the mud, half-buried.",
+      "Boots thud somewhere nearby \u2014 a patrol passing through."
     ]
   },
   "4036": {
@@ -1051,6 +1327,11 @@
     },
     "mob_spawns": [
       1413
+    ],
+    "ambient": [
+      "The ground trembles from artillery fire to the north.",
+      "Boots thud somewhere nearby \u2014 a patrol passing through.",
+      "The smell of cordite and diesel hangs in the air."
     ]
   },
   "4037": {
@@ -1071,6 +1352,12 @@
       1410,
       1401,
       1403
+    ],
+    "ambient": [
+      "Barbed wire creaks in the wind.",
+      "The ground trembles from artillery fire to the north.",
+      "Boots thud somewhere nearby \u2014 a patrol passing through.",
+      "Someone is shouting orders in the distance, barely audible."
     ]
   },
   "4038": {
@@ -1093,6 +1380,11 @@
     ],
     "initial_items": [
       1007
+    ],
+    "ambient": [
+      "Someone is shouting orders in the distance, barely audible.",
+      "Boots thud somewhere nearby \u2014 a patrol passing through.",
+      "Radio static crackles from a forgotten handset."
     ]
   },
   "4039": {
@@ -1113,6 +1405,10 @@
       1412,
       1411,
       1410
+    ],
+    "ambient": [
+      "Someone is shouting orders in the distance, barely audible.",
+      "Shell casings roll underfoot with a metallic whisper."
     ]
   },
   "4040": {
@@ -1128,6 +1424,11 @@
     },
     "mob_spawns": [
       1413
+    ],
+    "ambient": [
+      "Someone is shouting orders in the distance, barely audible.",
+      "The ground trembles from artillery fire to the north.",
+      "A distant explosion shakes dust from the ceiling."
     ]
   },
   "4041": {
@@ -1147,6 +1448,12 @@
     "mob_spawns": [
       1418,
       1423
+    ],
+    "ambient": [
+      "Radio static crackles from a forgotten handset.",
+      "A distant explosion shakes dust from the ceiling.",
+      "Someone is shouting orders in the distance, barely audible.",
+      "Shell casings roll underfoot with a metallic whisper."
     ]
   },
   "4042": {
@@ -1166,6 +1473,11 @@
     },
     "mob_spawns": [
       1416
+    ],
+    "ambient": [
+      "Radio static crackles from a forgotten handset.",
+      "Boots thud somewhere nearby \u2014 a patrol passing through.",
+      "A dog tag glints in the mud, half-buried."
     ]
   },
   "4043": {
@@ -1183,6 +1495,10 @@
     },
     "mob_spawns": [
       1409
+    ],
+    "ambient": [
+      "A dog tag glints in the mud, half-buried.",
+      "The ground trembles from artillery fire to the north."
     ]
   },
   "4044": {
@@ -1198,6 +1514,10 @@
     "mob_spawns": [
       1402,
       1419
+    ],
+    "ambient": [
+      "Someone is shouting orders in the distance, barely audible.",
+      "The smell of cordite and diesel hangs in the air."
     ]
   },
   "4045": {
@@ -1216,6 +1536,11 @@
     "mob_spawns": [
       1422,
       1428
+    ],
+    "ambient": [
+      "The ground trembles from artillery fire to the north.",
+      "Boots thud somewhere nearby \u2014 a patrol passing through.",
+      "Radio static crackles from a forgotten handset."
     ]
   },
   "4046": {
@@ -1236,6 +1561,11 @@
     "mob_spawns": [
       1402,
       1411
+    ],
+    "ambient": [
+      "A dog tag glints in the mud, half-buried.",
+      "Radio static crackles from a forgotten handset.",
+      "A distant explosion shakes dust from the ceiling."
     ]
   },
   "4047": {
@@ -1252,6 +1582,12 @@
     },
     "mob_spawns": [
       1407
+    ],
+    "ambient": [
+      "A dog tag glints in the mud, half-buried.",
+      "A distant explosion shakes dust from the ceiling.",
+      "Radio static crackles from a forgotten handset.",
+      "Someone is shouting orders in the distance, barely audible."
     ]
   },
   "4048": {
@@ -1268,6 +1604,10 @@
     "mob_spawns": [
       1417,
       1402
+    ],
+    "ambient": [
+      "The smell of cordite and diesel hangs in the air.",
+      "Someone is shouting orders in the distance, barely audible."
     ]
   },
   "4049": {
@@ -1284,6 +1624,11 @@
     },
     "flags": [
       "safe"
+    ],
+    "ambient": [
+      "The ground trembles from artillery fire to the north.",
+      "Boots thud somewhere nearby \u2014 a patrol passing through.",
+      "Someone is shouting orders in the distance, barely audible."
     ]
   },
   "4050": {
@@ -1300,6 +1645,10 @@
     "mob_spawns": [
       1418,
       1410
+    ],
+    "ambient": [
+      "The smell of cordite and diesel hangs in the air.",
+      "Someone is shouting orders in the distance, barely audible."
     ]
   },
   "4100": {
@@ -1319,6 +1668,10 @@
     ],
     "mob_spawns": [
       1413
+    ],
+    "ambient": [
+      "Someone is shouting orders in the distance, barely audible.",
+      "A helicopter passes overhead, its searchlight sweeping the ground."
     ]
   },
   "4101": {
@@ -1339,6 +1692,11 @@
     "flags": [
       "indoors",
       "dark"
+    ],
+    "ambient": [
+      "A helicopter passes overhead, its searchlight sweeping the ground.",
+      "Someone is shouting orders in the distance, barely audible.",
+      "The ground trembles from artillery fire to the north."
     ]
   },
   "4102": {
@@ -1360,6 +1718,10 @@
     "flags": [
       "indoors",
       "dark"
+    ],
+    "ambient": [
+      "Boots thud somewhere nearby \u2014 a patrol passing through.",
+      "A helicopter passes overhead, its searchlight sweeping the ground."
     ]
   },
   "4103": {
@@ -1384,6 +1746,10 @@
     ],
     "initial_items": [
       4004
+    ],
+    "ambient": [
+      "A distant explosion shakes dust from the ceiling.",
+      "A dog tag glints in the mud, half-buried."
     ]
   },
   "4104": {
@@ -1400,6 +1766,10 @@
     "flags": [
       "safe",
       "indoors"
+    ],
+    "ambient": [
+      "Shell casings roll underfoot with a metallic whisper.",
+      "A distant explosion shakes dust from the ceiling."
     ]
   },
   "4105": {
@@ -1419,6 +1789,10 @@
     "flags": [
       "safe",
       "indoors"
+    ],
+    "ambient": [
+      "Barbed wire creaks in the wind.",
+      "The ground trembles from artillery fire to the north."
     ]
   },
   "4106": {
@@ -1442,6 +1816,12 @@
     "flags": [
       "indoors",
       "dark"
+    ],
+    "ambient": [
+      "A dog tag glints in the mud, half-buried.",
+      "The smell of cordite and diesel hangs in the air.",
+      "A distant explosion shakes dust from the ceiling.",
+      "A helicopter passes overhead, its searchlight sweeping the ground."
     ]
   },
   "4107": {
@@ -1465,6 +1845,10 @@
     "flags": [
       "indoors",
       "dark"
+    ],
+    "ambient": [
+      "The smell of cordite and diesel hangs in the air.",
+      "Radio static crackles from a forgotten handset."
     ]
   },
   "4108": {
@@ -1485,6 +1869,12 @@
     "flags": [
       "indoors",
       "dark"
+    ],
+    "ambient": [
+      "Radio static crackles from a forgotten handset.",
+      "Boots thud somewhere nearby \u2014 a patrol passing through.",
+      "Someone is shouting orders in the distance, barely audible.",
+      "A distant explosion shakes dust from the ceiling."
     ]
   },
   "4109": {
@@ -1504,6 +1894,12 @@
     "flags": [
       "indoors",
       "dark"
+    ],
+    "ambient": [
+      "Boots thud somewhere nearby \u2014 a patrol passing through.",
+      "A distant explosion shakes dust from the ceiling.",
+      "Radio static crackles from a forgotten handset.",
+      "Barbed wire creaks in the wind."
     ]
   },
   "4110": {
@@ -1528,6 +1924,12 @@
       1402,
       1412,
       1419
+    ],
+    "ambient": [
+      "Barbed wire creaks in the wind.",
+      "A dog tag glints in the mud, half-buried.",
+      "Shell casings roll underfoot with a metallic whisper.",
+      "The smell of cordite and diesel hangs in the air."
     ]
   },
   "4111": {
@@ -1555,6 +1957,10 @@
     ],
     "initial_items": [
       3008
+    ],
+    "ambient": [
+      "Shell casings roll underfoot with a metallic whisper.",
+      "Boots thud somewhere nearby \u2014 a patrol passing through."
     ]
   },
   "4112": {
@@ -1577,6 +1983,11 @@
     "flags": [
       "indoors",
       "dark"
+    ],
+    "ambient": [
+      "Someone is shouting orders in the distance, barely audible.",
+      "The smell of cordite and diesel hangs in the air.",
+      "A helicopter passes overhead, its searchlight sweeping the ground."
     ]
   },
   "4113": {
@@ -1596,6 +2007,11 @@
     "flags": [
       "indoors",
       "dark"
+    ],
+    "ambient": [
+      "Shell casings roll underfoot with a metallic whisper.",
+      "Radio static crackles from a forgotten handset.",
+      "A distant explosion shakes dust from the ceiling."
     ]
   },
   "4114": {
@@ -1621,6 +2037,11 @@
     ],
     "initial_items": [
       1006
+    ],
+    "ambient": [
+      "Barbed wire creaks in the wind.",
+      "Radio static crackles from a forgotten handset.",
+      "A dog tag glints in the mud, half-buried."
     ]
   },
   "4115": {
@@ -1644,6 +2065,12 @@
     "flags": [
       "indoors",
       "dark"
+    ],
+    "ambient": [
+      "Boots thud somewhere nearby \u2014 a patrol passing through.",
+      "A dog tag glints in the mud, half-buried.",
+      "A helicopter passes overhead, its searchlight sweeping the ground.",
+      "Radio static crackles from a forgotten handset."
     ]
   },
   "4116": {
@@ -1670,6 +2097,11 @@
     ],
     "initial_items": [
       1014
+    ],
+    "ambient": [
+      "Radio static crackles from a forgotten handset.",
+      "Boots thud somewhere nearby \u2014 a patrol passing through.",
+      "Shell casings roll underfoot with a metallic whisper."
     ]
   },
   "4117": {
@@ -1690,6 +2122,11 @@
       1409,
       1402,
       1401
+    ],
+    "ambient": [
+      "The smell of cordite and diesel hangs in the air.",
+      "The ground trembles from artillery fire to the north.",
+      "A helicopter passes overhead, its searchlight sweeping the ground."
     ]
   },
   "4118": {
@@ -1712,6 +2149,12 @@
       1409,
       1410,
       1402
+    ],
+    "ambient": [
+      "A dog tag glints in the mud, half-buried.",
+      "A distant explosion shakes dust from the ceiling.",
+      "A helicopter passes overhead, its searchlight sweeping the ground.",
+      "Shell casings roll underfoot with a metallic whisper."
     ]
   },
   "4119": {
@@ -1730,6 +2173,10 @@
     ],
     "mob_spawns": [
       1402
+    ],
+    "ambient": [
+      "The smell of cordite and diesel hangs in the air.",
+      "A helicopter passes overhead, its searchlight sweeping the ground."
     ]
   },
   "5001": {
@@ -1746,6 +2193,10 @@
     },
     "mob_spawns": [
       1518
+    ],
+    "ambient": [
+      "The crystal hums at a frequency you feel in your teeth.",
+      "Light bends strangely here, as if space itself is tired."
     ]
   },
   "5002": {
@@ -1762,6 +2213,10 @@
     "mob_spawns": [
       1506,
       1511
+    ],
+    "ambient": [
+      "Gravity feels optional. Your feet barely touch the surface.",
+      "A faint radio signal repeats: three short, three long, three short."
     ]
   },
   "5003": {
@@ -1778,6 +2233,12 @@
     },
     "mob_spawns": [
       1514
+    ],
+    "ambient": [
+      "The silence here is absolute \u2014 not even your heartbeat echoes.",
+      "A distant nebula pulses with deep violet light.",
+      "A faint radio signal repeats: three short, three long, three short.",
+      "Light bends strangely here, as if space itself is tired."
     ]
   },
   "5004": {
@@ -1796,6 +2257,12 @@
     },
     "mob_spawns": [
       1502
+    ],
+    "ambient": [
+      "Gravity feels optional. Your feet barely touch the surface.",
+      "Light bends strangely here, as if space itself is tired.",
+      "The temperature drops suddenly, then returns to normal.",
+      "A comet traces a silent arc across the void."
     ]
   },
   "5005": {
@@ -1817,6 +2284,10 @@
     ],
     "initial_items": [
       2002
+    ],
+    "ambient": [
+      "The crystal hums at a frequency you feel in your teeth.",
+      "Something vast moves in the darkness between stars."
     ]
   },
   "5006": {
@@ -1832,6 +2303,11 @@
     },
     "mob_spawns": [
       1510
+    ],
+    "ambient": [
+      "Stars drift slowly past, impossibly close.",
+      "A faint radio signal repeats: three short, three long, three short.",
+      "A distant nebula pulses with deep violet light."
     ]
   },
   "5007": {
@@ -1849,6 +2325,10 @@
     "mob_spawns": [
       1524,
       1501
+    ],
+    "ambient": [
+      "Gravity feels optional. Your feet barely touch the surface.",
+      "A comet traces a silent arc across the void."
     ]
   },
   "5008": {
@@ -1885,6 +2365,12 @@
     ],
     "initial_items": [
       2014
+    ],
+    "ambient": [
+      "The temperature drops suddenly, then returns to normal.",
+      "Light bends strangely here, as if space itself is tired.",
+      "Something vast moves in the darkness between stars.",
+      "Gravity feels optional. Your feet barely touch the surface."
     ]
   },
   "5009": {
@@ -1904,6 +2390,10 @@
     },
     "mob_spawns": [
       1508
+    ],
+    "ambient": [
+      "The crystal hums at a frequency you feel in your teeth.",
+      "A faint radio signal repeats: three short, three long, three short."
     ]
   },
   "5010": {
@@ -1923,6 +2413,12 @@
     },
     "mob_spawns": [
       1522
+    ],
+    "ambient": [
+      "A comet traces a silent arc across the void.",
+      "Light bends strangely here, as if space itself is tired.",
+      "Stars drift slowly past, impossibly close.",
+      "Something vast moves in the darkness between stars."
     ]
   },
   "5011": {
@@ -1940,6 +2436,11 @@
     },
     "mob_spawns": [
       1514
+    ],
+    "ambient": [
+      "A faint radio signal repeats: three short, three long, three short.",
+      "Light bends strangely here, as if space itself is tired.",
+      "A comet traces a silent arc across the void."
     ]
   },
   "5012": {
@@ -1959,6 +2460,11 @@
     ],
     "initial_items": [
       5012
+    ],
+    "ambient": [
+      "A comet traces a silent arc across the void.",
+      "Stars drift slowly past, impossibly close.",
+      "Gravity feels optional. Your feet barely touch the surface."
     ]
   },
   "5013": {
@@ -1978,6 +2484,11 @@
     "mob_spawns": [
       1511,
       1514
+    ],
+    "ambient": [
+      "Stars drift slowly past, impossibly close.",
+      "A distant nebula pulses with deep violet light.",
+      "The silence here is absolute \u2014 not even your heartbeat echoes."
     ]
   },
   "5014": {
@@ -1997,6 +2508,12 @@
     },
     "flags": [
       "safe"
+    ],
+    "ambient": [
+      "The silence here is absolute \u2014 not even your heartbeat echoes.",
+      "The crystal hums at a frequency you feel in your teeth.",
+      "A distant nebula pulses with deep violet light.",
+      "Something vast moves in the darkness between stars."
     ]
   },
   "5015": {
@@ -2019,6 +2536,12 @@
     ],
     "initial_items": [
       285
+    ],
+    "ambient": [
+      "Something vast moves in the darkness between stars.",
+      "A comet traces a silent arc across the void.",
+      "The silence here is absolute \u2014 not even your heartbeat echoes.",
+      "A faint radio signal repeats: three short, three long, three short."
     ]
   },
   "5016": {
@@ -2041,6 +2564,10 @@
     ],
     "initial_items": [
       282
+    ],
+    "ambient": [
+      "A comet traces a silent arc across the void.",
+      "Something vast moves in the darkness between stars."
     ]
   },
   "5017": {
@@ -2059,6 +2586,10 @@
     },
     "mob_spawns": [
       1509
+    ],
+    "ambient": [
+      "A comet traces a silent arc across the void.",
+      "A distant nebula pulses with deep violet light."
     ]
   },
   "5018": {
@@ -2075,6 +2606,11 @@
     "mob_spawns": [
       1520,
       1519
+    ],
+    "ambient": [
+      "The silence here is absolute \u2014 not even your heartbeat echoes.",
+      "Gravity feels optional. Your feet barely touch the surface.",
+      "A comet traces a silent arc across the void."
     ]
   },
   "5019": {
@@ -2090,6 +2626,12 @@
     },
     "mob_spawns": [
       1523
+    ],
+    "ambient": [
+      "The crystal hums at a frequency you feel in your teeth.",
+      "Something vast moves in the darkness between stars.",
+      "Stars drift slowly past, impossibly close.",
+      "Light bends strangely here, as if space itself is tired."
     ]
   },
   "5020": {
@@ -2114,6 +2656,11 @@
     "mob_spawns": [
       1514,
       1523
+    ],
+    "ambient": [
+      "The silence here is absolute \u2014 not even your heartbeat echoes.",
+      "A faint radio signal repeats: three short, three long, three short.",
+      "The temperature drops suddenly, then returns to normal."
     ]
   },
   "5021": {
@@ -2133,6 +2680,11 @@
     },
     "flags": [
       "safe"
+    ],
+    "ambient": [
+      "Gravity feels optional. Your feet barely touch the surface.",
+      "The silence here is absolute \u2014 not even your heartbeat echoes.",
+      "Light bends strangely here, as if space itself is tired."
     ]
   },
   "5022": {
@@ -2153,6 +2705,10 @@
     "mob_spawns": [
       1515,
       1501
+    ],
+    "ambient": [
+      "The silence here is absolute \u2014 not even your heartbeat echoes.",
+      "Something vast moves in the darkness between stars."
     ]
   },
   "5023": {
@@ -2172,6 +2728,11 @@
     },
     "flags": [
       "safe"
+    ],
+    "ambient": [
+      "Gravity feels optional. Your feet barely touch the surface.",
+      "The crystal hums at a frequency you feel in your teeth.",
+      "A faint radio signal repeats: three short, three long, three short."
     ]
   },
   "5024": {
@@ -2191,6 +2752,11 @@
     "mob_spawns": [
       1511,
       1522
+    ],
+    "ambient": [
+      "Light bends strangely here, as if space itself is tired.",
+      "Something vast moves in the darkness between stars.",
+      "A distant nebula pulses with deep violet light."
     ]
   },
   "5025": {
@@ -2208,6 +2774,10 @@
       1512,
       1509,
       1519
+    ],
+    "ambient": [
+      "The crystal hums at a frequency you feel in your teeth.",
+      "Gravity feels optional. Your feet barely touch the surface."
     ]
   },
   "5026": {
@@ -2226,6 +2796,10 @@
     "mob_spawns": [
       1510,
       1511
+    ],
+    "ambient": [
+      "A faint radio signal repeats: three short, three long, three short.",
+      "Gravity feels optional. Your feet barely touch the surface."
     ]
   },
   "5027": {
@@ -2248,6 +2822,10 @@
     ],
     "initial_items": [
       2011
+    ],
+    "ambient": [
+      "The crystal hums at a frequency you feel in your teeth.",
+      "Something vast moves in the darkness between stars."
     ]
   },
   "5028": {
@@ -2272,6 +2850,11 @@
     ],
     "initial_items": [
       1011
+    ],
+    "ambient": [
+      "A distant nebula pulses with deep violet light.",
+      "Something vast moves in the darkness between stars.",
+      "The crystal hums at a frequency you feel in your teeth."
     ]
   },
   "5029": {
@@ -2291,6 +2874,11 @@
     },
     "mob_spawns": [
       1509
+    ],
+    "ambient": [
+      "A faint radio signal repeats: three short, three long, three short.",
+      "The silence here is absolute \u2014 not even your heartbeat echoes.",
+      "Gravity feels optional. Your feet barely touch the surface."
     ]
   },
   "5030": {
@@ -2310,7 +2898,11 @@
     "mob_spawns": [
       1507
     ],
-    "meta_clue": "marble_passage_5"
+    "meta_clue": "marble_passage_5",
+    "ambient": [
+      "Something vast moves in the darkness between stars.",
+      "Stars drift slowly past, impossibly close."
+    ]
   },
   "5031": {
     "vnum": 5031,
@@ -2325,6 +2917,12 @@
     },
     "mob_spawns": [
       1507
+    ],
+    "ambient": [
+      "Light bends strangely here, as if space itself is tired.",
+      "The silence here is absolute \u2014 not even your heartbeat echoes.",
+      "A distant nebula pulses with deep violet light.",
+      "A faint radio signal repeats: three short, three long, three short."
     ]
   },
   "5032": {
@@ -2345,6 +2943,10 @@
       1510,
       1509,
       1514
+    ],
+    "ambient": [
+      "A distant nebula pulses with deep violet light.",
+      "A faint radio signal repeats: three short, three long, three short."
     ]
   },
   "5033": {
@@ -2364,6 +2966,12 @@
     },
     "mob_spawns": [
       1501
+    ],
+    "ambient": [
+      "The crystal hums at a frequency you feel in your teeth.",
+      "Gravity feels optional. Your feet barely touch the surface.",
+      "Light bends strangely here, as if space itself is tired.",
+      "A distant nebula pulses with deep violet light."
     ]
   },
   "5034": {
@@ -2384,6 +2992,11 @@
     "mob_spawns": [
       1502,
       1524
+    ],
+    "ambient": [
+      "A distant nebula pulses with deep violet light.",
+      "Something vast moves in the darkness between stars.",
+      "Gravity feels optional. Your feet barely touch the surface."
     ]
   },
   "5035": {
@@ -2402,6 +3015,12 @@
     "mob_spawns": [
       1511,
       1515
+    ],
+    "ambient": [
+      "A comet traces a silent arc across the void.",
+      "The silence here is absolute \u2014 not even your heartbeat echoes.",
+      "Something vast moves in the darkness between stars.",
+      "A distant nebula pulses with deep violet light."
     ]
   },
   "5036": {
@@ -2417,6 +3036,11 @@
     "mob_spawns": [
       1502,
       1524
+    ],
+    "ambient": [
+      "A comet traces a silent arc across the void.",
+      "Gravity feels optional. Your feet barely touch the surface.",
+      "Something vast moves in the darkness between stars."
     ]
   },
   "5037": {
@@ -2434,6 +3058,12 @@
     },
     "mob_spawns": [
       1519
+    ],
+    "ambient": [
+      "Stars drift slowly past, impossibly close.",
+      "Gravity feels optional. Your feet barely touch the surface.",
+      "Light bends strangely here, as if space itself is tired.",
+      "The crystal hums at a frequency you feel in your teeth."
     ]
   },
   "5038": {
@@ -2454,6 +3084,11 @@
     "mob_spawns": [
       1501,
       1510
+    ],
+    "ambient": [
+      "A faint radio signal repeats: three short, three long, three short.",
+      "A distant nebula pulses with deep violet light.",
+      "The temperature drops suddenly, then returns to normal."
     ]
   },
   "5039": {
@@ -2475,6 +3110,11 @@
     ],
     "initial_items": [
       2
+    ],
+    "ambient": [
+      "The temperature drops suddenly, then returns to normal.",
+      "The silence here is absolute \u2014 not even your heartbeat echoes.",
+      "A faint radio signal repeats: three short, three long, three short."
     ]
   },
   "5040": {
@@ -2496,6 +3136,12 @@
     ],
     "initial_items": [
       2006
+    ],
+    "ambient": [
+      "A comet traces a silent arc across the void.",
+      "The crystal hums at a frequency you feel in your teeth.",
+      "Gravity feels optional. Your feet barely touch the surface.",
+      "The temperature drops suddenly, then returns to normal."
     ]
   },
   "5041": {
@@ -2514,6 +3160,12 @@
     ],
     "initial_items": [
       6017
+    ],
+    "ambient": [
+      "A faint radio signal repeats: three short, three long, three short.",
+      "A distant nebula pulses with deep violet light.",
+      "The crystal hums at a frequency you feel in your teeth.",
+      "Something vast moves in the darkness between stars."
     ]
   },
   "5042": {
@@ -2533,6 +3185,10 @@
     "mob_spawns": [
       1504,
       1504
+    ],
+    "ambient": [
+      "Gravity feels optional. Your feet barely touch the surface.",
+      "The silence here is absolute \u2014 not even your heartbeat echoes."
     ]
   },
   "5043": {
@@ -2551,6 +3207,10 @@
     "mob_spawns": [
       1503,
       1524
+    ],
+    "ambient": [
+      "A comet traces a silent arc across the void.",
+      "Stars drift slowly past, impossibly close."
     ]
   },
   "5044": {
@@ -2567,6 +3227,10 @@
     },
     "mob_spawns": [
       1518
+    ],
+    "ambient": [
+      "The silence here is absolute \u2014 not even your heartbeat echoes.",
+      "The temperature drops suddenly, then returns to normal."
     ]
   },
   "5045": {
@@ -2582,6 +3246,12 @@
     },
     "mob_spawns": [
       1505
+    ],
+    "ambient": [
+      "The crystal hums at a frequency you feel in your teeth.",
+      "The temperature drops suddenly, then returns to normal.",
+      "Something vast moves in the darkness between stars.",
+      "A distant nebula pulses with deep violet light."
     ]
   },
   "5046": {
@@ -2596,6 +3266,12 @@
     "mob_spawns": [
       1525,
       1518
+    ],
+    "ambient": [
+      "The silence here is absolute \u2014 not even your heartbeat echoes.",
+      "Something vast moves in the darkness between stars.",
+      "The temperature drops suddenly, then returns to normal.",
+      "A faint radio signal repeats: three short, three long, three short."
     ]
   },
   "5100": {
@@ -2620,6 +3296,10 @@
     ],
     "initial_items": [
       284
+    ],
+    "ambient": [
+      "A comet traces a silent arc across the void.",
+      "Stars drift slowly past, impossibly close."
     ]
   },
   "5101": {
@@ -2638,6 +3318,10 @@
     ],
     "flags": [
       "dark"
+    ],
+    "ambient": [
+      "Something vast moves in the darkness between stars.",
+      "The silence here is absolute \u2014 not even your heartbeat echoes."
     ]
   },
   "5102": {
@@ -2660,6 +3344,10 @@
     ],
     "initial_items": [
       6012
+    ],
+    "ambient": [
+      "Light bends strangely here, as if space itself is tired.",
+      "The temperature drops suddenly, then returns to normal."
     ]
   },
   "5103": {
@@ -2681,6 +3369,10 @@
     ],
     "flags": [
       "dark"
+    ],
+    "ambient": [
+      "Light bends strangely here, as if space itself is tired.",
+      "The silence here is absolute \u2014 not even your heartbeat echoes."
     ]
   },
   "5104": {
@@ -2702,6 +3394,10 @@
     ],
     "flags": [
       "dark"
+    ],
+    "ambient": [
+      "The temperature drops suddenly, then returns to normal.",
+      "A comet traces a silent arc across the void."
     ]
   },
   "5105": {
@@ -2721,6 +3417,11 @@
     ],
     "flags": [
       "dark"
+    ],
+    "ambient": [
+      "Light bends strangely here, as if space itself is tired.",
+      "A faint radio signal repeats: three short, three long, three short.",
+      "A distant nebula pulses with deep violet light."
     ]
   },
   "5106": {
@@ -2744,6 +3445,11 @@
     ],
     "initial_items": [
       5011
+    ],
+    "ambient": [
+      "A faint radio signal repeats: three short, three long, three short.",
+      "Light bends strangely here, as if space itself is tired.",
+      "Something vast moves in the darkness between stars."
     ]
   },
   "5107": {
@@ -2769,6 +3475,12 @@
     ],
     "initial_items": [
       5006
+    ],
+    "ambient": [
+      "The temperature drops suddenly, then returns to normal.",
+      "A comet traces a silent arc across the void.",
+      "A faint radio signal repeats: three short, three long, three short.",
+      "The silence here is absolute \u2014 not even your heartbeat echoes."
     ]
   },
   "5108": {
@@ -2792,6 +3504,11 @@
     ],
     "flags": [
       "dark"
+    ],
+    "ambient": [
+      "The silence here is absolute \u2014 not even your heartbeat echoes.",
+      "Gravity feels optional. Your feet barely touch the surface.",
+      "The temperature drops suddenly, then returns to normal."
     ]
   },
   "5109": {
@@ -2815,6 +3532,12 @@
     ],
     "initial_items": [
       2020
+    ],
+    "ambient": [
+      "The silence here is absolute \u2014 not even your heartbeat echoes.",
+      "Gravity feels optional. Your feet barely touch the surface.",
+      "The temperature drops suddenly, then returns to normal.",
+      "Stars drift slowly past, impossibly close."
     ]
   },
   "5110": {
@@ -2836,6 +3559,12 @@
     ],
     "initial_items": [
       3017
+    ],
+    "ambient": [
+      "Gravity feels optional. Your feet barely touch the surface.",
+      "The silence here is absolute \u2014 not even your heartbeat echoes.",
+      "A faint radio signal repeats: three short, three long, three short.",
+      "A comet traces a silent arc across the void."
     ]
   },
   "5111": {
@@ -2857,6 +3586,11 @@
     ],
     "mob_spawns": [
       1511
+    ],
+    "ambient": [
+      "Light bends strangely here, as if space itself is tired.",
+      "The crystal hums at a frequency you feel in your teeth.",
+      "A comet traces a silent arc across the void."
     ]
   },
   "5112": {
@@ -2879,6 +3613,10 @@
     ],
     "flags": [
       "dark"
+    ],
+    "ambient": [
+      "The silence here is absolute \u2014 not even your heartbeat echoes.",
+      "Something vast moves in the darkness between stars."
     ]
   },
   "5113": {
@@ -2897,6 +3635,12 @@
     ],
     "flags": [
       "dark"
+    ],
+    "ambient": [
+      "A comet traces a silent arc across the void.",
+      "The silence here is absolute \u2014 not even your heartbeat echoes.",
+      "The crystal hums at a frequency you feel in your teeth.",
+      "Light bends strangely here, as if space itself is tired."
     ]
   },
   "5114": {
@@ -2915,6 +3659,11 @@
     ],
     "mob_spawns": [
       1510
+    ],
+    "ambient": [
+      "A distant nebula pulses with deep violet light.",
+      "Light bends strangely here, as if space itself is tired.",
+      "The temperature drops suddenly, then returns to normal."
     ]
   },
   "5115": {
@@ -2933,6 +3682,11 @@
     ],
     "flags": [
       "dark"
+    ],
+    "ambient": [
+      "Stars drift slowly past, impossibly close.",
+      "The silence here is absolute \u2014 not even your heartbeat echoes.",
+      "Something vast moves in the darkness between stars."
     ]
   },
   "6001": {
@@ -2949,6 +3703,11 @@
     },
     "flags": [
       "safe"
+    ],
+    "ambient": [
+      "Dust motes hang frozen in a sunbeam, then resume falling.",
+      "A clock on the wall runs backward for a moment, then corrects itself.",
+      "For an instant, everything is sepia-toned. Then color returns."
     ]
   },
   "6002": {
@@ -2964,6 +3723,11 @@
     },
     "flags": [
       "safe"
+    ],
+    "ambient": [
+      "A clock on the wall runs backward for a moment, then corrects itself.",
+      "A pendulum swings in a pattern that defies physics.",
+      "Echoes of conversations that haven't happened yet drift through the walls."
     ]
   },
   "6003": {
@@ -2979,6 +3743,11 @@
     "mob_spawns": [
       1629,
       1615
+    ],
+    "ambient": [
+      "For an instant, everything is sepia-toned. Then color returns.",
+      "A grandfather clock chimes thirteen.",
+      "Time stutters. A second repeats itself."
     ]
   },
   "6004": {
@@ -2998,6 +3767,11 @@
       1609,
       1611,
       1605
+    ],
+    "ambient": [
+      "Time stutters. A second repeats itself.",
+      "Echoes of conversations that haven't happened yet drift through the walls.",
+      "For an instant, everything is sepia-toned. Then color returns."
     ]
   },
   "6005": {
@@ -3016,6 +3790,11 @@
     },
     "mob_spawns": [
       1606
+    ],
+    "ambient": [
+      "A clock on the wall runs backward for a moment, then corrects itself.",
+      "For an instant, everything is sepia-toned. Then color returns.",
+      "A pendulum swings in a pattern that defies physics."
     ]
   },
   "6006": {
@@ -3035,6 +3814,12 @@
     "flags": [
       "safe",
       "indoors"
+    ],
+    "ambient": [
+      "For an instant, everything is sepia-toned. Then color returns.",
+      "The air smells of ozone and old libraries.",
+      "You feel older. Then younger. Then exactly your age again.",
+      "You catch a glimpse of yourself from a different angle \u2014 a different time."
     ]
   },
   "6007": {
@@ -3052,6 +3837,12 @@
     "mob_spawns": [
       1631,
       1609
+    ],
+    "ambient": [
+      "A grandfather clock chimes thirteen.",
+      "A clock on the wall runs backward for a moment, then corrects itself.",
+      "For an instant, everything is sepia-toned. Then color returns.",
+      "Echoes of conversations that haven't happened yet drift through the walls."
     ]
   },
   "6008": {
@@ -3073,6 +3864,12 @@
     ],
     "flags": [
       "shop"
+    ],
+    "ambient": [
+      "A clock on the wall runs backward for a moment, then corrects itself.",
+      "You catch a glimpse of yourself from a different angle \u2014 a different time.",
+      "For an instant, everything is sepia-toned. Then color returns.",
+      "A grandfather clock chimes thirteen."
     ]
   },
   "6009": {
@@ -3093,6 +3890,11 @@
     "flags": [
       "safe",
       "indoors"
+    ],
+    "ambient": [
+      "The air smells of ozone and old libraries.",
+      "A clock on the wall runs backward for a moment, then corrects itself.",
+      "Echoes of conversations that haven't happened yet drift through the walls."
     ]
   },
   "6010": {
@@ -3113,6 +3915,11 @@
     "mob_spawns": [
       1619,
       1611
+    ],
+    "ambient": [
+      "A pendulum swings in a pattern that defies physics.",
+      "Time stutters. A second repeats itself.",
+      "You feel older. Then younger. Then exactly your age again."
     ]
   },
   "6011": {
@@ -3134,6 +3941,11 @@
       1610,
       1607,
       1611
+    ],
+    "ambient": [
+      "A pendulum swings in a pattern that defies physics.",
+      "For an instant, everything is sepia-toned. Then color returns.",
+      "Echoes of conversations that haven't happened yet drift through the walls."
     ]
   },
   "6012": {
@@ -3153,6 +3965,11 @@
     "mob_spawns": [
       1604,
       1603
+    ],
+    "ambient": [
+      "Echoes of conversations that haven't happened yet drift through the walls.",
+      "You catch a glimpse of yourself from a different angle \u2014 a different time.",
+      "You feel older. Then younger. Then exactly your age again."
     ]
   },
   "6013": {
@@ -3168,6 +3985,10 @@
     },
     "mob_spawns": [
       1629
+    ],
+    "ambient": [
+      "A grandfather clock chimes thirteen.",
+      "A clock on the wall runs backward for a moment, then corrects itself."
     ]
   },
   "6014": {
@@ -3185,6 +4006,11 @@
       1608,
       1602,
       1601
+    ],
+    "ambient": [
+      "Time stutters. A second repeats itself.",
+      "You catch a glimpse of yourself from a different angle \u2014 a different time.",
+      "A clock on the wall runs backward for a moment, then corrects itself."
     ]
   },
   "6015": {
@@ -3220,6 +4046,10 @@
     ],
     "initial_items": [
       4005
+    ],
+    "ambient": [
+      "Time stutters. A second repeats itself.",
+      "Dust motes hang frozen in a sunbeam, then resume falling."
     ]
   },
   "6016": {
@@ -3240,6 +4070,10 @@
     "mob_spawns": [
       1613,
       1601
+    ],
+    "ambient": [
+      "Dust motes hang frozen in a sunbeam, then resume falling.",
+      "The air smells of ozone and old libraries."
     ]
   },
   "6017": {
@@ -3259,6 +4093,10 @@
     },
     "mob_spawns": [
       1606
+    ],
+    "ambient": [
+      "The air smells of ozone and old libraries.",
+      "You feel older. Then younger. Then exactly your age again."
     ]
   },
   "6018": {
@@ -3279,6 +4117,12 @@
     "flags": [
       "safe",
       "indoors"
+    ],
+    "ambient": [
+      "You catch a glimpse of yourself from a different angle \u2014 a different time.",
+      "Time stutters. A second repeats itself.",
+      "You feel older. Then younger. Then exactly your age again.",
+      "A pendulum swings in a pattern that defies physics."
     ]
   },
   "6019": {
@@ -3298,6 +4142,11 @@
     "flags": [
       "safe",
       "indoors"
+    ],
+    "ambient": [
+      "A pendulum swings in a pattern that defies physics.",
+      "The air smells of ozone and old libraries.",
+      "You catch a glimpse of yourself from a different angle \u2014 a different time."
     ]
   },
   "6020": {
@@ -3313,6 +4162,10 @@
     },
     "mob_spawns": [
       1603
+    ],
+    "ambient": [
+      "Echoes of conversations that haven't happened yet drift through the walls.",
+      "You catch a glimpse of yourself from a different angle \u2014 a different time."
     ]
   },
   "6021": {
@@ -3328,6 +4181,12 @@
     },
     "mob_spawns": [
       1626
+    ],
+    "ambient": [
+      "A clock on the wall runs backward for a moment, then corrects itself.",
+      "Echoes of conversations that haven't happened yet drift through the walls.",
+      "For an instant, everything is sepia-toned. Then color returns.",
+      "Time stutters. A second repeats itself."
     ]
   },
   "6022": {
@@ -3346,6 +4205,12 @@
     },
     "mob_spawns": [
       1609
+    ],
+    "ambient": [
+      "Time stutters. A second repeats itself.",
+      "You catch a glimpse of yourself from a different angle \u2014 a different time.",
+      "Dust motes hang frozen in a sunbeam, then resume falling.",
+      "A clock on the wall runs backward for a moment, then corrects itself."
     ]
   },
   "6023": {
@@ -3366,6 +4231,12 @@
     "flags": [
       "safe",
       "indoors"
+    ],
+    "ambient": [
+      "Echoes of conversations that haven't happened yet drift through the walls.",
+      "You catch a glimpse of yourself from a different angle \u2014 a different time.",
+      "A clock on the wall runs backward for a moment, then corrects itself.",
+      "The air smells of ozone and old libraries."
     ]
   },
   "6024": {
@@ -3386,6 +4257,12 @@
     "mob_spawns": [
       1623,
       1609
+    ],
+    "ambient": [
+      "For an instant, everything is sepia-toned. Then color returns.",
+      "A pendulum swings in a pattern that defies physics.",
+      "You catch a glimpse of yourself from a different angle \u2014 a different time.",
+      "Echoes of conversations that haven't happened yet drift through the walls."
     ]
   },
   "6025": {
@@ -3407,6 +4284,12 @@
       1603,
       1607,
       1602
+    ],
+    "ambient": [
+      "A pendulum swings in a pattern that defies physics.",
+      "A clock on the wall runs backward for a moment, then corrects itself.",
+      "For an instant, everything is sepia-toned. Then color returns.",
+      "You feel older. Then younger. Then exactly your age again."
     ]
   },
   "6026": {
@@ -3425,6 +4308,11 @@
     "mob_spawns": [
       1631,
       1603
+    ],
+    "ambient": [
+      "You catch a glimpse of yourself from a different angle \u2014 a different time.",
+      "For an instant, everything is sepia-toned. Then color returns.",
+      "A pendulum swings in a pattern that defies physics."
     ]
   },
   "6027": {
@@ -3444,6 +4332,12 @@
     "mob_spawns": [
       1614,
       1618
+    ],
+    "ambient": [
+      "You feel older. Then younger. Then exactly your age again.",
+      "The air smells of ozone and old libraries.",
+      "For an instant, everything is sepia-toned. Then color returns.",
+      "You catch a glimpse of yourself from a different angle \u2014 a different time."
     ]
   },
   "6028": {
@@ -3464,6 +4358,12 @@
     "mob_spawns": [
       1607,
       1610
+    ],
+    "ambient": [
+      "A grandfather clock chimes thirteen.",
+      "Echoes of conversations that haven't happened yet drift through the walls.",
+      "You feel older. Then younger. Then exactly your age again.",
+      "Time stutters. A second repeats itself."
     ]
   },
   "6029": {
@@ -3484,6 +4384,11 @@
     "mob_spawns": [
       1616,
       1623
+    ],
+    "ambient": [
+      "Dust motes hang frozen in a sunbeam, then resume falling.",
+      "Echoes of conversations that haven't happened yet drift through the walls.",
+      "A pendulum swings in a pattern that defies physics."
     ]
   },
   "6030": {
@@ -3505,7 +4410,11 @@
       "safe",
       "indoors"
     ],
-    "meta_clue": "marble_passage_6"
+    "meta_clue": "marble_passage_6",
+    "ambient": [
+      "You catch a glimpse of yourself from a different angle \u2014 a different time.",
+      "Echoes of conversations that haven't happened yet drift through the walls."
+    ]
   },
   "6031": {
     "vnum": 6031,
@@ -3524,6 +4433,11 @@
     ],
     "initial_items": [
       2008
+    ],
+    "ambient": [
+      "Time stutters. A second repeats itself.",
+      "You feel older. Then younger. Then exactly your age again.",
+      "For an instant, everything is sepia-toned. Then color returns."
     ]
   },
   "6032": {
@@ -3539,6 +4453,11 @@
     "mob_spawns": [
       1609,
       1605
+    ],
+    "ambient": [
+      "A clock on the wall runs backward for a moment, then corrects itself.",
+      "You feel older. Then younger. Then exactly your age again.",
+      "A pendulum swings in a pattern that defies physics."
     ]
   },
   "6033": {
@@ -3556,6 +4475,10 @@
     },
     "mob_spawns": [
       1608
+    ],
+    "ambient": [
+      "You feel older. Then younger. Then exactly your age again.",
+      "Time stutters. A second repeats itself."
     ]
   },
   "6034": {
@@ -3579,6 +4502,11 @@
     ],
     "initial_items": [
       2007
+    ],
+    "ambient": [
+      "Echoes of conversations that haven't happened yet drift through the walls.",
+      "A pendulum swings in a pattern that defies physics.",
+      "Dust motes hang frozen in a sunbeam, then resume falling."
     ]
   },
   "6035": {
@@ -3604,6 +4532,12 @@
     ],
     "initial_items": [
       1003
+    ],
+    "ambient": [
+      "Echoes of conversations that haven't happened yet drift through the walls.",
+      "A grandfather clock chimes thirteen.",
+      "A clock on the wall runs backward for a moment, then corrects itself.",
+      "Dust motes hang frozen in a sunbeam, then resume falling."
     ]
   },
   "6036": {
@@ -3624,6 +4558,10 @@
     "flags": [
       "safe",
       "indoors"
+    ],
+    "ambient": [
+      "You catch a glimpse of yourself from a different angle \u2014 a different time.",
+      "Time stutters. A second repeats itself."
     ]
   },
   "6037": {
@@ -3642,6 +4580,12 @@
     "flags": [
       "safe",
       "indoors"
+    ],
+    "ambient": [
+      "For an instant, everything is sepia-toned. Then color returns.",
+      "You feel older. Then younger. Then exactly your age again.",
+      "Time stutters. A second repeats itself.",
+      "A pendulum swings in a pattern that defies physics."
     ]
   },
   "6038": {
@@ -3659,6 +4603,11 @@
     "mob_spawns": [
       1612,
       1632
+    ],
+    "ambient": [
+      "You feel older. Then younger. Then exactly your age again.",
+      "Dust motes hang frozen in a sunbeam, then resume falling.",
+      "A clock on the wall runs backward for a moment, then corrects itself."
     ]
   },
   "6039": {
@@ -3678,6 +4627,10 @@
     "mob_spawns": [
       1611,
       1623
+    ],
+    "ambient": [
+      "Echoes of conversations that haven't happened yet drift through the walls.",
+      "Time stutters. A second repeats itself."
     ]
   },
   "6040": {
@@ -3701,6 +4654,11 @@
     ],
     "initial_items": [
       5019
+    ],
+    "ambient": [
+      "Time stutters. A second repeats itself.",
+      "Echoes of conversations that haven't happened yet drift through the walls.",
+      "A pendulum swings in a pattern that defies physics."
     ]
   },
   "6041": {
@@ -3720,6 +4678,11 @@
     },
     "mob_spawns": [
       1610
+    ],
+    "ambient": [
+      "A grandfather clock chimes thirteen.",
+      "Dust motes hang frozen in a sunbeam, then resume falling.",
+      "A pendulum swings in a pattern that defies physics."
     ]
   },
   "6042": {
@@ -3739,6 +4702,11 @@
       1601,
       1602,
       1609
+    ],
+    "ambient": [
+      "A grandfather clock chimes thirteen.",
+      "A pendulum swings in a pattern that defies physics.",
+      "Dust motes hang frozen in a sunbeam, then resume falling."
     ]
   },
   "6043": {
@@ -3754,6 +4722,12 @@
     "mob_spawns": [
       1611,
       1606
+    ],
+    "ambient": [
+      "You feel older. Then younger. Then exactly your age again.",
+      "Echoes of conversations that haven't happened yet drift through the walls.",
+      "A grandfather clock chimes thirteen.",
+      "The air smells of ozone and old libraries."
     ]
   },
   "6044": {
@@ -3772,6 +4746,10 @@
     "mob_spawns": [
       1607,
       1604
+    ],
+    "ambient": [
+      "You catch a glimpse of yourself from a different angle \u2014 a different time.",
+      "Time stutters. A second repeats itself."
     ]
   },
   "6045": {
@@ -3795,6 +4773,11 @@
     ],
     "initial_items": [
       281
+    ],
+    "ambient": [
+      "You catch a glimpse of yourself from a different angle \u2014 a different time.",
+      "A grandfather clock chimes thirteen.",
+      "The air smells of ozone and old libraries."
     ]
   },
   "6046": {
@@ -3814,6 +4797,10 @@
     "mob_spawns": [
       1631,
       1623
+    ],
+    "ambient": [
+      "Time stutters. A second repeats itself.",
+      "You feel older. Then younger. Then exactly your age again."
     ]
   },
   "6047": {
@@ -3833,6 +4820,11 @@
     ],
     "initial_items": [
       5015
+    ],
+    "ambient": [
+      "Dust motes hang frozen in a sunbeam, then resume falling.",
+      "A grandfather clock chimes thirteen.",
+      "Echoes of conversations that haven't happened yet drift through the walls."
     ]
   },
   "6048": {
@@ -3852,6 +4844,10 @@
     ],
     "initial_items": [
       1017
+    ],
+    "ambient": [
+      "Time stutters. A second repeats itself.",
+      "Echoes of conversations that haven't happened yet drift through the walls."
     ]
   },
   "6049": {
@@ -3871,6 +4867,10 @@
     "mob_spawns": [
       1616,
       1624
+    ],
+    "ambient": [
+      "A pendulum swings in a pattern that defies physics.",
+      "The air smells of ozone and old libraries."
     ]
   },
   "6050": {
@@ -3890,6 +4890,11 @@
     "mob_spawns": [
       1620,
       1632
+    ],
+    "ambient": [
+      "A clock on the wall runs backward for a moment, then corrects itself.",
+      "A grandfather clock chimes thirteen.",
+      "The air smells of ozone and old libraries."
     ]
   },
   "6051": {
@@ -3905,6 +4910,11 @@
     },
     "mob_spawns": [
       1605
+    ],
+    "ambient": [
+      "A clock on the wall runs backward for a moment, then corrects itself.",
+      "Dust motes hang frozen in a sunbeam, then resume falling.",
+      "Echoes of conversations that haven't happened yet drift through the walls."
     ]
   },
   "6052": {
@@ -3919,6 +4929,12 @@
     },
     "mob_spawns": [
       1608
+    ],
+    "ambient": [
+      "The air smells of ozone and old libraries.",
+      "You feel older. Then younger. Then exactly your age again.",
+      "You catch a glimpse of yourself from a different angle \u2014 a different time.",
+      "For an instant, everything is sepia-toned. Then color returns."
     ]
   },
   "6100": {
@@ -3936,6 +4952,10 @@
       1603,
       1609,
       1602
+    ],
+    "ambient": [
+      "Dust motes hang frozen in a sunbeam, then resume falling.",
+      "Echoes of conversations that haven't happened yet drift through the walls."
     ]
   },
   "6101": {
@@ -3954,6 +4974,11 @@
     ],
     "flags": [
       "shop"
+    ],
+    "ambient": [
+      "You feel older. Then younger. Then exactly your age again.",
+      "Dust motes hang frozen in a sunbeam, then resume falling.",
+      "A pendulum swings in a pattern that defies physics."
     ]
   },
   "6102": {
@@ -3972,6 +4997,10 @@
     "mob_spawns": [
       1605,
       1602
+    ],
+    "ambient": [
+      "A clock on the wall runs backward for a moment, then corrects itself.",
+      "Echoes of conversations that haven't happened yet drift through the walls."
     ]
   },
   "6103": {
@@ -3989,6 +5018,11 @@
       1605,
       1609,
       1604
+    ],
+    "ambient": [
+      "You catch a glimpse of yourself from a different angle \u2014 a different time.",
+      "Dust motes hang frozen in a sunbeam, then resume falling.",
+      "For an instant, everything is sepia-toned. Then color returns."
     ]
   },
   "6104": {
@@ -4006,6 +5040,11 @@
     },
     "flags": [
       "safe"
+    ],
+    "ambient": [
+      "You catch a glimpse of yourself from a different angle \u2014 a different time.",
+      "A clock on the wall runs backward for a moment, then corrects itself.",
+      "The air smells of ozone and old libraries."
     ]
   },
   "6105": {
@@ -4026,6 +5065,10 @@
     "mob_spawns": [
       1610,
       1631
+    ],
+    "ambient": [
+      "Dust motes hang frozen in a sunbeam, then resume falling.",
+      "Echoes of conversations that haven't happened yet drift through the walls."
     ]
   },
   "6106": {
@@ -4046,6 +5089,10 @@
     ],
     "initial_items": [
       1004
+    ],
+    "ambient": [
+      "Time stutters. A second repeats itself.",
+      "You catch a glimpse of yourself from a different angle \u2014 a different time."
     ]
   },
   "6107": {
@@ -4061,6 +5108,12 @@
     },
     "mob_spawns": [
       1606
+    ],
+    "ambient": [
+      "For an instant, everything is sepia-toned. Then color returns.",
+      "Time stutters. A second repeats itself.",
+      "Dust motes hang frozen in a sunbeam, then resume falling.",
+      "A grandfather clock chimes thirteen."
     ]
   },
   "6108": {
@@ -4080,6 +5133,11 @@
     "mob_spawns": [
       1610,
       1616
+    ],
+    "ambient": [
+      "Echoes of conversations that haven't happened yet drift through the walls.",
+      "For an instant, everything is sepia-toned. Then color returns.",
+      "Dust motes hang frozen in a sunbeam, then resume falling."
     ]
   },
   "6109": {
@@ -4102,6 +5160,12 @@
     ],
     "initial_items": [
       3009
+    ],
+    "ambient": [
+      "Dust motes hang frozen in a sunbeam, then resume falling.",
+      "A clock on the wall runs backward for a moment, then corrects itself.",
+      "You catch a glimpse of yourself from a different angle \u2014 a different time.",
+      "For an instant, everything is sepia-toned. Then color returns."
     ]
   },
   "6110": {
@@ -4118,6 +5182,10 @@
     },
     "mob_spawns": [
       1609
+    ],
+    "ambient": [
+      "Time stutters. A second repeats itself.",
+      "Echoes of conversations that haven't happened yet drift through the walls."
     ]
   },
   "6111": {
@@ -4136,6 +5204,12 @@
     ],
     "flags": [
       "shop"
+    ],
+    "ambient": [
+      "You catch a glimpse of yourself from a different angle \u2014 a different time.",
+      "The air smells of ozone and old libraries.",
+      "Time stutters. A second repeats itself.",
+      "Dust motes hang frozen in a sunbeam, then resume falling."
     ]
   },
   "6112": {
@@ -4154,6 +5228,12 @@
     },
     "mob_spawns": [
       1604
+    ],
+    "ambient": [
+      "You catch a glimpse of yourself from a different angle \u2014 a different time.",
+      "The air smells of ozone and old libraries.",
+      "A clock on the wall runs backward for a moment, then corrects itself.",
+      "Time stutters. A second repeats itself."
     ]
   },
   "6113": {
@@ -4175,6 +5255,11 @@
       1601,
       1610,
       1606
+    ],
+    "ambient": [
+      "Dust motes hang frozen in a sunbeam, then resume falling.",
+      "You feel older. Then younger. Then exactly your age again.",
+      "Echoes of conversations that haven't happened yet drift through the walls."
     ]
   },
   "6114": {
@@ -4191,6 +5276,10 @@
     },
     "mob_spawns": [
       1616
+    ],
+    "ambient": [
+      "Time stutters. A second repeats itself.",
+      "Echoes of conversations that haven't happened yet drift through the walls."
     ]
   },
   "6115": {
@@ -4211,6 +5300,12 @@
     ],
     "initial_items": [
       1005
+    ],
+    "ambient": [
+      "Echoes of conversations that haven't happened yet drift through the walls.",
+      "You feel older. Then younger. Then exactly your age again.",
+      "You catch a glimpse of yourself from a different angle \u2014 a different time.",
+      "A pendulum swings in a pattern that defies physics."
     ]
   },
   "6116": {
@@ -4231,6 +5326,10 @@
     "mob_spawns": [
       1621,
       1602
+    ],
+    "ambient": [
+      "Echoes of conversations that haven't happened yet drift through the walls.",
+      "Time stutters. A second repeats itself."
     ]
   },
   "6117": {
@@ -4251,6 +5350,11 @@
     ],
     "initial_items": [
       5007
+    ],
+    "ambient": [
+      "You catch a glimpse of yourself from a different angle \u2014 a different time.",
+      "A grandfather clock chimes thirteen.",
+      "Time stutters. A second repeats itself."
     ]
   },
   "6118": {
@@ -4266,6 +5370,12 @@
     "mob_spawns": [
       1631,
       1603
+    ],
+    "ambient": [
+      "The air smells of ozone and old libraries.",
+      "Echoes of conversations that haven't happened yet drift through the walls.",
+      "Dust motes hang frozen in a sunbeam, then resume falling.",
+      "A clock on the wall runs backward for a moment, then corrects itself."
     ]
   },
   "6119": {
@@ -4282,6 +5392,10 @@
     },
     "flags": [
       "safe"
+    ],
+    "ambient": [
+      "The air smells of ozone and old libraries.",
+      "Echoes of conversations that haven't happened yet drift through the walls."
     ]
   },
   "6120": {
@@ -4297,6 +5411,12 @@
     "mob_spawns": [
       1605,
       1604
+    ],
+    "ambient": [
+      "Dust motes hang frozen in a sunbeam, then resume falling.",
+      "Echoes of conversations that haven't happened yet drift through the walls.",
+      "You feel older. Then younger. Then exactly your age again.",
+      "A clock on the wall runs backward for a moment, then corrects itself."
     ]
   },
   "3001": {
@@ -4313,6 +5433,11 @@
     },
     "mob_spawns": [
       1304
+    ],
+    "ambient": [
+      "Cigarette smoke curls from an ashtray nobody has used.",
+      "The city below hums with a thousand small betrayals.",
+      "The venetian blinds rattle in a draft from nowhere."
     ]
   },
   "3002": {
@@ -4329,6 +5454,12 @@
     "mob_spawns": [
       1322,
       1308
+    ],
+    "ambient": [
+      "You hear ice clinking in a glass. There's no glass here.",
+      "Headlights sweep across the ceiling as a car turns below.",
+      "The venetian blinds rattle in a draft from nowhere.",
+      "Rain hammers against the windows in irregular bursts."
     ]
   },
   "3003": {
@@ -4345,6 +5476,12 @@
     },
     "mob_spawns": [
       1304
+    ],
+    "ambient": [
+      "Rain hammers against the windows in irregular bursts.",
+      "The city below hums with a thousand small betrayals.",
+      "A phone rings once in another room, then stops.",
+      "Cigarette smoke curls from an ashtray nobody has used."
     ]
   },
   "3004": {
@@ -4364,6 +5501,11 @@
     "mob_spawns": [
       1309,
       1310
+    ],
+    "ambient": [
+      "Rain hammers against the windows in irregular bursts.",
+      "A saxophone plays somewhere below \u2014 mournful and distant.",
+      "The elevator dings on a floor nobody pressed."
     ]
   },
   "3005": {
@@ -4383,6 +5525,12 @@
     "flags": [
       "safe",
       "indoors"
+    ],
+    "ambient": [
+      "The venetian blinds rattle in a draft from nowhere.",
+      "Rain hammers against the windows in irregular bursts.",
+      "Cigarette smoke curls from an ashtray nobody has used.",
+      "Headlights sweep across the ceiling as a car turns below."
     ]
   },
   "3006": {
@@ -4400,6 +5548,10 @@
       1302,
       1314,
       1312
+    ],
+    "ambient": [
+      "Neon light flickers through the blinds, painting the room in red.",
+      "Headlights sweep across the ceiling as a car turns below."
     ]
   },
   "3007": {
@@ -4416,6 +5568,12 @@
     },
     "mob_spawns": [
       1313
+    ],
+    "ambient": [
+      "Headlights sweep across the ceiling as a car turns below.",
+      "Cigarette smoke curls from an ashtray nobody has used.",
+      "Neon light flickers through the blinds, painting the room in red.",
+      "You hear ice clinking in a glass. There's no glass here."
     ]
   },
   "3008": {
@@ -4434,6 +5592,11 @@
     },
     "mob_spawns": [
       1319
+    ],
+    "ambient": [
+      "Headlights sweep across the ceiling as a car turns below.",
+      "A saxophone plays somewhere below \u2014 mournful and distant.",
+      "The venetian blinds rattle in a draft from nowhere."
     ]
   },
   "3009": {
@@ -4454,6 +5617,11 @@
     "mob_spawns": [
       1330,
       1303
+    ],
+    "ambient": [
+      "The city below hums with a thousand small betrayals.",
+      "A phone rings once in another room, then stops.",
+      "You hear ice clinking in a glass. There's no glass here."
     ]
   },
   "3010": {
@@ -4473,6 +5641,12 @@
     },
     "mob_spawns": [
       1303
+    ],
+    "ambient": [
+      "A saxophone plays somewhere below \u2014 mournful and distant.",
+      "Neon light flickers through the blinds, painting the room in red.",
+      "A phone rings once in another room, then stops.",
+      "The elevator dings on a floor nobody pressed."
     ]
   },
   "3011": {
@@ -4491,6 +5665,12 @@
     "mob_spawns": [
       1308,
       1328
+    ],
+    "ambient": [
+      "Headlights sweep across the ceiling as a car turns below.",
+      "Cigarette smoke curls from an ashtray nobody has used.",
+      "The city below hums with a thousand small betrayals.",
+      "The venetian blinds rattle in a draft from nowhere."
     ]
   },
   "3012": {
@@ -4508,6 +5688,12 @@
       1312,
       1313,
       1303
+    ],
+    "ambient": [
+      "Rain hammers against the windows in irregular bursts.",
+      "Headlights sweep across the ceiling as a car turns below.",
+      "A saxophone plays somewhere below \u2014 mournful and distant.",
+      "Neon light flickers through the blinds, painting the room in red."
     ]
   },
   "3013": {
@@ -4527,6 +5713,11 @@
     "flags": [
       "safe",
       "indoors"
+    ],
+    "ambient": [
+      "A phone rings once in another room, then stops.",
+      "A saxophone plays somewhere below \u2014 mournful and distant.",
+      "The city below hums with a thousand small betrayals."
     ]
   },
   "3014": {
@@ -4547,6 +5738,12 @@
     "mob_spawns": [
       1313,
       1311
+    ],
+    "ambient": [
+      "Rain hammers against the windows in irregular bursts.",
+      "You hear ice clinking in a glass. There's no glass here.",
+      "Headlights sweep across the ceiling as a car turns below.",
+      "The elevator dings on a floor nobody pressed."
     ]
   },
   "3015": {
@@ -4566,6 +5763,10 @@
     },
     "mob_spawns": [
       1309
+    ],
+    "ambient": [
+      "The elevator dings on a floor nobody pressed.",
+      "You hear ice clinking in a glass. There's no glass here."
     ]
   },
   "3016": {
@@ -4585,6 +5786,11 @@
     },
     "mob_spawns": [
       1326
+    ],
+    "ambient": [
+      "The venetian blinds rattle in a draft from nowhere.",
+      "Headlights sweep across the ceiling as a car turns below.",
+      "You hear ice clinking in a glass. There's no glass here."
     ]
   },
   "3017": {
@@ -4606,6 +5812,10 @@
     ],
     "flags": [
       "indoors"
+    ],
+    "ambient": [
+      "The elevator dings on a floor nobody pressed.",
+      "Cigarette smoke curls from an ashtray nobody has used."
     ]
   },
   "3018": {
@@ -4624,6 +5834,12 @@
     ],
     "flags": [
       "indoors"
+    ],
+    "ambient": [
+      "Neon light flickers through the blinds, painting the room in red.",
+      "Cigarette smoke curls from an ashtray nobody has used.",
+      "Headlights sweep across the ceiling as a car turns below.",
+      "A phone rings once in another room, then stops."
     ]
   },
   "3019": {
@@ -4641,6 +5857,11 @@
     "mob_spawns": [
       1309,
       1320
+    ],
+    "ambient": [
+      "A saxophone plays somewhere below \u2014 mournful and distant.",
+      "Rain hammers against the windows in irregular bursts.",
+      "The elevator dings on a floor nobody pressed."
     ]
   },
   "3020": {
@@ -4678,6 +5899,12 @@
     ],
     "mob_spawns": [
       1313
+    ],
+    "ambient": [
+      "Neon light flickers through the blinds, painting the room in red.",
+      "Cigarette smoke curls from an ashtray nobody has used.",
+      "Rain hammers against the windows in irregular bursts.",
+      "You hear ice clinking in a glass. There's no glass here."
     ]
   },
   "3021": {
@@ -4697,6 +5924,11 @@
     },
     "mob_spawns": [
       1304
+    ],
+    "ambient": [
+      "A saxophone plays somewhere below \u2014 mournful and distant.",
+      "The elevator dings on a floor nobody pressed.",
+      "The venetian blinds rattle in a draft from nowhere."
     ]
   },
   "3022": {
@@ -4718,6 +5950,11 @@
       1304,
       1309,
       1311
+    ],
+    "ambient": [
+      "A saxophone plays somewhere below \u2014 mournful and distant.",
+      "Neon light flickers through the blinds, painting the room in red.",
+      "Headlights sweep across the ceiling as a car turns below."
     ]
   },
   "3023": {
@@ -4738,6 +5975,12 @@
     "flags": [
       "safe",
       "indoors"
+    ],
+    "ambient": [
+      "Cigarette smoke curls from an ashtray nobody has used.",
+      "You hear ice clinking in a glass. There's no glass here.",
+      "The venetian blinds rattle in a draft from nowhere.",
+      "The elevator dings on a floor nobody pressed."
     ]
   },
   "3024": {
@@ -4756,6 +5999,11 @@
     "mob_spawns": [
       1317,
       1309
+    ],
+    "ambient": [
+      "Headlights sweep across the ceiling as a car turns below.",
+      "The elevator dings on a floor nobody pressed.",
+      "The venetian blinds rattle in a draft from nowhere."
     ]
   },
   "3025": {
@@ -4773,7 +6021,13 @@
       1307,
       1311
     ],
-    "meta_clue": "marble_passage_3"
+    "meta_clue": "marble_passage_3",
+    "ambient": [
+      "Neon light flickers through the blinds, painting the room in red.",
+      "The city below hums with a thousand small betrayals.",
+      "The elevator dings on a floor nobody pressed.",
+      "Cigarette smoke curls from an ashtray nobody has used."
+    ]
   },
   "3026": {
     "vnum": 3026,
@@ -4792,6 +6046,12 @@
     "mob_spawns": [
       1320,
       1308
+    ],
+    "ambient": [
+      "Neon light flickers through the blinds, painting the room in red.",
+      "A saxophone plays somewhere below \u2014 mournful and distant.",
+      "Cigarette smoke curls from an ashtray nobody has used.",
+      "The city below hums with a thousand small betrayals."
     ]
   },
   "3027": {
@@ -4814,6 +6074,11 @@
     ],
     "initial_items": [
       1015
+    ],
+    "ambient": [
+      "A phone rings once in another room, then stops.",
+      "You hear ice clinking in a glass. There's no glass here.",
+      "Cigarette smoke curls from an ashtray nobody has used."
     ]
   },
   "3028": {
@@ -4838,6 +6103,10 @@
     ],
     "initial_items": [
       3
+    ],
+    "ambient": [
+      "Cigarette smoke curls from an ashtray nobody has used.",
+      "The venetian blinds rattle in a draft from nowhere."
     ]
   },
   "3029": {
@@ -4857,6 +6126,12 @@
     },
     "mob_spawns": [
       1304
+    ],
+    "ambient": [
+      "The venetian blinds rattle in a draft from nowhere.",
+      "Headlights sweep across the ceiling as a car turns below.",
+      "Neon light flickers through the blinds, painting the room in red.",
+      "The elevator dings on a floor nobody pressed."
     ]
   },
   "3030": {
@@ -4874,6 +6149,12 @@
     "mob_spawns": [
       1313,
       1309
+    ],
+    "ambient": [
+      "Headlights sweep across the ceiling as a car turns below.",
+      "A phone rings once in another room, then stops.",
+      "You hear ice clinking in a glass. There's no glass here.",
+      "Cigarette smoke curls from an ashtray nobody has used."
     ]
   },
   "3031": {
@@ -4891,6 +6172,12 @@
     },
     "mob_spawns": [
       1302
+    ],
+    "ambient": [
+      "The city below hums with a thousand small betrayals.",
+      "Headlights sweep across the ceiling as a car turns below.",
+      "A phone rings once in another room, then stops.",
+      "The venetian blinds rattle in a draft from nowhere."
     ]
   },
   "3032": {
@@ -4910,6 +6197,10 @@
     },
     "mob_spawns": [
       1324
+    ],
+    "ambient": [
+      "The elevator dings on a floor nobody pressed.",
+      "The city below hums with a thousand small betrayals."
     ]
   },
   "3033": {
@@ -4930,6 +6221,10 @@
     "mob_spawns": [
       1330,
       1305
+    ],
+    "ambient": [
+      "The city below hums with a thousand small betrayals.",
+      "Rain hammers against the windows in irregular bursts."
     ]
   },
   "3034": {
@@ -4949,6 +6244,11 @@
     },
     "mob_spawns": [
       1317
+    ],
+    "ambient": [
+      "Headlights sweep across the ceiling as a car turns below.",
+      "The city below hums with a thousand small betrayals.",
+      "You hear ice clinking in a glass. There's no glass here."
     ]
   },
   "3035": {
@@ -4968,6 +6268,12 @@
     ],
     "flags": [
       "indoors"
+    ],
+    "ambient": [
+      "Neon light flickers through the blinds, painting the room in red.",
+      "Headlights sweep across the ceiling as a car turns below.",
+      "Rain hammers against the windows in irregular bursts.",
+      "A saxophone plays somewhere below \u2014 mournful and distant."
     ]
   },
   "3036": {
@@ -4984,6 +6290,12 @@
     "mob_spawns": [
       1301,
       1313
+    ],
+    "ambient": [
+      "The venetian blinds rattle in a draft from nowhere.",
+      "A phone rings once in another room, then stops.",
+      "A saxophone plays somewhere below \u2014 mournful and distant.",
+      "The city below hums with a thousand small betrayals."
     ]
   },
   "3037": {
@@ -5002,6 +6314,11 @@
     },
     "mob_spawns": [
       1314
+    ],
+    "ambient": [
+      "A saxophone plays somewhere below \u2014 mournful and distant.",
+      "You hear ice clinking in a glass. There's no glass here.",
+      "Headlights sweep across the ceiling as a car turns below."
     ]
   },
   "3038": {
@@ -5022,6 +6339,10 @@
     "mob_spawns": [
       1328,
       1317
+    ],
+    "ambient": [
+      "Neon light flickers through the blinds, painting the room in red.",
+      "The city below hums with a thousand small betrayals."
     ]
   },
   "3039": {
@@ -5040,6 +6361,12 @@
     },
     "mob_spawns": [
       1318
+    ],
+    "ambient": [
+      "Neon light flickers through the blinds, painting the room in red.",
+      "A saxophone plays somewhere below \u2014 mournful and distant.",
+      "Headlights sweep across the ceiling as a car turns below.",
+      "The city below hums with a thousand small betrayals."
     ]
   },
   "3040": {
@@ -5055,6 +6382,11 @@
     },
     "mob_spawns": [
       1301
+    ],
+    "ambient": [
+      "A phone rings once in another room, then stops.",
+      "The city below hums with a thousand small betrayals.",
+      "A saxophone plays somewhere below \u2014 mournful and distant."
     ]
   },
   "3041": {
@@ -5072,6 +6404,11 @@
     },
     "mob_spawns": [
       1304
+    ],
+    "ambient": [
+      "You hear ice clinking in a glass. There's no glass here.",
+      "The city below hums with a thousand small betrayals.",
+      "A phone rings once in another room, then stops."
     ]
   },
   "3042": {
@@ -5091,6 +6428,12 @@
     },
     "mob_spawns": [
       1311
+    ],
+    "ambient": [
+      "Headlights sweep across the ceiling as a car turns below.",
+      "You hear ice clinking in a glass. There's no glass here.",
+      "Rain hammers against the windows in irregular bursts.",
+      "Cigarette smoke curls from an ashtray nobody has used."
     ]
   },
   "3043": {
@@ -5108,6 +6451,10 @@
     },
     "mob_spawns": [
       1301
+    ],
+    "ambient": [
+      "The elevator dings on a floor nobody pressed.",
+      "Cigarette smoke curls from an ashtray nobody has used."
     ]
   },
   "3044": {
@@ -5124,6 +6471,10 @@
     },
     "mob_spawns": [
       1307
+    ],
+    "ambient": [
+      "A saxophone plays somewhere below \u2014 mournful and distant.",
+      "The city below hums with a thousand small betrayals."
     ]
   },
   "3045": {
@@ -5143,6 +6494,10 @@
     },
     "mob_spawns": [
       1302
+    ],
+    "ambient": [
+      "A saxophone plays somewhere below \u2014 mournful and distant.",
+      "Headlights sweep across the ceiling as a car turns below."
     ]
   },
   "3046": {
@@ -5160,6 +6515,10 @@
     "mob_spawns": [
       1304,
       1324
+    ],
+    "ambient": [
+      "Cigarette smoke curls from an ashtray nobody has used.",
+      "Rain hammers against the windows in irregular bursts."
     ]
   },
   "3047": {
@@ -5174,6 +6533,10 @@
     },
     "mob_spawns": [
       1330
+    ],
+    "ambient": [
+      "A phone rings once in another room, then stops.",
+      "Rain hammers against the windows in irregular bursts."
     ]
   },
   "3048": {
@@ -5191,6 +6554,11 @@
     "mob_spawns": [
       1305,
       1328
+    ],
+    "ambient": [
+      "A phone rings once in another room, then stops.",
+      "The venetian blinds rattle in a draft from nowhere.",
+      "The city below hums with a thousand small betrayals."
     ]
   },
   "3049": {
@@ -5206,6 +6574,10 @@
     },
     "mob_spawns": [
       1310
+    ],
+    "ambient": [
+      "The elevator dings on a floor nobody pressed.",
+      "You hear ice clinking in a glass. There's no glass here."
     ]
   },
   "3100": {
@@ -5224,6 +6596,11 @@
     ],
     "mob_spawns": [
       1313
+    ],
+    "ambient": [
+      "The venetian blinds rattle in a draft from nowhere.",
+      "Neon light flickers through the blinds, painting the room in red.",
+      "You hear ice clinking in a glass. There's no glass here."
     ]
   },
   "3101": {
@@ -5243,6 +6620,10 @@
     ],
     "flags": [
       "dark"
+    ],
+    "ambient": [
+      "A saxophone plays somewhere below \u2014 mournful and distant.",
+      "The city below hums with a thousand small betrayals."
     ]
   },
   "3102": {
@@ -5264,6 +6645,12 @@
     ],
     "flags": [
       "dark"
+    ],
+    "ambient": [
+      "The elevator dings on a floor nobody pressed.",
+      "Headlights sweep across the ceiling as a car turns below.",
+      "Neon light flickers through the blinds, painting the room in red.",
+      "A saxophone plays somewhere below \u2014 mournful and distant."
     ]
   },
   "3103": {
@@ -5283,6 +6670,11 @@
     ],
     "flags": [
       "dark"
+    ],
+    "ambient": [
+      "Cigarette smoke curls from an ashtray nobody has used.",
+      "Headlights sweep across the ceiling as a car turns below.",
+      "The venetian blinds rattle in a draft from nowhere."
     ]
   },
   "3104": {
@@ -5305,6 +6697,12 @@
     ],
     "initial_items": [
       4009
+    ],
+    "ambient": [
+      "Rain hammers against the windows in irregular bursts.",
+      "Headlights sweep across the ceiling as a car turns below.",
+      "Cigarette smoke curls from an ashtray nobody has used.",
+      "A phone rings once in another room, then stops."
     ]
   },
   "3105": {
@@ -5328,6 +6726,12 @@
     "flags": [
       "dark",
       "indoors"
+    ],
+    "ambient": [
+      "Neon light flickers through the blinds, painting the room in red.",
+      "A saxophone plays somewhere below \u2014 mournful and distant.",
+      "Headlights sweep across the ceiling as a car turns below.",
+      "The venetian blinds rattle in a draft from nowhere."
     ]
   },
   "3106": {
@@ -5350,6 +6754,12 @@
     ],
     "flags": [
       "dark"
+    ],
+    "ambient": [
+      "Cigarette smoke curls from an ashtray nobody has used.",
+      "The city below hums with a thousand small betrayals.",
+      "The venetian blinds rattle in a draft from nowhere.",
+      "The elevator dings on a floor nobody pressed."
     ]
   },
   "3107": {
@@ -5371,6 +6781,11 @@
     ],
     "flags": [
       "dark"
+    ],
+    "ambient": [
+      "The elevator dings on a floor nobody pressed.",
+      "The city below hums with a thousand small betrayals.",
+      "Headlights sweep across the ceiling as a car turns below."
     ]
   },
   "3108": {
@@ -5389,6 +6804,10 @@
     ],
     "mob_spawns": [
       1309
+    ],
+    "ambient": [
+      "The elevator dings on a floor nobody pressed.",
+      "The city below hums with a thousand small betrayals."
     ]
   },
   "3109": {
@@ -5412,6 +6831,12 @@
     ],
     "initial_items": [
       4020
+    ],
+    "ambient": [
+      "A phone rings once in another room, then stops.",
+      "Cigarette smoke curls from an ashtray nobody has used.",
+      "You hear ice clinking in a glass. There's no glass here.",
+      "Rain hammers against the windows in irregular bursts."
     ]
   },
   "3110": {
@@ -5435,6 +6860,12 @@
       1314,
       1312,
       1304
+    ],
+    "ambient": [
+      "The city below hums with a thousand small betrayals.",
+      "Cigarette smoke curls from an ashtray nobody has used.",
+      "Rain hammers against the windows in irregular bursts.",
+      "You hear ice clinking in a glass. There's no glass here."
     ]
   },
   "3111": {
@@ -5461,6 +6892,12 @@
     ],
     "initial_items": [
       2009
+    ],
+    "ambient": [
+      "Rain hammers against the windows in irregular bursts.",
+      "Headlights sweep across the ceiling as a car turns below.",
+      "Cigarette smoke curls from an ashtray nobody has used.",
+      "The city below hums with a thousand small betrayals."
     ]
   },
   "3112": {
@@ -5486,6 +6923,10 @@
     ],
     "initial_items": [
       5018
+    ],
+    "ambient": [
+      "The venetian blinds rattle in a draft from nowhere.",
+      "A phone rings once in another room, then stops."
     ]
   },
   "3113": {
@@ -5504,6 +6945,10 @@
     ],
     "flags": [
       "dark"
+    ],
+    "ambient": [
+      "The elevator dings on a floor nobody pressed.",
+      "Cigarette smoke curls from an ashtray nobody has used."
     ]
   },
   "3114": {
@@ -5525,6 +6970,12 @@
     ],
     "flags": [
       "dark"
+    ],
+    "ambient": [
+      "Neon light flickers through the blinds, painting the room in red.",
+      "A saxophone plays somewhere below \u2014 mournful and distant.",
+      "Rain hammers against the windows in irregular bursts.",
+      "The venetian blinds rattle in a draft from nowhere."
     ]
   },
   "3115": {
@@ -5548,6 +6999,11 @@
     ],
     "flags": [
       "dark"
+    ],
+    "ambient": [
+      "Rain hammers against the windows in irregular bursts.",
+      "A phone rings once in another room, then stops.",
+      "Neon light flickers through the blinds, painting the room in red."
     ]
   },
   "3116": {
@@ -5569,6 +7025,10 @@
     "flags": [
       "dark",
       "indoors"
+    ],
+    "ambient": [
+      "Cigarette smoke curls from an ashtray nobody has used.",
+      "A phone rings once in another room, then stops."
     ]
   },
   "3117": {
@@ -5586,6 +7046,12 @@
     ],
     "flags": [
       "dark"
+    ],
+    "ambient": [
+      "The city below hums with a thousand small betrayals.",
+      "Neon light flickers through the blinds, painting the room in red.",
+      "The elevator dings on a floor nobody pressed.",
+      "A saxophone plays somewhere below \u2014 mournful and distant."
     ]
   },
   "3118": {
@@ -5606,6 +7072,12 @@
     ],
     "flags": [
       "dark"
+    ],
+    "ambient": [
+      "A phone rings once in another room, then stops.",
+      "You hear ice clinking in a glass. There's no glass here.",
+      "Cigarette smoke curls from an ashtray nobody has used.",
+      "The city below hums with a thousand small betrayals."
     ]
   },
   "3119": {
@@ -5623,6 +7095,10 @@
     ],
     "flags": [
       "dark"
+    ],
+    "ambient": [
+      "Cigarette smoke curls from an ashtray nobody has used.",
+      "Headlights sweep across the ceiling as a car turns below."
     ]
   },
   "2001": {
@@ -5642,6 +7118,11 @@
     ],
     "initial_items": [
       4014
+    ],
+    "ambient": [
+      "A security camera tracks your movement, then looks away.",
+      "The hum of servers fills the air like a mechanical heartbeat.",
+      "The floor vibrates from machinery deep below."
     ]
   },
   "2002": {
@@ -5658,6 +7139,10 @@
     "mob_spawns": [
       1230,
       1203
+    ],
+    "ambient": [
+      "A cleaning drone whirs past, ignoring you completely.",
+      "Fluorescent lights flicker in a pattern that might be morse code."
     ]
   },
   "2003": {
@@ -5674,6 +7159,12 @@
     },
     "mob_spawns": [
       1226
+    ],
+    "ambient": [
+      "Someone's augmented reality overlay bleeds into visible light briefly.",
+      "A vending machine dispenses something without being asked.",
+      "A security camera tracks your movement, then looks away.",
+      "A holographic ad glitches, showing static for a moment."
     ]
   },
   "2004": {
@@ -5693,6 +7184,11 @@
     "mob_spawns": [
       1224,
       1204
+    ],
+    "ambient": [
+      "A holographic ad glitches, showing static for a moment.",
+      "The air recyclers kick in with a low whine.",
+      "The hum of servers fills the air like a mechanical heartbeat."
     ]
   },
   "2005": {
@@ -5711,6 +7207,11 @@
     },
     "mob_spawns": [
       1230
+    ],
+    "ambient": [
+      "A security camera tracks your movement, then looks away.",
+      "The air recyclers kick in with a low whine.",
+      "Someone's augmented reality overlay bleeds into visible light briefly."
     ]
   },
   "2006": {
@@ -5728,6 +7229,12 @@
       1228,
       1206,
       1204
+    ],
+    "ambient": [
+      "A security camera tracks your movement, then looks away.",
+      "The hum of servers fills the air like a mechanical heartbeat.",
+      "Fluorescent lights flicker in a pattern that might be morse code.",
+      "The floor vibrates from machinery deep below."
     ]
   },
   "2007": {
@@ -5747,6 +7254,10 @@
     ],
     "initial_items": [
       5003
+    ],
+    "ambient": [
+      "Corporate muzak plays at the edge of hearing \u2014 just wrong enough to notice.",
+      "A vending machine dispenses something without being asked."
     ]
   },
   "2008": {
@@ -5766,6 +7277,11 @@
     "mob_spawns": [
       1214,
       1207
+    ],
+    "ambient": [
+      "Corporate muzak plays at the edge of hearing \u2014 just wrong enough to notice.",
+      "Fluorescent lights flicker in a pattern that might be morse code.",
+      "The hum of servers fills the air like a mechanical heartbeat."
     ]
   },
   "2009": {
@@ -5785,6 +7301,12 @@
     },
     "flags": [
       "safe"
+    ],
+    "ambient": [
+      "The floor vibrates from machinery deep below.",
+      "The air recyclers kick in with a low whine.",
+      "Someone's augmented reality overlay bleeds into visible light briefly.",
+      "A holographic ad glitches, showing static for a moment."
     ]
   },
   "2010": {
@@ -5805,6 +7327,10 @@
     "flags": [
       "safe",
       "indoors"
+    ],
+    "ambient": [
+      "A holographic ad glitches, showing static for a moment.",
+      "Corporate muzak plays at the edge of hearing \u2014 just wrong enough to notice."
     ]
   },
   "2011": {
@@ -5823,6 +7349,11 @@
     "mob_spawns": [
       1224,
       1222
+    ],
+    "ambient": [
+      "The floor vibrates from machinery deep below.",
+      "The hum of servers fills the air like a mechanical heartbeat.",
+      "A vending machine dispenses something without being asked."
     ]
   },
   "2012": {
@@ -5839,6 +7370,10 @@
     "mob_spawns": [
       1210,
       1231
+    ],
+    "ambient": [
+      "A vending machine dispenses something without being asked.",
+      "A cleaning drone whirs past, ignoring you completely."
     ]
   },
   "2013": {
@@ -5861,6 +7396,11 @@
     ],
     "flags": [
       "shop"
+    ],
+    "ambient": [
+      "The floor vibrates from machinery deep below.",
+      "A security camera tracks your movement, then looks away.",
+      "Someone's augmented reality overlay bleeds into visible light briefly."
     ]
   },
   "2014": {
@@ -5883,6 +7423,12 @@
     ],
     "initial_items": [
       3018
+    ],
+    "ambient": [
+      "A cleaning drone whirs past, ignoring you completely.",
+      "Someone's augmented reality overlay bleeds into visible light briefly.",
+      "The hum of servers fills the air like a mechanical heartbeat.",
+      "A vending machine dispenses something without being asked."
     ]
   },
   "2015": {
@@ -5917,6 +7463,11 @@
     "mob_spawns": [
       1229,
       1201
+    ],
+    "ambient": [
+      "Corporate muzak plays at the edge of hearing \u2014 just wrong enough to notice.",
+      "Someone's augmented reality overlay bleeds into visible light briefly.",
+      "The air recyclers kick in with a low whine."
     ]
   },
   "2016": {
@@ -5938,6 +7489,10 @@
       1202,
       1201,
       1204
+    ],
+    "ambient": [
+      "A security camera tracks your movement, then looks away.",
+      "Fluorescent lights flicker in a pattern that might be morse code."
     ]
   },
   "2017": {
@@ -5956,6 +7511,11 @@
     },
     "mob_spawns": [
       1201
+    ],
+    "ambient": [
+      "The floor vibrates from machinery deep below.",
+      "Fluorescent lights flicker in a pattern that might be morse code.",
+      "A security camera tracks your movement, then looks away."
     ]
   },
   "2018": {
@@ -5972,6 +7532,10 @@
     "mob_spawns": [
       1208,
       1207
+    ],
+    "ambient": [
+      "A security camera tracks your movement, then looks away.",
+      "A vending machine dispenses something without being asked."
     ]
   },
   "2019": {
@@ -5989,6 +7553,12 @@
       1206,
       1202,
       1229
+    ],
+    "ambient": [
+      "A security camera tracks your movement, then looks away.",
+      "A holographic ad glitches, showing static for a moment.",
+      "Someone's augmented reality overlay bleeds into visible light briefly.",
+      "A cleaning drone whirs past, ignoring you completely."
     ]
   },
   "2020": {
@@ -6013,6 +7583,10 @@
     "mob_spawns": [
       1220,
       1208
+    ],
+    "ambient": [
+      "The hum of servers fills the air like a mechanical heartbeat.",
+      "The floor vibrates from machinery deep below."
     ]
   },
   "2021": {
@@ -6035,6 +7609,10 @@
     ],
     "initial_items": [
       1020
+    ],
+    "ambient": [
+      "Fluorescent lights flicker in a pattern that might be morse code.",
+      "A holographic ad glitches, showing static for a moment."
     ]
   },
   "2022": {
@@ -6057,6 +7635,10 @@
     ],
     "initial_items": [
       5008
+    ],
+    "ambient": [
+      "A security camera tracks your movement, then looks away.",
+      "Fluorescent lights flicker in a pattern that might be morse code."
     ]
   },
   "2023": {
@@ -6078,6 +7660,10 @@
       1229,
       1203,
       1204
+    ],
+    "ambient": [
+      "Corporate muzak plays at the edge of hearing \u2014 just wrong enough to notice.",
+      "Fluorescent lights flicker in a pattern that might be morse code."
     ]
   },
   "2024": {
@@ -6099,6 +7685,10 @@
     ],
     "initial_items": [
       6015
+    ],
+    "ambient": [
+      "A vending machine dispenses something without being asked.",
+      "Fluorescent lights flicker in a pattern that might be morse code."
     ]
   },
   "2025": {
@@ -6114,6 +7704,12 @@
     },
     "mob_spawns": [
       1205
+    ],
+    "ambient": [
+      "Fluorescent lights flicker in a pattern that might be morse code.",
+      "Corporate muzak plays at the edge of hearing \u2014 just wrong enough to notice.",
+      "A security camera tracks your movement, then looks away.",
+      "Someone's augmented reality overlay bleeds into visible light briefly."
     ]
   },
   "2026": {
@@ -6133,6 +7729,10 @@
     "mob_spawns": [
       1205,
       1230
+    ],
+    "ambient": [
+      "Corporate muzak plays at the edge of hearing \u2014 just wrong enough to notice.",
+      "A holographic ad glitches, showing static for a moment."
     ]
   },
   "2027": {
@@ -6153,6 +7753,11 @@
     "mob_spawns": [
       1218,
       1208
+    ],
+    "ambient": [
+      "A cleaning drone whirs past, ignoring you completely.",
+      "Corporate muzak plays at the edge of hearing \u2014 just wrong enough to notice.",
+      "The air recyclers kick in with a low whine."
     ]
   },
   "2028": {
@@ -6172,6 +7777,10 @@
     },
     "mob_spawns": [
       1226
+    ],
+    "ambient": [
+      "The hum of servers fills the air like a mechanical heartbeat.",
+      "A holographic ad glitches, showing static for a moment."
     ]
   },
   "2029": {
@@ -6192,6 +7801,10 @@
     "mob_spawns": [
       1204,
       1202
+    ],
+    "ambient": [
+      "A holographic ad glitches, showing static for a moment.",
+      "A security camera tracks your movement, then looks away."
     ]
   },
   "2030": {
@@ -6215,7 +7828,11 @@
     "initial_items": [
       5013
     ],
-    "meta_clue": "marble_passage_2"
+    "meta_clue": "marble_passage_2",
+    "ambient": [
+      "Corporate muzak plays at the edge of hearing \u2014 just wrong enough to notice.",
+      "A security camera tracks your movement, then looks away."
+    ]
   },
   "2031": {
     "vnum": 2031,
@@ -6229,6 +7846,10 @@
     },
     "mob_spawns": [
       1230
+    ],
+    "ambient": [
+      "A cleaning drone whirs past, ignoring you completely.",
+      "The air recyclers kick in with a low whine."
     ]
   },
   "2032": {
@@ -6247,6 +7868,10 @@
     "mob_spawns": [
       1214,
       1214
+    ],
+    "ambient": [
+      "A cleaning drone whirs past, ignoring you completely.",
+      "Someone's augmented reality overlay bleeds into visible light briefly."
     ]
   },
   "2033": {
@@ -6269,6 +7894,12 @@
     ],
     "flags": [
       "shop"
+    ],
+    "ambient": [
+      "The hum of servers fills the air like a mechanical heartbeat.",
+      "Corporate muzak plays at the edge of hearing \u2014 just wrong enough to notice.",
+      "The floor vibrates from machinery deep below.",
+      "Fluorescent lights flicker in a pattern that might be morse code."
     ]
   },
   "2034": {
@@ -6289,6 +7920,11 @@
     "flags": [
       "safe",
       "indoors"
+    ],
+    "ambient": [
+      "A vending machine dispenses something without being asked.",
+      "The hum of servers fills the air like a mechanical heartbeat.",
+      "The floor vibrates from machinery deep below."
     ]
   },
   "2035": {
@@ -6308,6 +7944,12 @@
     },
     "mob_spawns": [
       1202
+    ],
+    "ambient": [
+      "Fluorescent lights flicker in a pattern that might be morse code.",
+      "A holographic ad glitches, showing static for a moment.",
+      "The air recyclers kick in with a low whine.",
+      "Corporate muzak plays at the edge of hearing \u2014 just wrong enough to notice."
     ]
   },
   "2036": {
@@ -6326,6 +7968,12 @@
     "mob_spawns": [
       1221,
       1221
+    ],
+    "ambient": [
+      "A holographic ad glitches, showing static for a moment.",
+      "Corporate muzak plays at the edge of hearing \u2014 just wrong enough to notice.",
+      "The floor vibrates from machinery deep below.",
+      "Someone's augmented reality overlay bleeds into visible light briefly."
     ]
   },
   "2037": {
@@ -6340,6 +7988,11 @@
     },
     "mob_spawns": [
       1203
+    ],
+    "ambient": [
+      "Someone's augmented reality overlay bleeds into visible light briefly.",
+      "The hum of servers fills the air like a mechanical heartbeat.",
+      "The floor vibrates from machinery deep below."
     ]
   },
   "2038": {
@@ -6357,6 +8010,12 @@
     },
     "mob_spawns": [
       1223
+    ],
+    "ambient": [
+      "The floor vibrates from machinery deep below.",
+      "The hum of servers fills the air like a mechanical heartbeat.",
+      "A vending machine dispenses something without being asked.",
+      "A cleaning drone whirs past, ignoring you completely."
     ]
   },
   "2039": {
@@ -6377,6 +8036,12 @@
     "mob_spawns": [
       1229,
       1230
+    ],
+    "ambient": [
+      "A cleaning drone whirs past, ignoring you completely.",
+      "The hum of servers fills the air like a mechanical heartbeat.",
+      "Corporate muzak plays at the edge of hearing \u2014 just wrong enough to notice.",
+      "The floor vibrates from machinery deep below."
     ]
   },
   "2040": {
@@ -6396,6 +8061,12 @@
     },
     "mob_spawns": [
       1228
+    ],
+    "ambient": [
+      "Corporate muzak plays at the edge of hearing \u2014 just wrong enough to notice.",
+      "A vending machine dispenses something without being asked.",
+      "A security camera tracks your movement, then looks away.",
+      "Fluorescent lights flicker in a pattern that might be morse code."
     ]
   },
   "2041": {
@@ -6415,6 +8086,12 @@
     },
     "mob_spawns": [
       1203
+    ],
+    "ambient": [
+      "A vending machine dispenses something without being asked.",
+      "The air recyclers kick in with a low whine.",
+      "The floor vibrates from machinery deep below.",
+      "Corporate muzak plays at the edge of hearing \u2014 just wrong enough to notice."
     ]
   },
   "2042": {
@@ -6433,6 +8110,12 @@
     "mob_spawns": [
       1201,
       1228
+    ],
+    "ambient": [
+      "Someone's augmented reality overlay bleeds into visible light briefly.",
+      "The hum of servers fills the air like a mechanical heartbeat.",
+      "A vending machine dispenses something without being asked.",
+      "Corporate muzak plays at the edge of hearing \u2014 just wrong enough to notice."
     ]
   },
   "2043": {
@@ -6449,6 +8132,12 @@
     "mob_spawns": [
       1214,
       1214
+    ],
+    "ambient": [
+      "A vending machine dispenses something without being asked.",
+      "Fluorescent lights flicker in a pattern that might be morse code.",
+      "Someone's augmented reality overlay bleeds into visible light briefly.",
+      "Corporate muzak plays at the edge of hearing \u2014 just wrong enough to notice."
     ]
   },
   "2044": {
@@ -6467,6 +8156,10 @@
     },
     "mob_spawns": [
       1215
+    ],
+    "ambient": [
+      "Someone's augmented reality overlay bleeds into visible light briefly.",
+      "A security camera tracks your movement, then looks away."
     ]
   },
   "2045": {
@@ -6487,6 +8180,11 @@
     "mob_spawns": [
       1229,
       1205
+    ],
+    "ambient": [
+      "Someone's augmented reality overlay bleeds into visible light briefly.",
+      "Corporate muzak plays at the edge of hearing \u2014 just wrong enough to notice.",
+      "The hum of servers fills the air like a mechanical heartbeat."
     ]
   },
   "2046": {
@@ -6505,6 +8203,11 @@
     },
     "mob_spawns": [
       1226
+    ],
+    "ambient": [
+      "Someone's augmented reality overlay bleeds into visible light briefly.",
+      "A security camera tracks your movement, then looks away.",
+      "The air recyclers kick in with a low whine."
     ]
   },
   "2047": {
@@ -6521,6 +8224,11 @@
     "mob_spawns": [
       1204,
       1221
+    ],
+    "ambient": [
+      "A cleaning drone whirs past, ignoring you completely.",
+      "The floor vibrates from machinery deep below.",
+      "The hum of servers fills the air like a mechanical heartbeat."
     ]
   },
   "2048": {
@@ -6539,6 +8247,10 @@
     "mob_spawns": [
       1226,
       1231
+    ],
+    "ambient": [
+      "The hum of servers fills the air like a mechanical heartbeat.",
+      "Corporate muzak plays at the edge of hearing \u2014 just wrong enough to notice."
     ]
   },
   "2049": {
@@ -6559,6 +8271,11 @@
     "mob_spawns": [
       1230,
       1229
+    ],
+    "ambient": [
+      "The hum of servers fills the air like a mechanical heartbeat.",
+      "A security camera tracks your movement, then looks away.",
+      "A cleaning drone whirs past, ignoring you completely."
     ]
   },
   "2050": {
@@ -6577,6 +8294,12 @@
     },
     "mob_spawns": [
       1204
+    ],
+    "ambient": [
+      "A holographic ad glitches, showing static for a moment.",
+      "A vending machine dispenses something without being asked.",
+      "A security camera tracks your movement, then looks away.",
+      "The floor vibrates from machinery deep below."
     ]
   },
   "2051": {
@@ -6593,6 +8316,10 @@
     },
     "mob_spawns": [
       1216
+    ],
+    "ambient": [
+      "Someone's augmented reality overlay bleeds into visible light briefly.",
+      "A security camera tracks your movement, then looks away."
     ]
   },
   "2052": {
@@ -6612,6 +8339,12 @@
     "mob_spawns": [
       1204,
       1201
+    ],
+    "ambient": [
+      "Someone's augmented reality overlay bleeds into visible light briefly.",
+      "A holographic ad glitches, showing static for a moment.",
+      "The air recyclers kick in with a low whine.",
+      "The floor vibrates from machinery deep below."
     ]
   },
   "2053": {
@@ -6630,6 +8363,11 @@
     ],
     "flags": [
       "shop"
+    ],
+    "ambient": [
+      "A security camera tracks your movement, then looks away.",
+      "The hum of servers fills the air like a mechanical heartbeat.",
+      "Fluorescent lights flicker in a pattern that might be morse code."
     ]
   },
   "2054": {
@@ -6646,6 +8384,10 @@
       1230,
       1201,
       1206
+    ],
+    "ambient": [
+      "The floor vibrates from machinery deep below.",
+      "Fluorescent lights flicker in a pattern that might be morse code."
     ]
   },
   "2055": {
@@ -6661,6 +8403,10 @@
     },
     "mob_spawns": [
       1201
+    ],
+    "ambient": [
+      "A security camera tracks your movement, then looks away.",
+      "A vending machine dispenses something without being asked."
     ]
   },
   "2100": {
@@ -6676,6 +8422,11 @@
     },
     "mob_spawns": [
       1209
+    ],
+    "ambient": [
+      "The hum of servers fills the air like a mechanical heartbeat.",
+      "The air recyclers kick in with a low whine.",
+      "Fluorescent lights flicker in a pattern that might be morse code."
     ]
   },
   "2101": {
@@ -6692,6 +8443,11 @@
     },
     "mob_spawns": [
       1209
+    ],
+    "ambient": [
+      "A vending machine dispenses something without being asked.",
+      "Corporate muzak plays at the edge of hearing \u2014 just wrong enough to notice.",
+      "A holographic ad glitches, showing static for a moment."
     ]
   },
   "2102": {
@@ -6710,6 +8466,12 @@
     "mob_spawns": [
       1230,
       1231
+    ],
+    "ambient": [
+      "The air recyclers kick in with a low whine.",
+      "A holographic ad glitches, showing static for a moment.",
+      "A cleaning drone whirs past, ignoring you completely.",
+      "The floor vibrates from machinery deep below."
     ]
   },
   "2103": {
@@ -6727,6 +8489,12 @@
     "mob_spawns": [
       1221,
       1216
+    ],
+    "ambient": [
+      "The air recyclers kick in with a low whine.",
+      "A security camera tracks your movement, then looks away.",
+      "A vending machine dispenses something without being asked.",
+      "A holographic ad glitches, showing static for a moment."
     ]
   },
   "2104": {
@@ -6743,6 +8511,10 @@
     "mob_spawns": [
       1201,
       1230
+    ],
+    "ambient": [
+      "A cleaning drone whirs past, ignoring you completely.",
+      "Someone's augmented reality overlay bleeds into visible light briefly."
     ]
   },
   "2105": {
@@ -6761,6 +8533,10 @@
     },
     "mob_spawns": [
       1207
+    ],
+    "ambient": [
+      "A cleaning drone whirs past, ignoring you completely.",
+      "A holographic ad glitches, showing static for a moment."
     ]
   },
   "2106": {
@@ -6782,6 +8558,10 @@
       1229,
       1203,
       1201
+    ],
+    "ambient": [
+      "A vending machine dispenses something without being asked.",
+      "Fluorescent lights flicker in a pattern that might be morse code."
     ]
   },
   "2107": {
@@ -6804,6 +8584,11 @@
     ],
     "initial_items": [
       4019
+    ],
+    "ambient": [
+      "Someone's augmented reality overlay bleeds into visible light briefly.",
+      "The floor vibrates from machinery deep below.",
+      "A security camera tracks your movement, then looks away."
     ]
   },
   "2108": {
@@ -6819,6 +8604,10 @@
     },
     "mob_spawns": [
       1202
+    ],
+    "ambient": [
+      "A security camera tracks your movement, then looks away.",
+      "The air recyclers kick in with a low whine."
     ]
   },
   "2109": {
@@ -6835,6 +8624,12 @@
     "mob_spawns": [
       1215,
       1229
+    ],
+    "ambient": [
+      "A security camera tracks your movement, then looks away.",
+      "The hum of servers fills the air like a mechanical heartbeat.",
+      "A holographic ad glitches, showing static for a moment.",
+      "A vending machine dispenses something without being asked."
     ]
   },
   "2110": {
@@ -6857,6 +8652,10 @@
     ],
     "flags": [
       "shop"
+    ],
+    "ambient": [
+      "Corporate muzak plays at the edge of hearing \u2014 just wrong enough to notice.",
+      "A holographic ad glitches, showing static for a moment."
     ]
   },
   "2111": {
@@ -6878,6 +8677,12 @@
       1202,
       1203,
       1201
+    ],
+    "ambient": [
+      "The hum of servers fills the air like a mechanical heartbeat.",
+      "The air recyclers kick in with a low whine.",
+      "The floor vibrates from machinery deep below.",
+      "A security camera tracks your movement, then looks away."
     ]
   },
   "2112": {
@@ -6901,6 +8706,11 @@
     ],
     "initial_items": [
       2013
+    ],
+    "ambient": [
+      "The floor vibrates from machinery deep below.",
+      "Corporate muzak plays at the edge of hearing \u2014 just wrong enough to notice.",
+      "Someone's augmented reality overlay bleeds into visible light briefly."
     ]
   },
   "2113": {
@@ -6916,6 +8726,11 @@
     },
     "mob_spawns": [
       1204
+    ],
+    "ambient": [
+      "Fluorescent lights flicker in a pattern that might be morse code.",
+      "A vending machine dispenses something without being asked.",
+      "The hum of servers fills the air like a mechanical heartbeat."
     ]
   },
   "2114": {
@@ -6934,6 +8749,11 @@
     "mob_spawns": [
       1203,
       1227
+    ],
+    "ambient": [
+      "Someone's augmented reality overlay bleeds into visible light briefly.",
+      "The hum of servers fills the air like a mechanical heartbeat.",
+      "The air recyclers kick in with a low whine."
     ]
   },
   "2115": {
@@ -6953,6 +8773,12 @@
     },
     "flags": [
       "safe"
+    ],
+    "ambient": [
+      "Corporate muzak plays at the edge of hearing \u2014 just wrong enough to notice.",
+      "The floor vibrates from machinery deep below.",
+      "The air recyclers kick in with a low whine.",
+      "A holographic ad glitches, showing static for a moment."
     ]
   },
   "2116": {
@@ -6970,6 +8796,10 @@
     },
     "mob_spawns": [
       1204
+    ],
+    "ambient": [
+      "Someone's augmented reality overlay bleeds into visible light briefly.",
+      "A holographic ad glitches, showing static for a moment."
     ]
   },
   "2117": {
@@ -6985,6 +8815,10 @@
     "mob_spawns": [
       1208,
       1219
+    ],
+    "ambient": [
+      "Fluorescent lights flicker in a pattern that might be morse code.",
+      "The air recyclers kick in with a low whine."
     ]
   },
   "2118": {
@@ -7002,6 +8836,10 @@
     "mob_spawns": [
       1203,
       1221
+    ],
+    "ambient": [
+      "A cleaning drone whirs past, ignoring you completely.",
+      "The air recyclers kick in with a low whine."
     ]
   },
   "2119": {
@@ -7017,6 +8855,11 @@
     "mob_spawns": [
       1217,
       1229
+    ],
+    "ambient": [
+      "A security camera tracks your movement, then looks away.",
+      "The hum of servers fills the air like a mechanical heartbeat.",
+      "A holographic ad glitches, showing static for a moment."
     ]
   },
   "20": {
@@ -7031,6 +8874,11 @@
     },
     "flags": [
       "safe"
+    ],
+    "ambient": [
+      "A door that wasn't there a moment ago appears, then fades.",
+      "Reality feels thin here, like paper stretched over a frame.",
+      "The air tastes of copper and possibility."
     ]
   },
   "16": {
@@ -7048,6 +8896,11 @@
     },
     "flags": [
       "safe"
+    ],
+    "ambient": [
+      "The floor reflects a sky that doesn't match the one above.",
+      "Threads of energy arc between the walls, briefly visible.",
+      "A door that wasn't there a moment ago appears, then fades."
     ]
   },
   "6": {
@@ -7066,6 +8919,12 @@
     },
     "flags": [
       "safe"
+    ],
+    "ambient": [
+      "You feel the weight of many worlds pressing against this one.",
+      "The void between worlds pulses with distant light.",
+      "The floor reflects a sky that doesn't match the one above.",
+      "A door that wasn't there a moment ago appears, then fades."
     ]
   },
   "19": {
@@ -7082,6 +8941,11 @@
     },
     "flags": [
       "safe"
+    ],
+    "ambient": [
+      "The void between worlds pulses with distant light.",
+      "The floor reflects a sky that doesn't match the one above.",
+      "The air tastes of copper and possibility."
     ]
   },
   "12": {
@@ -7104,7 +8968,12 @@
     "named_exits": {
       "quest shop": 150,
       "shop": 150
-    }
+    },
+    "ambient": [
+      "A door that wasn't there a moment ago appears, then fades.",
+      "Threads of energy arc between the walls, briefly visible.",
+      "The floor reflects a sky that doesn't match the one above."
+    ]
   },
   "2": {
     "vnum": 2,
@@ -7124,6 +8993,12 @@
     },
     "flags": [
       "safe"
+    ],
+    "ambient": [
+      "A door that wasn't there a moment ago appears, then fades.",
+      "A sound like wind chimes, but made of glass and starlight.",
+      "The void between worlds pulses with distant light.",
+      "The floor reflects a sky that doesn't match the one above."
     ]
   },
   "7": {
@@ -7144,6 +9019,10 @@
     },
     "flags": [
       "safe"
+    ],
+    "ambient": [
+      "You feel the weight of many worlds pressing against this one.",
+      "Reality feels thin here, like paper stretched over a frame."
     ]
   },
   "15": {
@@ -7160,6 +9039,12 @@
     },
     "flags": [
       "safe"
+    ],
+    "ambient": [
+      "The air tastes of copper and possibility.",
+      "A door that wasn't there a moment ago appears, then fades.",
+      "You feel the weight of many worlds pressing against this one.",
+      "A sound like wind chimes, but made of glass and starlight."
     ]
   },
   "8": {
@@ -7181,7 +9066,11 @@
       "armorer": 14,
       "workshop": 14,
       "armorer's workshop": 14
-    }
+    },
+    "ambient": [
+      "A door that wasn't there a moment ago appears, then fades.",
+      "The air tastes of copper and possibility."
+    ]
   },
   "5": {
     "vnum": 5,
@@ -7200,6 +9089,10 @@
     },
     "flags": [
       "safe"
+    ],
+    "ambient": [
+      "The floor reflects a sky that doesn't match the one above.",
+      "The air tastes of copper and possibility."
     ]
   },
   "1": {
@@ -7240,7 +9133,13 @@
       "upper": 6,
       "observatory": 15,
       "undercity": 13
-    }
+    },
+    "ambient": [
+      "A door that wasn't there a moment ago appears, then fades.",
+      "Threads of energy arc between the walls, briefly visible.",
+      "The void between worlds pulses with distant light.",
+      "The floor reflects a sky that doesn't match the one above."
+    ]
   },
   "4": {
     "vnum": 4,
@@ -7258,6 +9157,11 @@
     },
     "flags": [
       "safe"
+    ],
+    "ambient": [
+      "You feel the weight of many worlds pressing against this one.",
+      "Reality feels thin here, like paper stretched over a frame.",
+      "A sound like wind chimes, but made of glass and starlight."
     ]
   },
   "9": {
@@ -7274,6 +9178,10 @@
     "flags": [
       "safe",
       "shop"
+    ],
+    "ambient": [
+      "Reality feels thin here, like paper stretched over a frame.",
+      "Threads of energy arc between the walls, briefly visible."
     ]
   },
   "14": {
@@ -7291,6 +9199,12 @@
     "flags": [
       "safe",
       "shop"
+    ],
+    "ambient": [
+      "Reality feels thin here, like paper stretched over a frame.",
+      "Threads of energy arc between the walls, briefly visible.",
+      "A door that wasn't there a moment ago appears, then fades.",
+      "The air tastes of copper and possibility."
     ]
   },
   "10": {
@@ -7330,6 +9244,11 @@
         ],
         "description": "The groove is unnervingly precise \u2014 perfectly hemispherical, about the size of a large marble. Whatever made this was moving fast and didn't slow down. Small fragments of stone are fused smooth along the edges, as if heated by friction. The trail leads deeper into the world."
       }
+    ],
+    "ambient": [
+      "You feel the weight of many worlds pressing against this one.",
+      "The air tastes of copper and possibility.",
+      "A door that wasn't there a moment ago appears, then fades."
     ]
   },
   "3": {
@@ -7349,6 +9268,10 @@
     },
     "flags": [
       "safe"
+    ],
+    "ambient": [
+      "The floor reflects a sky that doesn't match the one above.",
+      "The void between worlds pulses with distant light."
     ]
   },
   "11": {
@@ -7367,6 +9290,10 @@
     },
     "flags": [
       "safe"
+    ],
+    "ambient": [
+      "Threads of energy arc between the walls, briefly visible.",
+      "Reality feels thin here, like paper stretched over a frame."
     ]
   },
   "21": {
@@ -7382,6 +9309,10 @@
     },
     "flags": [
       "safe"
+    ],
+    "ambient": [
+      "A sound like wind chimes, but made of glass and starlight.",
+      "A door that wasn't there a moment ago appears, then fades."
     ]
   },
   "17": {
@@ -7400,6 +9331,12 @@
     },
     "flags": [
       "safe"
+    ],
+    "ambient": [
+      "Reality feels thin here, like paper stretched over a frame.",
+      "The air tastes of copper and possibility.",
+      "You feel the weight of many worlds pressing against this one.",
+      "The floor reflects a sky that doesn't match the one above."
     ]
   },
   "13": {
@@ -7420,6 +9357,11 @@
     },
     "flags": [
       "safe"
+    ],
+    "ambient": [
+      "The air tastes of copper and possibility.",
+      "You feel the weight of many worlds pressing against this one.",
+      "Threads of energy arc between the walls, briefly visible."
     ]
   },
   "18": {
@@ -7437,6 +9379,12 @@
     },
     "flags": [
       "safe"
+    ],
+    "ambient": [
+      "You feel the weight of many worlds pressing against this one.",
+      "A door that wasn't there a moment ago appears, then fades.",
+      "The air tastes of copper and possibility.",
+      "A sound like wind chimes, but made of glass and starlight."
     ]
   },
   "22": {
@@ -7451,6 +9399,10 @@
     },
     "flags": [
       "safe"
+    ],
+    "ambient": [
+      "The air tastes of copper and possibility.",
+      "The void between worlds pulses with distant light."
     ]
   },
   "24": {
@@ -7463,7 +9415,12 @@
       "east": 23,
       "northeast": 13,
       "northwest": 21
-    }
+    },
+    "ambient": [
+      "The air tastes of copper and possibility.",
+      "You feel the weight of many worlds pressing against this one.",
+      "A sound like wind chimes, but made of glass and starlight."
+    ]
   },
   "23": {
     "vnum": 23,
@@ -7476,7 +9433,12 @@
       "west": 24,
       "northeast": 18,
       "northwest": 17
-    }
+    },
+    "ambient": [
+      "The void between worlds pulses with distant light.",
+      "A sound like wind chimes, but made of glass and starlight.",
+      "Threads of energy arc between the walls, briefly visible."
+    ]
   },
   "25": {
     "vnum": 25,
@@ -7488,7 +9450,11 @@
       "west": 23,
       "northeast": 22,
       "northwest": 13
-    }
+    },
+    "ambient": [
+      "Threads of energy arc between the walls, briefly visible.",
+      "The floor reflects a sky that doesn't match the one above."
+    ]
   },
   "1001": {
     "vnum": 1001,
@@ -7505,6 +9471,11 @@
     "mob_spawns": [
       1105,
       1130
+    ],
+    "ambient": [
+      "Wind whistles through gaps in the ancient stonework.",
+      "Frost creeps along the windowsill despite the season.",
+      "A cobweb trembles in a draft you cannot feel."
     ]
   },
   "1002": {
@@ -7522,6 +9493,11 @@
       1115,
       1101,
       1118
+    ],
+    "ambient": [
+      "A crow calls from a distant tower.",
+      "Frost creeps along the windowsill despite the season.",
+      "Footsteps echo from a passage you thought was empty."
     ]
   },
   "1003": {
@@ -7538,6 +9514,11 @@
     },
     "mob_spawns": [
       1111
+    ],
+    "ambient": [
+      "Frost creeps along the windowsill despite the season.",
+      "A distant horn sounds \u2014 hunting, or warning?",
+      "Wind whistles through gaps in the ancient stonework."
     ]
   },
   "1004": {
@@ -7558,6 +9539,11 @@
       1115,
       1118,
       1114
+    ],
+    "ambient": [
+      "Frost creeps along the windowsill despite the season.",
+      "Torchlight dances, casting long shadows down the corridor.",
+      "A cobweb trembles in a draft you cannot feel."
     ]
   },
   "1005": {
@@ -7577,6 +9563,12 @@
     "mob_spawns": [
       1105,
       1130
+    ],
+    "ambient": [
+      "The stones underfoot are worn smooth by centuries of travelers.",
+      "A distant horn sounds \u2014 hunting, or warning?",
+      "The smell of pine and cold stone fills your lungs.",
+      "Wind whistles through gaps in the ancient stonework."
     ]
   },
   "1006": {
@@ -7597,6 +9589,11 @@
     ],
     "initial_items": [
       1010
+    ],
+    "ambient": [
+      "A crow calls from a distant tower.",
+      "A cobweb trembles in a draft you cannot feel.",
+      "Frost creeps along the windowsill despite the season."
     ]
   },
   "1007": {
@@ -7613,6 +9610,12 @@
     "mob_spawns": [
       1109,
       1104
+    ],
+    "ambient": [
+      "The smell of pine and cold stone fills your lungs.",
+      "Wind whistles through gaps in the ancient stonework.",
+      "Torchlight dances, casting long shadows down the corridor.",
+      "A cobweb trembles in a draft you cannot feel."
     ]
   },
   "1008": {
@@ -7636,6 +9639,11 @@
       1117,
       1110,
       1104
+    ],
+    "ambient": [
+      "The stones underfoot are worn smooth by centuries of travelers.",
+      "A distant horn sounds \u2014 hunting, or warning?",
+      "The smell of pine and cold stone fills your lungs."
     ]
   },
   "1009": {
@@ -7656,6 +9664,11 @@
     "mob_spawns": [
       1111,
       1103
+    ],
+    "ambient": [
+      "A cobweb trembles in a draft you cannot feel.",
+      "Water drips somewhere deep within the walls.",
+      "Footsteps echo from a passage you thought was empty."
     ]
   },
   "1010": {
@@ -7680,6 +9693,11 @@
       1116,
       1109,
       1112
+    ],
+    "ambient": [
+      "A cobweb trembles in a draft you cannot feel.",
+      "Wind whistles through gaps in the ancient stonework.",
+      "Frost creeps along the windowsill despite the season."
     ]
   },
   "1011": {
@@ -7699,6 +9717,10 @@
     "mob_spawns": [
       1125,
       1123
+    ],
+    "ambient": [
+      "A cobweb trembles in a draft you cannot feel.",
+      "A crow calls from a distant tower."
     ]
   },
   "1012": {
@@ -7716,6 +9738,12 @@
     "mob_spawns": [
       1126,
       1122
+    ],
+    "ambient": [
+      "Footsteps echo from a passage you thought was empty.",
+      "Water drips somewhere deep within the walls.",
+      "A distant horn sounds \u2014 hunting, or warning?",
+      "A cobweb trembles in a draft you cannot feel."
     ]
   },
   "1013": {
@@ -7732,6 +9760,12 @@
     "mob_spawns": [
       1118,
       1102
+    ],
+    "ambient": [
+      "Frost creeps along the windowsill despite the season.",
+      "The smell of pine and cold stone fills your lungs.",
+      "A cobweb trembles in a draft you cannot feel.",
+      "Wind whistles through gaps in the ancient stonework."
     ]
   },
   "1014": {
@@ -7750,6 +9784,12 @@
     },
     "mob_spawns": [
       1124
+    ],
+    "ambient": [
+      "The smell of pine and cold stone fills your lungs.",
+      "A cobweb trembles in a draft you cannot feel.",
+      "Water drips somewhere deep within the walls.",
+      "A distant horn sounds \u2014 hunting, or warning?"
     ]
   },
   "1015": {
@@ -7785,6 +9825,12 @@
     ],
     "initial_items": [
       6020
+    ],
+    "ambient": [
+      "Footsteps echo from a passage you thought was empty.",
+      "The smell of pine and cold stone fills your lungs.",
+      "A crow calls from a distant tower.",
+      "A distant horn sounds \u2014 hunting, or warning?"
     ]
   },
   "1016": {
@@ -7806,6 +9852,12 @@
       1115,
       1102,
       1117
+    ],
+    "ambient": [
+      "Footsteps echo from a passage you thought was empty.",
+      "A cobweb trembles in a draft you cannot feel.",
+      "The smell of pine and cold stone fills your lungs.",
+      "A distant horn sounds \u2014 hunting, or warning?"
     ]
   },
   "1017": {
@@ -7826,6 +9878,12 @@
     "mob_spawns": [
       1117,
       1112
+    ],
+    "ambient": [
+      "A distant horn sounds \u2014 hunting, or warning?",
+      "A crow calls from a distant tower.",
+      "Footsteps echo from a passage you thought was empty.",
+      "Water drips somewhere deep within the walls."
     ]
   },
   "1018": {
@@ -7845,6 +9903,11 @@
       1104,
       1114,
       1109
+    ],
+    "ambient": [
+      "Wind whistles through gaps in the ancient stonework.",
+      "A cobweb trembles in a draft you cannot feel.",
+      "Water drips somewhere deep within the walls."
     ]
   },
   "1019": {
@@ -7859,6 +9922,10 @@
     },
     "mob_spawns": [
       1105
+    ],
+    "ambient": [
+      "Torchlight dances, casting long shadows down the corridor.",
+      "A cobweb trembles in a draft you cannot feel."
     ]
   },
   "1020": {
@@ -7880,6 +9947,11 @@
     ],
     "item_spawns": [
       1201
+    ],
+    "ambient": [
+      "Torchlight dances, casting long shadows down the corridor.",
+      "Frost creeps along the windowsill despite the season.",
+      "The smell of pine and cold stone fills your lungs."
     ]
   },
   "1021": {
@@ -7902,6 +9974,10 @@
     ],
     "flags": [
       "indoors"
+    ],
+    "ambient": [
+      "A crow calls from a distant tower.",
+      "Water drips somewhere deep within the walls."
     ]
   },
   "1022": {
@@ -7922,6 +9998,10 @@
     "flags": [
       "safe",
       "indoors"
+    ],
+    "ambient": [
+      "A distant horn sounds \u2014 hunting, or warning?",
+      "Frost creeps along the windowsill despite the season."
     ]
   },
   "1023": {
@@ -7945,6 +10025,12 @@
     "flags": [
       "shop",
       "indoors"
+    ],
+    "ambient": [
+      "A distant horn sounds \u2014 hunting, or warning?",
+      "Wind whistles through gaps in the ancient stonework.",
+      "A cobweb trembles in a draft you cannot feel.",
+      "Footsteps echo from a passage you thought was empty."
     ]
   },
   "1024": {
@@ -7962,6 +10048,12 @@
     },
     "mob_spawns": [
       1110
+    ],
+    "ambient": [
+      "The smell of pine and cold stone fills your lungs.",
+      "Footsteps echo from a passage you thought was empty.",
+      "Frost creeps along the windowsill despite the season.",
+      "A crow calls from a distant tower."
     ]
   },
   "1025": {
@@ -7980,6 +10072,10 @@
     ],
     "initial_items": [
       2001
+    ],
+    "ambient": [
+      "Frost creeps along the windowsill despite the season.",
+      "The smell of pine and cold stone fills your lungs."
     ]
   },
   "1026": {
@@ -8001,6 +10097,12 @@
     "flags": [
       "shop",
       "indoors"
+    ],
+    "ambient": [
+      "The stones underfoot are worn smooth by centuries of travelers.",
+      "Wind whistles through gaps in the ancient stonework.",
+      "Footsteps echo from a passage you thought was empty.",
+      "The smell of pine and cold stone fills your lungs."
     ]
   },
   "1027": {
@@ -8020,6 +10122,12 @@
     },
     "flags": [
       "safe"
+    ],
+    "ambient": [
+      "Torchlight dances, casting long shadows down the corridor.",
+      "The stones underfoot are worn smooth by centuries of travelers.",
+      "Water drips somewhere deep within the walls.",
+      "Footsteps echo from a passage you thought was empty."
     ]
   },
   "1028": {
@@ -8043,6 +10151,12 @@
     "flags": [
       "shop",
       "indoors"
+    ],
+    "ambient": [
+      "The stones underfoot are worn smooth by centuries of travelers.",
+      "Torchlight dances, casting long shadows down the corridor.",
+      "A distant horn sounds \u2014 hunting, or warning?",
+      "The smell of pine and cold stone fills your lungs."
     ]
   },
   "1029": {
@@ -8066,6 +10180,11 @@
     ],
     "initial_items": [
       283
+    ],
+    "ambient": [
+      "Torchlight dances, casting long shadows down the corridor.",
+      "A cobweb trembles in a draft you cannot feel.",
+      "The stones underfoot are worn smooth by centuries of travelers."
     ]
   },
   "1030": {
@@ -8084,6 +10203,11 @@
     "mob_spawns": [
       1136,
       1115
+    ],
+    "ambient": [
+      "Water drips somewhere deep within the walls.",
+      "Footsteps echo from a passage you thought was empty.",
+      "A distant horn sounds \u2014 hunting, or warning?"
     ]
   },
   "1031": {
@@ -8102,6 +10226,10 @@
     },
     "mob_spawns": [
       1104
+    ],
+    "ambient": [
+      "Torchlight dances, casting long shadows down the corridor.",
+      "The smell of pine and cold stone fills your lungs."
     ]
   },
   "1032": {
@@ -8121,6 +10249,11 @@
     },
     "flags": [
       "safe"
+    ],
+    "ambient": [
+      "Wind whistles through gaps in the ancient stonework.",
+      "The stones underfoot are worn smooth by centuries of travelers.",
+      "A cobweb trembles in a draft you cannot feel."
     ]
   },
   "1033": {
@@ -8141,6 +10274,12 @@
     "flags": [
       "safe",
       "indoors"
+    ],
+    "ambient": [
+      "A crow calls from a distant tower.",
+      "A distant horn sounds \u2014 hunting, or warning?",
+      "Frost creeps along the windowsill despite the season.",
+      "The smell of pine and cold stone fills your lungs."
     ]
   },
   "1034": {
@@ -8161,6 +10300,10 @@
     "mob_spawns": [
       1103,
       1127
+    ],
+    "ambient": [
+      "The smell of pine and cold stone fills your lungs.",
+      "Water drips somewhere deep within the walls."
     ]
   },
   "1035": {
@@ -8178,6 +10321,11 @@
     },
     "mob_spawns": [
       1140
+    ],
+    "ambient": [
+      "A distant horn sounds \u2014 hunting, or warning?",
+      "The smell of pine and cold stone fills your lungs.",
+      "Footsteps echo from a passage you thought was empty."
     ]
   },
   "1036": {
@@ -8193,6 +10341,10 @@
     "mob_spawns": [
       1109,
       1103
+    ],
+    "ambient": [
+      "Torchlight dances, casting long shadows down the corridor.",
+      "The stones underfoot are worn smooth by centuries of travelers."
     ]
   },
   "1037": {
@@ -8208,6 +10360,11 @@
     "mob_spawns": [
       1114,
       1117
+    ],
+    "ambient": [
+      "Wind whistles through gaps in the ancient stonework.",
+      "Footsteps echo from a passage you thought was empty.",
+      "Frost creeps along the windowsill despite the season."
     ]
   },
   "1038": {
@@ -8225,6 +10382,11 @@
     },
     "mob_spawns": [
       1112
+    ],
+    "ambient": [
+      "A distant horn sounds \u2014 hunting, or warning?",
+      "A cobweb trembles in a draft you cannot feel.",
+      "Torchlight dances, casting long shadows down the corridor."
     ]
   },
   "1039": {
@@ -8248,6 +10410,11 @@
     ],
     "flags": [
       "indoors"
+    ],
+    "ambient": [
+      "A crow calls from a distant tower.",
+      "A cobweb trembles in a draft you cannot feel.",
+      "Torchlight dances, casting long shadows down the corridor."
     ]
   },
   "1040": {
@@ -8268,6 +10435,10 @@
     "flags": [
       "safe",
       "indoors"
+    ],
+    "ambient": [
+      "A cobweb trembles in a draft you cannot feel.",
+      "A crow calls from a distant tower."
     ]
   },
   "1041": {
@@ -8290,6 +10461,12 @@
     ],
     "flags": [
       "indoors"
+    ],
+    "ambient": [
+      "A cobweb trembles in a draft you cannot feel.",
+      "The smell of pine and cold stone fills your lungs.",
+      "A distant horn sounds \u2014 hunting, or warning?",
+      "Wind whistles through gaps in the ancient stonework."
     ]
   },
   "1042": {
@@ -8310,6 +10487,11 @@
     ],
     "flags": [
       "indoors"
+    ],
+    "ambient": [
+      "The stones underfoot are worn smooth by centuries of travelers.",
+      "The smell of pine and cold stone fills your lungs.",
+      "Frost creeps along the windowsill despite the season."
     ]
   },
   "1043": {
@@ -8328,6 +10510,11 @@
     "mob_spawns": [
       1126,
       1125
+    ],
+    "ambient": [
+      "Frost creeps along the windowsill despite the season.",
+      "Wind whistles through gaps in the ancient stonework.",
+      "A crow calls from a distant tower."
     ]
   },
   "1044": {
@@ -8354,6 +10541,10 @@
     ],
     "initial_items": [
       1019
+    ],
+    "ambient": [
+      "Water drips somewhere deep within the walls.",
+      "Torchlight dances, casting long shadows down the corridor."
     ]
   },
   "1045": {
@@ -8381,6 +10572,10 @@
     ],
     "initial_items": [
       1008
+    ],
+    "ambient": [
+      "A distant horn sounds \u2014 hunting, or warning?",
+      "Frost creeps along the windowsill despite the season."
     ]
   },
   "1046": {
@@ -8403,6 +10598,11 @@
     ],
     "flags": [
       "indoors"
+    ],
+    "ambient": [
+      "A crow calls from a distant tower.",
+      "Water drips somewhere deep within the walls.",
+      "Torchlight dances, casting long shadows down the corridor."
     ]
   },
   "1047": {
@@ -8423,6 +10623,11 @@
     ],
     "flags": [
       "indoors"
+    ],
+    "ambient": [
+      "A crow calls from a distant tower.",
+      "Wind whistles through gaps in the ancient stonework.",
+      "Torchlight dances, casting long shadows down the corridor."
     ]
   },
   "1048": {
@@ -8440,6 +10645,11 @@
     },
     "mob_spawns": [
       1134
+    ],
+    "ambient": [
+      "Frost creeps along the windowsill despite the season.",
+      "The stones underfoot are worn smooth by centuries of travelers.",
+      "A crow calls from a distant tower."
     ]
   },
   "1049": {
@@ -8467,6 +10677,10 @@
     ],
     "initial_items": [
       4013
+    ],
+    "ambient": [
+      "The stones underfoot are worn smooth by centuries of travelers.",
+      "A distant horn sounds \u2014 hunting, or warning?"
     ]
   },
   "1050": {
@@ -8491,7 +10705,11 @@
       1116,
       1102
     ],
-    "meta_clue": "marble_passage_1"
+    "meta_clue": "marble_passage_1",
+    "ambient": [
+      "A distant horn sounds \u2014 hunting, or warning?",
+      "Torchlight dances, casting long shadows down the corridor."
+    ]
   },
   "1051": {
     "vnum": 1051,
@@ -8512,6 +10730,12 @@
     ],
     "mob_spawns": [
       1109
+    ],
+    "ambient": [
+      "The smell of pine and cold stone fills your lungs.",
+      "Water drips somewhere deep within the walls.",
+      "Footsteps echo from a passage you thought was empty.",
+      "Wind whistles through gaps in the ancient stonework."
     ]
   },
   "1052": {
@@ -8530,6 +10754,12 @@
     ],
     "flags": [
       "indoors"
+    ],
+    "ambient": [
+      "A cobweb trembles in a draft you cannot feel.",
+      "Torchlight dances, casting long shadows down the corridor.",
+      "Footsteps echo from a passage you thought was empty.",
+      "A crow calls from a distant tower."
     ]
   },
   "1053": {
@@ -8544,6 +10774,12 @@
     },
     "mob_spawns": [
       1102
+    ],
+    "ambient": [
+      "A crow calls from a distant tower.",
+      "A distant horn sounds \u2014 hunting, or warning?",
+      "A cobweb trembles in a draft you cannot feel.",
+      "Wind whistles through gaps in the ancient stonework."
     ]
   },
   "1054": {
@@ -8563,6 +10799,12 @@
       1114,
       1103,
       1109
+    ],
+    "ambient": [
+      "A distant horn sounds \u2014 hunting, or warning?",
+      "Frost creeps along the windowsill despite the season.",
+      "Wind whistles through gaps in the ancient stonework.",
+      "Torchlight dances, casting long shadows down the corridor."
     ]
   },
   "1055": {
@@ -8583,6 +10825,11 @@
     "mob_spawns": [
       1136,
       1113
+    ],
+    "ambient": [
+      "Wind whistles through gaps in the ancient stonework.",
+      "Footsteps echo from a passage you thought was empty.",
+      "A cobweb trembles in a draft you cannot feel."
     ]
   },
   "1056": {
@@ -8605,6 +10852,11 @@
     ],
     "initial_items": [
       6011
+    ],
+    "ambient": [
+      "Wind whistles through gaps in the ancient stonework.",
+      "A cobweb trembles in a draft you cannot feel.",
+      "A crow calls from a distant tower."
     ]
   },
   "1057": {
@@ -8622,6 +10874,11 @@
     "mob_spawns": [
       1119,
       1111
+    ],
+    "ambient": [
+      "Torchlight dances, casting long shadows down the corridor.",
+      "A crow calls from a distant tower.",
+      "A cobweb trembles in a draft you cannot feel."
     ]
   },
   "1058": {
@@ -8641,6 +10898,10 @@
     ],
     "initial_items": [
       6009
+    ],
+    "ambient": [
+      "Wind whistles through gaps in the ancient stonework.",
+      "A cobweb trembles in a draft you cannot feel."
     ]
   },
   "1059": {
@@ -8658,6 +10919,12 @@
     "mob_spawns": [
       1123,
       1111
+    ],
+    "ambient": [
+      "A cobweb trembles in a draft you cannot feel.",
+      "The smell of pine and cold stone fills your lungs.",
+      "The stones underfoot are worn smooth by centuries of travelers.",
+      "Frost creeps along the windowsill despite the season."
     ]
   },
   "1060": {
@@ -8674,6 +10941,11 @@
     "mob_spawns": [
       1118,
       1124
+    ],
+    "ambient": [
+      "The smell of pine and cold stone fills your lungs.",
+      "Frost creeps along the windowsill despite the season.",
+      "A crow calls from a distant tower."
     ]
   },
   "1100": {
@@ -8690,6 +10962,12 @@
     },
     "mob_spawns": [
       1109
+    ],
+    "ambient": [
+      "The stones underfoot are worn smooth by centuries of travelers.",
+      "Wind whistles through gaps in the ancient stonework.",
+      "Water drips somewhere deep within the walls.",
+      "A crow calls from a distant tower."
     ]
   },
   "1101": {
@@ -8757,6 +11035,10 @@
       1109,
       1114,
       1112
+    ],
+    "ambient": [
+      "Torchlight dances, casting long shadows down the corridor.",
+      "Wind whistles through gaps in the ancient stonework."
     ]
   },
   "1104": {
@@ -8797,6 +11079,11 @@
     "mob_spawns": [
       1107,
       1128
+    ],
+    "ambient": [
+      "Water drips somewhere deep within the walls.",
+      "A distant horn sounds \u2014 hunting, or warning?",
+      "Footsteps echo from a passage you thought was empty."
     ]
   },
   "1106": {
@@ -8889,6 +11176,12 @@
     "mob_spawns": [
       1105,
       1136
+    ],
+    "ambient": [
+      "The stones underfoot are worn smooth by centuries of travelers.",
+      "Water drips somewhere deep within the walls.",
+      "Wind whistles through gaps in the ancient stonework.",
+      "Footsteps echo from a passage you thought was empty."
     ]
   },
   "1110": {
@@ -8951,6 +11244,12 @@
     },
     "mob_spawns": [
       1107
+    ],
+    "ambient": [
+      "Torchlight dances, casting long shadows down the corridor.",
+      "Water drips somewhere deep within the walls.",
+      "A cobweb trembles in a draft you cannot feel.",
+      "Footsteps echo from a passage you thought was empty."
     ]
   },
   "1113": {
@@ -8972,6 +11271,10 @@
       1111,
       1109,
       1101
+    ],
+    "ambient": [
+      "A cobweb trembles in a draft you cannot feel.",
+      "Water drips somewhere deep within the walls."
     ]
   },
   "1114": {
@@ -8991,6 +11294,10 @@
     "mob_spawns": [
       1136,
       1111
+    ],
+    "ambient": [
+      "A cobweb trembles in a draft you cannot feel.",
+      "Footsteps echo from a passage you thought was empty."
     ]
   },
   "1115": {
@@ -9032,6 +11339,11 @@
     ],
     "mob_spawns": [
       1110
+    ],
+    "ambient": [
+      "The stones underfoot are worn smooth by centuries of travelers.",
+      "Footsteps echo from a passage you thought was empty.",
+      "A cobweb trembles in a draft you cannot feel."
     ]
   },
   "1117": {
@@ -9055,6 +11367,10 @@
     ],
     "flags": [
       "dark"
+    ],
+    "ambient": [
+      "The stones underfoot are worn smooth by centuries of travelers.",
+      "Frost creeps along the windowsill despite the season."
     ]
   },
   "1118": {
@@ -9167,6 +11483,11 @@
     "mob_spawns": [
       1113,
       1101
+    ],
+    "ambient": [
+      "A distant horn sounds \u2014 hunting, or warning?",
+      "Water drips somewhere deep within the walls.",
+      "A crow calls from a distant tower."
     ]
   },
   "1123": {
@@ -9223,6 +11544,12 @@
     "flags": [
       "safe",
       "train"
+    ],
+    "ambient": [
+      "Weights clank together as someone finishes a set.",
+      "The clash of practice weapons rings from the yard.",
+      "Chalk dust drifts in the air from a recently used board.",
+      "The smell of sweat and leather permeates everything."
     ]
   },
   "8002": {
@@ -9243,6 +11570,10 @@
     ],
     "mobs": [
       8020
+    ],
+    "ambient": [
+      "The smell of sweat and leather permeates everything.",
+      "Someone grunts with effort from behind a partition."
     ]
   },
   "8003": {
@@ -9260,6 +11591,10 @@
     },
     "flags": [
       "train"
+    ],
+    "ambient": [
+      "A training dummy creaks as it swings back to position.",
+      "Someone grunts with effort from behind a partition."
     ]
   },
   "8004": {
@@ -9277,6 +11612,12 @@
     },
     "flags": [
       "train"
+    ],
+    "ambient": [
+      "The smell of sweat and leather permeates everything.",
+      "Someone grunts with effort from behind a partition.",
+      "Chalk dust drifts in the air from a recently used board.",
+      "An instructor's voice carries: 'Again. Faster this time.'"
     ]
   },
   "8005": {
@@ -9294,6 +11635,12 @@
     ],
     "initial_items": [
       8003
+    ],
+    "ambient": [
+      "Weights clank together as someone finishes a set.",
+      "A training dummy creaks as it swings back to position.",
+      "A whistle blows sharply in the distance.",
+      "Chalk dust drifts in the air from a recently used board."
     ]
   },
   "8006": {
@@ -9312,6 +11659,11 @@
     ],
     "flags": [
       "train"
+    ],
+    "ambient": [
+      "An instructor's voice carries: 'Again. Faster this time.'",
+      "The clash of practice weapons rings from the yard.",
+      "A whistle blows sharply in the distance."
     ]
   },
   "8007": {
@@ -9334,6 +11686,11 @@
     ],
     "flags": [
       "train"
+    ],
+    "ambient": [
+      "Weights clank together as someone finishes a set.",
+      "Someone grunts with effort from behind a partition.",
+      "A whistle blows sharply in the distance."
     ]
   },
   "8008": {
@@ -9356,6 +11713,10 @@
     ],
     "flags": [
       "train"
+    ],
+    "ambient": [
+      "A training dummy creaks as it swings back to position.",
+      "A whistle blows sharply in the distance."
     ]
   },
   "8009": {
@@ -9379,6 +11740,12 @@
     ],
     "flags": [
       "train"
+    ],
+    "ambient": [
+      "Weights clank together as someone finishes a set.",
+      "Someone grunts with effort from behind a partition.",
+      "The smell of sweat and leather permeates everything.",
+      "A training dummy creaks as it swings back to position."
     ]
   },
   "8010": {
@@ -9395,6 +11762,10 @@
     },
     "flags": [
       "safe"
+    ],
+    "ambient": [
+      "Someone grunts with effort from behind a partition.",
+      "Weights clank together as someone finishes a set."
     ]
   },
   "8011": {
@@ -9414,6 +11785,12 @@
     ],
     "flags": [
       "train"
+    ],
+    "ambient": [
+      "An instructor's voice carries: 'Again. Faster this time.'",
+      "The clash of practice weapons rings from the yard.",
+      "A training dummy creaks as it swings back to position.",
+      "Weights clank together as someone finishes a set."
     ]
   },
   "8012": {
@@ -9433,7 +11810,11 @@
     "flags": [
       "train"
     ],
-    "puzzle_action": "use_mirror"
+    "puzzle_action": "use_mirror",
+    "ambient": [
+      "A pebble floats upward, then crashes back down.",
+      "Light bends around an invisible point in the air."
+    ]
   },
   "8013": {
     "vnum": 8013,
@@ -9453,6 +11834,11 @@
     "flags": [
       "safe",
       "train"
+    ],
+    "ambient": [
+      "Weights clank together as someone finishes a set.",
+      "The smell of sweat and leather permeates everything.",
+      "The clash of practice weapons rings from the yard."
     ]
   },
   "8014": {
@@ -9476,7 +11862,13 @@
     "flags": [
       "train"
     ],
-    "meta_clue": "marble_passage_8"
+    "meta_clue": "marble_passage_8",
+    "ambient": [
+      "Someone grunts with effort from behind a partition.",
+      "A whistle blows sharply in the distance.",
+      "Chalk dust drifts in the air from a recently used board.",
+      "An instructor's voice carries: 'Again. Faster this time.'"
+    ]
   },
   "8015": {
     "vnum": 8015,
@@ -9496,6 +11888,11 @@
     ],
     "flags": [
       "train"
+    ],
+    "ambient": [
+      "An instructor's voice carries: 'Again. Faster this time.'",
+      "Weights clank together as someone finishes a set.",
+      "The clash of practice weapons rings from the yard."
     ]
   },
   "8016": {
@@ -9517,6 +11914,12 @@
     ],
     "flags": [
       "train"
+    ],
+    "ambient": [
+      "Someone grunts with effort from behind a partition.",
+      "The smell of sweat and leather permeates everything.",
+      "An instructor's voice carries: 'Again. Faster this time.'",
+      "Chalk dust drifts in the air from a recently used board."
     ]
   },
   "8017": {
@@ -9536,6 +11939,11 @@
     },
     "flags": [
       "train"
+    ],
+    "ambient": [
+      "The smell of sweat and leather permeates everything.",
+      "A training dummy creaks as it swings back to position.",
+      "The clash of practice weapons rings from the yard."
     ]
   },
   "8018": {
@@ -9559,6 +11967,10 @@
     ],
     "flags": [
       "train"
+    ],
+    "ambient": [
+      "Someone grunts with effort from behind a partition.",
+      "Chalk dust drifts in the air from a recently used board."
     ]
   },
   "8019": {
@@ -9575,6 +11987,12 @@
     },
     "flags": [
       "train"
+    ],
+    "ambient": [
+      "Weights clank together as someone finishes a set.",
+      "The smell of sweat and leather permeates everything.",
+      "The clash of practice weapons rings from the yard.",
+      "Someone grunts with effort from behind a partition."
     ]
   },
   "8020": {
@@ -9591,6 +12009,11 @@
     "flags": [
       "safe",
       "train"
+    ],
+    "ambient": [
+      "An instructor's voice carries: 'Again. Faster this time.'",
+      "A training dummy creaks as it swings back to position.",
+      "The smell of sweat and leather permeates everything."
     ]
   },
   "8021": {
@@ -9610,6 +12033,11 @@
     "flags": [
       "safe",
       "train"
+    ],
+    "ambient": [
+      "An instructor's voice carries: 'Again. Faster this time.'",
+      "A training dummy creaks as it swings back to position.",
+      "The clash of practice weapons rings from the yard."
     ]
   },
   "8022": {
@@ -9631,6 +12059,10 @@
     ],
     "flags": [
       "train"
+    ],
+    "ambient": [
+      "A training dummy creaks as it swings back to position.",
+      "Chalk dust drifts in the air from a recently used board."
     ]
   },
   "8023": {
@@ -9649,6 +12081,10 @@
     ],
     "flags": [
       "train"
+    ],
+    "ambient": [
+      "An instructor's voice carries: 'Again. Faster this time.'",
+      "The clash of practice weapons rings from the yard."
     ]
   },
   "8024": {
@@ -9664,6 +12100,12 @@
     },
     "flags": [
       "train"
+    ],
+    "ambient": [
+      "A whistle blows sharply in the distance.",
+      "An instructor's voice carries: 'Again. Faster this time.'",
+      "Someone grunts with effort from behind a partition.",
+      "The clash of practice weapons rings from the yard."
     ]
   },
   "8025": {
@@ -9698,6 +12140,12 @@
         ],
         "description": "A shelf of training records has been scorched by something that passed through at impossible speed. The burn pattern is perfectly circular \u2014 three inches across \u2014 and the records behind the scorch mark have been fused together by heat. The entry in the logbook nearest the impact reads: 'ANOMALY DETECTED IN TRAINING ZONE. OBJECT: SPHERICAL. MASS: ERROR. SPEED: ERROR. RECOMMENDATION: DO NOT ENGAGE.' The entry after it simply says: 'It came back.'"
       }
+    ],
+    "ambient": [
+      "The smell of sweat and leather permeates everything.",
+      "Someone grunts with effort from behind a partition.",
+      "A training dummy creaks as it swings back to position.",
+      "A whistle blows sharply in the distance."
     ]
   },
   "7001": {
@@ -9715,6 +12163,11 @@
     "mob_spawns": [
       1311,
       1310
+    ],
+    "ambient": [
+      "Something metallic scrapes against stone in the darkness.",
+      "A distant rumble \u2014 the city above, living its life.",
+      "Rats scatter in the darkness ahead."
     ]
   },
   "7002": {
@@ -9731,6 +12184,10 @@
     "mob_spawns": [
       1717,
       1713
+    ],
+    "ambient": [
+      "The walls are slick with condensation and something else.",
+      "A distant rumble \u2014 the city above, living its life."
     ]
   },
   "7003": {
@@ -9748,6 +12205,11 @@
     "mob_spawns": [
       1705,
       1711
+    ],
+    "ambient": [
+      "Water drips from a pipe overhead, rhythmic and cold.",
+      "The air is thick with the smell of rust and decay.",
+      "Something metallic scrapes against stone in the darkness."
     ]
   },
   "7004": {
@@ -9766,6 +12228,11 @@
     },
     "mob_spawns": [
       1720
+    ],
+    "ambient": [
+      "Something metallic scrapes against stone in the darkness.",
+      "The walls are slick with condensation and something else.",
+      "Rats scatter in the darkness ahead."
     ]
   },
   "7005": {
@@ -9784,6 +12251,10 @@
     },
     "mob_spawns": [
       1719
+    ],
+    "ambient": [
+      "Graffiti on the wall glows faintly with bioluminescent paint.",
+      "A makeshift lantern flickers in a draft from below."
     ]
   },
   "7006": {
@@ -9800,6 +12271,12 @@
     },
     "mob_spawns": [
       1707
+    ],
+    "ambient": [
+      "Voices echo from somewhere deeper \u2014 too distorted to understand.",
+      "Something metallic scrapes against stone in the darkness.",
+      "A makeshift lantern flickers in a draft from below.",
+      "A cockroach the size of your thumb skitters across the ceiling."
     ]
   },
   "7007": {
@@ -9816,6 +12293,11 @@
     "mob_spawns": [
       1702,
       1721
+    ],
+    "ambient": [
+      "A cockroach the size of your thumb skitters across the ceiling.",
+      "Rats scatter in the darkness ahead.",
+      "The walls are slick with condensation and something else."
     ]
   },
   "7008": {
@@ -9837,7 +12319,12 @@
       1311,
       1310
     ],
-    "on_visit_flag": "zone_7_saw_windows"
+    "on_visit_flag": "zone_7_saw_windows",
+    "ambient": [
+      "Candle flames lean toward the altar in unison.",
+      "Stained glass casts colored light that moves against the sun.",
+      "The organ pipes hum with a note no one played."
+    ]
   },
   "7009": {
     "vnum": 7009,
@@ -9858,6 +12345,11 @@
       1302,
       1301,
       1311
+    ],
+    "ambient": [
+      "Something metallic scrapes against stone in the darkness.",
+      "The air is thick with the smell of rust and decay.",
+      "The walls are slick with condensation and something else."
     ]
   },
   "7010": {
@@ -9897,6 +12389,12 @@
     ],
     "initial_items": [
       6010
+    ],
+    "ambient": [
+      "A cockroach the size of your thumb skitters across the ceiling.",
+      "The walls are slick with condensation and something else.",
+      "Something metallic scrapes against stone in the darkness.",
+      "A distant rumble \u2014 the city above, living its life."
     ]
   },
   "7011": {
@@ -9919,6 +12417,12 @@
     ],
     "initial_items": [
       5020
+    ],
+    "ambient": [
+      "Water drips from a pipe overhead, rhythmic and cold.",
+      "Rats scatter in the darkness ahead.",
+      "The walls are slick with condensation and something else.",
+      "Voices echo from somewhere deeper \u2014 too distorted to understand."
     ]
   },
   "7012": {
@@ -9934,7 +12438,11 @@
     "mob_spawns": [
       1301
     ],
-    "puzzle_action": "use_pipe_organ"
+    "puzzle_action": "use_pipe_organ",
+    "ambient": [
+      "Stained glass casts colored light that moves against the sun.",
+      "The organ pipes hum with a note no one played."
+    ]
   },
   "7013": {
     "vnum": 7013,
@@ -9950,6 +12458,12 @@
     "mob_spawns": [
       1309,
       1301
+    ],
+    "ambient": [
+      "A distant rumble \u2014 the city above, living its life.",
+      "The air is thick with the smell of rust and decay.",
+      "Graffiti on the wall glows faintly with bioluminescent paint.",
+      "A makeshift lantern flickers in a draft from below."
     ]
   },
   "7014": {
@@ -9969,6 +12483,10 @@
     "mob_spawns": [
       1702,
       1701
+    ],
+    "ambient": [
+      "Graffiti on the wall glows faintly with bioluminescent paint.",
+      "A distant rumble \u2014 the city above, living its life."
     ]
   },
   "7015": {
@@ -9989,7 +12507,13 @@
     "mob_spawns": [
       1715
     ],
-    "meta_clue": "marble_passage_7"
+    "meta_clue": "marble_passage_7",
+    "ambient": [
+      "Something metallic scrapes against stone in the darkness.",
+      "Graffiti on the wall glows faintly with bioluminescent paint.",
+      "The walls are slick with condensation and something else.",
+      "The air is thick with the smell of rust and decay."
+    ]
   },
   "7016": {
     "vnum": 7016,
@@ -10008,6 +12532,11 @@
     },
     "mob_spawns": [
       1707
+    ],
+    "ambient": [
+      "A cockroach the size of your thumb skitters across the ceiling.",
+      "Something metallic scrapes against stone in the darkness.",
+      "Rats scatter in the darkness ahead."
     ]
   },
   "7017": {
@@ -10026,6 +12555,12 @@
     "mob_spawns": [
       1302,
       1311
+    ],
+    "ambient": [
+      "The walls are slick with condensation and something else.",
+      "A cockroach the size of your thumb skitters across the ceiling.",
+      "Something metallic scrapes against stone in the darkness.",
+      "The air is thick with the smell of rust and decay."
     ]
   },
   "7018": {
@@ -10046,6 +12581,12 @@
     ],
     "flags": [
       "shop"
+    ],
+    "ambient": [
+      "A cockroach the size of your thumb skitters across the ceiling.",
+      "The air is thick with the smell of rust and decay.",
+      "Water drips from a pipe overhead, rhythmic and cold.",
+      "A makeshift lantern flickers in a draft from below."
     ]
   },
   "7019": {
@@ -10066,6 +12607,10 @@
     "mob_spawns": [
       1719,
       1702
+    ],
+    "ambient": [
+      "Rats scatter in the darkness ahead.",
+      "Water drips from a pipe overhead, rhythmic and cold."
     ]
   },
   "7020": {
@@ -10092,6 +12637,12 @@
       1301,
       1309,
       1310
+    ],
+    "ambient": [
+      "A cockroach the size of your thumb skitters across the ceiling.",
+      "Graffiti on the wall glows faintly with bioluminescent paint.",
+      "A distant rumble \u2014 the city above, living its life.",
+      "A makeshift lantern flickers in a draft from below."
     ]
   },
   "7021": {
@@ -10108,6 +12659,12 @@
     },
     "mob_spawns": [
       1717
+    ],
+    "ambient": [
+      "A makeshift lantern flickers in a draft from below.",
+      "Water drips from a pipe overhead, rhythmic and cold.",
+      "Voices echo from somewhere deeper \u2014 too distorted to understand.",
+      "The air is thick with the smell of rust and decay."
     ]
   },
   "7022": {
@@ -10124,6 +12681,12 @@
     "mob_spawns": [
       1713,
       1717
+    ],
+    "ambient": [
+      "Graffiti on the wall glows faintly with bioluminescent paint.",
+      "A cockroach the size of your thumb skitters across the ceiling.",
+      "Voices echo from somewhere deeper \u2014 too distorted to understand.",
+      "Rats scatter in the darkness ahead."
     ]
   },
   "7023": {
@@ -10143,6 +12706,12 @@
     "mob_spawns": [
       1311,
       1302
+    ],
+    "ambient": [
+      "A makeshift lantern flickers in a draft from below.",
+      "Graffiti on the wall glows faintly with bioluminescent paint.",
+      "Voices echo from somewhere deeper \u2014 too distorted to understand.",
+      "Water drips from a pipe overhead, rhythmic and cold."
     ]
   },
   "7024": {
@@ -10161,6 +12730,12 @@
     },
     "mob_spawns": [
       1703
+    ],
+    "ambient": [
+      "Water drips from a pipe overhead, rhythmic and cold.",
+      "The walls are slick with condensation and something else.",
+      "Voices echo from somewhere deeper \u2014 too distorted to understand.",
+      "A distant rumble \u2014 the city above, living its life."
     ]
   },
   "7025": {
@@ -10176,6 +12751,11 @@
     },
     "mob_spawns": [
       1302
+    ],
+    "ambient": [
+      "Voices echo from somewhere deeper \u2014 too distorted to understand.",
+      "A distant rumble \u2014 the city above, living its life.",
+      "The air is thick with the smell of rust and decay."
     ]
   },
   "7026": {
@@ -10192,6 +12772,12 @@
     "mob_spawns": [
       1704,
       1706
+    ],
+    "ambient": [
+      "The walls are slick with condensation and something else.",
+      "The air is thick with the smell of rust and decay.",
+      "Something metallic scrapes against stone in the darkness.",
+      "Voices echo from somewhere deeper \u2014 too distorted to understand."
     ]
   },
   "7027": {
@@ -10222,6 +12808,11 @@
         ],
         "description": "A deep gouge has been carved into the stone wall at the dead end \u2014 not chiseled, not eroded. The groove is perfectly semicircular, three inches wide, and runs along the wall in a sweeping curve before diving straight down through the floor. The stone inside the groove is polished to a mirror finish. Whatever made this was moving at tremendous speed and simply... went through the wall when it ran out of tunnel. Faint vibrations still pulse from the groove if you press your hand against it."
       }
+    ],
+    "ambient": [
+      "A makeshift lantern flickers in a draft from below.",
+      "The walls are slick with condensation and something else.",
+      "The air is thick with the smell of rust and decay."
     ]
   },
   "101": {
@@ -10255,6 +12846,12 @@
     "flags": [],
     "mob_spawns": [
       102
+    ],
+    "ambient": [
+      "A practice dummy's straw stuffing litters the floor.",
+      "Torchlight flickers as a draft sweeps through the stairwell.",
+      "A training manual lies open on a bench, pages dog-eared.",
+      "You hear encouraging shouts from somewhere above."
     ]
   },
   "103": {
@@ -10351,6 +12948,11 @@
     "flags": [],
     "mob_spawns": [
       107
+    ],
+    "ambient": [
+      "Torchlight flickers as a draft sweeps through the stairwell.",
+      "A training manual lies open on a bench, pages dog-eared.",
+      "The walls bear scorch marks from overeager students."
     ]
   },
   "108": {
@@ -10365,6 +12967,10 @@
     "flags": [],
     "mob_spawns": [
       108
+    ],
+    "ambient": [
+      "The sound of combat echoes from floors above.",
+      "Torchlight flickers as a draft sweeps through the stairwell."
     ]
   },
   "109": {
@@ -10400,6 +13006,10 @@
     "flags": [],
     "mob_spawns": [
       110
+    ],
+    "ambient": [
+      "A training manual lies open on a bench, pages dog-eared.",
+      "The walls bear scorch marks from overeager students."
     ]
   },
   "111": {
@@ -10414,6 +13024,12 @@
     "flags": [],
     "mob_spawns": [
       111
+    ],
+    "ambient": [
+      "The walls bear scorch marks from overeager students.",
+      "The sound of combat echoes from floors above.",
+      "A practice dummy's straw stuffing litters the floor.",
+      "You hear encouraging shouts from somewhere above."
     ]
   },
   "112": {
@@ -10428,6 +13044,12 @@
     "flags": [],
     "mob_spawns": [
       112
+    ],
+    "ambient": [
+      "You hear encouraging shouts from somewhere above.",
+      "A training manual lies open on a bench, pages dog-eared.",
+      "The sound of combat echoes from floors above.",
+      "Torchlight flickers as a draft sweeps through the stairwell."
     ]
   },
   "113": {
@@ -10576,7 +13198,12 @@
     "zone": "neon_district",
     "exits": {
       "south": 2020
-    }
+    },
+    "ambient": [
+      "A holographic street performer repeats its routine endlessly.",
+      "Bass thrums from a club somewhere below street level.",
+      "Neon signs buzz and pop, casting everything in harsh pink."
+    ]
   },
   "3099": {
     "name": "Smuggler's Cache",
@@ -10584,7 +13211,12 @@
     "zone": "docks",
     "exits": {
       "west": 3020
-    }
+    },
+    "ambient": [
+      "The creak of rope and wood fills the silence.",
+      "Waves slap against the pilings with a hollow sound.",
+      "Salt air burns your nostrils."
+    ]
   },
   "4099": {
     "name": "Armory Vault",
@@ -10592,7 +13224,12 @@
     "zone": "warzone",
     "exits": {
       "north": 4020
-    }
+    },
+    "ambient": [
+      "The silence between explosions feels louder than the blasts.",
+      "A flag snaps in the wind, its colors faded beyond recognition.",
+      "The ground is scarred with craters and tank tracks."
+    ]
   },
   "5099": {
     "name": "Astral Sanctum",
@@ -10600,7 +13237,11 @@
     "zone": "astral_plane",
     "exits": {
       "east": 5020
-    }
+    },
+    "ambient": [
+      "Your thoughts echo back to you, slightly changed.",
+      "Colors here have sounds. Sounds have weight."
+    ]
   },
   "7099": {
     "name": "Undercity Treasury",
@@ -10608,7 +13249,11 @@
     "zone": "undercity",
     "exits": {
       "south": 7020
-    }
+    },
+    "ambient": [
+      "Stained glass casts colored light that moves against the sun.",
+      "The organ pipes hum with a note no one played."
+    ]
   },
   "2098": {
     "name": "The Whispering Terminal",
@@ -10618,7 +13263,12 @@
     "password_destination": 2097,
     "exits": {
       "south": 2015
-    }
+    },
+    "ambient": [
+      "A holographic street performer repeats its routine endlessly.",
+      "Bass thrums from a club somewhere below street level.",
+      "Neon signs buzz and pop, casting everything in harsh pink."
+    ]
   },
   "2097": {
     "name": "Digital Sanctum",
@@ -10627,7 +13277,12 @@
     "hidden": true,
     "exits": {
       "out": 2098
-    }
+    },
+    "ambient": [
+      "Neon signs buzz and pop, casting everything in harsh pink.",
+      "A holographic street performer repeats its routine endlessly.",
+      "Bass thrums from a club somewhere below street level."
+    ]
   },
   "4098": {
     "name": "The Sealed Bunker Door",
@@ -10637,7 +13292,11 @@
     "password_destination": 4097,
     "exits": {
       "west": 4015
-    }
+    },
+    "ambient": [
+      "A flag snaps in the wind, its colors faded beyond recognition.",
+      "The silence between explosions feels louder than the blasts."
+    ]
   },
   "4097": {
     "name": "Command Bunker",
@@ -10646,7 +13305,12 @@
     "hidden": true,
     "exits": {
       "out": 4098
-    }
+    },
+    "ambient": [
+      "A flag snaps in the wind, its colors faded beyond recognition.",
+      "The ground is scarred with craters and tank tracks.",
+      "The silence between explosions feels louder than the blasts."
+    ]
   },
   "6098": {
     "name": "The Timeless Arch",
@@ -10656,7 +13320,11 @@
     "password_destination": 6097,
     "exits": {
       "east": 6010
-    }
+    },
+    "ambient": [
+      "The air smells of a century that never existed.",
+      "Time moves differently here \u2014 your shadow lags behind you."
+    ]
   },
   "6097": {
     "name": "Temporal Vault",
@@ -10665,7 +13333,12 @@
     "hidden": true,
     "exits": {
       "out": 6098
-    }
+    },
+    "ambient": [
+      "The air smells of a century that never existed.",
+      "Ancient runes glow briefly, then dim as if embarrassed.",
+      "Time moves differently here \u2014 your shadow lags behind you."
+    ]
   },
   "8098": {
     "name": "Gravitational Anomaly",
@@ -10675,7 +13348,12 @@
     "password_destination": 8097,
     "exits": {
       "north": 8010
-    }
+    },
+    "ambient": [
+      "A pebble floats upward, then crashes back down.",
+      "Light bends around an invisible point in the air.",
+      "Gravity shifts subtly \u2014 your hair lifts for a moment."
+    ]
   },
   "8097": {
     "name": "Zero-Point Chamber",
@@ -10684,7 +13362,12 @@
     "hidden": true,
     "exits": {
       "out": 8098
-    }
+    },
+    "ambient": [
+      "A pebble floats upward, then crashes back down.",
+      "Gravity shifts subtly \u2014 your hair lifts for a moment.",
+      "Light bends around an invisible point in the air."
+    ]
   },
   "10098": {
     "name": "The Final Gate",
@@ -10694,7 +13377,11 @@
     "password_destination": 10097,
     "exits": {
       "south": 10010
-    }
+    },
+    "ambient": [
+      "The ground shifts beneath you \u2014 not physically, but conceptually.",
+      "A mirror shard reflects a version of you that looks worried."
+    ]
   },
   "10097": {
     "name": "Chamber of Revelations",
@@ -10704,7 +13391,12 @@
     "exits": {
       "out": 10098
     },
-    "meta_clue": "marble_fragment_11"
+    "meta_clue": "marble_fragment_11",
+    "ambient": [
+      "A mirror shard reflects a version of you that looks worried.",
+      "The ground shifts beneath you \u2014 not physically, but conceptually.",
+      "Fragments of broken reality float past like debris in a current."
+    ]
   },
   "10012": {
     "name": "The Cracked Obelisk",
@@ -10714,7 +13406,11 @@
     "exits": {
       "south": 10010
     },
-    "meta_clue": "marble_passage_10"
+    "meta_clue": "marble_passage_10",
+    "ambient": [
+      "A mirror shard reflects a version of you that looks worried.",
+      "The ground shifts beneath you \u2014 not physically, but conceptually."
+    ]
   },
   "11012": {
     "name": "Edge of the Void",
@@ -10729,7 +13425,12 @@
         "key_vnum": null,
         "description": "The void stretches below, but you sense nothing to anchor to. Perhaps if you had followed every trace of the marble..."
       }
-    }
+    },
+    "ambient": [
+      "Nothing moves here. Nothing can.",
+      "You are aware of your own existence more sharply than ever.",
+      "The absence of everything presses against your mind."
+    ]
   },
   "10005": {
     "name": "Zone 1 Area",
@@ -10737,6 +13438,10 @@
     "exits": {},
     "initial_items": [
       10003
+    ],
+    "ambient": [
+      "Nothing moves. For now.",
+      "Silence presses in from all sides."
     ]
   },
   "11005": {
@@ -10745,6 +13450,11 @@
     "exits": {},
     "initial_items": [
       11003
+    ],
+    "ambient": [
+      "Nothing moves. For now.",
+      "Silence presses in from all sides.",
+      "The air is still."
     ]
   },
   "11099": {
@@ -10753,6 +13463,11 @@
     "zone": "the_void",
     "hidden": true,
     "final_confrontation": true,
-    "exits": {}
+    "exits": {},
+    "ambient": [
+      "You are aware of your own existence more sharply than ever.",
+      "Nothing moves here. Nothing can.",
+      "The absence of everything presses against your mind."
+    ]
   }
 }
