@@ -387,24 +387,36 @@
   /* ─── Tournament Bracket Logic ─────────────────────────────────────────── */
 
   /**
-   * Build a shuffled bracket of 8 traits for a 7-question elimination tournament.
-   * Returns an object tracking the bracket state.
+   * Create a bracket with opposing-trait seeding for maximum differentiation.
+   * Pairs thematically opposed traits in round 1 so answers matter more.
+   * Also tracks cumulative scores for all traits across all rounds.
    */
   function createBracket() {
-    const shuffled = [...TRAITS].sort(() => Math.random() - 0.5);
+    // Opposing pairs: valor/shadow, cunning/devotion, wisdom/fury, mercy/guile
+    const OPPOSING = [
+      ['valor', 'shadow'],
+      ['cunning', 'devotion'],
+      ['wisdom', 'fury'],
+      ['mercy', 'guile']
+    ];
+    // Shuffle the order of pairs and randomize which side is A/B
+    const pairs = [...OPPOSING].sort(() => Math.random() - 0.5);
+    const matchups = pairs.map(([a, b]) => {
+      const tA = TRAITS.find(t => t.id === a);
+      const tB = TRAITS.find(t => t.id === b);
+      return Math.random() < 0.5 ? [tA, tB] : [tB, tA];
+    });
+    // Initialize scores for all traits
+    const scores = {};
+    TRAITS.forEach(t => { scores[t.id] = 0; });
     return {
       round: 1,
-      /** Round 1: 4 matchups of 2 traits each */
-      matchups: [
-        [shuffled[0], shuffled[1]],
-        [shuffled[2], shuffled[3]],
-        [shuffled[4], shuffled[5]],
-        [shuffled[6], shuffled[7]]
-      ],
+      matchups,
       matchIndex: 0,
-      survivors: [],    // traits that won their round
-      eliminated: [],   // traits that lost
-      questionNum: 0    // total questions asked (0-6)
+      survivors: [],
+      eliminated: [],
+      scores,         // cumulative score per trait across all rounds
+      questionNum: 0
     };
   }
 
@@ -433,12 +445,18 @@
 
   /**
    * Advance the bracket after a choice. Returns the next dilemma or null if done.
-   * choice: 'a' or 'b' (which answer the player picked)
+   * Scores both traits: winner gets 3 points, loser gets 1 (still contributes).
+   * Later rounds award more points so they carry more weight.
    */
   function advanceBracket(bracket, choice) {
     const matchup = bracket.matchups[bracket.matchIndex];
     const winner = choice === 'a' ? matchup[0] : matchup[1];
     const loser = choice === 'a' ? matchup[1] : matchup[0];
+
+    // Score based on round weight (later rounds matter more)
+    const roundWeight = bracket.round === 1 ? 1 : bracket.round === 2 ? 2 : 3;
+    bracket.scores[winner.id] += 3 * roundWeight;
+    bracket.scores[loser.id] += 1 * roundWeight;
 
     bracket.survivors.push(winner);
     bracket.eliminated.push(loser);
@@ -508,20 +526,25 @@
       ];
     }
 
-    /** Show race selection. */
+    /** Show race selection with percentage-based mods. */
     function showRaces() {
       const lines = [
-        { type: 'room-name', text: '─── Choose Your Race ───' },
+        { type: 'room-name', text: '--- Choose Your Race ---' },
         { type: 'info', text: '' }
       ];
       RACES.forEach((r, i) => {
-        const s = r.stats;
-        const mods = [];
-        if (s.hp)      mods.push(`HP${s.hp > 0 ? '+' : ''}${s.hp}`);
-        if (s.attack)  mods.push(`ATK${s.attack > 0 ? '+' : ''}${s.attack}`);
-        if (s.defense) mods.push(`DEF${s.defense > 0 ? '+' : ''}${s.defense}`);
-        const statStr = mods.length ? ` [${mods.join(' ')}]` : '';
-        lines.push({ type: 'items', text: `  ${i + 1}. ${r.name}${statStr} - ${r.desc}` });
+        const m = r.mods || {};
+        const tags = [];
+        if (m.attack)   tags.push(`ATK +${Math.round(m.attack * 100)}%`);
+        if (m.defense)  tags.push(`DEF +${Math.round(m.defense * 100)}%`);
+        if (m.hp)       tags.push(`HP +${Math.round(m.hp * 100)}%`);
+        if (m.focus)    tags.push(`Focus +${Math.round(m.focus * 100)}%`);
+        if (m.dodge)    tags.push(`Dodge +${Math.round(m.dodge * 100)}%`);
+        if (m.healing)  tags.push(`Healing ${Math.round(m.healing * 100)}%`);
+        if (m.regen)    tags.push(`Regen ${Math.round(m.regen * 100)}%`);
+        const tagStr = tags.length ? ` [${tags.join(', ')}]` : '';
+        lines.push({ type: 'items', text: `  ${i + 1}. ${r.name}${tagStr}` });
+        lines.push({ type: 'info', text: `      ${r.desc}` });
       });
       lines.push({ type: 'info', text: '' });
       lines.push({ type: 'success', text: 'Type the number or name of your choice.' });
@@ -544,13 +567,15 @@
       ];
     }
 
-    /** Calculate the top 6 specs from the tournament results. */
+    /**
+     * Calculate the top 6 specs using cumulative scores from all rounds.
+     * Ranks all 8 traits by score, takes top 2 traits' specs (3 each = 6).
+     * This ensures every answer contributes to the final result.
+     */
     function calculateTopSpecs() {
-      // Winner's 3 specs + runner-up's 3 specs = 6
-      const winner = bracket.survivors[0];
-      const runnerUp = bracket.eliminated[bracket.eliminated.length - 1];
-      // Winner specs first, then runner-up
-      return [...winner.specs, ...runnerUp.specs];
+      const ranked = [...TRAITS].sort((a, b) => bracket.scores[b.id] - bracket.scores[a.id]);
+      // Top 2 scoring traits provide the 6 spec choices
+      return [...ranked[0].specs, ...ranked[1].specs];
     }
 
     /** Show specialization choices. */

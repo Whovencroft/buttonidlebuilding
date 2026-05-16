@@ -282,7 +282,17 @@
               source = 'inventory';
             }
           }
-          if (!itemDef) return [{ type: 'error', text: `You don't have '${target}'.` }];
+          // Fallback: check room interactables (for 'examine dummy', 'exam sign', etc.)
+          if (!itemDef) {
+            const room = engine._internals.currentRoom();
+            const interactable = (room?.interactables || []).find(i =>
+              i.keyword.some(k => targetLC.includes(k) || k.includes(targetLC))
+            );
+            if (interactable) {
+              return [{ type: 'info', text: interactable.description }];
+            }
+            return [{ type: 'error', text: `You don't see '${target}' here.` }];
+          }
 
           // Build the inspection output
           const out = [

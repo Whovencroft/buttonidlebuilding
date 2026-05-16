@@ -1117,36 +1117,67 @@
     }
 
     /**
-     * Calculate power gained from a fight.
-     * - Creature < 50% of player power → 0 (no reward)
-     * - Kill within ±10% of player power → 10% of creature power
-     * - Kill creature 10%+ stronger → 10% + 1% per 5% beyond threshold
-     * - Death → 2% of creature power (only if creature >= 50% player power)
+     * Calculate the MAXIMUM power that can be gained from a fight.
+     * - Creature < 50% of player power -> 0 (too weak)
+     * - Creature 50-90% of player -> 2% of creature power
+     * - Creature within +/-10% -> 10% of creature power
+     * - Creature 10%+ stronger -> 10% + 1% per 5% beyond threshold
+     * Power is gained per-hit proportional to damage dealt, capped at this max.
      */
-    function calcPowerGain(creaturePower, playerPower, killed) {
-      // Hard floor: creatures below 50% of player power give nothing
+    function calcMaxFightReward(creaturePower, playerPower) {
       const ratio = playerPower > 0 ? (creaturePower / playerPower) : 2;
       if (ratio < 0.5) return 0;
 
-      if (!killed) return Math.max(1, Math.floor(creaturePower * 0.02));
-
       const threshold = 0.10;
-
-      // Creature is 10%+ weaker (but above 50% floor) → only 2%
+      let base;
       if (ratio < (1 - threshold)) {
-        return Math.max(1, Math.floor(creaturePower * 0.02));
+        base = Math.max(1, Math.floor(creaturePower * 0.02));
+      } else if (ratio <= (1 + threshold)) {
+        base = Math.max(1, Math.floor(creaturePower * 0.10));
+      } else {
+        const excessPercent = (ratio - (1 + threshold)) * 100;
+        const bonusPercent = Math.floor(excessPercent / 5);
+        const totalPercent = 10 + bonusPercent;
+        base = Math.max(1, Math.floor(creaturePower * totalPercent / 100));
       }
 
-      // Creature is within ±10% → standard 10%
-      if (ratio <= (1 + threshold)) {
-        return Math.max(1, Math.floor(creaturePower * 0.10));
+      // Echo invasions award 2.5x the normal max reward
+      if (combatState && mobs[combatState.mobVnum]?.isEchoInvasion) {
+        return Math.floor(base * 2.5);
       }
+      return base;
+    }
 
-      // Creature is 10%+ stronger → 10% + 1% per 5% beyond threshold
-      const excessPercent = (ratio - (1 + threshold)) * 100;
-      const bonusPercent = Math.floor(excessPercent / 5);
-      const totalPercent = 10 + bonusPercent;
-      return Math.max(1, Math.floor(creaturePower * totalPercent / 100));
+    /**
+     * Award power on a successful hit, proportional to damage dealt.
+     * Power gained = (damage / mobMaxHp) * maxFightReward, capped so total
+     * gained in the fight never exceeds the max reward for that mob.
+     * Only awards if mob is >= 50% of player power.
+     * @param {number} damage - Damage dealt this hit
+     * @returns {number} Power actually gained (0 if mob too weak)
+     */
+    function awardHitPower(damage) {
+      if (!combatState) return 0;
+      const mob = mobs[combatState.mobVnum];
+      if (!mob) return 0;
+
+      const creaturePower = getCreaturePower(mob);
+      const maxReward = calcMaxFightReward(creaturePower, player.power);
+      if (maxReward <= 0) return 0;
+
+      // Calculate proportional gain: (damage / mobMaxHp) * maxReward
+      const mobMaxHp = combatState.mobMaxHp || 1;
+      const proportional = Math.max(1, Math.floor((damage / mobMaxHp) * maxReward));
+
+      // Cap at remaining reward for this fight
+      if (!combatState.powerGained) combatState.powerGained = 0;
+      const remaining = maxReward - combatState.powerGained;
+      if (remaining <= 0) return 0;
+
+      const gained = Math.min(proportional, remaining);
+      combatState.powerGained += gained;
+      player.power += gained;
+      return gained;
     }
 
     /**
@@ -1590,7 +1621,9 @@
           const baseDmg = Math.max(1, player.attackPower - Math.floor((mob.stats.defense || 0) / 2));
           const counter = window.MudBossCounter.resolveCounter(def, player, mob, baseDmg);
           combatState.mobHp -= counter.damage;
+          const counterPwr = awardHitPower(counter.damage);
           output.push(...counter.output);
+          if (counterPwr > 0) output.push({ type: 'success', text: `+${counterPwr} power` });
           if (player.momentum !== undefined) player.momentum = Math.min(12, player.momentum + counter.momentumDelta);
           combatState.bossCounter.telegraphRound = false;
           combatState.bossCounter.telegraphActive = false;
@@ -1695,7 +1728,8 @@
               }
             }
             combatState.mobHp -= dmg;
-            output.push({ type: 'combat', text: `${hits > 1 ? `[Hit ${h + 1}] ` : (glimmered ? '' : `You use ${activeDef.name}! `)}${dmg} damage! [Mob HP: ${Math.max(0, combatState.mobHp)}/${combatState.mobMaxHp}]` });
+            const abilPwr = awardHitPower(dmg);
+            output.push({ type: 'combat', text: `${hits > 1 ? `[Hit ${h + 1}] ` : (glimmered ? '' : `You use ${activeDef.name}! `)}${dmg} damage!${abilPwr > 0 ? ` (+${abilPwr} pwr)` : ''} [Mob HP: ${Math.max(0, combatState.mobHp)}/${combatState.mobMaxHp}]` });
             // Stop hitting if mob is dead
             if (combatState.mobHp <= 0) break;
           }
@@ -1764,18 +1798,16 @@
       markMobDefeated(combatState.mobVnum);
       player.killCounts[combatState.mobVnum] = (player.killCounts[combatState.mobVnum] || 0) + 1;
 
-      // Award power and gold based on relative strength
-      const creaturePower = getCreaturePower(mob);
-      const gained = calcPowerGain(creaturePower, player.power, true);
-      const goldDrop = calcGoldDrop(creaturePower, player.power);
-
-      if (gained > 0) {
-        player.power += gained;
-        output.push({ type: 'success', text: `+${gained} power (total: ${player.power})` });
-      } else {
-        output.push({ type: 'info', text: 'Too weak to learn from.' });
+      // Power is gained per-hit during the fight, not on kill.
+      // Show fight summary of total power gained.
+      const fightPower = combatState.powerGained || 0;
+      if (fightPower > 0) {
+        output.push({ type: 'success', text: `Fight total: +${fightPower} power (total: ${player.power})` });
       }
 
+      // Award gold based on relative strength
+      const creaturePower = getCreaturePower(mob);
+      const goldDrop = calcGoldDrop(creaturePower, player.power);
       if (goldDrop > 0) {
         player.gold += goldDrop;
         output.push({ type: 'success', text: `+${goldDrop} gold (total: ${player.gold})` });
@@ -2173,7 +2205,8 @@
             const baseMult = aDef?.multiplier || 1.5;
             const totalDmg = Math.floor(player.attackPower * baseMult * mult);
             combatState.mobHp -= totalDmg;
-            output.push({ type: 'combat', text: `FULLY CHARGED! ${aDef?.name || 'Attack'} unleashes for ${totalDmg} damage! [Mob HP: ${Math.max(0, combatState.mobHp)}/${combatState.mobMaxHp}]` });
+            const chargePwr = awardHitPower(totalDmg);
+            output.push({ type: 'combat', text: `FULLY CHARGED! ${aDef?.name || 'Attack'} unleashes for ${totalDmg} damage!${chargePwr > 0 ? ` (+${chargePwr} pwr)` : ''} [Mob HP: ${Math.max(0, combatState.mobHp)}/${combatState.mobMaxHp}]` });
             lastAbilityUsed = { name: aDef?.name || 'Charged Attack', type: aDef?.type || 'attack' };
             chargeState = null;
             if (combatState.mobHp <= 0) {
@@ -2202,9 +2235,14 @@
           output.push({ type: 'combat', text: `${mob.name} hits you for ${mobDmg} damage while you charge. [HP: ${player.hp}/${player.maxHp}]` });
           if (player.hp <= 0) {
             output.push({ type: 'combat', text: 'You have been defeated...' });
-            const deathPower = calcPowerGain(getCreaturePower(mob), player.power, false);
-            player.power += deathPower;
-            output.push({ type: 'info', text: `+${deathPower} power from the struggle. (total: ${player.power})` });
+            // Death penalty: lose fight gains + 2% total power
+            const fightGains = combatState.powerGained || 0;
+            const percentPenalty = Math.floor(player.power * 0.02);
+            const totalLoss = fightGains + percentPenalty;
+            player.power = Math.max(0, player.power - totalLoss);
+            if (totalLoss > 0) {
+              output.push({ type: 'error', text: `Lost ${totalLoss} power (${fightGains} from fight + ${percentPenalty} penalty). [Power: ${player.power}]` });
+            }
             output.push({ type: 'info', text: 'You awaken back at the Nexus.' });
             if (window.MudEchoes) {
               const echo = window.MudEchoes.createEcho(player, player.currentRoom, mob.name);
@@ -2213,7 +2251,14 @@
               player.echoes = window.MudEchoes.pruneExpired(player.echoes);
               output.push({ type: 'info', text: 'A faint echo of your struggle lingers behind...' });
             }
+            player.deaths = (player.deaths || 0) + 1;
             player.exhausted = false;
+            if (!player.worldFlags) player.worldFlags = {};
+            player.worldFlags.death_weakness = {
+              rounds: 24, atkMod: 0.9, defMod: 0.9, hpMod: 0.9, focusMod: 0.9
+            };
+            output.push({ type: 'error', text: 'You feel weakened... (-10% ATK/DEF/HP/Focus for 1 minute)' });
+            recalcStats();
             player.hp = player.maxHp;
             combatState = null;
             combatTimer = 0;
@@ -2351,6 +2396,7 @@
         }
         const playerDmg = rawPlayerDmg;
         combatState.mobHp -= playerDmg;
+        const hitPwr = awardHitPower(playerDmg);
         const critTag = playerCrit ? ' CRITICAL!' : '';
         const HIT_MSGS = [
           `You hit ${mob.name} for ${playerDmg} damage.`,
@@ -2367,7 +2413,7 @@
         const hitMsg = playerCrit
           ? CRIT_MSGS[Math.floor(Math.random() * CRIT_MSGS.length)]
           : HIT_MSGS[Math.floor(Math.random() * HIT_MSGS.length)];
-        output.push({ type: 'combat', text: `${hitMsg} [Mob HP: ${Math.max(0, combatState.mobHp)}/${combatState.mobMaxHp}]` });
+        output.push({ type: 'combat', text: `${hitMsg}${hitPwr > 0 ? ` (+${hitPwr} pwr)` : ''} [Mob HP: ${Math.max(0, combatState.mobHp)}/${combatState.mobMaxHp}]` });
         // Precision grows from landing basic attacks
         if (window.MudStats && player.coreStats) {
           const growth = window.MudStats.onBasicAttackLanded();
@@ -2390,7 +2436,8 @@
             let ohDmg = Math.max(1, Math.floor((ohItem.stats?.attack || 3) * 0.6) - Math.floor((mob.stats.defense || 0) / 3));
             if (ohDmg < 1) ohDmg = 1;
             combatState.mobHp -= ohDmg;
-            output.push({ type: 'combat', text: `Your off-hand ${ohItem.name} strikes ${mob.name} for ${ohDmg} damage. [Mob HP: ${Math.max(0, combatState.mobHp)}/${combatState.mobMaxHp}]` });
+            const ohPwr = awardHitPower(ohDmg);
+            output.push({ type: 'combat', text: `Your off-hand ${ohItem.name} strikes ${mob.name} for ${ohDmg} damage.${ohPwr > 0 ? ` (+${ohPwr} pwr)` : ''} [Mob HP: ${Math.max(0, combatState.mobHp)}/${combatState.mobMaxHp}]` });
             // Weapon proficiency gain for offhand category
             if (window.MudWeaponProficiency && ohItem.weapon_category) {
               const wpResult = window.MudWeaponProficiency.onWeaponUsed(player, ohItem.weapon_category);
@@ -2414,7 +2461,8 @@
           let extraDmg = Math.max(1, effectiveAtk - Math.floor(effectiveMobDef / 2));
           if (window.MudStats) extraDmg = window.MudStats.applyDamageVariance(extraDmg, derived);
           combatState.mobHp -= extraDmg;
-          output.push({ type: 'combat', text: `Extra strike! You hit ${mob.name} for ${extraDmg} damage. [Mob HP: ${Math.max(0, combatState.mobHp)}/${combatState.mobMaxHp}]` });
+          const extraPwr = awardHitPower(extraDmg);
+          output.push({ type: 'combat', text: `Extra strike! You hit ${mob.name} for ${extraDmg} damage.${extraPwr > 0 ? ` (+${extraPwr} pwr)` : ''} [Mob HP: ${Math.max(0, combatState.mobHp)}/${combatState.mobMaxHp}]` });
         }
       }
 
@@ -2568,12 +2616,16 @@
       // Check player death
       if (player.hp <= 0) {
         output.push({ type: 'combat', text: 'You have been defeated...' });
-        // Award small power on death (2% of creature power, 0 if below 50% floor)
-        const deathPower = calcPowerGain(getCreaturePower(mob), player.power, false);
-        if (deathPower > 0) {
-          player.power += deathPower;
-          output.push({ type: 'info', text: `+${deathPower} power from the struggle. (total: ${player.power})` });
+
+        // Death penalty: lose all power gained this fight + 2% of total power
+        const fightGains = combatState.powerGained || 0;
+        const percentPenalty = Math.floor(player.power * 0.02);
+        const totalLoss = fightGains + percentPenalty;
+        player.power = Math.max(0, player.power - totalLoss);
+        if (totalLoss > 0) {
+          output.push({ type: 'error', text: `Lost ${totalLoss} power (${fightGains} from fight + ${percentPenalty} penalty). [Power: ${player.power}]` });
         }
+
         output.push({ type: 'info', text: 'You awaken back at the Nexus.' });
 
         // Create a death echo at the location where the player fell
@@ -2581,7 +2633,6 @@
           const echo = window.MudEchoes.createEcho(player, player.currentRoom, mob.name);
           if (!player.echoes) player.echoes = [];
           player.echoes.push(echo);
-          // Prune expired echoes to prevent unbounded growth
           player.echoes = window.MudEchoes.pruneExpired(player.echoes);
           output.push({ type: 'info', text: 'A faint echo of your struggle lingers behind...' });
         }
@@ -2592,12 +2643,17 @@
         // Clear exhaustion on death
         player.exhausted = false;
 
-        // Apply 10% weakness debuff for 1 minute (24 combat rounds at 2.5s each)
+        // Apply weakness debuff for 1 minute (24 rounds at 2.5s each)
+        // -10% attack, -10% defense, -10% maxHp, -10% maxFocus
         if (!player.worldFlags) player.worldFlags = {};
-        player.worldFlags.death_weakness = { rounds: 24, atkMod: 0.9, defMod: 0.9 };
-        output.push({ type: 'error', text: 'You feel weakened... (10% penalty for 1 minute)' });
+        player.worldFlags.death_weakness = {
+          rounds: 24, atkMod: 0.9, defMod: 0.9, hpMod: 0.9, focusMod: 0.9
+        };
+        output.push({ type: 'error', text: 'You feel weakened... (-10% ATK/DEF/HP/Focus for 1 minute)' });
 
         player.hp = player.maxHp;
+        recalcStats();  // Recalc to apply weakness to maxHp/maxFocus
+        player.hp = player.maxHp;  // Set HP to weakened max
         combatState = null;
         combatTimer = 0;
         player.currentRoom = player.recallPoint || 1;
@@ -3036,8 +3092,9 @@
         }
         const dmg = stats.damage;
         combatState.mobHp -= dmg;
+        const throwPwr = awardHitPower(dmg);
         const mob = mobs[combatState.mobVnum];
-        output.push({ type: 'combat', text: `You hurl the ${item.name}! ${dmg} damage! [Mob HP: ${Math.max(0, combatState.mobHp)}/${combatState.mobMaxHp}]` });
+        output.push({ type: 'combat', text: `You hurl the ${item.name}! ${dmg} damage!${throwPwr > 0 ? ` (+${throwPwr} pwr)` : ''} [Mob HP: ${Math.max(0, combatState.mobHp)}/${combatState.mobMaxHp}]` });
         if (combatState.mobHp <= 0) {
           output.push(...handleMobKill(mob));
         }
@@ -3296,6 +3353,13 @@
       if (rm.dodge) {
         player._derived = player._derived || {};
         player._derived.dodgeBonus = (player._derived.dodgeBonus || 0) + rm.dodge;
+      }
+
+      // Apply death_weakness penalty to maxHp and maxFocus (-10% each)
+      const dw = player.worldFlags?.death_weakness;
+      if (dw) {
+        if (dw.hpMod)    player.maxHp = Math.floor(player.maxHp * dw.hpMod);
+        if (dw.focusMod) player.maxFocus = Math.floor(player.maxFocus * dw.focusMod);
       }
     }
 

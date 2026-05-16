@@ -252,30 +252,27 @@
 
   /**
    * Calculate rewards for defeating an echo invasion.
+   * Power is now gained per-hit during the fight (2.5x normal cap).
+   * This function only handles the victory message and item drop.
    * @param {object} echoMob - The defeated echo mob
    * @param {object} player - Player state
-   * @returns {{ output: Array, powerGain: number, itemDrop: number|null }}
+   * @returns {{ output: Array, itemDrop: number|null }}
    */
   function calculateInvasionRewards(echoMob, player) {
     const output = [];
 
-    // Bonus power: 2.5x what a normal mob of equivalent strength would give
-    const echoPower = echoMob.stats.maxHp + echoMob.stats.attack * 3 + echoMob.stats.defense * 2;
-    const basePowerGain = Math.max(1, Math.floor(echoPower * 0.10));
-    const powerGain = Math.floor(basePowerGain * BONUS_POWER_MULTIPLIER);
-
-    output.push({ type: 'quest', text: `═══ INVASION DEFEATED ═══` });
+    output.push({ type: 'quest', text: '=== INVASION DEFEATED ===' });
     output.push({ type: 'success', text: `The echo of ${echoMob.echoUsername || 'Unknown'} dissolves into shimmering fragments.` });
-    output.push({ type: 'success', text: `+${powerGain} power (invasion bonus!)` });
+    output.push({ type: 'success', text: 'Power was gained during the fight (2.5x invasion bonus).' });
 
-    // Item drop chance  -  random item from the echo's inventory
+    // Item drop chance - random item from the echo's inventory
     let itemDrop = null;
     if (echoMob.echoInventory && echoMob.echoInventory.length > 0 && Math.random() < ITEM_DROP_CHANCE) {
       itemDrop = echoMob.echoInventory[Math.floor(Math.random() * echoMob.echoInventory.length)];
-      output.push({ type: 'success', text: `Something falls from the fading echo - you snatch it before it vanishes!` });
+      output.push({ type: 'success', text: 'Something falls from the fading echo - you snatch it before it vanishes!' });
     }
 
-    return { output, powerGain, itemDrop };
+    return { output, itemDrop };
   }
 
   // ─── Notification System ───────────────────────────────────────────────

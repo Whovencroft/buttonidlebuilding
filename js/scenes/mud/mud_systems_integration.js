@@ -718,12 +718,11 @@
         }
       }
 
-      // Handle echo invasion kill rewards
+      // Handle echo invasion kill rewards (power already gained per-hit during fight)
       if (mob.isEchoInvasion && window.MudInvasions) {
         const playerState = getPlayerFromSave();
         const rewards = window.MudInvasions.calculateInvasionRewards(mob, playerState);
         output.push(...rewards.output);
-        setPlayerField('power', (playerState.power || 0) + rewards.powerGain);
         if (rewards.itemDrop && playerState.inventory.length < 99) {
           const inv = [...(playerState.inventory || []), rewards.itemDrop];
           setPlayerField('inventory', inv);
