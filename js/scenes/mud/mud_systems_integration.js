@@ -112,7 +112,7 @@
         if (invasionState.killStreakSinceSafe > 0) {
           invasionState.killStreakSinceSafe = 0;
           saveInvasionState(invasionState);
-          engine._pendingSystemOutput = (engine._pendingSystemOutput || []).concat([
+          engine._internals.pendingSystemOutput = (engine._internals.pendingSystemOutput || []).concat([
             { type: 'info', text: 'You feel the tension ease as you enter safe ground.' }
           ]);
         }
@@ -169,7 +169,7 @@
         }
 
         if (output.length > 0) {
-          engine._pendingSystemOutput = (engine._pendingSystemOutput || []).concat(output);
+          engine._internals.pendingSystemOutput = (engine._internals.pendingSystemOutput || []).concat(output);
         }
       }).catch(() => {
         // Ghost fetch failed silently — no invasion
@@ -788,7 +788,7 @@
               setPlayerField('hp', playerState.hp);
               setPlayerField('focus', playerState.focus);
               setPlayerField('restState', playerState.restState);
-              engine._pendingSystemOutput = (engine._pendingSystemOutput || []).concat(result);
+              engine._internals.pendingSystemOutput = (engine._internals.pendingSystemOutput || []).concat(result);
             }
           }
         }
@@ -810,7 +810,7 @@
           const playerState = getPlayerFromSave();
           const result = window.MudTrainingRooms.tickTraining(trainingState, playerState);
           if (result.output.length > 0) {
-            engine._pendingSystemOutput = (engine._pendingSystemOutput || []).concat(result.output);
+            engine._internals.pendingSystemOutput = (engine._internals.pendingSystemOutput || []).concat(result.output);
           }
           if (result.done) {
             trainingState = null;
@@ -877,8 +877,8 @@
 
     engine.flushCombatOutput = function() {
       const combat = originalFlush();
-      const system = engine._pendingSystemOutput || [];
-      engine._pendingSystemOutput = [];
+      const system = engine._internals.pendingSystemOutput || [];
+      engine._internals.pendingSystemOutput = [];
       return [...combat, ...system];
     };
 

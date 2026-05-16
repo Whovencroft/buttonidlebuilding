@@ -32,10 +32,12 @@
     let combatTick = 0;
     let lastAbilityUsed = null;  // Track last ability for finishing moves
     let chargeState = null;  // Active charge-up ability state
+    let pendingSystemOutput = [];  // Queued output from stat growth etc.
 
     const COMBAT_TICK_INTERVAL = 2.5; // seconds per auto-attack round
 
     let quests = {};
+    let recipes = {};
 
     // Load world data from global (set by data loader script)
     if (window.MudData) {
@@ -43,7 +45,7 @@
       mobs = window.MudData.mobs || {};
       items = window.MudData.items || {};
       quests = window.MudData.quests || {};
-      engine._recipes = window.MudData.recipes || {};
+      recipes = window.MudData.recipes || {};
     }
 
     // Restore from save if available
@@ -203,7 +205,7 @@
           const iResult = window.MudStats.applyGrowth(player.coreStats, iGrowth);
           // Queue output for next flush since moveToRoom returns its own output
           if (iResult.output.length > 0) {
-            engine._pendingSystemOutput = (engine._pendingSystemOutput || []).concat(iResult.output);
+            pendingSystemOutput = pendingSystemOutput.concat(iResult.output);
           }
         }
       }
@@ -2828,9 +2830,9 @@
      */
     function checkCombineRecipe(vnum1, vnum2) {
       // Check loaded recipes from data/mud/recipes.json
-      if (!engine._recipes) return null;
+      if (!recipes || Object.keys(recipes).length === 0) return null;
       const inv = player.inventory;
-      for (const recipe of Object.values(engine._recipes)) {
+      for (const recipe of Object.values(recipes)) {
         const ings = recipe.ingredients || [];
         // Check if all ingredients are present in inventory
         const needed = {};
@@ -3195,6 +3197,17 @@
         player.attackPower = 10 + bonusAtk;
         player.defense = 5 + bonusDef;
       }
+
+      // Apply racial percentage modifiers (from chargen raceMods)
+      const rm = player.raceMods || {};
+      if (rm.attack)  player.attackPower = Math.floor(player.attackPower * (1 + rm.attack));
+      if (rm.defense) player.defense = Math.floor(player.defense * (1 + rm.defense));
+      if (rm.hp)      player.maxHp = Math.floor(player.maxHp * (1 + rm.hp));
+      if (rm.focus)   player.maxFocus = Math.floor(player.maxFocus * (1 + rm.focus));
+      if (rm.dodge) {
+        player._derived = player._derived || {};
+        player._derived.dodgeBonus = (player._derived.dodgeBonus || 0) + rm.dodge;
+      }
     }
 
     // ─── Public Interface ────────────────────────────────────────────────────
@@ -3278,7 +3291,7 @@
     }
 
     /** Current save schema version — increment when adding new fields. */
-    const SAVE_VERSION = 3;
+    const SAVE_VERSION = 4;
 
     function getSaveSlice() {
       return {
@@ -3317,6 +3330,17 @@
           if (!savedState.player.description) savedState.player.description = 'A mysterious traveler from another place.';
         }
       }
+      if (v < 4) {
+        // v4 additions: raceMods for percentage-based racial bonuses
+        if (savedState.player) {
+          if (!savedState.player.raceMods) {
+            // Look up race mods from chargen if available
+            const raceId = savedState.player.race;
+            const raceDef = window.MudChargen?.RACES?.find(r => r.id === raceId);
+            savedState.player.raceMods = raceDef?.mods || {};
+          }
+        }
+      }
       savedState._version = SAVE_VERSION;
       return savedState;
     }
@@ -3345,7 +3369,10 @@
       get player() { return player; },
       /** Charge state shared between engine and systems_integration. */
       get chargeState() { return chargeState; },
-      set chargeState(v) { chargeState = v; }
+      set chargeState(v) { chargeState = v; },
+      /** Pending system output queue (stat growth, etc.). */
+      get pendingSystemOutput() { return pendingSystemOutput; },
+      set pendingSystemOutput(v) { pendingSystemOutput = v; }
     };
 
     return {

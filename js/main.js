@@ -14,7 +14,6 @@
       hyperPresses: 0,
       pressDerivatives: 0,
       autonomy: 0,
-      debt: 0,
       larceny: 0,
       upgrades: Object.fromEntries(CONFIG.upgrades.map((u) => [u.id, 0])),
       activeModules: [],
@@ -180,8 +179,7 @@
     manualValue: $('manualValue'),
     autonomyValue: $('autonomyValue'),
     autonomySub: $('autonomySub'),
-    debtValue: $('debtValue'),
-    debtSub: $('debtSub'),
+
     regretValue: $('regretValue'),
     layerSummary: $('layerSummary'),
     activeRulesValue: $('activeRulesValue'),

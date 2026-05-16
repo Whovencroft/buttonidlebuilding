@@ -262,7 +262,6 @@ function completeIdleGame() {
         s.regret += gain;
         s.stats.prestiges += 1;
         s.presses = 0;
-        s.debt = 0;
         s.autonomy = 0;
         s.upgrades = Object.fromEntries(CONFIG.upgrades.map((u) => [u.id, 0]));
         s.activeModules = [];
@@ -343,8 +342,6 @@ function completeIdleGame() {
       const autonomyLoss = getDumbDownLoss();
 
       s.presses -= cost;
-      if (s.presses < 0) s.debt = Math.max(s.debt, -s.presses);
-
       s.autonomy = Math.max(0, s.autonomy - autonomyLoss);
       s.larceny += 1;
       s.stats.dumbDowns += 1;
@@ -387,9 +384,7 @@ function completeIdleGame() {
       let costMult = 1;
       let liarChance = 0;
       let autonomyGain = 0.01 + s.regret * 0.002 + s.pressDerivatives * 0.01;
-      let allowDebt = false;
-      let debtLimit = 0;
-      let debtComboMult = 1;
+
       let cursorEvasion = 0;
       let fakeButtons = 0;
       let idleEnabled = false;
@@ -398,7 +393,6 @@ function completeIdleGame() {
       let hideButtonAt = 100;
       let fakeCrashRate = 0;
       let pressDrain = 0;
-      const regretDebtFloor = 2500 * Math.max(1, Math.floor(s.regret || 0));
 
       const autonomySuppressed = now() < (s.session.autonomySuppressedUntil || 0);
       const activeModules = s.activeModules.map(getModuleById).filter(Boolean);
@@ -430,8 +424,6 @@ function completeIdleGame() {
         if (fx.costMult) costMult *= (fx.costMult <= 1 ? Math.pow(fx.costMult, posMult) : Math.pow(fx.costMult, negMult));
         if (fx.liarChance) liarChance += fx.liarChance * negMult;
         if (fx.autonomyGain) autonomyGain += fx.autonomyGain * posMult;
-        if (fx.allowDebt) allowDebt = true;
-        if (fx.debtLimit) debtLimit = Math.max(debtLimit, fx.debtLimit * posMult);
         if (fx.cursorEvasion) cursorEvasion += fx.cursorEvasion * negMult;
         if (fx.fakeButtons) fakeButtons += Math.round(fx.fakeButtons * negMult);
         if (fx.idleEnabled) idleEnabled = true;
@@ -449,7 +441,6 @@ function completeIdleGame() {
         if (fx.costMult) costMult *= fx.costMult;
         if (fx.liarChance) liarChance += fx.liarChance;
         if (fx.autonomyGain) autonomyGain += fx.autonomyGain;
-        if (fx.debtComboMult) debtComboMult *= fx.debtComboMult;
         if (fx.idleScale) idleScale += fx.idleScale;
         if (fx.hideButtonAt) hideButtonAt = Math.min(hideButtonAt, fx.hideButtonAt);
       }
@@ -473,11 +464,6 @@ function completeIdleGame() {
       synergyBonus = Math.max(1.0, synergyBonus);
       antiSynergyPenalty = Math.max(0.1, antiSynergyPenalty);
       
-      if (allowDebt) {
-        debtLimit = Math.max(debtLimit, regretDebtFloor);
-      } else {
-        debtLimit = 0;
-      }
 
       if (autonomySuppressed) {
         autonomyGain = 0;
@@ -517,10 +503,7 @@ function completeIdleGame() {
         ? (1 + Math.log2(1 + idleSeconds) * 0.2 * Math.max(1, idleScale))
         : 1;
 
-      const debtMagnitude = Math.max(0, -s.presses);
-      const debtBoost = allowDebt
-        ? (1 + Math.pow(debtMagnitude + 1, 0.35) / 25 * debtComboMult)
-        : 1;
+
 
       const autonomyFactor = 1 + s.autonomy / 100;
       const efficiency =
@@ -530,10 +513,18 @@ function completeIdleGame() {
         regretBoost *
         derivativeBoost *
         idleBonus *
-        debtBoost;
+        1;
+
+      // Sum manual bonus from Human-branch upgrades
+      let manualBase = 1;
+      for (const upgrade of CONFIG.upgrades) {
+        if (upgrade.manualBonus) {
+          manualBase += (s.upgrades[upgrade.id] || 0) * upgrade.manualBonus;
+        }
+      }
 
       const manualValue =
-        1 *
+        manualBase *
         manualMult *
         (1 + s.metaPresses * 0.02) *
         regretBoost *
@@ -553,10 +544,7 @@ function completeIdleGame() {
         inflation,
         liarChance: clamp(liarChance + s.autonomy * 0.0015, 0, 0.75),
         autonomyGain,
-        allowDebt,
-        debtLimit,
-        debtBoost,
-        debtMagnitude,
+
         cursorEvasion,
         fakeButtons,
         fakeCrashRate,
@@ -586,8 +574,7 @@ function completeIdleGame() {
       const s = state();
       const computed = getComputed();
       if (s.presses >= cost) return true;
-      if (!computed.allowDebt) return false;
-      return s.presses - cost >= -computed.debtLimit;
+      return false;
     }
 
     /** Buy one or more of an upgrade based on the current buyMode (x1, x10, max). */
@@ -609,11 +596,28 @@ function completeIdleGame() {
 
       s.presses -= totalCost;
       s.upgrades[id] = (s.upgrades[id] || 0) + count;
-      if (s.presses < 0) s.debt = Math.max(s.debt, -s.presses);
-
       const label = count > 1 ? `${count}x ${upgrade.name}` : upgrade.name;
       logMessage(`Bought ${label} for ${format(totalCost)} presses.`, 'good');
       s.autonomy = clamp(s.autonomy + 0.25 * count, 0, 100);
+
+      saveNow();
+      render();
+    }
+
+    /** Sell one unit of an upgrade for 50% of its current cost. */
+    function sellUpgrade(id) {
+      const s = state();
+      const upgrade = CONFIG.upgrades.find((u) => u.id === id);
+      if (!upgrade) return;
+
+      const owned = s.upgrades[id] || 0;
+      if (owned <= 0) return;
+
+      // Refund is 50% of the cost to buy the level being sold (the last one owned)
+      const refund = Math.floor(getUpgradeCost(upgrade, owned - 1) * 0.5);
+      s.upgrades[id] = owned - 1;
+      s.presses += refund;
+      logMessage(`Sold 1x ${upgrade.name} for ${format(refund)} presses.`, 'warn');
 
       saveNow();
       render();
@@ -629,7 +633,7 @@ function completeIdleGame() {
 
       if (buyMode === 10) {
         let affordable = 0;
-        let budget = computed.allowDebt ? s.presses + computed.debtLimit : s.presses;
+        let budget = s.presses;
         for (let i = 0; i < 10; i++) {
           const cost = Math.ceil(upgrade.baseCost * Math.pow(upgrade.costMult, owned + i) * computed.costMult);
           if (budget >= cost) { budget -= cost; affordable++; }
@@ -640,7 +644,7 @@ function completeIdleGame() {
 
       // max mode
       let affordable = 0;
-      let budget = computed.allowDebt ? s.presses + computed.debtLimit : s.presses;
+      let budget = s.presses;
       for (let i = 0; i < 1000; i++) {
         const cost = Math.ceil(upgrade.baseCost * Math.pow(upgrade.costMult, owned + i) * computed.costMult);
         if (budget >= cost) { budget -= cost; affordable++; }
@@ -695,7 +699,6 @@ function completeIdleGame() {
       }
 
       s.activeModules.push(id);
-      if (id === 'debt_spiral') s.flags.introducedDebt = true;
       if (id === 'user_repellant') s.flags.introducedFakeButtons = true;
 
       logMessage(`Activated ${mod.name}. The system worsens itself productively.`, 'good');
@@ -791,7 +794,7 @@ function completeIdleGame() {
       // Level 0: Just the button and nothing else (0-9 presses)
       // Level 1: Show statusbar (10+ presses)
       // Level 2: Show topbar stats + automation panel (100+ presses)
-      // Level 3: Show autonomy/debt stats + situation panel + panel header (1000+ presses)
+      // Level 3: Show autonomy stats + situation panel + panel header (1000+ presses)
       // Level 4: Show tabs + active rules (10000+ presses)
       // Level 5: Show regret/layers (first prestige or 100000+ presses)
       if (s.regret > 0 || total >= 100000) return 5;
@@ -903,7 +906,7 @@ function completeIdleGame() {
         'System Notice: Presses are now performance art.',
         'Warning: Manual labor detected. Consider automation.',
         'Browser Alert: The button is learning boundaries.',
-        'Reminder: Debt is not the same as progress, but it is adjacent.'
+        'Reminder: The numbers are real. The meaning is not.'
       ];
 
       const popup = {
@@ -1360,9 +1363,8 @@ function completeIdleGame() {
       overlay.querySelector('.negotiation-pay').addEventListener('click', () => {
         const current = state();
         const computed = getComputed();
-        // Enforce debt limit: don't let negotiation push below debt limit
-        const minPresses = computed.allowDebt ? -computed.debtLimit : 0;
-        if (current.presses - demandAmount < minPresses) {
+        // Enforce: can't pay more than you have
+        if (current.presses - demandAmount < 0) {
           current.session.negotiationActive = false;
           overlay.remove();
           logMessage('You tried to pay but lack the funds. The button is unimpressed.', 'bad');
@@ -1370,7 +1372,6 @@ function completeIdleGame() {
           return;
         }
         current.presses -= demandAmount;
-        if (current.presses < 0) current.debt = Math.max(current.debt, -current.presses);
         current.session.negotiationActive = false;
         overlay.remove();
         logMessage('You paid the button\'s ransom. It is temporarily satisfied.', 'warn');
@@ -1562,8 +1563,8 @@ function completeIdleGame() {
 
       const tierNames = { 1: 'Physical Delegation', 2: 'Systemic Automation', 3: 'Abstract Value' };
       const tierUnlockAt = { 1: 0, 2: 2000, 3: 500000 };
-      const branchColors = { human: 'branch-human', machine: 'branch-machine', debt: 'branch-debt' };
-      const branchLabels = { human: 'Human', machine: 'Machine', debt: 'Debt' };
+      const branchColors = { human: 'branch-human', machine: 'branch-machine' };
+      const branchLabels = { human: 'Human', machine: 'Machine' };
 
       let html = '';
 
@@ -1617,10 +1618,13 @@ function completeIdleGame() {
                 <div class="small">Owned: ${owned}</div>
               </div>
               <div class="tag-row">
-                <span class="tag">+${format(upgrade.pps)} pps each</span>
+                <span class="tag">${upgrade.manualBonus ? `+${format(upgrade.manualBonus)} manual each` : `+${format(upgrade.pps)} pps each`}</span>
                 <span class="tag">Cost: ${format(displayCost)}</span>
               </div>
-              <button ${affordable ? '' : 'disabled'} data-buy-upgrade="${upgrade.id}">${btnLabel}</button>
+              <div class="card-actions">
+                <button ${affordable ? '' : 'disabled'} data-buy-upgrade="${upgrade.id}">${btnLabel}</button>
+                ${owned > 0 ? `<button class="sell-btn" data-sell-upgrade="${upgrade.id}">Sell</button>` : ''}
+              </div>
             </div>
           `;
         }
@@ -1631,6 +1635,10 @@ function completeIdleGame() {
 
       bySel('[data-buy-upgrade]', elements.upgradeList).forEach((btn) => {
         btn.addEventListener('click', () => buyUpgrade(btn.dataset.buyUpgrade));
+      });
+
+      bySel('[data-sell-upgrade]', elements.upgradeList).forEach((btn) => {
+        btn.addEventListener('click', () => sellUpgrade(btn.dataset.sellUpgrade));
       });
 
       elements.automationSummary.textContent =
@@ -1650,9 +1658,6 @@ function completeIdleGame() {
         costMult: (v) => `Costs x${format(v)}`,
         liarChance: (v) => `Lie +${Math.round(v * 100)}%`,
         autonomyGain: (v) => `Autonomy +${format(v)}/s`,
-        allowDebt: () => 'Debt enabled',
-        debtLimit: (v) => `Debt limit ${format(v)}`,
-        debtComboMult: (v) => `Debt combo x${format(v)}`,
         cursorEvasion: () => 'Button dodges',
         fakeButtons: (v) => `${v} fake buttons`,
         fakeCrashRate: (v) => `Crash chance ${format(v, 3)}/s`,
@@ -1889,7 +1894,6 @@ function completeIdleGame() {
         ['Anti-synergy penalty', '-20% per active conflicting module pair (min 0.1)'],
         ['Regret gain', 'floor((log10(presses) - 4)^2 × derivativeBonus)'],
         ['Idle bonus', '1 + log2(idleSeconds + 1) × 0.2 × idleScale'],
-        ['Debt bonus', '1 + ((-presses + 1)^0.35 / 25) × debtComboMult'],
         ['Press drain', 'presses × drainRate per second (from Press Siphon module)']
       ].map(([label, formula]) => `
         <div class="card">
@@ -1950,9 +1954,7 @@ function completeIdleGame() {
         ? 'The button has decided.  You are unnecessary.'
         : hidden
           ? 'The button no longer needs your hand. It still judges it.'
-          : computed.allowDebt
-            ? 'You can now buy things with presses you do not possess.'
-            : 'Your job is to remove yourself from this process.';
+          : 'Your job is to remove yourself from this process.';
     }
 
     function renderFakeButtons() {
@@ -2011,10 +2013,6 @@ function completeIdleGame() {
           ? 'The system no longer requires visible participation'
           : `+${format(computed.autonomyGain, 3)}/s before automation pressure`;
 
-      elements.debtValue.textContent = format(-Math.min(0, s.presses));
-      elements.debtSub.textContent = computed.allowDebt
-        ? `Debt limit ${format(computed.debtLimit)} • scales with Regret • boost x${format(computed.debtBoost)}`
-        : 'Financially irresponsible mode locked';
 
       elements.regretValue.textContent = format(s.regret);
       elements.layerSummary.textContent =
@@ -2032,7 +2030,7 @@ function completeIdleGame() {
       elements.formulaEfficiency.textContent =
         `passive × meta(${format(computed.metaBoost)}) × hyper(${format(computed.hyperBoost)}) × ` +
         `regret(${format(computed.regretBoost)}) × derivatives(${format(computed.derivativeBoost)}) × ` +
-        `idle(${format(computed.idleBonus)}) × debt(${format(computed.debtBoost)})`;
+        `idle(${format(computed.idleBonus)})`;
 
       elements.formulaInflation.textContent =
         `base inflation ${format(computed.inflation)} × module costs modifier ` +
@@ -2174,11 +2172,6 @@ function completeIdleGame() {
         openAutonomyEnding();
       }
 
-      if (s.presses < 0) {
-        s.debt = Math.max(s.debt, -s.presses);
-      } else if (!computed.allowDebt) {
-        s.debt = 0;
-      }
 
       const idleSeconds = (current - s.session.lastClick) / 1000;
       if (computed.idleEnabled && idleSeconds > 18 && Math.random() < 0.0006) {

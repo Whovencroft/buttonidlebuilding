@@ -667,6 +667,22 @@ button, input, textarea, select { font: inherit; }
   transform: none;
 }
 
+.card-actions {
+  display: flex;
+  gap: var(--space-sm);
+}
+.card-actions button { flex: 1; }
+.card-actions .sell-btn {
+  flex: 0 0 auto;
+  width: auto;
+  padding: var(--space-sm) var(--space-md);
+  background: rgba(200, 80, 80, 0.25);
+  border: 1px solid rgba(200, 80, 80, 0.5);
+}
+.card-actions .sell-btn:hover {
+  background: rgba(200, 80, 80, 0.45);
+}
+
 /* ============================================================
    METERS & INPUTS
    ============================================================ */
@@ -1562,11 +1578,6 @@ button, input, textarea, select { font: inherit; }
   border: 1px solid rgba(37, 99, 235, 0.35);
 }
 
-.branch-debt {
-  background: rgba(185, 28, 28, 0.2);
-  color: var(--error-readable);
-  border: 1px solid rgba(185, 28, 28, 0.35);
-}
 
 /* ── Module category headers ── */
 .category-header {

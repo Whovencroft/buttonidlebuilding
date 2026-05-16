@@ -260,7 +260,7 @@
       chargen = null;
       miniOutput([
         { type: 'info', text: '' },
-        { type: 'success', text: 'Your story begins...' },
+        { type: 'success', text: 'The story continues...' },
         { type: 'info', text: '' }
       ]);
       // Build a save-like object from the fresh player data
