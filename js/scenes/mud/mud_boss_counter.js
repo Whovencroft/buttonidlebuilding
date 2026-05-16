@@ -1,5 +1,5 @@
 /**
- * mud_boss_counter.js — Boss Counter-Attack System
+ * mud_boss_counter.js  -  Boss Counter-Attack System
  *
  * Bosses (mobs flagged as boss: true) periodically telegraph a powerful
  * attack. The player has a 1-round window to use any Tier 2+ ability
@@ -12,7 +12,7 @@
  *   - Boss deals 200% of its normal damage
  *   - Player loses 2 momentum
  *
- * This system is universal — any spec's Tier 2+ ability can counter.
+ * This system is universal  -  any spec's Tier 2+ ability can counter.
  *
  * Exposes window.MudBossCounter for integration with mud_engine.js.
  */

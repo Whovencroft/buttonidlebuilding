@@ -1,5 +1,5 @@
 /**
- * mud_sense.js — Sense & Scan System
+ * mud_sense.js  -  Sense & Scan System
  *
  * Provides the 'sense' command to gauge relative mob power in the current
  * room and adjacent rooms. Shows descriptive tiers rather than raw numbers.

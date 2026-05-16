@@ -1,5 +1,5 @@
 /**
- * mud_missions.js — Bulletin Board Quest System
+ * mud_missions.js  -  Bulletin Board Quest System
  *
  * Generates procedural quests from the mob/item/room pools.
  * The Bulletin Board (room 12) offers one quest at a time.
@@ -106,7 +106,7 @@
   }
 
   /**
-   * Generate a hunt quest — kill a specific mob.
+   * Generate a hunt quest  -  kill a specific mob.
    */
   function generateHuntQuest(mobs, rooms, playerPower, completedIds) {
     // Filter to hostile mobs within a reasonable power range
@@ -157,7 +157,7 @@
   }
 
   /**
-   * Generate a fetch quest — find a specific item placed in the world.
+   * Generate a fetch quest  -  find a specific item placed in the world.
    * Returns the quest object with a spawnRoomVnum for the engine to place the item.
    */
   function generateFetchQuest(items, rooms, playerPower, completedIds) {
@@ -212,7 +212,7 @@
   }
 
   /**
-   * Generate a defend quest — survive X waves of mobs in a specific room.
+   * Generate a defend quest  -  survive X waves of mobs in a specific room.
    * Waves spawn automatically when the player enters the defend room.
    */
   function generateDefendQuest(mobs, rooms, playerPower, completedIds) {

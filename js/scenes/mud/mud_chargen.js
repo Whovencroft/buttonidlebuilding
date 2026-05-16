@@ -1,5 +1,5 @@
 /**
- * mud_chargen.js — Character Creation System
+ * mud_chargen.js  -  Character Creation System
  *
  * Flow:
  *  1. Pick race (12 options)
@@ -10,7 +10,7 @@
  *     - Round 2: 2 questions (remaining 4 traits, each appears once) → 2 eliminated
  *     - Round 3: 1 final question between last 2 traits → winner determined
  *  5. Pick specialization from top 6 scoring results
- *  6. Confirm — race + specialization + appearance. Base class derived from spec.
+ *  6. Confirm  -  race + specialization + appearance. Base class derived from spec.
  *
  * 28 unique dilemma questions cover every possible trait pairing (8 choose 2).
  * Brackets are shuffled each playthrough for variety.

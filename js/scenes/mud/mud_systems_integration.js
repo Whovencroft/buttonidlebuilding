@@ -1,5 +1,5 @@
 /**
- * mud_systems_integration.js — System Integration Layer (v2)
+ * mud_systems_integration.js  -  System Integration Layer (v2)
  *
  * Registers all new system commands with the unified MudCommands registry
  * and adds middleware hooks for rest-state blocking, exhaustion, and
@@ -106,7 +106,7 @@
       const invasionState = getInvasionState();
       if (!invasionState) return;
 
-      // Check if player entered a safe zone — reset kill streak
+      // Check if player entered a safe zone  -  reset kill streak
       const room = engine._internals.currentRoom();
       if (window.MudInvasions.isSafeZone(room)) {
         if (invasionState.killStreakSinceSafe > 0) {
@@ -172,7 +172,7 @@
           engine._internals.pendingSystemOutput = (engine._internals.pendingSystemOutput || []).concat(output);
         }
       }).catch(() => {
-        // Ghost fetch failed silently — no invasion
+        // Ghost fetch failed silently  -  no invasion
       });
     }
 
@@ -676,7 +676,7 @@
       );
 
       if (isEchoKill) {
-        // Echo invasion kill — rewards already handled by combat
+        // Echo invasion kill  -  rewards already handled by combat
         invasionState.invasionKills += 1;
         saveInvasionState(invasionState);
         return;
@@ -747,7 +747,7 @@
       return output;
     };
 
-    // ─── doTake wrapper — fetch quest progress ─────────────────────────
+    // ─── doTake wrapper  -  fetch quest progress ─────────────────────────
     const originalDoTake = engine._internals.doTake;
     engine._internals.doTake = function(target) {
       const output = originalDoTake(target);

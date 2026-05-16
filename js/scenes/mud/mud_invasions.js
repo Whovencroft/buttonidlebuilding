@@ -1,15 +1,15 @@
 /**
- * mud_invasions.js — Echo Invasion System
+ * mud_invasions.js  -  Echo Invasion System
  *
  * When a ghost appears in a room, there is a small chance it "solidifies"
- * into a hostile Echo — a corrupted version of another player that must
+ * into a hostile Echo  -  a corrupted version of another player that must
  * be fought. Inspired by Dark Souls invasions, adapted for async MUD play.
  *
  * Key mechanics:
  *   - Base 2% invasion chance per ghost encounter
  *   - Kill streak bonus: +1% per 20 mobs killed since last safe zone visit
  *   - Karma penalty: permanent +% for killing friendly NPCs (with warning)
- *   - Echo stats scale to player (0.8–1.2x HP/ATK/DEF)
+ *   - Echo stats scale to player (0.8-1.2x HP/ATK/DEF)
  *   - Echo uses the ghost player's specialization abilities
  *   - Rewards: bonus power/XP + possible item from ghost's inventory
  *   - Ghost player is notified their echo was used
@@ -143,7 +143,7 @@
   /**
    * Calculate the current invasion chance for a player.
    * @param {object} invasionState - Player's invasion state
-   * @returns {number} Probability (0.0–1.0)
+   * @returns {number} Probability (0.0-1.0)
    */
   function getInvasionChance(invasionState) {
     let chance = BASE_INVASION_CHANCE;
@@ -196,7 +196,7 @@
   function generateEchoMob(ghost, player, ghostSaveData) {
     const echoName = `Echo of ${ghost.username || 'Unknown'}`;
 
-    // Scale stats to the player with random 0.8–1.2 variance
+    // Scale stats to the player with random 0.8-1.2 variance
     const scaleFactor = () => STAT_SCALE_MIN + Math.random() * (STAT_SCALE_MAX - STAT_SCALE_MIN);
 
     const hp = Math.max(20, Math.round(player.maxHp * scaleFactor()));
@@ -231,7 +231,7 @@
         defense,
         hostile: true
       },
-      // Echo mobs don't have normal loot tables — handled by invasion reward
+      // Echo mobs don't have normal loot tables  -  handled by invasion reward
       loot_table: [],
       flags: 'hostile,roaming'
     };
@@ -268,7 +268,7 @@
     output.push({ type: 'success', text: `The echo of ${echoMob.echoUsername || 'Unknown'} dissolves into shimmering fragments.` });
     output.push({ type: 'success', text: `+${powerGain} power (invasion bonus!)` });
 
-    // Item drop chance — random item from the echo's inventory
+    // Item drop chance  -  random item from the echo's inventory
     let itemDrop = null;
     if (echoMob.echoInventory && echoMob.echoInventory.length > 0 && Math.random() < ITEM_DROP_CHANCE) {
       itemDrop = echoMob.echoInventory[Math.floor(Math.random() * echoMob.echoInventory.length)];

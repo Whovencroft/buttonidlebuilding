@@ -1,5 +1,5 @@
 /**
- * mud_charge.js — Charge-and-Release System
+ * mud_charge.js  -  Charge-and-Release System
  *
  * Certain abilities require charging before release. While charging:
  *   - The player is vulnerable (cannot use other abilities)
@@ -25,20 +25,20 @@
    * Mapped to their required charge rounds for full power.
    */
   const CHARGEABLE_ABILITIES = {
-    // Anime specs — beam/energy attacks
+    // Anime specs  -  beam/energy attacks
     spirit_blast:   2,  // Elementalist T0 - ki wave
     dragon_breath:  3,  // Elementalist T2 - draconic fire
     ultimate_form:  2,  // Elementalist T3 - power-up (charge to transform)
     pressure_point: 2,  // Monk T2 - focused strike
     inner_peace:    2,  // Monk T3 - deep meditation
-    // Fantasy specs — high-power spells
+    // Fantasy specs  -  high-power spells
     divine_charge:  2,  // Knight T3 - holy energy
     void_rift:      3,  // Occultist T3 - tear reality
     exorcism:       2,  // Priest T2 - banishment
     miracle:        2,  // Priest T3 - divine intervention
     apocalypse:     3,  // Oracle T3 - end of days
     divine_wrath:   2,  // Oracle T0 - invoke the gods
-    // Sci-fi specs — energy weapons
+    // Sci-fi specs  -  energy weapons
     orbital_strike: 3,  // Commando T3 - calling in fire from orbit
     zero_day:       2,  // Hacker T3 - system exploit (digital charge)
     quantum_blade:  2   // Cyber-Thief T3 - quantum energy
@@ -108,7 +108,7 @@
    * Check if charging is interrupted by taking damage.
    * 30% base chance, reduced by 10% per proficiency level (min 5%).
    *
-   * @param {number} proficiencyLevel - Ability proficiency level (0–10)
+   * @param {number} proficiencyLevel - Ability proficiency level (0-10)
    * @returns {boolean} True if interrupted
    */
   function checkChargeInterrupt(proficiencyLevel) {

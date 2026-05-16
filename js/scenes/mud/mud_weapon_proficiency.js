@@ -1,7 +1,7 @@
 /**
- * mud_weapon_proficiency.js — Weapon Proficiency System
+ * mud_weapon_proficiency.js  -  Weapon Proficiency System
  *
- * Tracks per-category weapon proficiency as a percentage (0–100%).
+ * Tracks per-category weapon proficiency as a percentage (0-100%).
  * Categories are hidden until the player first uses a weapon of that type.
  *
  * Bonuses:
@@ -9,7 +9,7 @@
  *   At 100%, attacks with that weapon type cannot miss
  *
  * Proficiency is stored on player.weaponProficiency as:
- *   { [category]: number }  — where number is 0–100 (percentage)
+ *   { [category]: number }   -  where number is 0-100 (percentage)
  *
  * Gain rate scales inversely with current proficiency:
  *   Low proficiency  → faster gains
@@ -98,7 +98,7 @@
     const catName = CATEGORY_NAMES[category] || category;
 
     if (isNew && prev === 0) {
-      // First time using this weapon type — unlock notification
+      // First time using this weapon type  -  unlock notification
       message = `[Proficiency] You've begun training with ${catName}! (${Math.floor(next)}%)`;
     } else if (milestone === 100) {
       message = `[Proficiency] MASTERY! You've reached 100% proficiency with ${catName}! You can no longer miss with this weapon type. (+10 attack bonus)`;
@@ -116,7 +116,7 @@
    *
    * @param {object} player   - The player state object
    * @param {string} category - The weapon category
-   * @returns {number} Attack bonus (0–10)
+   * @returns {number} Attack bonus (0-10)
    */
   function getAttackBonus(player, category) {
     ensureData(player);
@@ -141,7 +141,7 @@
    *
    * @param {object} player   - The player state object
    * @param {string} category - The weapon category
-   * @returns {number} Proficiency 0–100
+   * @returns {number} Proficiency 0-100
    */
   function getProficiency(player, category) {
     ensureData(player);
@@ -182,7 +182,7 @@
 
   /**
    * Build a simple progress bar string.
-   * @param {number} pct - Percentage 0–100
+   * @param {number} pct - Percentage 0-100
    * @returns {string} e.g. "[████████░░]"
    */
   function buildBar(pct) {

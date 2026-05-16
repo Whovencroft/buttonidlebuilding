@@ -1,5 +1,5 @@
 /**
- * mud_npc_say.js — NPC Keyword Response System
+ * mud_npc_say.js  -  NPC Keyword Response System
  *
  * Makes NPCs respond to things the player says aloud.
  * When a player types "say <message>", NPCs in the room check
@@ -21,7 +21,7 @@
 
   const KEYWORD_HANDLERS = [
     {
-      // Greetings — any NPC responds, merchants also hint at shop
+      // Greetings  -  any NPC responds, merchants also hint at shop
       keywords: ['hail', 'hello', 'greet', 'hi', 'hey', 'good day', 'howdy'],
       handler: (mob, player, roomVnum, allMobs) => {
         const output = [];
@@ -43,7 +43,7 @@
       }
     },
     {
-      // Shopping — opens merchant inventory
+      // Shopping  -  opens merchant inventory
       keywords: ['shop', 'buy', 'wares', 'trade', 'sell', 'browse', 'goods', 'stock', 'inventory'],
       handler: (mob, player, roomVnum) => {
         if (!window.MudMerchants) {
@@ -57,7 +57,7 @@
       }
     },
     {
-      // Quest inquiry — shows available quests from this NPC
+      // Quest inquiry  -  shows available quests from this NPC
       keywords: ['quest', 'task', 'job', 'work', 'mission', 'bounty', 'assignment'],
       handler: (mob, player, roomVnum, allMobs, quests) => {
         const mobVnum = mob.vnum;
@@ -78,7 +78,7 @@
       }
     },
     {
-      // Help/info — shows NPC lore dialogue
+      // Help/info  -  shows NPC lore dialogue
       keywords: ['help', 'info', 'tell me', 'what do you know', 'rumor', 'rumors', 'news', 'gossip'],
       handler: (mob) => {
         const dialogues = (mob.dialogue || []).filter(d => !d.condition);
@@ -94,7 +94,7 @@
       }
     },
     {
-      // Training — redirect to train command if in training room
+      // Training  -  redirect to train command if in training room
       keywords: ['train', 'teach', 'learn', 'instruct', 'practice'],
       handler: (mob, player) => {
         const TRAINING_ROOM = 8;

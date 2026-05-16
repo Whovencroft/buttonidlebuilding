@@ -1,5 +1,5 @@
 /**
- * mud_core_commands.js — Core Command Registration
+ * mud_core_commands.js  -  Core Command Registration
  *
  * Registers all original engine commands (go, look, take, etc.) with the
  * unified MudCommands registry. Each command wraps the engine's internal
@@ -9,13 +9,13 @@
  * It hooks into the engine creation via a factory wrapper.
  *
  * Categories:
- *   Movement    — go, recall, setrecall
- *   Interaction — look, take, drop, use, combine, rotate, talk, say
- *   Inventory   — inventory, equipment, wear, unequip
- *   Combat      — attack, flee
- *   Progression — train, buy, respec, abilities, status, quest
- *   Social      — write, notes, shop
- *   System      — help
+ *   Movement     -  go, recall, setrecall
+ *   Interaction  -  look, take, drop, use, combine, rotate, talk, say
+ *   Inventory    -  inventory, equipment, wear, unequip
+ *   Combat       -  attack, flee
+ *   Progression  -  train, buy, respec, abilities, status, quest
+ *   Social       -  write, notes, shop
+ *   System       -  help
  */
 (() => {
   'use strict';

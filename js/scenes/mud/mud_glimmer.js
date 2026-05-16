@@ -1,5 +1,5 @@
 /**
- * mud_glimmer.js — SaGa-Style Ability Discovery System (v2)
+ * mud_glimmer.js  -  SaGa-Style Ability Discovery System (v2)
  *
  * Abilities are "glimmered" (sparked) mid-combat by using related techniques.
  * Two discovery paths:
@@ -168,7 +168,7 @@
     // Don't re-learn something already owned
     if (owned.includes(nextEntry.id)) return null;
 
-    // Calculate spark chance — chain evolutions have their own base rate
+    // Calculate spark chance  -  chain evolutions have their own base rate
     let baseChance = CHAIN_SPARK_CHANCE;
     if (nextEntry.statGate) baseChance += STAT_GATE_BONUS; // Stat-gated paths slightly easier
     const finalChance = (baseChance + profBonus + instinctBonus) * challengeBonus;
@@ -300,7 +300,7 @@
     const lines = [];
 
     if (discovered.isChainEvolution) {
-      // Chain evolution messages — vary by rank and branch
+      // Chain evolution messages  -  vary by rank and branch
       if (discovered.chainBranch) {
         // Stat-gated branch discovery
         const branchFlavors = {

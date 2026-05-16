@@ -1,5 +1,5 @@
 /**
- * mud_echoes.js — Skill Echoes (Ghost-Based Learning)
+ * mud_echoes.js  -  Skill Echoes (Ghost-Based Learning)
  *
  * When a player dies, they leave behind a "ghost" (echo) at the death
  * location. Other players (or the same player on return) can interact
@@ -10,7 +10,7 @@
  *
  * Echoes persist for a limited time and fade after being read once.
  * In single-player mode, echoes from your own deaths still provide
- * a "reflection" bonus — learning from your mistakes.
+ * a "reflection" bonus  -  learning from your mistakes.
  *
  * Exposes window.MudEchoes for integration with mud_engine.js.
  */

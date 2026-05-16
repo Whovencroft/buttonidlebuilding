@@ -135,7 +135,7 @@
   word-wrap: break-word;
 }
 
-/* Line types — mapped to DESIGN.md semantic colors.                        */
+/* Line types  -  mapped to DESIGN.md semantic colors.                        */
 /* Color is reinforced with weight or style so it is never the sole cue.    */
 
 .mud-line-room-name {
@@ -148,15 +148,15 @@
 .mud-line-exits      { color: var(--mud-info); }
 
 .mud-line-items {
-  color: #86EFAC;                     /* green-300 — readable on inverse bg */
+  color: #86EFAC;                     /* green-300  -  readable on inverse bg */
 }
 
 .mud-line-mobs {
-  color: #FDBA74;                     /* orange-300 — readable on inverse bg */
+  color: #FDBA74;                     /* orange-300  -  readable on inverse bg */
 }
 
 .mud-line-combat {
-  color: #FCA5A5;                     /* red-300 — readable on inverse bg */
+  color: #FCA5A5;                     /* red-300  -  readable on inverse bg */
   font-weight: 650;
 }
 
@@ -178,7 +178,7 @@
 }
 
 .mud-line-dialogue {
-  color: #93C5FD;                     /* blue-300 — readable on inverse bg */
+  color: #93C5FD;                     /* blue-300  -  readable on inverse bg */
   font-style: italic;
 }
 
@@ -206,11 +206,11 @@
 }
 
 .mud-hp {
-  color: #FCA5A5;                     /* red-300 — HP always red-toned */
+  color: #FCA5A5;                     /* red-300  -  HP always red-toned */
 }
 
 .mud-focus {
-  color: #93C5FD;                     /* blue-300 — Focus = info-toned */
+  color: #93C5FD;                     /* blue-300  -  Focus = info-toned */
 }
 
 .mud-power {
@@ -222,7 +222,7 @@
 }
 
 .mud-momentum {
-  color: #FDBA74;                     /* orange-300 — warm momentum cue */
+  color: #FDBA74;                     /* orange-300  -  warm momentum cue */
 }
 
 .mud-room {
@@ -242,7 +242,7 @@
   background: var(--mud-primary);
 }
 
-/* Persistent quick-action row — always visible, visually distinct */
+/* Persistent quick-action row  -  always visible, visually distinct */
 .mud-quick-buttons {
   display: flex;
   flex-wrap: wrap;

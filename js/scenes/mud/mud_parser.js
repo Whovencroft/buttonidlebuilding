@@ -1,5 +1,5 @@
 /**
- * mud_parser.js — Smart Input Parser
+ * mud_parser.js  -  Smart Input Parser
  *
  * Replaces the original flat tokenizer with a parser that:
  *   - Resolves verbs through MudCommands registry (not a hardcoded map)
@@ -8,7 +8,7 @@
  *   - Supports multi-word targets without losing meaning
  *   - Provides a clean ParsedInput object for command handlers
  *
- * Does NOT strip stop words — that was causing ambiguity. Instead, it
+ * Does NOT strip stop words  -  that was causing ambiguity. Instead, it
  * identifies structural prepositions and splits around them.
  *
  * Exposes window.MudParser for use by mud_engine.js.
@@ -83,7 +83,7 @@
     if (resolved) {
       result.verb = resolved;
     } else {
-      // Not a registered command — store as-is for ability name matching
+      // Not a registered command  -  store as-is for ability name matching
       result.verb = null;
       result.target = cleaned;
       result.args = tokens;
@@ -128,7 +128,7 @@
           break;
         }
         // If preposition is first token after verb, it's a structural prefix
-        // e.g., "look at sword" — "at" is structural, "sword" is target
+        // e.g., "look at sword"  -  "at" is structural, "sword" is target
         if (i === 0 && targetTokens.length > 1) {
           // Strip the preposition, rest is target
           targetTokens = targetTokens.slice(1);

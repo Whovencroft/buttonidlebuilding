@@ -21,7 +21,7 @@
 //
 // "Actor south-face front row" = floor(actorState.y + actor.height)
 // "Actor east-face front col"  = floor(actorState.x + actor.width)
-// "Actor top draw tile"         = (floor(ax+aw-ε), floor(ay+ah-ε))  — bottom-right of footprint
+// "Actor top draw tile"         = (floor(ax+aw-ε), floor(ay+ah-ε))   -  bottom-right of footprint
 // "Marble tile"                = (floor(marble.x), floor(marble.y))
 //
 // This ordering is correct because:
@@ -170,7 +170,7 @@
   let _lastSimClock = -1;
   let _actorBySouthTile    = null; // Map<packed (originX | southRow<<16), actor[]>
   let _actorByEastTile     = null; // Map<packed (eastCol | originY<<16), actor[]>
-  let _actorByOrigin       = null; // Map<packed (topDrawX | topDrawY<<16), actor[]> — bottom-right tile of each actor's footprint
+  let _actorByOrigin       = null; // Map<packed (topDrawX | topDrawY<<16), actor[]>  -  bottom-right tile of each actor's footprint
 
   function rebuildActorTables(level, dynState) {
     // dynState is mutated in place, so compare clock to detect physics steps
@@ -271,7 +271,7 @@
 
   // ─── Draw helpers (direct ctx, no intermediate arrays) ────────────────────
 
-  // Draw a quad given 4 world corners (all at the same z) — used for flat tops
+  // Draw a quad given 4 world corners (all at the same z)  -  used for flat tops
   function quad(ctx, x0,y0, x1,y1, x2,y2, x3,y3, z, view, color) {
     ctx.beginPath();
     ctx.moveTo(screenX(x0,y0,z,view), screenY(x0,y0,z,view));
@@ -461,7 +461,7 @@
   // ─── Terrain south/east faces ─────────────────────────────────────────────
   //
   // FLAT terrain tiles at the same height are grouped into contiguous solid
-  // face sheets — exactly mirroring the blocker face grouping logic.
+  // face sheets  -  exactly mirroring the blocker face grouping logic.
   // This eliminates seams between adjacent wall tiles that would otherwise
   // allow the marble sphere to visually bleed through.
   //
@@ -839,11 +839,11 @@
   //
   // The shadow and ball are drawn at DIFFERENT points in the tile loop:
   //
-  //   Shadow: drawn at step 9 of bucket (mTX+mTY)  — after the terrain top
+  //   Shadow: drawn at step 9 of bucket (mTX+mTY)   -  after the terrain top
   //           face of the marble's own tile, so it sits ON the floor.
   //           Any terrain face in a higher bucket will paint over it.
   //
-  //   Ball:   drawn at step 0 of bucket (mTX+mTY+1) — before the faces of
+  //   Ball:   drawn at step 0 of bucket (mTX+mTY+1)  -  before the faces of
   //           the tile one step forward, so those faces correctly cover it.
   //
   // We cache the computed shadowZ and renderZ so both functions share the
@@ -1004,11 +1004,11 @@
   //
   //   The marble is occluded (hidden) in two situations:
   //
-  //   1. INSIDE A WALL TILE — the marble's own tile is taller than the marble
+  //   1. INSIDE A WALL TILE  -  the marble's own tile is taller than the marble
   //      (e.g. spawned inside a wall, or physics tunnelling at high speed).
   //      Terrain collision normally prevents this during gameplay.
   //
-  //   2. SPHERE OVERLAPS A LOWER-BUCKET FACE — the marble's sphere extends into
+  //   2. SPHERE OVERLAPS A LOWER-BUCKET FACE  -  the marble's sphere extends into
   //      a tile face that is drawn BEFORE the marble in painter's order (i.e. a
   //      face in a lower isometric bucket).  This happens when the marble is
   //      near the NW corner of its tile and an adjacent NW tile has a tall face.
@@ -1133,7 +1133,7 @@
     // marble's own tile bucket from appearing on top of the shadow.
     // The shadow fires at step 9b and the ball at step 9c of the same bucket,
     // so the ball is always drawn on top of the shadow.
-    const shadowBucket = mTX + mTY;   // same bucket as ball — draw after all tops
+    const shadowBucket = mTX + mTY;   // same bucket as ball  -  draw after all tops
 
     // When the marble is standing on a moving actor (elevator/bridge), the actor
     // top face is drawn at the bottom-right tile of the actor's footprint, which
@@ -1181,7 +1181,7 @@
       // Ball is drawn at step 9b of ballBucket (after the top face of that
       // tile), so the top face of the next tile does not cover the ball.
       // The ball is still covered by faces of tiles in higher buckets.
-      // (Ball draw is at the BOTTOM of the loop body — see below)
+      // (Ball draw is at the BOTTOM of the loop body  -  see below)
 
       // ── 1. Actor south faces triggered at tile (tx, ty) ──
       // Each actor south face is drawn exactly once, at tile (floor(ax), southRow).
@@ -1297,7 +1297,7 @@
           const actorTop = actor.kind === window.MarbleLevels.ACTOR_KINDS.TIMED_GATE
             ? actor.topHeight : state.topHeight;
           // Skip if ANY tile under the actor's footprint has terrain above the actor.
-          // Note: actorFaceSuppressed is intentionally NOT checked here — it only
+          // Note: actorFaceSuppressed is intentionally NOT checked here  -  it only
           // suppresses side faces, not the top face.  The top face should appear
           // as soon as the actor emerges above the terrain (actorTopCovered=false).
           const _topCov = actorTopCovered(level, dyn, state.x, state.y, actor.width, actor.height, actorTop);

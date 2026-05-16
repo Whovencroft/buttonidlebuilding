@@ -1,5 +1,5 @@
 /**
- * mud_titles.js — Title Progression System
+ * mud_titles.js  -  Title Progression System
  *
  * Players earn cosmetic titles as they reach power milestones.
  * Titles are displayed in status and can be shown to other players
@@ -12,7 +12,7 @@
 
   /**
    * Title chains by base class. Each entry: [powerThreshold, title].
-   * Ordered ascending — player gets the highest title they qualify for.
+   * Ordered ascending  -  player gets the highest title they qualify for.
    */
   const TITLE_CHAINS = {
     fighter: [

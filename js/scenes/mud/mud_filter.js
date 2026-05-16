@@ -1,5 +1,5 @@
 /**
- * mud_filter.js — Client-Side Moderation Filter
+ * mud_filter.js  -  Client-Side Moderation Filter
  *
  * Filters player-typed input for profanity, slurs, and abusive content.
  * Designed to run client-side before any text is sent to the server

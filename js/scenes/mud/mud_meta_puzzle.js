@@ -1,10 +1,10 @@
 /**
- * mud_meta_puzzle.js — Meta-Puzzle Tracking & Marble Confrontation
+ * mud_meta_puzzle.js  -  Meta-Puzzle Tracking & Marble Confrontation
  *
  * Tracks the player's discovery of marble passage clues across all zones.
  * When all 11 clues are found, unlocks the final confrontation with the marble.
  *
- * The marble is the final "boss" — not a creature, but an entity.
+ * The marble is the final "boss"  -  not a creature, but an entity.
  * The confrontation is a narrative event, not a combat encounter.
  *
  * Exposes window.MudMetaPuzzle for integration.
@@ -86,7 +86,7 @@
   }
 
   /**
-   * Execute the marble confrontation — the final narrative event.
+   * Execute the marble confrontation  -  the final narrative event.
    * Returns a sequence of messages that form the ending.
    * @param {object} player - Player state
    * @returns {Array} Output messages

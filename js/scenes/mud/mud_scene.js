@@ -1,5 +1,5 @@
 /**
- * mud_scene.js — MUD Scene Entry Point
+ * mud_scene.js  -  MUD Scene Entry Point
  *
  * Orchestrates the full lifecycle:
  *   1. Auth (login/register) via MudAPI
@@ -195,7 +195,7 @@
         const result = await window.MudAPI.register(authPending.username, authPending.password);
         miniOutput([{ type: 'success', text: `Account created. Welcome, ${result.username}.` }]);
         authPending = { username: '', password: '' };
-        // New account — no save exists, go to chargen
+        // New account  -  no save exists, go to chargen
         startChargenOrPlay(null);
       } catch (err) {
         miniOutput([
@@ -231,10 +231,10 @@
     /** Decide whether to run chargen or jump straight to the engine. */
     function startChargenOrPlay(savedState) {
       if (savedState && savedState.player) {
-        // Have a save — skip chargen, go to play
+        // Have a save  -  skip chargen, go to play
         initEngine(savedState);
       } else {
-        // No save — run chargen
+        // No save  -  run chargen
         startChargen();
       }
     }
@@ -255,7 +255,7 @@
       chargen.processInput(text);
     }
 
-    /** Called when chargen finishes — build engine with new player data. */
+    /** Called when chargen finishes  -  build engine with new player data. */
     function onChargenComplete(playerData) {
       chargen = null;
       miniOutput([
@@ -313,17 +313,17 @@
 
     async function enter(context) {
       if (phase === 'play' && engine && ui) {
-        // Re-entering from another scene — just resume
+        // Re-entering from another scene  -  just resume
         engine.resume(context.state?.scenes?.mud || null);
         ui.render();
         ui.focus();
         return;
       }
 
-      // First entry — start the auth flow
+      // First entry  -  start the auth flow
       renderMiniTerminal();
 
-      // Atmospheric intro — first thing every player sees
+      // Atmospheric intro  -  first thing every player sees
       miniOutput([
         { type: 'room-name', text: 'You are nowhere.' },
         { type: 'info', text: '' },
@@ -336,7 +336,7 @@
       ]);
 
       if (window.MudAPI?.isLoggedIn()) {
-        // Already logged in (token in localStorage) — try loading save
+        // Already logged in (token in localStorage)  -  try loading save
         miniOutput([
           { type: 'room-name', text: '═══ WELCOME BACK ═══' },
           { type: 'info', text: `Logged in as ${window.MudAPI.getUsername()}.` },

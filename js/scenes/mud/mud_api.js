@@ -1,5 +1,5 @@
 /**
- * mud_api.js — MUD Backend API Client
+ * mud_api.js  -  MUD Backend API Client
  *
  * Thin wrapper around the Railway backend. Handles auth token persistence,
  * save/load, notes, marketplace, and ghost recordings.

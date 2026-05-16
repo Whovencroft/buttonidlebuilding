@@ -1,15 +1,15 @@
 /**
- * mud_training_rooms.js — Training Room System
+ * mud_training_rooms.js  -  Training Room System
  *
  * Specific rooms allow passive stat training through exercises.
  * The Sparring Pit (room 17) allows physical training.
  * Training costs Focus, takes time, and has diminishing returns.
  *
  * Exercises:
- *   - 'train attack'  — Improve attack power
- *   - 'train defense' — Improve defense
- *   - 'train focus'   — Improve max focus
- *   - 'train hp'      — Improve max HP
+ *   - 'train attack'   -  Improve attack power
+ *   - 'train defense'  -  Improve defense
+ *   - 'train focus'    -  Improve max focus
+ *   - 'train hp'       -  Improve max HP
  *
  * Each exercise costs Focus, takes multiple ticks, and has a chance
  * to grant +1 to the stat. Diminishing returns prevent AFK farming.
@@ -41,7 +41,7 @@
    * Minimum 10%.
    *
    * @param {number} sessionCount - Total sessions completed today
-   * @returns {number} Probability (0.0–1.0)
+   * @returns {number} Probability (0.0-1.0)
    */
   function getTrainingChance(sessionCount) {
     const base = 0.60;
@@ -117,7 +117,7 @@
       return { done: false, output: [{ type: 'info', text: `  ...training... (${trainingState.ticksRemaining} ticks remaining)` }] };
     }
 
-    // Training complete — roll for stat gain
+    // Training complete  -  roll for stat gain
     const exercise = EXERCISES[trainingState.exercise];
     const sessionCount = player.trainingCounts?.[trainingState.exercise] || 0;
     const chance = getTrainingChance(sessionCount);

@@ -1,5 +1,5 @@
 /**
- * mud_data.js — MUD World Data Loader
+ * mud_data.js  -  MUD World Data Loader
  *
  * Fetches room, mob, item, and quest JSON files and exposes them on window.MudData.
  * Must be loaded before mud_engine.js.

@@ -1,5 +1,5 @@
 /**
- * mud_ui.js — MUD Terminal UI (v2)
+ * mud_ui.js  -  MUD Terminal UI (v2)
  *
  * Handles the DOM-based terminal interface with:
  *   - Scrollable output log with line-type styling
@@ -83,10 +83,10 @@
 
     /**
      * Handle keyboard input:
-     *   Enter  — submit command (or queue in combat)
-     *   Tab    — cycle through completions
-     *   Up/Down — command history navigation
-     *   Escape — clear input / cancel tab-completion
+     *   Enter   -  submit command (or queue in combat)
+     *   Tab     -  cycle through completions
+     *   Up/Down  -  command history navigation
+     *   Escape  -  clear input / cancel tab-completion
      */
     function handleKeyDown(e) {
       if (e.key === 'Enter') {
@@ -176,7 +176,7 @@
       const tokens = tabPrefix.split(/\s+/);
 
       if (tokens.length <= 1) {
-        // Completing the verb — match against registered commands
+        // Completing the verb  -  match against registered commands
         const allNames = window.MudCommands?.getAllNames() || [];
         tabCandidates = allNames.filter(n => n.startsWith(tabPrefix));
 
@@ -184,7 +184,7 @@
         const directions = window.MudParser?.getDirectionNames() || [];
         tabCandidates.push(...directions.filter(d => d.startsWith(tabPrefix)));
       } else {
-        // Completing the target — context-aware
+        // Completing the target  -  context-aware
         const verb = tokens[0];
         const partial = tokens.slice(1).join(' ');
 
@@ -227,11 +227,11 @@
       tabCandidates = [...new Set(tabCandidates)].sort();
 
       if (tabCandidates.length === 1) {
-        // Single match — auto-complete
+        // Single match  -  auto-complete
         inputEl.value = tabCandidates[0];
         resetTabState();
       } else if (tabCandidates.length > 1) {
-        // Multiple matches — show first, display candidates
+        // Multiple matches  -  show first, display candidates
         tabIndex = 0;
         inputEl.value = tabCandidates[0];
         appendOutput([{
@@ -348,7 +348,7 @@
     function updateContext(ctx) {
       if (!ctx) return;
 
-      // Update status bar — game-stat: current/max format, monospaced
+      // Update status bar  -  game-stat: current/max format, monospaced
       const hpEl = root.querySelector('#mudHpBar');
       const focusEl = root.querySelector('#mudFocusBar');
       const powerEl = root.querySelector('#mudPowerBar');

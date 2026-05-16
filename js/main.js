@@ -93,7 +93,7 @@
     if (typeof data.app.activeScene !== 'string' || !data.app.activeScene) {
       data.app.activeScene = 'title';
     }
-    // Migrate old saves that default to button_idle on first load — keep them as-is
+    // Migrate old saves that default to button_idle on first load  -  keep them as-is
     // (button_idle is still a valid scene id)
 
     if (!data.flags || typeof data.flags !== 'object' || Array.isArray(data.flags)) {
@@ -552,7 +552,7 @@
       marbleSlice.rewardClaims[reward.claimKey] = true;
     }
 
-    // Check if all 20 levels are now beaten — show secret tunnel hint (only once)
+    // Check if all 20 levels are now beaten  -  show secret tunnel hint (only once)
     if (result.levelId === 'the_final_ascent' && !marbleSlice.rewardClaims['secret_tunnel'] && window.MarbleLevels && window.MarbleLevels.isSecretRevealed) {
       if (window.MarbleLevels.isSecretRevealed(marbleSlice.clearedLevels)) {
         // Show the secret tunnel notification after a brief delay
@@ -889,7 +889,7 @@ try {
       dt = 1 / 60;
     }
 
-    dt = Math.min(dt, 0.1); // clamp to 100ms max — prevents physics catch-up after GC pauses
+    dt = Math.min(dt, 0.1); // clamp to 100ms max  -  prevents physics catch-up after GC pauses
     sceneManager.update(dt, { state });
     frameHandle = requestAnimationFrame(frame);
   }

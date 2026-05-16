@@ -1,5 +1,5 @@
 /**
- * mud_commands.js — Unified Command Registry & Middleware Pipeline
+ * mud_commands.js  -  Unified Command Registry & Middleware Pipeline
  *
  * Replaces the flat VERB_ALIASES + switch statement pattern with a
  * centralized registry. Any module can register commands with metadata.

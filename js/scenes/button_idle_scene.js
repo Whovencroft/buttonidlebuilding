@@ -1117,7 +1117,7 @@ function completeIdleGame() {
           generateFakeButtons(autoFakeCount);
         }
 
-        // Button shrinking (only if NOT in meltdown — meltdown overrides with smooth grow)
+        // Button shrinking (only if NOT in meltdown  -  meltdown overrides with smooth grow)
         if (meltdown <= 0) {
           const shrinkFactor = 1 - (s.autonomy - 60) * 0.008; // at 85% = 0.8 scale
           elements.mainButton.style.transform = `translate(-50%, -50%) scale(${clamp(shrinkFactor, 0.5, 1)})`;
@@ -1166,7 +1166,7 @@ function completeIdleGame() {
         root.classList.toggle('meltdown', true);
         root.style.setProperty('--meltdown-intensity', meltdown.toFixed(3));
 
-        // Button grows massive — smooth transition from shrink to grow
+        // Button grows massive  -  smooth transition from shrink to grow
         const shrinkBase = chaosLevel >= 3 ? clamp(1 - (s.autonomy - 60) * 0.008, 0.5, 1) : 1;
         const growFactor = shrinkBase + meltdown * (3.5 - shrinkBase); // lerp from shrink to 3.5x
         elements.mainButton.style.transform = `translate(-50%, -50%) scale(${growFactor})`;
@@ -1408,7 +1408,7 @@ function completeIdleGame() {
       setTimeout(() => flash.remove(), 1200 + Math.random() * 800);
     }
 
-    // === PHASE 4: THE CLIMAX — PPS SPIN-OUT, MARBLE MORPH, SHATTER ===
+    // === PHASE 4: THE CLIMAX  -  PPS SPIN-OUT, MARBLE MORPH, SHATTER ===
 
     // PPS counter spin-out during meltdown: numbers flicker wildly
     function applyPpsSpinOut(meltdownIntensity) {

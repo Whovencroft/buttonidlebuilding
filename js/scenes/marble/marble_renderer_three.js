@@ -4,13 +4,13 @@
  * Three.js-based renderer for the marble scene.
  *
  * Fixes in v8:
- *  1. Ramp geometry   — uses getSurfaceCornerHeights() for exact per-corner Z
+ *  1. Ramp geometry    -  uses getSurfaceCornerHeights() for exact per-corner Z
  *                       values so slopes match the physics surface exactly.
  *                       No more sky-pointing fins.
- *  2. Camera Z lock   — camera vertical target is fixed to the level's median
+ *  2. Camera Z lock    -  camera vertical target is fixed to the level's median
  *                       tile height, not the marble's live Z.  This eliminates
  *                       all void-background vibration as the marble moves.
- *  3. Internal walls  — north and west wall faces are NOT rendered.  From the
+ *  3. Internal walls   -  north and west wall faces are NOT rendered.  From the
  *                       isometric camera (looking south-east from above) only
  *                       the south and east faces of any raised tile are ever
  *                       visible.  North/west faces were the ones clipping
@@ -43,10 +43,10 @@
     //   slope_s  normal ≈ (0, +0.7, -0.7)  → faces away      → lighter base
     //   slope_e  normal ≈ (+0.7, +0.7, 0)  → moderate        → mid base
     //   slope_w  normal ≈ (-0.7, +0.7, 0)  → faces away      → lighter base
-    rampN:         0x8fa8b5,   // north slope  — sun-facing, match tile top
-    rampS:         0xb0c8d4,   // south slope  — slightly lighter than tile top
-    rampE:         0x9ab2be,   // east slope   — moderate
-    rampW:         0xa8c0cc,   // west slope   — slightly lighter
+    rampN:         0x8fa8b5,   // north slope   -  sun-facing, match tile top
+    rampS:         0xb0c8d4,   // south slope   -  slightly lighter than tile top
+    rampE:         0x9ab2be,   // east slope    -  moderate
+    rampW:         0xa8c0cc,   // west slope    -  slightly lighter
     rampEmissive:  0x1a2530,   // emissive floor prevents any slope going black
     hazardOverlay: 0xef4444,
     marbleTop:     0x253244,
@@ -61,11 +61,11 @@
     hazardSide:    0xdc2626,
     conveyorTop:   0x0891b2,
     conveyorSide:  0x0e7490,
-    crumbleTop:    0x7c5c3a,   // warm brown — crumble tile base
+    crumbleTop:    0x7c5c3a,   // warm brown  -  crumble tile base
     crumbleDark:   0x4a3520,   // dark brown grid lines
-    iceTop:        0xbae6fd,   // pale cyan — ice tile base
+    iceTop:        0xbae6fd,   // pale cyan  -  ice tile base
     iceDark:       0x7dd3fc,   // slightly deeper cyan grid
-    funnelTop:     0x22d3ee,   // cyan — tunnel funnel bowl
+    funnelTop:     0x22d3ee,   // cyan  -  tunnel funnel bowl
     funnelEmissive:0x083344,   // dark teal emissive for funnel
   };
 
@@ -78,8 +78,8 @@
   let levelMeshGroup = null;
   let lastLevelId    = null;
   let dynamicGroup   = null;
-  let actorMeshMap   = {};   // actorId -> { group, kind } — persistent per level
-  let crumbleMeshMap = {};   // 'tx,ty' -> THREE.Group — individual crumble tile meshes, toggled per-frame
+  let actorMeshMap   = {};   // actorId -> { group, kind }  -  persistent per level
+  let crumbleMeshMap = {};   // 'tx,ty' -> THREE.Group  -  individual crumble tile meshes, toggled per-frame
   let marbleMesh     = null;
   let dragArrowGroup = null;
   // Fixed camera Z anchor computed once per level load
@@ -90,10 +90,10 @@
   let lastCamZoom    = -1;
   let lastCamW       = 0;
   let lastCamH       = 0;
-  // Smoothed camera Z — follows marble height changes gradually to avoid jitter
+  // Smoothed camera Z  -  follows marble height changes gradually to avoid jitter
   let smoothCamZ     = 0;
   let lastRenderTime = 0;  // performance.now() at last render call, for dt computation
-  // Secret tunnel reveal state — set by marble_state before entering a level
+  // Secret tunnel reveal state  -  set by marble_state before entering a level
   let _secretRevealed = false;
 
   // ─── Texture helpers ─────────────────────────────────────────────────────────
@@ -288,12 +288,12 @@
     }));
   }
   function matHazard() {
-    // Use MeshLambertMaterial to match goal overlay approach — always visible.
+    // Use MeshLambertMaterial to match goal overlay approach  -  always visible.
     return getMat('hazard', () => new THREE.MeshLambertMaterial({
       map: texHazardTop,
     }));
   }
-  // Wall faces: FrontSide only — south and east faces always face the camera.
+  // Wall faces: FrontSide only  -  south and east faces always face the camera.
   function matWallSouth()     { return getMat('wall_s',  () => new THREE.MeshLambertMaterial({ color: COL.wallSouth })); }
   function matWallEast()      { return getMat('wall_e',  () => new THREE.MeshLambertMaterial({ color: COL.wallEast  })); }
   function matWallHighlight() { return getMat('wall_hl', () => new THREE.MeshLambertMaterial({ color: COL.wallHighlight, emissive: new THREE.Color(COL.wallHighlight), emissiveIntensity: 0.25 })); }
@@ -583,7 +583,7 @@
   }
 
   /**
-   * Box group (top + south + east faces) — used for blockers and platforms.
+   * Box group (top + south + east faces)  -  used for blockers and platforms.
    */
   function buildBoxGroup(tx, ty, zBot, w, d, h, matTop, matSide) {
     const group = new THREE.Group();
@@ -645,9 +645,9 @@
     //   IDX_TOP: vertices (tx,z,ty),(tx+1,z,ty),(tx,z,ty+1),(tx+1,z,ty+1)  → normal +Y
     //   IDX_S:   vertices (x0,zBot,fy),(x1,zBot,fy),(x0,zTop,fy),(x1,zTop,fy) → normal +Z
     //   IDX_E:   vertices (fx,zBot,z0),(fx,zBot,z1),(fx,zTop,z0),(fx,zTop,z1) → normal +X
-    const IDX_TOP = [0,2,1, 2,3,1]; // horizontal top faces  — verified: normal +Y
-    const IDX_S   = [0,1,2, 1,3,2]; // south/north wall faces — verified: normal +Z
-    const IDX_E   = [0,2,1, 1,2,3]; // east/west wall faces   — verified: normal +X
+    const IDX_TOP = [0,2,1, 2,3,1]; // horizontal top faces   -  verified: normal +Y
+    const IDX_S   = [0,1,2, 1,3,2]; // south/north wall faces  -  verified: normal +Z
+    const IDX_E   = [0,2,1, 1,2,3]; // east/west wall faces    -  verified: normal +X
 
     // Collect non-void tiles (handle hidden tiles based on reveal state)
     const tiles = [];
@@ -693,7 +693,7 @@
     crumbleMeshMap = {}; // reset for this level
     for (const { tx, ty, cell } of tiles) {
       // Render FUNNEL tiles as normal terrain tiles using corner heights
-      // (they get the standard ramp material — no separate bowl mesh)
+      // (they get the standard ramp material  -  no separate bowl mesh)
       if (cell.shape === 'funnel') {
         group.add(buildSlopeMesh(tx, ty, cell));
         continue;
@@ -733,9 +733,9 @@
       }
     }
 
-    // (Funnel tiles rendered as normal terrain above — no separate bowl mesh)
+    // (Funnel tiles rendered as normal terrain above  -  no separate bowl mesh)
 
-    // ── Pass 2: Wall faces — all four edges ──────────────────────────────────
+    // ── Pass 2: Wall faces  -  all four edges ──────────────────────────────────
     const W_HL = 0.06;
     for (const { tx, ty, cell } of tiles) {
       // Funnel tiles render walls normally (they're standard terrain now)
@@ -803,7 +803,7 @@
     }
 
     // ── Pass 3: Blockers ─────────────────────────────────────────────────────
-    // Blockers are rare — keep as individual meshes (buildBoxGroup)
+    // Blockers are rare  -  keep as individual meshes (buildBoxGroup)
     for (let ty = 0; ty < level.height; ty++) {
       for (let tx = 0; tx < level.width; tx++) {
         const blk = ML.getBlockerCell(level, tx, ty);
@@ -843,7 +843,7 @@
           getMat('goal_overlay', () => new THREE.MeshLambertMaterial({ map: texGoalTop })),
           [tx, z, ty,  tx+1, z, ty,  tx, z, ty+1,  tx+1, z, ty+1],
           NUP, UV01, IDX_TOP);
-        // Goal pole — individual mesh (one per level)
+        // Goal pole  -  individual mesh (one per level)
         const pole = new THREE.Mesh(
           new THREE.CylinderGeometry(0.04, 0.04, 1.2, 8),
           getMat('pole', () => new THREE.MeshLambertMaterial({ color: 0xffd700 }))
@@ -891,7 +891,7 @@
         const geo = new THREE.BoxGeometry(len, 0.15, actor.armWidth ?? 0.26);
         const mat = getMat('haz_bar', () => new THREE.MeshLambertMaterial({ color: COL.hazardTop }));
         const mesh = new THREE.Mesh(geo, mat);
-        // No offset needed — BoxGeometry is centered, hit detection sweeps
+        // No offset needed  -  BoxGeometry is centered, hit detection sweeps
         // from center to armLength in the angle direction, so the visual
         // arm centered on the pivot is correct.
         actorGroup = new THREE.Group();
@@ -1008,7 +1008,7 @@
   }
 
   // Update persistent actor mesh positions/rotations/visibility each frame.
-  // No geometry or material allocation — just transforms.
+  // No geometry or material allocation  -  just transforms.
   // Track which tunnels have been revealed (marble entered them)
   let revealedTunnels = {};
 
@@ -1016,7 +1016,7 @@
     const ML = window.MarbleLevels;
     if (!dynState?.actors) return;
 
-    // Check if marble is currently inside a tunnel — reveal that tunnel
+    // Check if marble is currently inside a tunnel  -  reveal that tunnel
     if (marble && marble.inTunnel && marble.inTunnel.actorId) {
       revealedTunnels[marble.inTunnel.actorId] = true;
     }
@@ -1210,7 +1210,7 @@
     ensureRenderer(canvas);
     if (!renderer || !THREE) return;
 
-    // Only call setSize when dimensions actually change — avoids framebuffer resize every frame
+    // Only call setSize when dimensions actually change  -  avoids framebuffer resize every frame
     if (w !== lastRendererW || h !== lastRendererH) {
       renderer.setSize(w, h, false);
       lastRendererW = w;
@@ -1245,7 +1245,7 @@
       smoothCamZ = runtime.marble.z;
     }
 
-    // Update actor positions/rotations in-place — no allocations per frame
+    // Update actor positions/rotations in-place  -  no allocations per frame
     updateActorMeshes(runtime.level, runtime.dynamicState, runtime.marble);
     // Show/hide crumble tiles based on dynamic crumble state
     updateCrumbleMeshes(runtime.dynamicState);
@@ -1274,7 +1274,7 @@
       dragArrowGroup.visible = false;
     }
 
-    // Camera — XY follows marble, Z is fixed to level median (no vibration)
+    // Camera  -  XY follows marble, Z is fixed to level median (no vibration)
     const zoom = runtime.camera?.zoom ?? 1;
     // Only update projection matrix when zoom or viewport dimensions change
     if (zoom !== lastCamZoom || w !== lastCamW || h !== lastCamH) {
@@ -1284,14 +1284,14 @@
       lastCamH = h;
     }
 
-    // Center exactly on the marble — XY tracks instantly, Z smoothed to avoid jitter
+    // Center exactly on the marble  -  XY tracks instantly, Z smoothed to avoid jitter
     const camX = marble.x;
     const camY = marble.y;
     // Compute per-frame dt from wall clock for smooth Z lerp
     const now = performance.now();
     const renderDt = lastRenderTime > 0 ? Math.min((now - lastRenderTime) / 1000, 0.1) : 0.016;
     lastRenderTime = now;
-    // Lerp smoothCamZ toward marble.z at ~4 units/sec — fast enough to follow ramps
+    // Lerp smoothCamZ toward marble.z at ~4 units/sec  -  fast enough to follow ramps
     // and descents without the camera bobbing on every bump or airborne frame.
     const CAM_Z_SPEED = 4.0;
     smoothCamZ += (marble.z - smoothCamZ) * Math.min(1, CAM_Z_SPEED * renderDt);
@@ -1365,7 +1365,7 @@
     const halfW = cw / 2;
     const halfH = ch / 2;
 
-    // Determine visible tile range — reduced range for performance
+    // Determine visible tile range  -  reduced range for performance
     const RANGE = 10;
     const x0 = Math.max(0, mx - RANGE);
     const x1 = Math.min(level.width - 1, mx + RANGE);
@@ -1398,7 +1398,7 @@
         // Skip if off-screen
         if (sx < -20 || sx > cw + 20 || sy < -20 || sy > ch + 20) continue;
 
-        // Draw label — round z to avoid long decimals on ramp tiles
+        // Draw label  -  round z to avoid long decimals on ramp tiles
         const zDisp = Number.isInteger(z) ? z : z.toFixed(1);
         const label = `${tx},${ty},${zDisp}`;
         const tw = label.length * charW;
@@ -1595,7 +1595,7 @@
     };
   }
 
-  // Full GPU resource release — call when leaving the marble scene to free VRAM
+  // Full GPU resource release  -  call when leaving the marble scene to free VRAM
   function dispose() {
     if (!renderer) return;
     // Dispose all level geometry

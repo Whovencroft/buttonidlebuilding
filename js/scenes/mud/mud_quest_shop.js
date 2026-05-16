@@ -1,13 +1,13 @@
 /**
- * mud_quest_shop.js — Quest Point Shop
+ * mud_quest_shop.js  -  Quest Point Shop
  *
  * A special shop at room 150 (Quest Reward Depot) where players spend
  * Quest Points (QP) instead of gold. Inventory is a curated catalog
  * of equipment, consumables, and special items.
  *
  * Commands (registered via integration):
- *   qshop           — List the shop's wares
- *   qbuy <name|#>   — Purchase an item with QP
+ *   qshop            -  List the shop's wares
+ *   qbuy <name|#>    -  Purchase an item with QP
  *
  * Exposes window.MudQuestShop for integration.
  */
@@ -17,7 +17,7 @@
   const QUEST_SHOP_ROOM = 150;
 
   /**
-   * Shop catalog — each entry has a display name, item vnum to give,
+   * Shop catalog  -  each entry has a display name, item vnum to give,
    * QP cost, and a short description.
    * Items reference vnums from the expanded item pool (200+).
    */

@@ -110,7 +110,7 @@
 
     function onPointerCancel(e) {
       if (e.pointerId === dragPointer) {
-        // Cancel the drag cleanly — the browser interrupted the gesture.
+        // Cancel the drag cleanly  -  the browser interrupted the gesture.
         dragActive  = false;
         dragPointer = null;
       }
@@ -251,7 +251,7 @@
     }
 
     function endFrame() {
-      // Nothing to do — buffered presses are consumed on read
+      // Nothing to do  -  buffered presses are consumed on read
     }
 
     return {

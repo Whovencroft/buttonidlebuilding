@@ -1,11 +1,11 @@
 /**
- * mud_stats.js — Expanded Character Stat System
+ * mud_stats.js  -  Expanded Character Stat System
  *
  * Four core attributes that grow organically through gameplay:
- *   Vigor     — Physical toughness. Affects max HP, HP regen, exhaustion recovery.
- *   Precision — Accuracy and technique. Affects damage variance, crit, cooldown reduction.
- *   Grit      — Resilience and willpower. Affects defense, momentum retention, damage reduction.
- *   Instinct  — Awareness and reaction. Affects dodge, sense range, initiative, multi-attack.
+ *   Vigor      -  Physical toughness. Affects max HP, HP regen, exhaustion recovery.
+ *   Precision  -  Accuracy and technique. Affects damage variance, crit, cooldown reduction.
+ *   Grit       -  Resilience and willpower. Affects defense, momentum retention, damage reduction.
+ *   Instinct   -  Awareness and reaction. Affects dodge, sense range, initiative, multi-attack.
  *
  * Stats grow through USE, not menus:
  *   Vigor     grows from taking damage and surviving combat.
@@ -23,17 +23,17 @@
   /** Starting value for all attributes. */
   const BASE_STAT = 1;
 
-  /** Soft cap — growth slows dramatically beyond this. */
+  /** Soft cap  -  growth slows dramatically beyond this. */
   const SOFT_CAP = 100;
 
-  /** Hard cap — cannot exceed. */
+  /** Hard cap  -  cannot exceed. */
   const HARD_CAP = 200;
 
   /** Base XP needed to gain 1 point in any stat at level 1. */
   const BASE_XP_PER_LEVEL = 25;
 
   /**
-   * XP scaling factor — each level costs more.
+   * XP scaling factor  -  each level costs more.
    * Cost for level N = BASE_XP_PER_LEVEL * (1 + (N - 1) * SCALING_FACTOR)
    * Beyond soft cap, scaling triples.
    */

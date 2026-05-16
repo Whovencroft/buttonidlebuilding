@@ -247,7 +247,7 @@
 
     function applySecretUnlock(result) {
       runtime.resultApplied = true;
-      // Apply the secret unlock reward (no levelId — don't update clearedLevels/bestTimes)
+      // Apply the secret unlock reward (no levelId  -  don't update clearedLevels/bestTimes)
       applyMarbleReward({
         type: 'secret_unlocked',
         reward: { presses: 0, unlocks: ['next_game_unlocked'], claimKey: 'secret_tunnel' }

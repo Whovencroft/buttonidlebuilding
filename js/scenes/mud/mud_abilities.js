@@ -1,5 +1,5 @@
 /**
- * mud_abilities.js — Expanded Ability Progression System
+ * mud_abilities.js  -  Expanded Ability Progression System
  *
  * Each specialization has:
  *   - 8 trainable abilities (tiers 0-3, bought with QP)

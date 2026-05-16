@@ -1,12 +1,12 @@
 /**
- * mud_suppress.js — Power Suppression System
+ * mud_suppress.js  -  Power Suppression System
  *
  * Players can suppress their power to fight at a handicap. Fighting at
  * reduced power against mobs of similar or greater strength increases
  * Power gain rate. Must be trained/learned before it can be used.
  *
  * Mechanics:
- *   - 'suppress <percent>' sets output power (10–100%)
+ *   - 'suppress <percent>' sets output power (10-100%)
  *   - While suppressed: ATK and DEF reduced proportionally
  *   - Power gain multiplier increases inversely to suppression level
  *   - Must learn "Power Control" from Training Hall (costs 8 QP, requires 500 power)
@@ -33,7 +33,7 @@
    * At 25% power: 2.0x
    * At 10% power: 2.5x
    *
-   * @param {number} suppressPercent - Current suppression level (10–100)
+   * @param {number} suppressPercent - Current suppression level (10-100)
    * @returns {number} Power gain multiplier
    */
   function getPowerGainMultiplier(suppressPercent) {
@@ -47,7 +47,7 @@
   /**
    * Calculate effective attack at current suppression level.
    * @param {number} baseAttack - Player's full attack power
-   * @param {number} suppressPercent - Current suppression (10–100)
+   * @param {number} suppressPercent - Current suppression (10-100)
    * @returns {number} Effective attack
    */
   function getEffectiveAttack(baseAttack, suppressPercent) {
@@ -57,7 +57,7 @@
   /**
    * Calculate effective defense at current suppression level.
    * @param {number} baseDefense - Player's full defense
-   * @param {number} suppressPercent - Current suppression (10–100)
+   * @param {number} suppressPercent - Current suppression (10-100)
    * @returns {number} Effective defense
    */
   function getEffectiveDefense(baseDefense, suppressPercent) {
@@ -66,7 +66,7 @@
 
   /**
    * Execute the 'suppress' command.
-   * @param {string} target - The argument (a number 10–100, or 'off'/'release')
+   * @param {string} target - The argument (a number 10-100, or 'off'/'release')
    * @param {object} player - Player state
    * @returns {{ output: Array, newPercent: number }}
    */
@@ -89,7 +89,7 @@
     const percent = parseInt(target, 10);
     if (isNaN(percent) || percent < SUPPRESS_MIN_PERCENT || percent > 100) {
       return {
-        output: [{ type: 'error', text: `Suppress to what percentage? (${SUPPRESS_MIN_PERCENT}–100, or 'off')` }],
+        output: [{ type: 'error', text: `Suppress to what percentage? (${SUPPRESS_MIN_PERCENT}-100, or 'off')` }],
         newPercent: player.suppressPercent || SUPPRESS_DEFAULT
       };
     }

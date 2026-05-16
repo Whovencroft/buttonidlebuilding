@@ -1,5 +1,5 @@
 /**
- * mud_engine.js — MUD Engine Core
+ * mud_engine.js  -  MUD Engine Core
  *
  * Manages the room graph, parser, player state, combat loop, and command execution.
  * Exposes a simple interface: create(), execute(input), update(dt), getSaveSlice().
@@ -98,6 +98,9 @@
      * Flow: MudParser.parse → MudCommands.execute → fallback to ability match.
      */
     function execute(input) {
+      // Reset ambient idle timer  -  player is active
+      ambientTimer = 0;
+
       // Use the new parser if available, otherwise basic fallback
       const parsed = window.MudParser
         ? window.MudParser.parse(input)
@@ -828,7 +831,7 @@
     }
 
     /**
-     * Dynamic help — pulls from the command registry if available,
+     * Dynamic help  -  pulls from the command registry if available,
      * otherwise shows a static fallback.
      */
     function doHelp() {
@@ -848,14 +851,14 @@
     /** Auto-save interval tracker (saves every 60 seconds of play). */
     let autoSaveTimer = 0;
     let ambientTimer = 0;
-    const AMBIENT_INTERVAL = 30; // Show ambient text every 30 seconds when idle
+    const AMBIENT_INTERVAL = 30; // Show ambient text after 30 seconds of no player input
     const AUTO_SAVE_INTERVAL = 60;
     let focusRegenTimer = 0;
     const FOCUS_REGEN_INTERVAL = 5; // seconds between passive focus ticks
 
     /**
      * Write a note in the current room (max 280 chars).
-     * Async — returns a pending message, then posts to server.
+     * Async  -  returns a pending message, then posts to server.
      */
     function doWrite(target) {
       if (!target) return [{ type: 'error', text: 'Write what? Usage: write <message>' }];
@@ -875,7 +878,7 @@
         }
       }
 
-      // Fire and forget — post to server
+      // Fire and forget  -  post to server
       window.MudAPI.postNote(room.vnum, target).catch(err => {
         combatOutput.push({ type: 'error', text: `Note failed: ${err.message}` });
       });
@@ -885,7 +888,7 @@
 
     /**
      * Read notes left by other players in the current room.
-     * Async — returns a pending message, then fetches from server.
+     * Async  -  returns a pending message, then fetches from server.
      */
     function doReadNotes() {
       if (!window.MudAPI?.isLoggedIn()) {
@@ -911,7 +914,7 @@
 
     /**
      * Browse the rotating marketplace.
-     * Async — fetches stock from server.
+     * Async  -  fetches stock from server.
      */
     function doShop(target) {
       if (!window.MudAPI?.isLoggedIn()) {
@@ -1491,7 +1494,7 @@
 
     /**
      * Execute an ability by ID. Handles focus cost, cooldown, and effects.
-     * If a glimmer sparks, the new ability REPLACES the original attack —
+     * If a glimmer sparks, the new ability REPLACES the original attack  - 
      * the player discovers and immediately uses the new technique.
      */
     function executeAbility(abilityId) {
@@ -1555,10 +1558,10 @@
           }
           return output;
         }
-        // Ability was too low tier — it still fires normally but counter fails next round
+        // Ability was too low tier  -  it still fires normally but counter fails next round
       }
 
-      // ── Glimmer Roll: BEFORE damage — check if a new ability sparks ──
+      // ── Glimmer Roll: BEFORE damage  -  check if a new ability sparks ──
       // If it does, the glimmered ability replaces the original for this attack.
       let activeDef = def; // The ability that actually fires
       let glimmered = null;
@@ -1608,7 +1611,7 @@
               player.chainProgress || {}, glimmered
             );
           } else {
-            // Non-chain glimmer — just add to the list
+            // Non-chain glimmer  -  just add to the list
             player.abilities.push(glimmered.id);
           }
           // The glimmered ability replaces the original for this attack
@@ -1627,7 +1630,7 @@
         if (shift.message) output.push({ type: 'combat', text: shift.message });
       }
 
-      // Apply ability effects based on type (using activeDef — either original or glimmered)
+      // Apply ability effects based on type (using activeDef  -  either original or glimmered)
       switch (activeDef.type || 'attack') {
         case 'attack': {
           const mult = activeDef.multiplier || 1.5;
@@ -2024,11 +2027,12 @@
         autoSave();
       }
 
-      // Ambient flavor text when idle (not in combat)
+      // Ambient flavor text  -  only fires after player is truly idle (no input)
       if (!combatState) {
         ambientTimer += dt;
         if (ambientTimer >= AMBIENT_INTERVAL) {
-          ambientTimer = 0;
+          // Reset with jitter (45-75s) so subsequent messages feel organic
+          ambientTimer = -(Math.random() * 30 + 15);
           const room = currentRoom();
           if (room?.ambient) {
             const msgs = Array.isArray(room.ambient) ? room.ambient : [room.ambient];
@@ -2215,7 +2219,7 @@
       // Player attacks mob (with stat-derived variance, crit, initiative)
       const derived = player._derived || {};
 
-      // Hit/miss check — base 15% miss chance, reduced by weapon proficiency
+      // Hit/miss check  -  base 15% miss chance, reduced by weapon proficiency
       let playerMissed = false;
       const BASE_MISS_CHANCE = 0.15;
       if (window.MudWeaponProficiency && player.equipped.weapon != null) {
@@ -2227,7 +2231,7 @@
           if (Math.random() < missChance) playerMissed = true;
         }
       } else if (Math.random() < BASE_MISS_CHANCE) {
-        // No weapon equipped — base miss chance applies
+        // No weapon equipped  -  base miss chance applies
         playerMissed = true;
       }
 
@@ -2294,7 +2298,7 @@
           }
         }
 
-        // Offhand attack (dual wield) — 60% of offhand weapon damage
+        // Offhand attack (dual wield)  -  60% of offhand weapon damage
         if (player.equipped.offhand != null && combatState.mobHp > 0) {
           const ohItem = items[player.equipped.offhand];
           if (ohItem) {
@@ -2395,7 +2399,7 @@
       if (combatState.isBoss && combatState.bossCounter && window.MudBossCounter) {
         const bc = combatState.bossCounter;
         if (bc.telegraphRound) {
-          // Player didn't counter in time — resolve failed counter
+          // Player didn't counter in time  -  resolve failed counter
           const mobAtk = mob.stats.attack || 10;
           const fail = window.MudBossCounter.resolveFail(mob, mobAtk);
           player.hp -= fail.damage;
@@ -2915,7 +2919,7 @@
       const output = [];
       let consumed = false;
 
-      // Flee effect — guaranteed escape from combat
+      // Flee effect  -  guaranteed escape from combat
       if (stats.flee) {
         if (!combatState) {
           return [{ type: 'error', text: "You aren't in combat - no need for that." }];
@@ -2940,7 +2944,7 @@
         consumed = true;
       }
 
-      // Damage effect — deal damage to current combat target
+      // Damage effect  -  deal damage to current combat target
       if (stats.damage && !consumed) {
         if (!combatState) {
           return [{ type: 'error', text: "No target - you need to be in combat to use that." }];
@@ -2978,14 +2982,14 @@
         output.push({ type: 'info', text: `Also restored ${stats.focus} Focus. [Focus: ${player.focus}/${player.maxFocus}]` });
       }
 
-      // Attack boost — temporary buff stored in worldFlags
+      // Attack boost  -  temporary buff stored in worldFlags
       if (stats.attack_boost) {
         player.worldFlags['buff_consumable_atk'] = 5; // Lasts 5 combat rounds
         output.push({ type: 'success', text: `You use the ${item.name}. Attack boosted for 5 rounds!` });
         consumed = true;
       }
 
-      // Cure — remove debuffs
+      // Cure  -  remove debuffs
       if (stats.cure) {
         let cured = 0;
         for (const key of Object.keys(player.worldFlags)) {
@@ -3002,7 +3006,7 @@
         }
       }
 
-      // Respec Token — reset specialization
+      // Respec Token  -  reset specialization
       if (stats.respec && !consumed) {
         player.specialization = null;
         player.specName = null;
@@ -3012,7 +3016,7 @@
         consumed = true;
       }
 
-      // XP Tome — boost all core stats
+      // XP Tome  -  boost all core stats
       if (stats.stat_boost && !consumed) {
         const boost = stats.stat_boost || 5;
         if (player.coreStats) {
@@ -3028,7 +3032,7 @@
         consumed = true;
       }
 
-      // Treasure Map — reveal a hidden room
+      // Treasure Map  -  reveal a hidden room
       if (stats.reveal_hidden && !consumed) {
         // Find rooms with hidden exits or locked doors the player hasn't found
         const hiddenRooms = Object.entries(rooms).filter(([rv, r]) => {
@@ -3264,10 +3268,10 @@
         if (Array.isArray(savedState.defeatedMobs)) {
           for (const entry of savedState.defeatedMobs) {
             if (Array.isArray(entry)) {
-              // New format: [vnum, remainingSeconds] — schedule relative to current clock
+              // New format: [vnum, remainingSeconds]  -  schedule relative to current clock
               defeatedMobs.set(entry[0], engineClock - (MOB_RESPAWN_TIME - entry[1]));
             } else {
-              // Old format: just a vnum — treat as freshly defeated
+              // Old format: just a vnum  -  treat as freshly defeated
               defeatedMobs.set(entry, engineClock);
             }
           }
@@ -3290,7 +3294,7 @@
       recalcStats();
     }
 
-    /** Current save schema version — increment when adding new fields. */
+    /** Current save schema version  -  increment when adding new fields. */
     const SAVE_VERSION = 4;
 
     function getSaveSlice() {
@@ -3356,11 +3360,11 @@
       getAliveMobsInRoom, matchKeyword, getItemName, getMobName,
       initiateCombat, executeAbility, handleMobKill, pushCombatOutput,
       recalcStats, autoSave, recordGhost,
-      /** Item data lookup — used by merchant/sell/inspect commands. */
+      /** Item data lookup  -  used by merchant/sell/inspect commands. */
       get items() { return items; },
-      /** Room data lookup — used by merchant/say commands. */
+      /** Room data lookup  -  used by merchant/say commands. */
       get rooms() { return rooms; },
-      /** Mutable mob registry — allows injecting temporary mobs (e.g. echo invasions). */
+      /** Mutable mob registry  -  allows injecting temporary mobs (e.g. echo invasions). */
       get mobs() { return mobs; },
       /** Direct reference to combatState for invasion checks. */
       get combatState() { return combatState; },

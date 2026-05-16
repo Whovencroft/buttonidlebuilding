@@ -14,8 +14,8 @@
   const LEDGE_FALL_DOWNWARD_KICK = -0.4;
   // Air drag tuned for 90% horizontal momentum preservation over a ~0.6s jump arc.
   // At 60fps a 0.6s jump = ~36 frames.
-  // 0.9971^36 ≈ 0.90  (idle — no steering input while airborne)
-  // 0.9985^36 ≈ 0.95  (active — player steers during jump)
+  // 0.9971^36 ≈ 0.90  (idle  -  no steering input while airborne)
+  // 0.9985^36 ≈ 0.95  (active  -  player steers during jump)
   const AIR_IDLE_DRAG = 0.9971;
   const AIR_ACTIVE_DRAG = 0.9985;
   const HAZARD_TRIGGER_RADIUS = 0.28;
@@ -402,7 +402,7 @@
     marble.vx *= drag;
     marble.vy *= drag;
 
-    // Ice does NOT boost speed cap — same cap as normal tiles
+    // Ice does NOT boost speed cap  -  same cap as normal tiles
     const speedMult = isIce ? 1.0 : clamp(1.2 / friction, 0.78, 1.35);
     clampSpeed(marble, MAX_GROUND_SPEED * speedMult * speedCapMult);
   }
@@ -500,7 +500,7 @@
       // CRUMBLE FREEZE FIX: only apply horizontal damping if the marble's
       // center point is truly over void/no-surface. When a nearby crumble
       // tile breaks, the multi-sample spread may lose support ratio, but
-      // the marble center is still on solid ground — don't halve speed.
+      // the marble center is still on solid ground  -  don't halve speed.
       const centerSurface = window.MarbleLevels.sampleStaticSurfaceOnly
         ? window.MarbleLevels.sampleStaticSurfaceOnly(runtime.level, runtime.dynamicState, marble.x, marble.y)
         : null;
@@ -979,7 +979,7 @@
       if (Math.hypot(dx, dy) <= radius) return complete(runtime, Math.round(runtime.timerMs));
     }
 
-    // Secret goal — only active when secret is revealed
+    // Secret goal  -  only active when secret is revealed
     if (trigger?.kind === 'secret_goal' && runtime.secretRevealed) {
       const cx = groundSurface.tx + 0.5;
       const cy = groundSurface.ty + 0.5;

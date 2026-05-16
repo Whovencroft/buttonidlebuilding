@@ -75,7 +75,7 @@
     return hash >>> 0;
   }
 
-  // Shared singleton for void cells — avoids allocating ~10K identical objects per level
+  // Shared singleton for void cells  -  avoids allocating ~10K identical objects per level
   const _VOID_CELL = Object.freeze({
     kind: 'void',
     shape: SHAPES.FLAT,
@@ -131,7 +131,7 @@
       funnelMaxDist: patch.funnelMaxDist ?? undefined,
       _tx: patch._tx ?? undefined,
       _ty: patch._ty ?? undefined,
-      // Hidden flag — tile is invisible and non-collidable until secret is revealed
+      // Hidden flag  -  tile is invisible and non-collidable until secret is revealed
       hidden: !!patch.hidden,
       // When hidden and not revealed, render/collide as flat tile at this height (null = void)
       hiddenFallback: patch.hiddenFallback ?? null
@@ -211,7 +211,7 @@
       tunnelRadius: actor.tunnelRadius ?? 0.45,
       exitType: actor.exitType ?? 'emerge',
       exitVelocity: actor.exitVelocity ?? null,
-      // Secret/hidden flag — actor is invisible and non-interactive until revealed
+      // Secret/hidden flag  -  actor is invisible and non-interactive until revealed
       hidden: !!actor.hidden
     };
   }
@@ -305,13 +305,13 @@
     const cell = getSurfaceCell(level, tx, ty);
     if (cell) {
       if (cell.kind === 'void') {
-        console.warn(`[LevelDesign] setGoal at (${tx},${ty}) is on a void tile — goal will be unreachable.`);
+        console.warn(`[LevelDesign] setGoal at (${tx},${ty}) is on a void tile  -  goal will be unreachable.`);
       } else if (cell.shape !== SHAPES.FLAT) {
-        console.warn(`[LevelDesign] setGoal at (${tx},${ty}) is on a non-flat tile (shape='${cell.shape}') — marble may slide through goal.`);
+        console.warn(`[LevelDesign] setGoal at (${tx},${ty}) is on a non-flat tile (shape='${cell.shape}')  -  marble may slide through goal.`);
       } else if (cell.bounce > 0) {
-        console.warn(`[LevelDesign] setGoal at (${tx},${ty}) is on a bounce tile (bounce=${cell.bounce}) — marble will be deflected away from goal.`);
+        console.warn(`[LevelDesign] setGoal at (${tx},${ty}) is on a bounce tile (bounce=${cell.bounce})  -  marble will be deflected away from goal.`);
       } else if (cell.crumble) {
-        console.warn(`[LevelDesign] setGoal at (${tx},${ty}) is on a crumble tile — goal surface may disappear before marble arrives.`);
+        console.warn(`[LevelDesign] setGoal at (${tx},${ty}) is on a crumble tile  -  goal surface may disappear before marble arrives.`);
       }
     }
     setTrigger(level, tx, ty, { kind: 'goal', radius });
@@ -326,7 +326,7 @@
       for (const pt of points) {
         const cell = getSurfaceCell(level, Math.floor(pt.x), Math.floor(pt.y));
         if (cell && cell.kind !== 'void') {
-          console.warn(`[LevelDesign] Moving platform '${actor.id || 'unknown'}' path point (${pt.x},${pt.y}) overlaps terrain tile — platform may clip through geometry.`);
+          console.warn(`[LevelDesign] Moving platform '${actor.id || 'unknown'}' path point (${pt.x},${pt.y}) overlaps terrain tile  -  platform may clip through geometry.`);
         }
       }
     }
@@ -385,7 +385,7 @@
         // Funnel: radial height. rise = depth of bowl (positive = slopes up from center).
         // funnelCenterU/V stored on cell give the center offset in tile-local coords.
         // Distance from center determines height: further = higher.
-        return baseHeight; // base case — actual funnel height computed in getSurfaceSampleForCell
+        return baseHeight; // base case  -  actual funnel height computed in getSurfaceSampleForCell
       default:
         return baseHeight;
     }
@@ -469,7 +469,7 @@
       // Bowl shape: rim is at baseHeight (flush with surrounding terrain),
       // center dips DOWN by 'rise' amount.
       // Cubic falloff (1-t)^3 keeps the rim nearly flat so outer tile
-      // corners stay within 0.01 of baseHeight — preventing visible
+      // corners stay within 0.01 of baseHeight  -  preventing visible
       // wall faces between funnel rim tiles and neighbouring track.
       const oneMinusT = 1 - t;
       const z = cell.baseHeight - cell.rise * oneMinusT * oneMinusT * oneMinusT;
@@ -624,7 +624,7 @@
   // PLATFORM HITBOX FIX: sampleActorSurface now uses a generous edge tolerance
   // (0.35 instead of 0.15) so that the multi-sample support spread in
   // sampleSupportSurface can detect the platform even when the marble center
-  // is near the platform edge. The old 0.15 tolerance was too tight — many of
+  // is near the platform edge. The old 0.15 tolerance was too tight  -  many of
   // the 16 sample offsets would miss the platform rect, driving the support
   // ratio below the 0.28 landing threshold and causing fall-through.
   function sampleActorSurface(level, runtime, x, y) {
@@ -673,7 +673,7 @@
     return best;
   }
 
-  // Direct center-point actor surface check — used by the physics engine's
+  // Direct center-point actor surface check  -  used by the physics engine's
   // platform sweep pass. Unlike sampleActorSurface (which is called from the
   // multi-sample spread), this checks only the marble center XY against the
   // platform rect with a very generous tolerance. Returns the highest platform
@@ -681,7 +681,7 @@
   function sampleActorSurfaceDirect(level, runtime, x, y, maxZ) {
     if (!runtime?.actors) return null;
     let best = null;
-    const TOL = 0.45; // generous — marble center must be within 0.45 tiles of platform edge
+    const TOL = 0.45; // generous  -  marble center must be within 0.45 tiles of platform edge
     for (const actor of level.actors) {
       if (actor.kind !== ACTOR_KINDS.MOVING_PLATFORM && actor.kind !== ACTOR_KINDS.ELEVATOR) continue;
       const actorState = getActorWorldState(actor, runtime);
@@ -725,7 +725,7 @@
     );
   }
 
-  // Reusable blocker surface object — avoids allocation per sampleWalkableSurface call
+  // Reusable blocker surface object  -  avoids allocation per sampleWalkableSurface call
   const _blockerSample = {
     source: 'blocker', cell: null, tx: 0, ty: 0, u: 0, v: 0, z: 0,
     gradient: { gx: 0, gy: 0 }, trigger: null, friction: 1,
@@ -773,7 +773,7 @@ const _ssBuf = new Array(17);    // max 17 samples
 const _ssWBuf = new Array(17);   // parallel weight buffer (stores weight for each sample)
 const _ssWeights = [2.4, 1.5, 1.5, 1.5, 1.5, 1.15, 1.15, 1.15, 1.15, 0.8, 0.8, 0.8, 0.8, 0.65, 0.65, 0.65, 0.65];
 const _ssTotalWeight = _ssWeights.reduce((a, b) => a + b, 0);
-// Reusable result object — only one caller reads it at a time
+// Reusable result object  -  only one caller reads it at a time
 const _ssResult = {
   source: null, cell: null, tx: 0, ty: 0, u: 0, v: 0, z: 0,
   gradient: { gx: 0, gy: 0 }, trigger: null, friction: 1,
@@ -816,7 +816,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
   let center = null;
   let hitWeight = 0;
 
-  // Sample all 17 points — store sample and its weight in parallel buffers
+  // Sample all 17 points  -  store sample and its weight in parallel buffers
   const s0 = sampleWalkableSurface(level, x + ox0, y + oy0, _opts);
   center = s0;
   if (s0) { _ssBuf[sampleCount] = s0; _ssWBuf[sampleCount] = _ssWeights[0]; sampleCount++; hitWeight += _ssWeights[0]; }
@@ -1575,7 +1575,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     // entrance is at the bottom of the funnel mouth, not at floor level
     const adjustedPath = path.map((p, i) => i === 0 ? { x: p.x, y: p.y, z: ez - fDepth } : p);
 
-    // Place funnel tiles using FUNNEL shape — fill the entire square area
+    // Place funnel tiles using FUNNEL shape  -  fill the entire square area
     // (no circular cutoff, so there are no void gaps at corners)
     for (let dy = -funnelRadius; dy <= funnelRadius; dy++) {
       for (let dx = -funnelRadius; dx <= funnelRadius; dx++) {
@@ -1598,7 +1598,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
       }
     }
 
-    // Place entry center tile (flat, at bottom of bowl — this is where the trigger goes)
+    // Place entry center tile (flat, at bottom of bowl  -  this is where the trigger goes)
     // Center is at ez - fDepth so it's flush with the lowest point of the funnel bowl
     setSurface(level, entryTx, entryTy, { baseHeight: ez - fDepth, shape: SHAPES.FLAT, hidden: hidden, hiddenFallback: hiddenFallback });
 
@@ -1715,7 +1715,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     return { x: x + w * 0.5, y: y + h + 1 };
   }
   // ═══════════════════════════════════════════════════════════════════════════
-  // LEVEL 0 — Training Ground
+  // LEVEL 0  -  Training Ground
   // ─── Level 0: Training Ground ───
   // ─── Level 0: Training Ground ───
   function buildTrainingGround() {
@@ -3335,7 +3335,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     setSurface(level, 14, 19, { baseHeight: 0.7273, shape: 'slope_w', rise: 0.3636, kind: 'track' });
     setSurface(level, 15, 19, { baseHeight: 0.3636, shape: 'slope_w', rise: 0.3636, kind: 'track' });
     setSurface(level, 16, 19, { baseHeight: 0.0, shape: 'slope_w', rise: 0.3636, kind: 'track' });
-    // End of ramp 7 — flat track connection to goal area
+    // End of ramp 7  -  flat track connection to goal area
     setSurface(level, 17, 19, { baseHeight: 0, kind: 'track' });
     setSurface(level, 17, 20, { baseHeight: 0, kind: 'track' });
 

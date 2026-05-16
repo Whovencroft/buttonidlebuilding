@@ -1,7 +1,7 @@
 /**
- * mud_proficiency.js — Ability Proficiency System
+ * mud_proficiency.js  -  Ability Proficiency System
  *
- * Abilities improve through use. Each ability tracks a proficiency level (0–10).
+ * Abilities improve through use. Each ability tracks a proficiency level (0-10).
  * Higher proficiency grants:
  *   - Reduced cooldown (-1 round at level 5, -2 at level 10)
  *   - Reduced focus cost (-1 at level 3, -2 at level 7)
@@ -34,13 +34,13 @@
     if (playerPower <= 0) return 1;
     const ratio = mobPower / playerPower;
 
-    // Too weak — no proficiency gain
+    // Too weak  -  no proficiency gain
     if (ratio < 0.25) return 0;
-    // Weak — reduced gain
+    // Weak  -  reduced gain
     if (ratio < 0.75) return 1;
-    // Appropriate — standard gain
+    // Appropriate  -  standard gain
     if (ratio < 1.5) return 2;
-    // Stronger — bonus gain
+    // Stronger  -  bonus gain
     return 3;
   }
 
@@ -83,7 +83,7 @@
 
   /**
    * Get the cooldown reduction from proficiency level.
-   * @param {number} level - Proficiency level (0–10)
+   * @param {number} level - Proficiency level (0-10)
    * @returns {number} Rounds reduced from base cooldown
    */
   function getCooldownReduction(level) {
@@ -94,7 +94,7 @@
 
   /**
    * Get the focus cost reduction from proficiency level.
-   * @param {number} level - Proficiency level (0–10)
+   * @param {number} level - Proficiency level (0-10)
    * @returns {number} Focus cost reduction (flat)
    */
   function getFocusCostReduction(level) {
@@ -105,7 +105,7 @@
 
   /**
    * Get the damage/heal multiplier bonus from proficiency level.
-   * @param {number} level - Proficiency level (0–10)
+   * @param {number} level - Proficiency level (0-10)
    * @returns {number} Multiplier (e.g., 1.25 at level 5)
    */
   function getDamageBonus(level) {
@@ -116,7 +116,7 @@
    * Get the current proficiency level for an ability.
    * @param {object} profData - Player's proficiency data
    * @param {string} abilityId - Ability ID
-   * @returns {number} Level (0–10)
+   * @returns {number} Level (0-10)
    */
   function getLevel(profData, abilityId) {
     return profData[abilityId]?.level || 0;

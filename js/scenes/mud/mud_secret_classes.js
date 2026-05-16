@@ -1,24 +1,24 @@
 /**
- * mud_secret_classes.js — Secret Unlockable Classes & Transformations
+ * mud_secret_classes.js  -  Secret Unlockable Classes & Transformations
  *
  * Hidden classes that players discover through gameplay. These are full
  * "anime" classes with transformation systems. They replace the player's
  * current spec (keeping old abilities) and unlock a transformation tree.
  *
  * Secret Classes:
- *   1. Spirit Fighter — Unlocked by reaching 5000 power as any fighter anime spec
+ *   1. Spirit Fighter  -  Unlocked by reaching 5000 power as any fighter anime spec
  *      Transforms: Power Release → Ascended → Transcendent
  *      (DBZ-inspired power escalation)
  *
- *   2. Soul Reaper — Unlocked by reaching 5000 power as any rogue anime spec
+ *   2. Soul Reaper  -  Unlocked by reaching 5000 power as any rogue anime spec
  *      Transforms: Shikai → Bankai → Final Release
  *      (Bleach-inspired blade awakening)
  *
- *   3. Sage — Unlocked by reaching 5000 power as any mage anime spec
+ *   3. Sage  -  Unlocked by reaching 5000 power as any mage anime spec
  *      Transforms: Nature Mode → Sage Mode → Perfect Sage
  *      (Naruto-inspired nature energy)
  *
- *   4. Sentinel — Unlocked by reaching 5000 power as any cleric anime spec
+ *   4. Sentinel  -  Unlocked by reaching 5000 power as any cleric anime spec
  *      Transforms: Henshin → Armored Form → Final Form
  *      (Kamen Rider / Power Rangers inspired)
  *

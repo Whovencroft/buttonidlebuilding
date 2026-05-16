@@ -1,5 +1,5 @@
 /**
- * mud_merchants.js — Local Merchant System
+ * mud_merchants.js  -  Local Merchant System
  *
  * Gives NPC mobs shop inventories so players can buy/sell items
  * without needing a server API. Merchants are identified by the
@@ -342,7 +342,7 @@
         itemsMap[entry.vnum] = entry; // Also set numeric key for direct lookups
         if (entry.vnum >= nextPurchaseVnum) nextPurchaseVnum = entry.vnum + 1;
       } else if (entry.name) {
-        // Old-format entry without vnum — assign one now
+        // Old-format entry without vnum  -  assign one now
         const vnum = nextPurchaseVnum++;
         entry.vnum = vnum;
         itemsMap[String(vnum)] = entry;

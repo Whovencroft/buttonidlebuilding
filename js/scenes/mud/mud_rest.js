@@ -1,5 +1,5 @@
 /**
- * mud_rest.js — Rest & Sleep System
+ * mud_rest.js  -  Rest & Sleep System
  *
  * Provides 'rest' and 'sleep' commands for out-of-combat HP/Focus recovery.
  *   - rest: Moderate regen (5% HP + 10% Focus per tick), can still look/inventory

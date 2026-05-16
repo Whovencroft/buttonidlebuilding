@@ -1,8 +1,8 @@
 /**
- * mud_combat_systems.js — Combat Enhancement Systems
+ * mud_combat_systems.js  -  Combat Enhancement Systems
  *
  * Adds five interlocking combat mechanics:
- *   1. Momentum (0–10 positional advantage tracker)
+ *   1. Momentum (0-10 positional advantage tracker)
  *   2. Stances (Aggressive / Balanced / Defensive + spec-specific)
  *   3. Multi-attack (extra hits from abilities, stances, and progression)
  *   4. Exhaustion (locked state when Focus hits 0)
@@ -14,7 +14,7 @@
   'use strict';
 
   // ─── Momentum System ────────────────────────────────────────────────────
-  // Tracks positional advantage in combat (0–10, neutral at 5–6).
+  // Tracks positional advantage in combat (0-10, neutral at 5-6).
   // Shifts on hits/misses/abilities. Affects damage dealt/taken.
 
   const MOMENTUM_NEUTRAL = 6;
@@ -50,7 +50,7 @@
 
   /**
    * Shift momentum by a delta, clamped to [0, 10].
-   * Returns { newValue, message } — message is null if no threshold crossed.
+   * Returns { newValue, message }  -  message is null if no threshold crossed.
    */
   function shiftMomentum(current, delta) {
     const prev = current;
@@ -156,7 +156,7 @@
   /**
    * Calculate total attacks per round.
    * @param {object} opts - { power, stanceId, specId, hasMultiAttackTraining }
-   * @returns {number} Total attacks this round (1–4).
+   * @returns {number} Total attacks this round (1-4).
    */
   function calcAttacksPerRound(opts) {
     const { power, stanceId, specId, hasMultiAttackTraining } = opts;
