@@ -1,243 +1,328 @@
 VNUM,NAME,DESC,HOSTILE,HP,ATTACK,DEFENSE,LOOT,RESPAWN,DIALOGUE,FLAGS
-1101,Bandit Footpad,A scrawny thief with a rusty dagger and desperate eyes.,true,80,12,5,,60,,roaming
-1102,Forest Wolf,A grey wolf with yellow eyes. It circles warily.,true,100,15,8,,45,,roaming
-1103,Skeleton Warrior,Bones held together by dark magic. It raises a notched sword.,true,120,18,12,,60,,roaming
-1104,Goblin Scout,A green-skinned creature with a crude spear and a nasty grin.,true,90,14,6,,45,,roaming
-1105,Dark Acolyte,A hooded figure muttering forbidden incantations.,true,150,22,10,,90,,stationary
-1106,Iron Golem,A massive construct of rusted iron. Its eyes glow red.,true,300,30,25,,120,,stationary
-1107,Shadow Knight,A warrior in black plate armor. Darkness seeps from the joints.,true,250,35,20,,120,,roaming
-1108,Dragon Whelp,A young dragon the size of a horse. Smoke curls from its nostrils.,true,400,40,30,,180,,stationary
-1109,Field Mouse,A tiny brown mouse that scurries between the cobblestones. Harmless but annoying.,true,25,3,1,,20,,roaming
-1110,Stray Cat,A mangy tabby cat with one torn ear. It hisses at your approach.,true,35,5,2,,20,,roaming
-1111,Feral Boar,A bristle-backed boar with yellowed tusks. It paws the ground aggressively.,true,110,16,10,,50,,roaming
-1112,Bandit Archer,A rangy woman with a shortbow and a quiver of black-fletched arrows.,true,75,18,4,,60,,roaming
-1113,Bandit Captain,A scarred man in mismatched armor barking orders at his crew.,true,160,24,14,,90,,stationary
-1114,Goblin Shaman,A hunched goblin rattling a bone staff and chanting in a guttural tongue.,true,100,20,5,,60,,stationary
-1115,Goblin Brute,A massive goblin nearly the size of an orc. It drags a spiked club.,true,140,22,8,,60,,roaming
-1116,Dire Wolf,A wolf twice the normal size with frost on its muzzle and murder in its eyes.,true,160,22,12,,75,,roaming
-1117,Timber Rattlesnake,A thick-bodied snake coiled in the underbrush. Its rattle buzzes a warning.,true,50,12,3,,30,,stationary
-1118,Giant Spider,A spider the size of a dog with venom dripping from its fangs.,true,90,16,6,,45,,stationary
-1119,Skeleton Archer,A skeleton with a cracked longbow. It draws back a bone-tipped arrow.,true,100,20,8,,60,,stationary
-1120,Skeleton Mage,A robed skeleton clutching a staff that crackles with necrotic energy.,true,80,25,5,,75,,stationary
-1121,Restless Spirit,A translucent figure drifting through the ruins. Its wail chills the blood.,true,70,15,2,,45,,roaming
-1122,Cursed Knight,A knight in tarnished armor. The visor is rusted shut but something moves inside.,true,200,28,18,,90,,roaming
-1123,Troll,A hulking green-skinned brute that regenerates wounds before your eyes.,true,250,25,15,,90,,roaming
-1124,Ogre,A dim-witted giant in a loincloth swinging a tree trunk as a weapon.,true,220,30,10,,90,,roaming
-1125,Harpy,A shrieking bird-woman with talons like daggers. She dives from above.,true,130,22,6,,60,,roaming
-1126,Minotaur,A bull-headed warrior in bronze armor. The labyrinth is his domain.,true,280,32,22,,120,,stationary
-1127,Wraith Lord,An ancient spirit of terrible power. The air freezes in its presence.,true,350,38,18,,150,,stationary
-1128,Lich Apprentice,A skeletal mage surrounded by floating spell-tomes and crackling runes.,true,300,42,15,,150,,stationary
-1129,Stone Gargoyle,A statue that wasn't a statue. Its stone wings crack open as it lunges.,true,200,20,30,,90,,stationary
-1130,Wandering Merchant,A jovial halfling with an overloaded pack mule and a winning smile.,false,150,5,5,,300,Welcome friend! Care to browse my wares?;I've traveled every road in the Crown.,npc
-1131,Old Hermit,A weathered man in patched robes leaning on a gnarled staff.,false,100,3,3,,300,The forest remembers what men forget.;Beware the barrows after dark.,npc
-1132,Crown Militia Guard,A soldier in the livery of the Shattered Crown. Alert but not hostile.,false,180,20,15,,120,Move along citizen.;The roads aren't safe after dark.,npc
-1133,Blacksmith Apprentice,A soot-covered youth hammering at a bent horseshoe.,false,120,10,8,,300,Master says I'll make journeyman by winter!,npc
-1134,Plague Rat,A bloated rat with patchy fur and weeping sores. Disease incarnate.,true,45,8,2,,25,,roaming
-1135,Carrion Crow,A fat black bird pecking at something best not examined.,true,30,6,1,,20,,roaming
-1136,Moss Golem,A shambling mass of earth and moss. Mushrooms sprout from its shoulders.,true,180,18,22,,90,,stationary
-1137,Barrow Wight,A desiccated corpse in ancient finery. Gold coins spill from its eye sockets.,true,220,30,16,,120,,stationary
-1138,Forest Troll,A smaller troll covered in bark and lichen. It blends with the trees.,true,190,22,14,,75,,roaming
-1139,Will-o-Wisp,A dancing ball of pale light that leads travelers astray.,true,40,10,1,,30,,roaming
-1140,Owlbear,A terrifying hybrid of owl and bear. It hoots and roars simultaneously.,true,240,28,16,,90,,roaming
-1201,Street Punk,A wired-up ganger with chrome implants and a switchblade.,true,80,13,5,,60,,roaming
-1202,Rogue Drone,A malfunctioning delivery drone sparking with exposed wires.,true,100,16,10,,45,,roaming
-1203,Corporate Security,A guard in black tactical gear with a stun baton.,true,130,20,15,,60,,stationary
-1204,Cyber Hound,A mechanical dog with razor teeth and infrared eyes.,true,110,18,8,,45,,roaming
-1205,Hacker Ghost,A holographic projection of a dead netrunner. Still dangerous.,true,160,25,5,,90,,stationary
-1206,Mech Enforcer,A bipedal combat mech with twin autocannons.,true,350,38,28,,120,,stationary
-1207,Synth Assassin,An android built for killing. Its face is eerily human.,true,280,42,18,,120,,roaming
-1208,Rogue AI Node,A server rack pulsing with malevolent intelligence. Drones orbit it.,true,500,45,35,,180,,stationary
-1209,Junk Rat,A rat with a circuit board fused to its spine. Its eyes glow faintly blue.,true,30,4,1,,20,,roaming
-1210,Stray Synth-Cat,A robotic cat with torn synthetic fur. It sparks when it moves.,true,40,6,3,,20,,roaming
-1211,Glitch Beetle,A swarm of tiny metallic insects that eat through wiring.,true,50,8,2,,25,,roaming
-1212,Neon Junkie,A twitching addict with a crackling stun-knuckle and nothing to lose.,true,60,10,3,,45,,roaming
-1213,Chrome Ganger,A street soldier with a chrome arm and a sawed-off shotgun.,true,95,16,8,,60,,roaming
-1214,Data Courier,A nervous runner with encrypted data-chips and a holdout pistol.,true,70,12,4,,45,,roaming
-1215,Corpo Intern,A terrified office worker who pulled a taser from their desk drawer.,true,55,8,6,,45,,roaming
-1216,Sentry Turret,A ceiling-mounted auto-turret tracking movement with a red laser.,true,120,22,20,,90,,stationary
-1217,Maintenance Bot,A utility robot gone haywire. Its welding torch swings wildly.,true,90,14,12,,45,,roaming
-1218,Netrunner Shade,The digital ghost of a flatlined hacker. It attacks through your implants.,true,140,28,3,,90,,stationary
-1219,Corporate Ninja,A black-clad operative with a monofilament blade. Corpo wetwork.,true,200,35,12,,120,,roaming
-1220,Armored Response Unit,Three corpo soldiers in heavy tactical gear moving in formation.,true,300,32,25,,120,,stationary
-1221,Cyber-Psycho,A chrome-loaded maniac who lost their humanity to too many implants.,true,250,40,10,,120,,roaming
-1222,Black ICE,Hostile intrusion countermeasure. It manifests as crackling black lightning.,true,180,35,8,,90,,stationary
-1223,Trash Compactor Bot,A massive industrial robot repurposed for violence. It crushes.,true,280,25,30,,120,,stationary
-1224,Neon District Vendor,A cheerful woman selling street food from a hovering cart.,false,100,3,3,,300,Best synth-noodles in the Grid! Only five credits!;You look like you could use a meal.,npc
-1225,Info Broker,A thin man in mirrorshades who knows everyone's secrets.,false,80,5,5,,300,Information has a price. Everything has a price.;I hear things. I know things.,npc
-1226,Street Doc,A former corpo surgeon running a back-alley clinic.,false,120,8,8,,300,I can patch you up but it won't be pretty.;No questions asked. That's the deal.,npc
-1227,Grid Patrol Officer,A tired cop in light armor doing their best in a broken system.,false,150,18,12,,120,Keep your nose clean.;I've got enough paperwork already.,npc
-1228,Viral Adware Sprite,A tiny holographic mascot that attacks with pop-up ads and malware.,true,35,6,1,,20,,roaming
-1229,Overclocked Courier Drone,A delivery drone hacked to kamikaze speed. It rams anything in its path.,true,65,15,2,,30,,roaming
-1230,EMP Spider,A palm-sized robot that latches on and fries electronics.,true,45,12,1,,25,,roaming
-1231,Corpo Security Chief,A scarred veteran in a custom exo-suit. She's seen everything.,true,400,45,30,,180,,stationary
-1301,Alley Mugger,A desperate man with a snub-nose revolver and shaking hands.,true,70,10,4,,60,,roaming
-1302,Corrupt Cop,A detective with dead eyes and a badge that means nothing.,true,150,22,15,,90,,roaming
-1303,Hired Muscle,A massive enforcer in a cheap suit. Knuckles like walnuts.,true,180,25,18,,60,,roaming
-1304,Cat Burglar,A lithe figure in black. You almost didn't see them.,true,120,20,8,,90,,roaming
-1305,Mob Lieutenant,A sharp-dressed man with cold eyes and a silenced pistol.,true,220,30,20,,120,,stationary
-1306,Femme Fatale,Beautiful and deadly. The knife is already in her hand.,true,200,35,12,,120,,stationary
-1307,Ghost of the Drowned,A waterlogged specter that haunts the rain-slicked docks.,true,300,32,25,,180,,stationary
-1308,The Fixer,A shadowy broker who deals in secrets and violence.,true,400,40,30,,240,,stationary
-1309,Dock Rat,A fat wharf rat the size of a terrier. It gnaws on something unidentifiable.,true,30,4,1,,20,,roaming
-1310,Feral Alley Cat,A one-eyed tom with scars and an attitude. It yowls in the dark.,true,35,5,2,,20,,roaming
-1311,Pickpocket Kid,A scrawny child with quick hands and quicker feet.,true,40,6,1,,30,,roaming
-1312,Drunk Sailor,A staggering man reeking of cheap whiskey. He swings a bottle.,true,65,8,3,,30,,roaming
-1313,Loan Shark's Thug,A thick-necked man with brass knuckles and a debt to collect.,true,100,14,8,,60,,roaming
-1314,Crooked Bookie,A sweating man with a ledger full of lies and a derringer.,true,80,12,5,,60,,stationary
-1315,Opium Den Guard,A drowsy but dangerous man with a curved knife and glazed eyes.,true,110,16,10,,60,,stationary
-1316,Smuggler,A wiry woman in a peacoat with contraband sewn into the lining.,true,90,14,6,,60,,roaming
-1317,Dock Worker Ghost,The spirit of a longshoreman crushed by falling cargo. Still working.,true,130,18,8,,75,,roaming
-1318,Speakeasy Bouncer,A mountain of a man in a too-tight vest. He cracks his knuckles.,true,160,22,16,,90,,stationary
-1319,Jazz Club Singer,A woman in a red dress with a voice like honey and eyes like razors.,false,100,5,5,,300,Buy a girl a drink?;The night is young and full of trouble.,npc
-1320,Private Eye,A rumpled man in a trench coat nursing a bourbon. He watches everything.,false,120,10,8,,300,I'm working a case. Can't talk about it.;Everyone's got secrets in this town.,npc
-1321,Newspaper Boy,A kid hawking papers on the corner. He knows every rumor in town.,false,40,2,2,,300,Extra! Extra! Read all about it!;I hear things mister. For a price.,npc
-1322,Bartender,A stone-faced man polishing a glass. He's heard every story twice.,false,130,8,8,,300,What'll it be?;I don't want no trouble in my establishment.,npc
-1323,Torch Singer's Bodyguard,A silent woman with a shoulder holster and dead eyes.,true,170,26,14,,90,,stationary
-1324,Triad Enforcer,A tattooed man with a hatchet and a code of honor that doesn't include you.,true,190,28,12,,90,,roaming
-1325,Dirty Politician,A sweating man in a fine suit. He reaches for a hidden gun.,true,100,18,5,,120,,stationary
-1326,Phantom Cabbie,A ghostly taxi that runs you down in the fog. The meter's still running.,true,160,24,10,,90,,roaming
-1327,Sewer Gator,A massive albino alligator that lurks in the storm drains.,true,220,26,20,,120,,stationary
-1328,Rain Wraith,A figure made of falling rain. It dissolves and reforms endlessly.,true,250,30,15,,120,,roaming
-1329,Mob Boss's Double,A body double for someone important. Armed and expendable.,true,200,28,18,,120,,stationary
-1330,Dockside Fence,A hunched woman who buys and sells stolen goods from a boat.,false,90,5,5,,300,I don't ask where it came from and you don't ask where it goes.,npc
-1401,Feral Dog Pack,A pack of starving dogs with madness in their eyes.,true,60,8,3,,30,,roaming
-1402,Raider Scout,A wasteland scavenger in patchwork armor.,true,100,15,8,,45,,roaming
-1403,Militia Grunt,A poorly trained soldier with more bravery than skill.,true,130,18,12,,60,,roaming
-1404,Landmine Drone,A small crawling robot that beeps ominously.,true,80,30,2,,90,,stationary
-1405,Sniper Ghillie,A nearly invisible marksman. You only see the muzzle flash.,true,180,40,5,,120,,stationary
-1406,Tank Wraith,The ghost of a destroyed tank. Its cannon still fires.,true,350,35,30,,180,,stationary
-1407,Warlord's Champion,A scarred veteran in salvaged power armor.,true,300,38,25,,120,,roaming
-1408,Siege Mech,A towering war machine bristling with weapons.,true,600,50,40,,240,,stationary
-1409,Carrion Vulture,A huge bald bird circling overhead. It's patient.,true,40,6,2,,20,,roaming
-1410,Irradiated Coyote,A mangy coyote with glowing patches on its hide. It moves wrong.,true,55,8,3,,25,,roaming
-1411,Scrap Beetle,A metallic beetle the size of a fist that feeds on ammunition casings.,true,25,4,4,,15,,roaming
-1412,Wasteland Drifter,A gaunt figure in rags shambling through the dust. Not quite alive.,true,70,10,4,,30,,roaming
-1413,Raider Berserker,A screaming lunatic in spiked armor charging with a fire axe.,true,120,22,6,,60,,roaming
-1414,Raider Gunner,A raider with a jury-rigged machine gun mounted on a shopping cart.,true,110,25,5,,60,,stationary
-1415,Militia Sergeant,A grizzled NCO with a battered rifle and a thousand-yard stare.,true,170,22,15,,75,,stationary
-1416,Militia Medic,A field medic with a red cross armband and a combat shotgun.,true,140,18,12,,60,,roaming
-1417,Minefield Specter,The ghost of a soldier who stepped on his own mine. He warns too late.,true,100,20,5,,60,,roaming
-1418,Scorched Crawler,A burned humanoid that drags itself through the ash. It was something once.,true,90,14,8,,45,,roaming
-1419,War Dog,A trained attack dog in a kevlar vest. It responds to whistle commands.,true,85,16,10,,45,,roaming
-1420,Armored Personnel Carrier,An autonomous APC with a mounted turret. Its AI is degraded.,true,400,35,35,,180,,stationary
-1421,Flamethrower Trooper,A soldier in a heat-resistant suit with a backpack fuel tank.,true,200,30,12,,90,,roaming
-1422,Chemical Zombie,A soldier exposed to nerve agent. Still walking. Still armed.,true,150,20,8,,60,,roaming
-1423,Drone Swarm,A cloud of micro-drones that strip flesh from bone in seconds.,true,180,28,2,,90,,roaming
-1424,Artillery Ghost,The spectral crew of a destroyed howitzer. They fire phantom shells.,true,280,40,15,,120,,stationary
-1425,Field Commander,A decorated officer with a sidearm and tactical genius.,true,250,32,22,,120,,stationary
-1426,Quartermaster,A gruff supply sergeant behind a cage of military surplus.,false,160,10,10,,300,You need it I probably got it. For a price.;Everything's rationed. Don't ask for extras.,npc
-1427,Combat Medic,A weary medic with bloodstained hands and a kind voice.,false,140,8,8,,300,Hold still. This'll sting.;I've patched up worse. You'll live.,npc
-1428,War Correspondent,A civilian with a camera and more courage than sense.,false,60,3,3,,300,The people need to see what's happening here.;Don't mind me. Just documenting.,npc
-1429,Refugee,A hollow-eyed civilian clutching a bundle of possessions.,false,40,2,2,,300,Have you seen my family?;Is it safe ahead?,npc
-1430,Munitions Rat,A rat nesting in an ammo crate. It chews on primer caps.,true,30,6,1,,15,,roaming
-1431,Rust Scorpion,A scorpion the size of a cat living in a burned-out vehicle.,true,50,10,6,,25,,stationary
-1501,Void Wisp,A drifting mote of anti-light that drains warmth.,true,90,12,2,,30,,roaming
-1502,Crystal Elemental,A being of living crystal that refracts reality.,true,150,20,20,,60,,roaming
-1503,Astral Predator,A translucent creature that swims through empty space.,true,180,25,10,,60,,roaming
-1504,Echo Fragment,A piece of someone's memory given hostile form.,true,120,18,8,,45,,roaming
-1505,Gravity Anomaly,A sphere of compressed spacetime. It pulls everything inward.,true,250,30,30,,120,,stationary
-1506,Star Wraith,A being of compressed stellar energy. Blindingly bright.,true,350,40,20,,120,,stationary
-1507,Void Leviathan,A massive creature that drifts between the shards.,true,500,45,35,,180,,stationary
-1508,Reality Fracture,A tear in spacetime that lashes out at anything nearby.,true,400,50,15,,240,,stationary
-1509,Dust Mote,A tiny particle of cosmic debris that drifts aimlessly. Barely a threat.,true,20,3,1,,15,,roaming
-1510,Starlight Moth,A luminous insect with wings of condensed light. Beautiful and fragile.,true,30,5,1,,15,,roaming
-1511,Nebula Jellyfish,A translucent creature trailing bioluminescent tendrils through the void.,true,60,10,3,,30,,roaming
-1512,Comet Shard,A chunk of ice and rock hurtling through space with a mind of its own.,true,80,14,8,,45,,roaming
-1513,Phase Spider,A spider that blinks in and out of reality. Hard to hit.,true,100,20,2,,45,,roaming
-1514,Stellar Parasite,A worm-like creature that feeds on starlight and radiates cold.,true,130,18,10,,60,,roaming
-1515,Gravity Sprite,A playful entity that reverses local gravity for fun. Yours.,true,70,12,5,,30,,roaming
-1516,Void Stalker,A predator perfectly adapted to the emptiness. You see only its teeth.,true,200,30,12,,90,,roaming
-1517,Temporal Moth,A moth whose wings show scenes from other times. Its dust causes vertigo.,true,110,16,6,,60,,roaming
-1518,Crystallized Memory,A frozen moment from someone's life given solid form. It attacks with regret.,true,160,22,15,,75,,stationary
-1519,Entropy Worm,A creature that accelerates decay in everything it touches.,true,190,28,8,,90,,roaming
-1520,Cosmic Ray,A beam of pure energy that has achieved sentience and malice.,true,140,35,1,,60,,roaming
-1521,Shard Guardian,A crystalline construct tasked with protecting a floating island.,true,280,32,28,,120,,stationary
-1522,Nebula Titan,A colossal figure made of gas and dust. Stars burn in its chest.,true,450,42,30,,180,,stationary
-1523,The Cartographer,An ancient being that maps the drift. It trades in coordinates.,false,200,5,5,,300,I have charted every shard in this sector.;The void between is not empty. It watches.,npc
-1524,Drift Hermit,A human who chose to live alone on a floating rock. Surprisingly sane.,false,80,3,3,,300,Quiet out here. I like quiet.;The crystals sing if you listen.,npc
-1525,Astral Merchant,A four-armed being selling exotic goods from a hovering bazaar.,false,150,5,5,,300,Wares from a thousand realities! Browse freely!;This? From a dimension where gravity is optional.,npc
-1601,Gladiator Slave,A desperate fighter with nothing left to lose.,true,100,15,10,,45,,roaming
-1602,Roman Legionnaire,A disciplined soldier in bronze armor with a gladius.,true,150,20,18,,60,,roaming
-1603,Egyptian Guardian,A jackal-headed warrior wielding a khopesh.,true,180,22,15,,60,,stationary
-1604,Samurai Ronin,A masterless warrior seeking death with honor.,true,200,30,12,,90,,roaming
-1605,Viking Berserker,A frothing warrior who feels no pain.,true,250,35,8,,90,,roaming
-1606,Aztec Jaguar Warrior,A fierce warrior in a jaguar pelt with an obsidian blade.,true,220,28,15,,90,,roaming
-1607,Pharaoh's Mummy,Ancient royalty wrapped in enchanted bandages.,true,350,32,28,,120,,stationary
-1608,Time Paradox,A glitching entity that exists in multiple moments simultaneously.,true,500,45,25,,180,,stationary
-1609,Cave Rat,A prehistoric rat the size of a small dog. Primitive and vicious.,true,35,5,2,,20,,roaming
-1610,Feral Pigeon,A pigeon from some era. It pecks aggressively at anything shiny.,true,20,3,1,,15,,roaming
-1611,Sand Scarab,A golden beetle the size of a fist that burrows through sand and flesh.,true,45,8,4,,25,,roaming
-1612,Gladiator Retiarius,A net-and-trident fighter with a cruel smile and quick reflexes.,true,120,18,8,,60,,roaming
-1613,Gladiator Murmillo,A heavily armored gladiator with a tower shield and short sword.,true,140,16,20,,60,,roaming
-1614,Roman Centurion,An officer in a red-crested helmet commanding with iron authority.,true,200,25,20,,90,,stationary
-1615,Egyptian Priest,A shaven-headed priest chanting protection spells over sacred ground.,true,130,20,10,,75,,stationary
-1616,Anubis Jackal,A supernatural jackal with golden eyes that guards the dead.,true,170,24,14,,75,,roaming
-1617,Ninja,A shadow-clad warrior who attacks from concealment with shuriken.,true,160,28,6,,75,,roaming
-1618,Ashigaru Spearman,A common foot soldier with a long spear and wicker armor.,true,110,16,12,,45,,roaming
-1619,Viking Shieldmaiden,A fierce woman with a round shield and a hand axe. She sings as she fights.,true,190,26,16,,90,,roaming
-1620,Viking Skald,A warrior-poet whose battle songs strengthen allies and weaken foes.,true,140,18,10,,75,,stationary
-1621,Aztec Eagle Warrior,An elite soldier in feathered armor with a macuahuitl edged in obsidian.,true,240,30,18,,90,,roaming
-1622,Terracotta Soldier,A clay warrior that animates when intruders approach. It does not tire.,true,200,22,25,,90,,stationary
-1623,Mongol Horse Archer,A mounted warrior firing arrows at a full gallop. Nearly impossible to catch.,true,180,30,8,,90,,roaming
-1624,Greek Hoplite,A bronze-armored soldier with a long spear and aspis shield.,true,170,20,22,,75,,roaming
-1625,Spartan Champion,An elite warrior who has trained since childhood for war.,true,280,35,25,,120,,stationary
-1626,Pirate Captain,A swaggering buccaneer with a cutlass and a flintlock pistol.,true,210,28,14,,90,,roaming
-1627,Clockwork Soldier,A mechanical warrior from a future that never was. Gears whir inside.,true,260,30,22,,120,,stationary
-1628,Temporal Guardian,A being tasked with protecting the timestream. You are a violation.,true,350,38,28,,150,,stationary
-1629,Chrono-Beast,A creature unstuck in time. It ages and de-ages as it fights.,true,300,35,18,,120,,roaming
-1630,Era Merchant,A time-displaced trader selling goods from every century.,false,120,5,5,,300,Silk from the Tang Dynasty! Spices from the Age of Sail!;Time is money friend. Literally in my case.,npc
-1631,Temporal Scholar,A confused academic studying the frozen moments of history.,false,80,3,3,,300,Fascinating! This epoch shouldn't exist!;The temporal mechanics here are extraordinary.,npc
-1632,Gladiator Trainer,A retired fighter covered in scars who trains the next generation.,false,200,15,15,,300,You fight like a child. Again!;Strength without technique is just flailing.,npc
-1701,Sewer Rat Swarm,Hundreds of rats moving as one hungry mass.,true,80,10,2,,30,,roaming
-1702,Tunnel Crawler,A pale humanoid that has lived too long in the dark.,true,130,18,8,,60,,roaming
-1703,Fungal Shambler,A mass of toxic mushrooms given ambulatory form.,true,160,15,15,,60,,roaming
-1704,Pipe Wraith,A ghost trapped in the water system. It screams through the pipes.,true,200,25,12,,90,,stationary
-1705,Undercity Boss,A massive mutant who rules a section of tunnel.,true,350,35,25,,120,,stationary
-1706,The Collector,A thing that hoards everything — bones and trinkets and screams.,true,400,30,30,,180,,stationary
-1707,Sewer Roach,A cockroach the size of your hand. It skitters across the wet stone.,true,15,2,1,,10,,roaming
-1708,Drain Slug,A fat grey slug leaving a trail of corrosive slime.,true,40,6,3,,20,,roaming
-1709,Blind Fish,A pale eyeless fish that has grown legs and teeth.,true,50,8,2,,25,,roaming
-1710,Mold Colony,A patch of aggressive mold that launches spores at warm bodies.,true,60,10,5,,30,,stationary
-1711,Gutter Snake,A long thin snake adapted to the pipes. It drops from above.,true,55,12,2,,25,,roaming
-1712,Tunnel Spider,A pale spider with translucent skin. You can see its organs pulse.,true,70,14,4,,30,,stationary
-1713,Sewer Gator,An albino alligator that has grown enormous in the dark.,true,200,24,18,,90,,stationary
-1714,Mushroom Man,A humanoid fungus that communicates through spore clouds.,true,120,16,12,,60,,roaming
-1715,Escaped Experiment,Something that crawled out of a lab drain. It has too many limbs.,true,180,22,10,,75,,roaming
-1716,Undercity Scavenger,A human who lives in the tunnels. Territorial and desperate.,true,90,14,6,,45,,roaming
-1717,Plague Doctor,A masked figure in a long coat administering dubious cures.,true,150,20,10,,75,,roaming
-1718,Bone Collector,A hunched figure that builds sculptures from the bones of the dead.,true,170,18,14,,75,,stationary
-1719,The Drip,A sentient mass of sewage and industrial waste. It absorbs what it touches.,true,250,22,20,,120,,stationary
-1720,Tunnel Hermit,An old woman who knows every passage in the Undercity.,false,60,3,3,,300,You're lost aren't you? They all get lost.;The deep tunnels are older than the city above.,npc
-1721,Mushroom Farmer,A pale man who cultivates edible fungi in the damp tunnels.,false,70,4,4,,300,Try the blue caps. Taste like chicken.;Don't eat the glowing ones. Trust me.,npc
+50,Old Gregor,A weathered man in faded robes who seems to know more than he lets on.,false,,,,,,,no_attack
+51,Sister Mara,"A calm woman in white robes, her hands glowing faintly with restorative energy.",false,,,,,,,"no_attack,healer"
+52,Hargrim the Smith,A broad-shouldered dwarf hammering at a glowing blade. Sparks fly with each strike.,false,,,,,,,"no_attack,merchant"
+53,Zara the Peddler,A quick-eyed woman with a cart overflowing with trinkets and oddities.,false,,,,,,,"no_attack,merchant"
+54,Finn the Bookkeeper,"A thin man with spectacles perched on his nose, surrounded by ledgers.",false,,,,,,,no_attack
+101,Straw Dummy,A crude training dummy stuffed with straw. It doesn't fight back much.,false,20,1,0,100,30,,
+102,Tower Rat,A large grey rat with beady red eyes. It hisses at your approach.,true,30,1,0,101,30,,"aggressive,animal"
+103,Cave Spider,A palm-sized spider with venomous-looking fangs.,true,35,2,0,102,30,,"aggressive,animal"
+105,Feral Hound,A scarred dog gone wild. It bares its teeth and circles you.,true,50,2,1,103,30,,"aggressive,animal"
+107,Skeleton Sentry,A reanimated skeleton clutching a rusted sword. It moves with jerky purpose.,true,60,2,1,112,30,,aggressive
+108,Goblin Archer,"A small green creature perched on a ledge, bow drawn.",true,45,3,0,113,30,,aggressive
+110,Tower Guardian,A stone golem animated by faint magic. It blocks the stairs upward.,true,80,2,2,116,30,,aggressive
+111,Wind Wraith,A translucent figure made of swirling air. It moans softly.,true,70,3,1,106,30,,aggressive
+112,Animated Tome,"A thick book that floats in the air, its pages fluttering with malice.",true,55,4,1,117,30,,aggressive
+113,Blood Slime,A quivering mass of crimson ooze that absorbs everything it touches.,true,90,2,2,107,30,,aggressive
+115,Tower Champion,A battle-scarred warrior in dented plate armor. The final test.,false,120,3,2,118;119,30,,
+120,Instructor Kael,A grizzled warrior with scars across both arms. He watches newcomers with a knowing eye.,false,500,10,10,,0,You've done well to reach the summit. The real challenges lie beyond the gateways.,"npc,boss,trainer"
+121,Quartermaster Pip,"A small, energetic gnome-like figure with oversized spectacles and ink-stained fingers.",false,200,1,0,,0,Welcome to the Quest Shop! Everything here costs Quest Points.,"npc,merchant"
+1050,Barkeep Roderick,A burly man polishing a mug behind a stained oak counter. The inn smells of ale and woodsmoke.,false,,,,,,,no_attack
+1051,Elara the Alchemist,A young woman surrounded by bubbling flasks and dried herbs. Her eyes are slightly different colors.,false,,,,,,,"no_attack,merchant"
+1052,Market Crier,"A loud man in a colorful vest, shouting about daily deals to anyone who will listen.",false,,,,,,,no_attack
+1053,Priestess Solara,"A serene woman in golden robes, standing before a sunlit altar. Light seems to bend toward her.",false,,,,,,,no_attack
+1054,One-Eyed Jack,A scarred man nursing a drink in the corner. His one good eye misses nothing.,false,,,,,,,no_attack
+1055,Gate Sergeant Brynn,"A stern woman in dented plate armor, watching the road with practiced vigilance.",false,,,,,,,no_attack
+1056,Chamberlain Aldous,"A thin man in fine but dusty clothes, wringing his hands nervously.",false,,,,,,,no_attack
+1057,Master-at-Arms Voss,A grizzled veteran surrounded by racks of weapons. Every blade is perfectly maintained.,false,,,,,,,"no_attack,merchant"
+1058,Sage Meridian,"An elderly figure hunched over ancient texts, muttering to themselves.",false,,,,,,,no_attack
+1101,Bandit Footpad,A scrawny thief with a rusty dagger and desperate eyes.,true,80,7,2,250;260,60,,roaming
+1102,Forest Wolf,A grey wolf with yellow eyes. It circles warily.,true,100,7,4,280;250,45,,"roaming,animal"
+1103,Skeleton Warrior,Bones held together by dark magic. It raises a notched sword.,true,120,8,5,260;280,60,,roaming
+1104,Goblin Scout,A green-skinned creature with a crude spear and a nasty grin.,true,90,7,3,250;280,45,,roaming
+1105,Dark Acolyte,A hooded figure muttering forbidden incantations.,true,150,9,4,200;280,90,,stationary
+1106,Iron Golem,A massive construct of rusted iron. Its eyes glow red.,true,300,11,9,260;280,120,,stationary
+1107,Shadow Knight,A warrior in black plate armor. Darkness seeps from the joints.,true,250,13,7,280;220,120,,roaming
+1108,Dragon Whelp,A young dragon the size of a horse. Smoke curls from its nostrils.,true,400,20,15,220;270,180,,"stationary,boss"
+1109,Field Mouse,A tiny brown mouse that scurries between the cobblestones. Harmless but annoying.,true,25,4,1,260;200,20,,"roaming,animal"
+1110,Stray Cat,A mangy tabby cat with one torn ear. It hisses at your approach.,true,35,4,1,260;220,20,,"roaming,animal"
+1111,Feral Boar,A bristle-backed boar with yellowed tusks. It paws the ground aggressively.,true,110,8,5,220;280,50,,"roaming,animal"
+1112,Bandit Archer,A rangy woman with a shortbow and a quiver of black-fletched arrows.,true,75,10,2,250;200,60,,roaming
+1113,Bandit Captain,A scarred man in mismatched armor barking orders at his crew.,true,160,11,6,200;280,90,,stationary
+1114,Goblin Shaman,A hunched goblin rattling a bone staff and chanting in a guttural tongue.,true,100,10,2,270;250,60,,stationary
+1115,Goblin Brute,A massive goblin nearly the size of an orc. It drags a spiked club.,true,140,10,3,250;280,60,,roaming
+1116,Dire Wolf,A wolf twice the normal size with frost on its muzzle and murder in its eyes.,true,160,10,5,270;260,75,,"roaming,animal"
+1117,Timber Rattlesnake,A thick-bodied snake coiled in the underbrush. Its rattle buzzes a warning.,true,50,8,2,260;270,30,,"stationary,animal"
+1118,Giant Spider,A spider the size of a dog with venom dripping from its fangs.,true,90,8,3,220;270,45,,"stationary,animal"
+1119,Skeleton Archer,A skeleton with a cracked longbow. It draws back a bone-tipped arrow.,true,100,10,4,200;270,60,,stationary
+1120,Skeleton Mage,A robed skeleton clutching a staff that crackles with necrotic energy.,true,80,13,2,270;200,75,,stationary
+1121,Restless Spirit,A translucent figure drifting through the ruins. Its wail chills the blood.,true,70,9,1,270;280,45,,roaming
+1122,Cursed Knight,A knight in tarnished armor. The visor is rusted shut but something moves inside.,true,200,12,7,260;270,90,,roaming
+1123,Troll,A hulking green-skinned brute that regenerates wounds before your eyes.,true,250,10,6,250;280,90,,roaming
+1124,Ogre,A dim-witted giant in a loincloth swinging a tree trunk as a weapon.,true,220,13,4,200;250,90,,roaming
+1125,Harpy,A shrieking bird-woman with talons like daggers. She dives from above.,true,130,10,2,220;250,60,,roaming
+1126,Minotaur,A bull-headed warrior in bronze armor. The labyrinth is his domain.,true,280,13,9,250;200,120,,stationary
+1127,Wraith Lord,An ancient spirit of terrible power. The air freezes in its presence.,true,350,15,7,260;220,150,,stationary
+1128,Lich Apprentice,A skeletal mage surrounded by floating spell-tomes and crackling runes.,true,300,18,6,200;270,150,,stationary
+1129,Stone Gargoyle,A statue that wasn't a statue. Its stone wings crack open as it lunges.,true,200,11,17,280;260,90,,stationary
+1130,Wandering Merchant,A jovial halfling with an overloaded pack mule and a winning smile.,false,150,3,3,,300,Welcome friend! Care to browse my wares?,"npc,merchant"
+1131,Old Hermit,A weathered man in patched robes leaning on a gnarled staff.,false,100,2,2,,300,The forest remembers what men forget.,"npc,trainer"
+1132,Crown Militia Guard,A soldier in the livery of the Shattered Crown. Alert but not hostile.,false,180,11,8,,120,Move along citizen.,npc
+1133,Scarred Veteran Grimjaw,"A hulking figure covered in old battle scars, chained to the wall by choice rather than force. An enormous axe rests against the stone beside them. Their eyes burn with barely contained fury.",false,700,70,20,,-1,Defense is for cowards. Swing harder. Swing ANGRIER.,"npc,teacher"
+1134,Plague Rat,A bloated rat with patchy fur and weeping sores. Disease incarnate.,true,45,6,1,200;270,25,,"roaming,animal"
+1135,Carrion Crow,A fat black bird pecking at something best not examined.,true,30,6,1,270;260,20,,"roaming,animal"
+1136,Moss Golem,A shambling mass of earth and moss. Mushrooms sprout from its shoulders.,true,180,10,12,200;280,90,,stationary
+1137,Barrow Wight,A desiccated corpse in ancient finery. Gold coins spill from its eye sockets.,true,220,16,9,260;270,120,,stationary
+1138,Forest Troll,A smaller troll covered in bark and lichen. It blends with the trees.,true,190,12,8,250;270,75,,roaming
+1139,Will-o-Wisp,A dancing ball of pale light that leads travelers astray.,true,40,8,0,200;260,30,,roaming
+1140,Owlbear,A terrifying hybrid of owl and bear. It hoots and roars simultaneously.,true,240,15,8,250;220,90,,"roaming,animal"
+1141,Prisoner Giles,"A haggard man chained to the wall, barely conscious but still aware.",false,,,,,,,no_attack
+1142,Ghost of Forgemaster Durin,"A translucent dwarf standing before the cold forge, forever reaching for his hammer.",false,,,,,,,no_attack
+1200,Aldric the Distraught Wizard,"A tall, thin man in singed robes paces the ruins of his tower. His hair stands at wild angles, and his eyes dart between the destruction around him and the sheaf of notes clutched in his trembling hands. He mutters calculations under his breath, occasionally stopping to stare at the holes in his walls with a mixture of terror and academic fascination.",false,500,22,15,241,0,,"no_attack,quest_npc"
+1201,Street Punk,A wired-up ganger with chrome implants and a switchblade.,true,80,13,5,221;286;9810,60,,roaming
+1202,Rogue Drone,A malfunctioning delivery drone sparking with exposed wires.,true,100,13,8,232;242,45,,roaming
+1203,Corporate Security,A guard in black tactical gear with a stun baton.,true,130,15,11,286;221,60,,stationary
+1204,Cyber Hound,A mechanical dog with razor teeth and infrared eyes.,true,110,15,6,242;262,45,,roaming
+1205,Hacker Ghost,A holographic projection of a dead netrunner. Still dangerous.,true,160,17,3,262;242,90,,stationary
+1206,Mech Enforcer,A bipedal combat mech with twin autocannons.,true,350,20,15,232;242,120,,stationary
+1207,Synth Assassin,An android built for killing. Its face is eerily human.,true,280,23,10,262;286,120,,roaming
+1208,Rogue AI Node,A server rack pulsing with malevolent intelligence. Drones orbit it.,true,500,33,26,205;286,180,,"stationary,boss"
+1209,Junk Rat,A rat with a circuit board fused to its spine. Its eyes glow faintly blue.,true,30,9,2,286;252,20,,roaming
+1210,Stray Synth-Cat,A robotic cat with torn synthetic fur. It sparks when it moves.,true,40,9,4,205;252,20,,roaming
+1211,Glitch Beetle,A swarm of tiny metallic insects that eat through wiring.,true,50,11,2,232;262,25,,roaming
+1212,Neon Junkie,A twitching addict with a crackling stun-knuckle and nothing to lose.,true,60,12,3,286;232,45,,roaming
+1213,Chrome Ganger,A street soldier with a chrome arm and a sawed-off shotgun.,true,95,14,7,252;242,60,,roaming
+1214,Data Courier,A nervous runner with encrypted data-chips and a holdout pistol.,true,70,12,4,232;262,45,,roaming
+1215,Corpo Intern,A terrified office worker who pulled a taser from their desk drawer.,true,55,10,7,242;262,45,,roaming
+1216,Sentry Turret,A ceiling-mounted auto-turret tracking movement with a red laser.,true,120,16,14,252;205,90,,stationary
+1217,Maintenance Bot,A utility robot gone haywire. Its welding torch swings wildly.,true,90,12,10,205;252,45,,roaming
+1218,Netrunner Shade,The digital ghost of a flatlined hacker. It attacks through your implants.,true,140,20,2,252;221,90,,stationary
+1219,Corporate Ninja,A black-clad operative with a monofilament blade. Corpo wetwork.,true,200,22,7,286;252,120,,roaming
+1220,Armored Response Unit,Three corpo soldiers in heavy tactical gear moving in formation.,true,300,18,14,232;262,120,,stationary
+1221,Cyber-Psycho,A chrome-loaded maniac who lost their humanity to too many implants.,true,250,23,5,205;242,120,,roaming
+1222,Black ICE,Hostile intrusion countermeasure. It manifests as crackling black lightning.,true,180,22,5,252;242,90,,stationary
+1223,Trash Compactor Bot,A massive industrial robot repurposed for violence. It crushes.,true,280,14,17,262;286,120,,stationary
+1224,Neon District Vendor,A cheerful woman selling street food from a hovering cart.,false,100,3,3,,300,Best synth-noodles in the Grid! Only five credits!,"npc,merchant"
+1225,Info Broker,A thin man in mirrorshades who knows everyone's secrets.,false,80,5,5,,300,Information has a price. Everything has a price.,npc
+1226,Street Doc,A former corpo surgeon running a back-alley clinic.,false,120,7,7,,300,I can patch you up but it won't be pretty.,"npc,merchant"
+1227,Grid Patrol Officer,A tired cop in light armor doing their best in a broken system.,false,150,13,8,,120,Keep your nose clean.,npc
+1228,Viral Adware Sprite,A tiny holographic mascot that attacks with pop-up ads and malware.,true,35,10,1,205;232,20,,roaming
+1229,Overclocked Courier Drone,A delivery drone hacked to kamikaze speed. It rams anything in its path.,true,65,14,1,221;242,30,,roaming
+1230,EMP Spider,A palm-sized robot that latches on and fries electronics.,true,45,14,1,252;262,25,,roaming
+1231,Corpo Security Chief,A scarred veteran in a custom exo-suit. She's seen everything.,true,400,23,15,242;252,180,,stationary
+1301,Alley Mugger,A desperate man with a snub-nose revolver and shaking hands.,true,70,17,7,233;272,60,,roaming
+1302,Corrupt Cop,A detective with dead eyes and a badge that means nothing.,true,150,25,17,233;207,90,,roaming
+1303,Hired Muscle,A massive enforcer in a cheap suit. Knuckles like walnuts.,true,180,26,19,222;272,60,,roaming
+1304,Cat Burglar,A lithe figure in black. You almost didn't see them.,true,120,25,10,233;222,90,,roaming
+1305,Mob Lieutenant,A sharp-dressed man with cold eyes and a silenced pistol.,true,220,29,19,208;233,120,,stationary
+1306,Femme Fatale,Beautiful and deadly. The knife is already in her hand.,true,200,35,12,233;207,120,,stationary
+1307,Ghost of the Drowned,A waterlogged specter that haunts the rain-slicked docks.,true,300,29,23,272;208,180,,stationary
+1308,The Fixer,A shadowy broker who deals in secrets and violence.,true,400,51,38,233;208,240,,"stationary,boss"
+1309,Dock Rat,A fat wharf rat the size of a terrier. It gnaws on something unidentifiable.,true,30,13,3,233;272;9811,20,,"roaming,animal"
+1310,Feral Alley Cat,A one-eyed tom with scars and an attitude. It yowls in the dark.,true,35,14,5,208;222,20,,"roaming,animal"
+1311,Pickpocket Kid,A scrawny child with quick hands and quicker feet.,true,40,15,2,208;222,30,,roaming
+1312,Drunk Sailor,A staggering man reeking of cheap whiskey. He swings a bottle.,true,65,14,5,272;222,30,,roaming
+1313,Loan Shark's Thug,A thick-necked man with brass knuckles and a debt to collect.,true,100,18,10,272;233,60,,roaming
+1314,Crooked Bookie,A sweating man with a ledger full of lies and a derringer.,true,80,17,7,233;207,60,,stationary
+1315,Opium Den Guard,A drowsy but dangerous man with a curved knife and glazed eyes.,true,110,19,12,233;222,60,,stationary
+1316,Smuggler,A wiry woman in a peacoat with contraband sewn into the lining.,true,90,19,8,208;272,60,,roaming
+1317,Dock Worker Ghost,The spirit of a longshoreman crushed by falling cargo. Still working.,true,130,20,9,272;222,75,,roaming
+1318,Speakeasy Bouncer,A mountain of a man in a too-tight vest. He cracks his knuckles.,true,160,21,15,222;233,90,,stationary
+1319,Jazz Club Singer,A woman in a red dress with a voice like honey and eyes like razors.,false,100,7,7,,300,Buy a girl a drink?,npc
+1320,Private Eye,A rumpled man in a trench coat nursing a bourbon. He watches everything.,false,120,12,10,,300,I'm working a case. Can't talk about it.,npc
+1321,Newspaper Boy,A kid hawking papers on the corner. He knows every rumor in town.,false,40,6,6,,300,Extra! Extra! Read all about it!,npc
+1322,Bartender,A stone-faced man polishing a glass. He's heard every story twice.,false,130,8,8,,300,What'll it be?,"npc,merchant"
+1323,Torch Singer's Bodyguard,A silent woman with a shoulder holster and dead eyes.,true,170,22,12,233;272,90,,stationary
+1324,Triad Enforcer,A tattooed man with a hatchet and a code of honor that doesn't include you.,true,190,23,10,233;272,90,,roaming
+1325,Dirty Politician,A sweating man in a fine suit. He reaches for a hidden gun.,true,100,19,5,272;208,120,,stationary
+1326,Phantom Cabbie,A ghostly taxi that runs you down in the fog. The meter's still running.,true,160,21,8,233;207,90,,roaming
+1327,Sewer Gator,A massive albino alligator that lurks in the storm drains.,true,220,21,16,208;222,120,,"stationary,animal"
+1328,Rain Wraith,A figure made of falling rain. It dissolves and reforms endlessly.,true,250,23,11,208;233,120,,roaming
+1329,Mob Boss's Double,A body double for someone important. Armed and expendable.,true,200,23,14,233;272,120,,stationary
+1330,Dockside Fence,A hunched woman who buys and sells stolen goods from a boat.,false,90,6,6,,300,I don't ask where it came from and you don't ask where it goes.,"npc,merchant"
+1401,Feral Dog Pack,A pack of starving dogs with madness in their eyes.,true,60,24,9,261;209,30,,"roaming,animal"
+1402,Raider Scout,A wasteland scavenger in patchwork armor.,true,100,29,15,209;251,45,,roaming
+1403,Militia Grunt,A poorly trained soldier with more bravery than skill.,true,130,29,19,251;230,60,,roaming
+1404,Landmine Drone,A small crawling robot that beeps ominously.,true,80,55,3,209;261,90,,stationary
+1405,Sniper Ghillie,A nearly invisible marksman. You only see the muzzle flash.,true,180,51,6,261;209,120,,stationary
+1406,Tank Wraith,The ghost of a destroyed tank. Its cannon still fires.,true,350,35,30,230;251,180,,stationary
+1407,Warlord's Champion,A scarred veteran in salvaged power armor.,true,300,40,26,209;251,120,,roaming
+1408,Siege Mech,A towering war machine bristling with weapons.,true,600,63,50,261;230,240,,"stationary,boss"
+1409,Carrion Vulture,A huge bald bird circling overhead. It's patient.,true,40,24,8,209;251,20,,"roaming,animal"
+1410,Irradiated Coyote,A mangy coyote with glowing patches on its hide. It moves wrong.,true,55,25,9,251;230,25,,"roaming,animal"
+1411,Scrap Beetle,A metallic beetle the size of a fist that feeds on ammunition casings.,true,25,22,22,209;251,15,,"roaming,animal"
+1412,Wasteland Drifter,A gaunt figure in rags shambling through the dust. Not quite alive.,true,70,25,10,261;209,30,,roaming
+1413,Raider Berserker,A screaming lunatic in spiked armor charging with a fire axe.,true,120,35,9,261;230,60,,roaming
+1414,Raider Gunner,A raider with a jury-rigged machine gun mounted on a shopping cart.,true,110,40,8,230;251,60,,stationary
+1415,Militia Sergeant,A grizzled NCO with a battered rifle and a thousand-yard stare.,true,170,28,19,261;251,75,,stationary
+1416,Militia Medic,A field medic with a red cross armband and a combat shotgun.,true,140,26,17,209;251;9812,60,,roaming
+1417,Minefield Specter,The ghost of a soldier who stepped on his own mine. He warns too late.,true,100,35,8,251;261,60,,roaming
+1418,Scorched Crawler,A burned humanoid that drags itself through the ash. It was something once.,true,90,27,15,209;230,45,,roaming
+1419,War Dog,A trained attack dog in a kevlar vest. It responds to whistle commands.,true,85,31,19,209;261,45,,"roaming,animal"
+1420,Armored Personnel Carrier,An autonomous APC with a mounted turret. Its AI is degraded.,true,400,29,29,261;230,180,,stationary
+1421,Flamethrower Trooper,A soldier in a heat-resistant suit with a backpack fuel tank.,true,200,35,14,209;251,90,,roaming
+1422,Chemical Zombie,A soldier exposed to nerve agent. Still walking. Still armed.,true,150,29,11,230;261,60,,roaming
+1423,Drone Swarm,A cloud of micro-drones that strip flesh from bone in seconds.,true,180,36,2,261;230,90,,roaming
+1424,Artillery Ghost,The spectral crew of a destroyed howitzer. They fire phantom shells.,true,280,39,14,209;230,120,,stationary
+1425,Field Commander,A decorated officer with a sidearm and tactical genius.,true,250,33,22,251;209,120,,stationary
+1426,Quartermaster,A gruff supply sergeant behind a cage of military surplus.,false,160,15,15,,300,You need it I probably got it. For a price.,"npc,merchant"
+1427,Combat Medic,A weary medic with bloodstained hands and a kind voice.,false,140,13,13,,300,Hold still. This'll sting.,"npc,merchant"
+1428,War Correspondent,A civilian with a camera and more courage than sense.,false,60,10,10,,300,The people need to see what's happening here.,npc
+1429,Refugee,A hollow-eyed civilian clutching a bundle of possessions.,false,40,10,10,,300,Have you seen my family?,npc
+1430,Munitions Rat,A rat nesting in an ammo crate. It chews on primer caps.,true,30,30,5,251;261,15,,"roaming,animal"
+1431,Rust Scorpion,A scorpion the size of a cat living in a burned-out vehicle.,true,50,27,16,230;261,25,,"stationary,animal"
+1501,Void Wisp,A drifting mote of anti-light that drains warmth.,true,90,45,7,287;211;9813,30,,roaming
+1502,Crystal Elemental,A being of living crystal that refracts reality.,true,150,47,47,211;271,60,,roaming
+1503,Astral Predator,A translucent creature that swims through empty space.,true,180,56,22,234;211,60,,roaming
+1504,Echo Fragment,A piece of someone's memory given hostile form.,true,120,51,22,234;271,45,,roaming
+1505,Gravity Anomaly,A sphere of compressed spacetime. It pulls everything inward.,true,250,54,54,210;287,120,,stationary
+1506,Star Wraith,A being of compressed stellar energy. Blindingly bright.,true,350,63,31,211;234,120,,stationary
+1507,Void Leviathan,A massive creature that drifts between the shards.,true,500,86,67,210;234,180,,"stationary,boss"
+1508,Reality Fracture,A tear in spacetime that lashes out at anything nearby.,true,400,55,16,223;271,240,,stationary
+1509,Dust Mote,A tiny particle of cosmic debris that drifts aimlessly. Barely a threat.,true,20,38,12,223;211,15,,roaming
+1510,Starlight Moth,A luminous insect with wings of condensed light. Beautiful and fragile.,true,30,42,8,234;287,15,,"roaming,animal"
+1511,Nebula Jellyfish,A translucent creature trailing bioluminescent tendrils through the void.,true,60,41,12,211;234,30,,"roaming,animal"
+1512,Comet Shard,A chunk of ice and rock hurtling through space with a mind of its own.,true,80,42,24,234;271,45,,roaming
+1513,Phase Spider,A spider that blinks in and out of reality. Hard to hit.,true,100,52,5,271;223,45,,roaming
+1514,Stellar Parasite,A worm-like creature that feeds on starlight and radiates cold.,true,130,39,22,210;211,60,,roaming
+1515,Gravity Sprite,A playful entity that reverses local gravity for fun. Yours.,true,70,42,17,287;223,30,,roaming
+1516,Void Stalker,A predator perfectly adapted to the emptiness. You see only its teeth.,true,200,48,19,211;210,90,,roaming
+1517,Temporal Moth,A moth whose wings show scenes from other times. Its dust causes vertigo.,true,110,41,15,234;287,60,,roaming
+1518,Crystallized Memory,A frozen moment from someone's life given solid form. It attacks with regret.,true,160,40,27,211;234,75,,stationary
+1519,Entropy Worm,A creature that accelerates decay in everything it touches.,true,190,47,13,211;223,90,,roaming
+1520,Cosmic Ray,A beam of pure energy that has achieved sentience and malice.,true,140,66,1,234;211,60,,roaming
+1521,Shard Guardian,A crystalline construct tasked with protecting a floating island.,true,280,41,36,210;223,120,,stationary
+1522,Nebula Titan,A colossal figure made of gas and dust. Stars burn in its chest.,true,450,43,31,271;211,180,,stationary
+1523,The Cartographer,An ancient being that maps the drift. It trades in coordinates.,false,200,10,10,,300,I have charted every shard in this sector.,npc
+1524,Drift Hermit,A human who chose to live alone on a floating rock. Surprisingly sane.,false,80,12,12,,300,Quiet out here. I like quiet.,npc
+1525,Astral Merchant,A four-armed being selling exotic goods from a hovering bazaar.,false,150,11,11,,300,Wares from a thousand realities! Browse freely!,"npc,merchant"
+1601,Gladiator Slave,A desperate fighter with nothing left to lose.,true,100,58,38,2010,45,,roaming
+1602,Roman Legionnaire,A disciplined soldier in bronze armor with a gladius.,true,150,59,53,5010,60,,roaming
+1603,Egyptian Guardian,A jackal-headed warrior wielding a khopesh.,true,180,59,40,1001,60,,stationary
+1604,Samurai Ronin,A masterless warrior seeking death with honor.,true,200,74,29,,90,,roaming
+1605,Viking Berserker,A frothing warrior who feels no pain.,true,250,77,17,,90,,roaming
+1606,Aztec Jaguar Warrior,A fierce warrior in a jaguar pelt with an obsidian blade.,true,220,64,34,3015,90,,roaming
+1607,Pharaoh's Mummy,Ancient royalty wrapped in enchanted bandages.,true,350,58,51,,120,,stationary
+1608,Time Paradox,A glitching entity that exists in multiple moments simultaneously.,true,500,95,53,,180,,"stationary,boss"
+1609,Cave Rat,A prehistoric rat the size of a small dog. Primitive and vicious.,true,35,47,18,201,20,,"roaming,animal"
+1610,Feral Pigeon,A pigeon from some era. It pecks aggressively at anything shiny.,true,20,48,16,3016,15,,"roaming,animal"
+1611,Sand Scarab,A golden beetle the size of a fist that burrows through sand and flesh.,true,45,51,25,6005,25,,"roaming,animal"
+1612,Gladiator Retiarius,A net-and-trident fighter with a cruel smile and quick reflexes.,true,120,51,23,202,60,,roaming
+1613,Gladiator Murmillo,A heavily armored gladiator with a tower shield and short sword.,true,140,39,49,240,60,,roaming
+1614,Roman Centurion,An officer in a red-crested helmet commanding with iron authority.,true,200,48,38,4006,90,,stationary
+1615,Egyptian Priest,A shaven-headed priest chanting protection spells over sacred ground.,true,130,53,26,5009,75,,stationary
+1616,Anubis Jackal,A supernatural jackal with golden eyes that guards the dead.,true,170,52,30,4003,75,,"roaming,animal"
+1617,Ninja,A shadow-clad warrior who attacks from concealment with shuriken.,true,160,63,13,203,75,,roaming
+1618,Ashigaru Spearman,A common foot soldier with a long spear and wicker armor.,true,110,47,35,4,45,,roaming
+1619,Viking Shieldmaiden,A fierce woman with a round shield and a hand axe. She sings as she fights.,true,190,52,32,6013,90,,roaming
+1620,Viking Skald,A warrior-poet whose battle songs strengthen allies and weaken foes.,true,140,47,26,1013,75,,stationary
+1621,Aztec Eagle Warrior,An elite soldier in feathered armor with a macuahuitl edged in obsidian.,true,240,52,31,204,90,,roaming
+1622,Terracotta Soldier,A clay warrior that animates when intruders approach. It does not tire.,true,200,42,48,4002,90,,stationary
+1623,Mongol Horse Archer,A mounted warrior firing arrows at a full gallop. Nearly impossible to catch.,true,180,62,16,5,90,,roaming
+1624,Greek Hoplite,A bronze-armored soldier with a long spear and aspis shield.,true,170,43,47,2019,75,,roaming
+1625,Spartan Champion,An elite warrior who has trained since childhood for war.,true,280,54,38,1009,120,,stationary
+1626,Pirate Captain,A swaggering buccaneer with a cutlass and a flintlock pistol.,true,210,53,26,231,90,,roaming
+1627,Clockwork Soldier,A mechanical warrior from a future that never was. Gears whir inside.,true,260,49,36,3001,120,,stationary
+1628,Temporal Guardian,A being tasked with protecting the timestream. You are a violation.,true,350,52,38,5001,150,,stationary
+1629,Chrono-Beast,A creature unstuck in time. It ages and de-ages as it fights.,true,300,53,27,4007,120,,roaming
+1630,Era Merchant,A time-displaced trader selling goods from every century.,false,120,18,18,,300,Silk from the Tang Dynasty! Spices from the Age of Sail!,"npc,merchant"
+1631,Temporal Scholar,A confused academic studying the frozen moments of history.,false,80,15,15,,300,Fascinating! This epoch shouldn't exist!,npc
+1632,Gladiator Trainer,A retired fighter covered in scars who trains the next generation.,false,200,27,27,,300,You fight like a child. Again!,"npc,trainer"
+1701,Sewer Rat Swarm,Hundreds of rats moving as one hungry mass.,true,80,16,3,3010;9814,30,,"roaming,animal"
+1702,Tunnel Crawler,A pale humanoid that has lived too long in the dark.,true,130,24,10,1002,60,,roaming
+1703,Fungal Shambler,A mass of toxic mushrooms given ambulatory form.,true,160,19,19,4018,60,,roaming
+1704,Pipe Wraith,A ghost trapped in the water system. It screams through the pipes.,true,200,30,14,3011,90,,stationary
+1705,Undercity Boss,A massive mutant who rules a section of tunnel.,true,350,38,27,5005,120,,stationary
+1706,The Collector,A thing that hoards everything — bones and trinkets and screams.,true,400,48,48,,180,,"stationary,boss"
+1707,Sewer Roach,A cockroach the size of your hand. It skitters across the wet stone.,true,15,8,4,4008,10,,"roaming,animal"
+1708,Drain Slug,A fat grey slug leaving a trail of corrosive slime.,true,40,9,4,213,20,,"roaming,animal"
+1709,Blind Fish,A pale eyeless fish that has grown legs and teeth.,true,50,10,2,5014,25,,"roaming,animal"
+1710,Undercity Pawnbroker,"A hunched figure behind a cage of rusted bars, appraising items with a jeweler's loupe.",false,100,1,50,,,Got something to sell? Or looking to buy? I've got... things.,"npc,merchant,stationary"
+1711,Gutter Snake,A long thin snake adapted to the pipes. It drops from above.,true,55,14,2,6002,25,,"roaming,animal"
+1712,Tunnel Spider,A pale spider with translucent skin. You can see its organs pulse.,true,70,14,4,5002,30,,"stationary,animal"
+1713,Sewer Gator,An albino alligator that has grown enormous in the dark.,true,200,18,14,6003,90,,"stationary,animal"
+1714,Mushroom Man,A humanoid fungus that communicates through spore clouds.,true,120,14,10,206,60,,roaming
+1715,Escaped Experiment,Something that crawled out of a lab drain. It has too many limbs.,true,180,17,8,212,75,,roaming
+1716,Undercity Scavenger,A human who lives in the tunnels. Territorial and desperate.,true,90,13,5,214,45,,roaming
+1717,Plague Doctor,A masked figure in a long coat administering dubious cures.,true,150,16,8,4001,75,,roaming
+1718,Bone Collector,A hunched figure that builds sculptures from the bones of the dead.,true,170,14,11,6016,75,,stationary
+1719,The Drip,A sentient mass of sewage and industrial waste. It absorbs what it touches.,true,250,16,15,2003,120,,stationary
+1720,Tunnel Hermit,"A gaunt figure wrapped in shadow, barely visible even in direct light. Their hands move in constant, fluid patterns  -  practicing strikes against targets only they can see.",false,60,4,4,,300,The shadow is not where you hide. It is where you strike from.,"npc,teacher"
+1721,Whisper,"You almost didn't see them. A figure in the darkest corner, wrapped in cloth so black it seems to absorb light. Only their eyes are visible  -  and they're watching you.",false,300,55,10,,-1,You saw me. That means I let you. Remember that.,"npc,teacher"
 1801,Training Dummy,A reinforced practice target. It doesn't fight back.,true,9999,0,0,,5,,stationary
-1802,Sparring Partner,A skilled fighter who pulls their punches. Barely.,true,200,15,15,,30,,stationary
-1803,Gravity Construct,A training golem that gets heavier the longer you fight it.,true,500,25,25,,60,,stationary
-1804,Mirror Self,An exact copy of you. It knows every move you'll make.,true,1,1,1,,120,,stationary
+1802,Sparring Partner,A skilled fighter who pulls their punches. Barely.,true,200,15,15,6001,30,,stationary
+1803,Gravity Construct,A training golem that gets heavier the longer you fight it.,true,500,25,25,1012,60,,stationary
+1804,Mirror Self,An exact copy of you. It knows every move you'll make.,true,1,1,1,3003,120,,stationary
 1805,Wooden Striking Post,A simple wooden post with target rings painted on it.,true,9999,0,0,,5,,stationary
-1806,Speed Bag Golem,A small fast-moving construct that tests reflexes.,true,300,5,5,,30,,stationary
+1806,Speed Bag Golem,A small fast-moving construct that tests reflexes.,true,300,5,5,2012,30,,stationary
 1807,Iron Sparring Golem,A heavy metal construct that hits hard and takes punishment.,true,800,30,30,,60,,stationary
-1808,Elemental Training Orb,A floating orb that cycles through fire ice and lightning attacks.,true,400,20,15,,45,,stationary
-1809,Shadow Clone,A dark copy of you that fights with your weaknesses exposed.,true,1,1,1,,120,,stationary
+1808,Elemental Training Orb,A floating orb that cycles through fire ice and lightning attacks.,true,400,20,15,2005,45,,stationary
+1809,Shadow Clone,A dark copy of you that fights with your weaknesses exposed.,true,1,1,1,6004,120,,stationary
 1810,Endurance Pillar,A construct that never attacks but gets harder to damage over time.,true,9999,0,50,,60,,stationary
-1811,Training Master,A weathered instructor who evaluates your form and technique.,false,300,20,20,,300,Your stance is sloppy. Widen your feet.;Again. Faster this time.,npc
-1812,Meditation Guide,A serene figure in white robes who teaches focus techniques.,false,150,5,5,,300,Breathe. Center yourself.;The mind is the sharpest weapon.,npc
-1901,Lost Soul,A confused spirit wandering the afterlife paths.,true,100,12,5,,30,,roaming
-1902,Spirit Guardian,A warrior who chose to guard the paths between life and death.,true,250,30,20,,90,,stationary
-1903,Oni Gatekeeper,A massive horned demon that guards a checkpoint.,true,400,40,30,,120,,stationary
-1904,Reaper Initiate,A young death god still learning the trade.,true,500,45,25,,180,,roaming
-1905,The Forgotten King,A spirit so old even death has forgotten his name.,true,800,55,40,,300,,stationary
-1906,Soul Moth,A tiny luminous insect that feeds on spiritual energy.,true,25,4,1,,15,,roaming
-1907,Wandering Shade,A formless shadow drifting without purpose or memory.,true,60,8,3,,25,,roaming
-1908,Hungry Ghost,A spirit consumed by a single desire it can never fulfill.,true,80,12,4,,30,,roaming
-1909,Spirit Fox,A ghostly fox with multiple tails. Mischievous but dangerous.,true,110,16,8,,45,,roaming
-1910,Ancestral Warrior,The spirit of a great fighter who trains eternally in death.,true,180,25,15,,75,,roaming
-1911,Demon Foot Soldier,A minor demon with red skin and a barbed spear.,true,150,22,12,,60,,roaming
-1912,Celestial Soldier,An armored spirit serving the judges of the dead.,true,200,28,18,,90,,stationary
-1913,Soul Eater,A bloated spirit that consumes other ghosts to grow stronger.,true,280,35,15,,120,,roaming
-1914,Infernal Hound,A three-headed dog made of black fire that guards the deeper paths.,true,220,30,20,,90,,roaming
-1915,Wrathful Ancestor,A spirit twisted by rage who attacks the living on sight.,true,170,26,10,,75,,roaming
-1916,Bone Serpent,A massive snake made of interlocking bones that slithers through the spirit realm.,true,240,28,22,,90,,roaming
-1917,Judge's Scribe,A spectral bureaucrat who records the deeds of the dead.,false,100,5,5,,300,Your name is not yet in my ledger.;All are judged. All are weighed.,npc
-1918,Afterlife Ferryman,A hooded figure with a long pole who transports souls across the river.,false,200,10,10,,300,The crossing costs a memory. Choose wisely.;I have ferried kings and beggars alike.,npc
-1919,Spirit Healer,A gentle ghost who mends the wounds of the recently deceased.,false,150,5,5,,300,You are not dead yet. Interesting.;Rest here. Even spirits need rest.,npc
-1200,Aldric the Distraught Wizard,"A tall thin man in singed robes paces the ruins of his tower",false,500,45,30,,,no_attack,quest_npc
+1811,Training Master,A weathered instructor who evaluates your form and technique.,false,300,20,20,,300,Your stance is sloppy. Widen your feet.,"npc,trainer"
+1812,Meditation Guide,A serene figure in white robes who teaches focus techniques.,false,150,5,5,,300,Breathe. Center yourself.,"npc,trainer"
+1813,Blade Monk Takeshi,"A weathered monk in simple robes, his hands calloused from decades of sword practice. He moves with an economy of motion that suggests absolute mastery.",false,500,45,30,,-1,The sword is not a weapon. It is an extension of will.,"npc,teacher"
+1814,Grandmaster Yun,"An impossibly old figure seated in perfect stillness. Their hands rest on their knees, each knuckle a weapon unto itself. The air around them feels denser.",false,800,60,40,,-1,The fist is the first weapon. The last weapon. The only weapon you will never lose.,"npc,teacher"
+1815,Archery Master Hana,"A serene figure with a longbow taller than themselves. They stand motionless, arrow nocked, watching something invisible in the distance with absolute patience.",false,400,60,15,,-1,Release before you think. The arrow knows where it must go.,"npc,teacher"
+1901,Lost Soul,A confused spirit wandering the afterlife paths.,true,100,68,28,,30,,roaming
+1902,Spirit Guardian,A warrior who chose to guard the paths between life and death.,true,250,90,60,,90,,stationary
+1903,Oni Gatekeeper,A massive horned demon that guards a checkpoint.,true,400,92,69,,120,,stationary
+1904,Reaper Initiate,A young death god still learning the trade.,true,500,88,49,,180,,roaming
+1905,The Forgotten King,A spirit so old even death has forgotten his name.,true,800,130,94,,300,,"stationary,boss"
+1906,Soul Moth,A tiny luminous insect that feeds on spiritual energy.,true,25,71,17,3002,15,,"roaming,animal"
+1907,Wandering Shade,A formless shadow drifting without purpose or memory.,true,60,62,23,4017,25,,roaming
+1908,Hungry Ghost,A spirit consumed by a single desire it can never fulfill.,true,80,67,22,3005,30,,roaming
+1909,Spirit Fox,A ghostly fox with multiple tails. Mischievous but dangerous.,true,110,66,33,5004,45,,"roaming,animal"
+1910,Ancestral Warrior,The spirit of a great fighter who trains eternally in death.,true,180,69,41,,75,,roaming
+1911,Demon Foot Soldier,A minor demon with red skin and a barbed spear.,true,150,70,38,3004,60,,roaming
+1912,Celestial Soldier,An armored spirit serving the judges of the dead.,true,200,70,45,,90,,stationary
+1913,Soul Eater,A bloated spirit that consumes other ghosts to grow stronger.,true,280,72,31,,120,,roaming
+1914,Infernal Hound,A three-headed dog made of black fire that guards the deeper paths.,true,220,70,47,,90,,"roaming,animal"
+1915,Wrathful Ancestor,A spirit twisted by rage who attacks the living on sight.,true,170,75,29,,75,,roaming
+1916,Bone Serpent,A massive snake made of interlocking bones that slithers through the spirit realm.,true,240,63,49,,90,,"roaming,animal"
+1917,Judge's Scribe,A spectral bureaucrat who records the deeds of the dead.,false,100,28,28,,300,Your name is not yet in my ledger.,npc
+1918,Afterlife Ferryman,A hooded figure with a long pole who transports souls across the river.,false,200,29,29,,300,The crossing costs a memory. Choose wisely.,npc
+1919,Spirit Healer,A gentle ghost who mends the wounds of the recently deceased.,false,150,20,20,,300,You are not dead yet. Interesting.,"npc,trainer"
+2018,Holo-Sensei,"A flickering holographic figure in samurai armor, projected from a device bolted to the counter. Despite being intangible, the blade it holds leaves scorch marks on the air.",false,600,55,20,,-1,Energy follows intent. The beam blade is thought made manifest.,"npc,teacher"
+2019,The Archmage (Holographic),"A robed figure rendered in blue light, their staff crackling with simulated arcane energy. The hologram is so detailed you can see individual runes shifting on their skin.",false,500,40,30,,-1,The staff channels. Focus flows through it like water through a riverbed. Let it carry you.,"npc,teacher"
+2050,Reception AI,"A holographic woman behind a desk, her smile frozen in corporate perfection.",false,,,,,,,no_attack
+2051,Noodle Chef Tanaka,"A sweating man working three woks simultaneously, flames leaping with each toss.",false,,,,,,,no_attack
+2052,Chrome Dealer Vex,"A woman with more metal than skin, her eyes cycling through colors as she scans you.",false,,,,,,,"no_attack,merchant"
+2053,Street Prophet,"A man covered in glowing tattoos, standing at the crossroads muttering prophecies.",false,,,,,,,no_attack
+2054,Junkyard Boss Krill,"A massive man made mostly of salvaged parts, sitting on a throne of scrap metal.",false,,,,,,,no_attack
+2055,The Broker,"A figure in a hooded coat, face hidden behind a featureless mask. Their voice is synthesized.",false,,,,,,,"no_attack,merchant"
+2056,Doc Patches,"A woman in a bloodstained lab coat, her cybernetic hands twitching with precision.",false,,,,,,,"no_attack,healer"
+2057,Mama Chen,An old woman selling synthetic vegetables from a rickety stall. Her eyes are sharp despite her age.,false,,,,,,,no_attack
+3015,Maestro Beaumont,"A silver-haired gentleman in an immaculate white suit, a rapier resting against his chair. His posture is perfect, his smile dangerous.",false,450,50,25,,-1,"Every parry is an invitation. Every riposte, an acceptance.","npc,teacher"
+3050,Building Super,"A grumpy man in overalls, jangling a ring of keys.",false,,,,,,,no_attack
+3051,Detective Morrison,"A tired man in a rumpled suit, cigarette smoke curling around his fedora. Files cover every surface.",false,,,,,,,no_attack
+3052,Old Man Wei,An ancient man sitting behind a counter of dried herbs and strange artifacts.,false,,,,,,,"no_attack,merchant"
+3053,Monk Liang,"A bald man in saffron robes, sitting in perfect stillness before a smoking incense burner.",false,,,,,,,no_attack
+3054,Dockmaster Hank,"A weathered man with a clipboard, shouting orders at longshoremen.",false,,,,,,,no_attack
+3055,Fishmonger Pete,"A man in a stained apron, gutting fish with mechanical efficiency.",false,,,,,,,no_attack
+4015,Siege Engineer Volkov,"A massive figure in blast-scarred armor, idly spinning a war hammer that would take two normal people to lift. Craters in the floor mark where they practice.",false,650,65,45,,-1,"Armor is a suggestion. With enough force, everything breaks.","npc,teacher"
+4016,Sniper Instructor Reyes,"A lean figure in a ghillie suit, cleaning a rifle with methodical precision. Their eyes never stop scanning, even in conversation. A collection of spent casings forms a neat pyramid nearby.",false,350,70,10,,-1,One round. One target. Patience is the deadliest weapon in any arsenal.,"npc,teacher"
+4050,Quartermaster Hayes,A no-nonsense woman behind a cage of weapons and supplies.,false,,,,,,,"no_attack,merchant"
+4051,Sergeant Major Cole,"A scarred man sitting on a bunk, cleaning his rifle with practiced hands.",false,,,,,,,no_attack
+4052,Cook Ramirez,A heavyset man stirring a massive pot of something that might be stew.,false,,,,,,,no_attack
+4053,Refugee Elder Miriam,"An old woman wrapped in blankets, eyes hollow but determined.",false,,,,,,,no_attack
+4054,Field Medic Torres,"A young woman with blood on her hands, working frantically on a wounded soldier.",false,,,,,,,"no_attack,healer"
+4055,Arms Dealer Vasquez,"A man in a leather jacket, surrounded by crates of weapons from a dozen different armies.",false,,,,,,,"no_attack,merchant"
+5050,The Librarian,"A being of pure light, hovering between shelves of crystallized knowledge.",false,,,,,,,no_attack
+5051,Shard Merchant Opal,A crystalline humanoid whose body refracts light into rainbows. Their voice chimes like glass.,false,,,,,,,"no_attack,merchant"
+5052,Forge Spirit,"A being of molten metal and flame, hammering at an anvil that floats in empty space.",false,,,,,,,"no_attack,merchant"
+6015,Terracotta General,"A figure of fired clay given impossible life. It stands at attention with a halberd, its movements precise and mechanical yet devastatingly effective.",false,550,50,50,,-1,Reach is control. Control is victory. The polearm commands the battlefield.,"npc,teacher"
+6016,Paradox Smith,"A figure that seems to exist in multiple moments simultaneously. Their weapon shifts form between heartbeats  -  blade, whip, chain, something that has no name.",false,600,55,25,,-1,Predictability is death. Chaos is life. Let the weapon decide what it wants to be.,"npc,teacher"
+6050,Roman Announcer,"A man in a toga, his voice trained to carry across the colosseum.",false,,,,,,,no_attack
+6051,Egyptian Merchant Khufu,"A man in white linen, his stall covered in golden trinkets and papyrus scrolls.",false,,,,,,,"no_attack,merchant"
+6052,High Priest Amenhotep,"A tall man with a golden headdress, his eyes lined with kohl. Power radiates from him.",false,,,,,,,no_attack
+6053,Viking Shipwright Bjorn,"A massive man with a braided beard, carving a dragon prow from a single log.",false,,,,,,,no_attack
+6054,Skald Ingrid,"A woman with wild red hair, singing tales of battle over a horn of mead.",false,,,,,,,no_attack
+6055,Viking Smith Thorvald,A soot-covered man hammering a blade on a rune-carved anvil.,false,,,,,,,"no_attack,merchant"
+6056,Aztec Trader Itzel,"A woman in feathered garments, her stall displaying obsidian blades and jade ornaments.",false,,,,,,,"no_attack,merchant"
+6057,Sheriff Hawkins,"A lean man with a star pinned to his vest, a revolver on each hip.",false,,,,,,,no_attack
+6058,Stablehand Eli,"A young man mucking out stalls, whistling tunelessly.",false,,,,,,,no_attack
+6150,Atlantean Merchant Nereus,"A being with iridescent scales and webbed fingers, displaying wares on a coral counter.",false,,,,,,,"no_attack,merchant"
+6151,Atlantean Herald,"A tall figure in flowing robes of living water, their voice echoing with authority.",false,,,,,,,no_attack
+6152,Atlantean Archivist,"A hunched figure surrounded by floating tablets of compressed water, each containing text.",false,,,,,,,no_attack
+6153,Golden Guardian,A statue of pure gold that moves with fluid grace. Its eyes burn with ancient fire.,false,,,,,,,no_attack
+7050,Undercity Fence,"A hunched figure in the shadows, eyes gleaming with avarice.",false,,,,,,,"no_attack,merchant"
+8020,Gravity Chamber Technician,"A wiry technician in a lab coat, surrounded by floating equipment modules.",false,200,1,80,,,Need supplies for your training? I've got the good stuff.,"npc,merchant,stationary,trainer"
+8021,Void Adept Kira,"A figure floating cross-legged above the ground, surrounded by a faint distortion in space. Their eyes are closed, but you sense they are acutely aware of everything.",false,700,55,35,,-1,"Between atoms, there is void. Learn to strike there, and nothing can resist you.","npc,teacher"
+8099,Gravity Core Sentinel,"A towering construct of folded spacetime, its body rippling with gravitational distortions. The air around it bends light into prismatic halos.",false,3000,800,400,194,,The Sentinel compresses space around its fist...,"boss,stationary"
+8100,Archivist Unit 7,A floating mechanical sphere covered in lenses and data ports. It hums with stored information.,false,,,,,,,no_attack
+9010,Spectral Vendor,"A translucent figure that flickers between planes, its wares hovering in mid-air.",false,300,1,100,,,"Even the dead need supplies... browse freely, traveler.","npc,merchant,stationary"
+9099,The Hollow King,"A skeletal monarch wreathed in pale fire, seated on a throne of petrified screams. Its crown pulses with the memories of a thousand forgotten worlds.",false,5000,1200,600,195,,"The Hollow King raises his scepter, drawing power from the void...","boss,stationary"
+9100,Gatekeeper Anubis,"A towering figure with the head of a jackal, holding golden scales in one hand.",false,,,,,,,no_attack
+9101,Spirit of Valor,"A luminous warrior in ancient armor, their form flickering between a dozen different faces.",false,,,,,,,no_attack
+9102,Judge of Souls,A robed figure whose face is hidden behind a featureless golden mask. They radiate absolute authority.,false,,,,,,,no_attack
