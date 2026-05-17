@@ -230,7 +230,7 @@
     exportBtn: $('exportBtn'),
     importBtn: $('importBtn'),
     resetBtn: $('resetBtn'),
-    fakeCrashBtn: $('fakeCrashBtn'),
+    fakeCrashBtn: null,
     sceneHost: $('sceneHost'),
     playGameGrid: $('playGameGrid'),
     buttonIdleSceneRoot: $('buttonIdleSceneRoot'),
@@ -859,11 +859,13 @@ try {
     elements.importBtn.addEventListener('click', importSave);
     document.addEventListener('keydown', handleDebugSceneCommand);
     elements.resetBtn.addEventListener('click', hardReset);
-    elements.fakeCrashBtn.addEventListener('click', () => {
-      if (buttonScene && typeof buttonScene.simulateFakeCrash === 'function') {
-        buttonScene.simulateFakeCrash();
-      }
-    });
+    if (elements.fakeCrashBtn) {
+      elements.fakeCrashBtn.addEventListener('click', () => {
+        if (buttonScene && typeof buttonScene.simulateFakeCrash === 'function') {
+          buttonScene.simulateFakeCrash();
+        }
+      });
+    }
 
     document.addEventListener('visibilitychange', () => {
       if (!document.hidden) {

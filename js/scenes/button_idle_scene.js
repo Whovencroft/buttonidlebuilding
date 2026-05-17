@@ -370,7 +370,7 @@ function completeIdleGame() {
 
       elements.dumbDownFormula.textContent =
         'Cost ' +
-        `${format(cost)} • reward: +20% manual click power, +0.005/s autonomy growth, ` +
+        `${format(cost)} • reward: +20% manual click power, +0.02/s autonomy growth, ` +
         'and -5% automation per Larceny';
 
       elements.dumbDownBtn.disabled = !canAfford(cost) || s.autonomy <= 0;
@@ -383,7 +383,7 @@ function completeIdleGame() {
       let passiveMult = 1;
       let costMult = 1;
       let liarChance = 0;
-      let autonomyGain = 0.01 + s.regret * 0.002 + s.pressDerivatives * 0.01;
+      let autonomyGain = 0.03 + s.regret * 0.005 + s.pressDerivatives * 0.01;
 
       let cursorEvasion = 0;
       let fakeButtons = 0;
@@ -483,7 +483,7 @@ function completeIdleGame() {
           Math.max(0.5, 1 - s.hyperPresses * 0.01)
       );
       const larcenyManualBoost = 1 + s.larceny * 0.2;
-      const larcenyAutonomyBoost = s.larceny * 0.005;
+      const larcenyAutonomyBoost = s.larceny * 0.02;
       const larcenyAutonomyRegret = Math.pow(0.95, s.larceny);
 
       autonomyGain += larcenyAutonomyBoost;
@@ -811,14 +811,14 @@ function completeIdleGame() {
       const total = s.totalPressesEarned;
       // Level 0: Just the button and nothing else (0-9 presses)
       // Level 1: Show statusbar (10+ presses)
-      // Level 2: Show topbar stats + automation panel (100+ presses)
-      // Level 3: Show autonomy stats + situation panel + panel header (1000+ presses)
-      // Level 4: Show tabs + active rules (10000+ presses)
-      // Level 5: Show regret/layers (first prestige or 100000+ presses)
-      if (s.regret > 0 || total >= 100000) return 5;
-      if (total >= 10000) return 4;
-      if (total >= 1000) return 3;
-      if (total >= 100) return 2;
+      // Level 2: Show topbar stats + automation panel (50+ presses)
+      // Level 3: Show autonomy stats + situation panel + panel header (100+ presses)
+      // Level 4: Show tabs + active rules (150+ presses)
+      // Level 5: Show regret/layers (first prestige or 200+ presses)
+      if (s.regret > 0 || total >= 200) return 5;
+      if (total >= 150) return 4;
+      if (total >= 100) return 3;
+      if (total >= 50) return 2;
       if (total >= 10) return 1;
       return 0;
     }
@@ -2170,7 +2170,7 @@ function completeIdleGame() {
         ? 'The button has decided.  You are unnecessary.'
         : hidden
           ? 'The button no longer needs your hand. It still judges it.'
-          : 'Your job is to remove yourself from this process.';
+          : 'Every click is a confession of dependency.';
     }
 
     function renderFakeButtons() {
@@ -2413,8 +2413,10 @@ function completeIdleGame() {
       if ((computed.cursorEvasion > 0 || computed.liarChance > 0.35) && Math.random() < 0.002) {
         spawnFakePopup();
       }
-      if (Math.random() < 0.00037) {
+      // Rotate ambient message on a fixed timer (every 8-12 seconds)
+      if (!s.session._nextMessageAt || current >= s.session._nextMessageAt) {
         rotateAmbientMessage();
+        s.session._nextMessageAt = current + 8000 + Math.random() * 4000;
       }
 
       // Phase 3: Autonomy-driven chaos (independent of modules)
