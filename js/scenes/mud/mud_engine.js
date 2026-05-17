@@ -213,6 +213,7 @@
           // Queue output for next flush since moveToRoom returns its own output
           if (iResult.output.length > 0) {
             pendingSystemOutput = pendingSystemOutput.concat(iResult.output);
+            recalcStats();
           }
         }
       }
@@ -290,10 +291,13 @@
         }
       }
 
-      // Check for aggressive mobs
+      // Check for aggressive mobs (Oni allAggro makes every mob hostile)
+      const allAggro = (player.raceMods || {}).allAggro;
       const aggressive = roomMobs.find(v => {
         const mob = mobs[v];
-        return mob && mob.flags && mob.flags.includes('aggressive');
+        if (!mob) return false;
+        if (allAggro) return true;
+        return mob.flags && mob.flags.includes('aggressive');
       });
       if (aggressive) {
         output.push(...initiateCombat(aggressive));
@@ -1743,7 +1747,7 @@
             const killed = combatState.mobHp <= 0;
             const pGrowth = window.MudStats.onAbilityUsed(activeDef.tier || 0, killed);
             const pResult = window.MudStats.applyGrowth(player.coreStats, pGrowth);
-            if (pResult.output.length > 0) output.push(...pResult.output);
+            if (pResult.output.length > 0) { output.push(...pResult.output); recalcStats(); }
           }
 
           if (activeDef.healPercent) {
@@ -1788,6 +1792,21 @@
      */
     function handleMobKill(mob) {
       const output = [];
+
+      // Beastkin animalNoKill: animals flee instead of dying
+      const isAnimal = mob.flags && mob.flags.includes('animal');
+      if (isAnimal && (player.raceMods || {}).animalNoKill) {
+        output.push({ type: 'combat', text: `${mob.name} whimpers and flees into the distance.` });
+        markMobDefeated(combatState.mobVnum);
+        // Power still gained from the fight, but no kill credit, gold, or loot
+        const fightPower = combatState.powerGained || 0;
+        if (fightPower > 0) {
+          output.push({ type: 'success', text: `Fight total: +${fightPower} power (total: ${player.power})` });
+        }
+        player.focus = Math.min(player.maxFocus, player.focus + 3);
+        combatState = null;
+        return output;
+      }
 
       // Finishing move text if killed by an ability
       if (lastAbilityUsed && window.MudCombatSystems) {
@@ -2077,7 +2096,7 @@
       const isBoss = (mob.flags || []).includes('boss');
       combatState = {
         mobVnum,
-        mobHp: mob.stats.hp,
+        mobHp: mob.stats.max_hp || mob.stats.hp,
         mobMaxHp: mob.stats.max_hp || mob.stats.hp,
         // Boss counter state
         isBoss,
@@ -2364,8 +2383,14 @@
           const missChance = BASE_MISS_CHANCE * (1 - prof / 100);
           if (Math.random() < missChance) playerMissed = true;
         }
+      } else if (window.MudWeaponProficiency) {
+        // Unarmed proficiency reduces miss chance
+        if (!window.MudWeaponProficiency.cannotMiss(player, 'unarmed')) {
+          const prof = window.MudWeaponProficiency.getProficiency(player, 'unarmed');
+          const missChance = BASE_MISS_CHANCE * (1 - prof / 100);
+          if (Math.random() < missChance) playerMissed = true;
+        }
       } else if (Math.random() < BASE_MISS_CHANCE) {
-        // No weapon equipped  -  base miss chance applies
         playerMissed = true;
       }
 
@@ -2423,12 +2448,19 @@
           const growth = window.MudStats.onBasicAttackLanded();
           const result = window.MudStats.applyGrowth(player.coreStats, growth);
           if (result.output.length > 0) output.push(...result.output);
+          if (result.output.length > 0) recalcStats();
         }
-        // Weapon proficiency gain for primary weapon category
-        if (window.MudWeaponProficiency && player.equipped.weapon != null) {
-          const wpnItem = items[player.equipped.weapon];
-          if (wpnItem?.weapon_category) {
-            const wpResult = window.MudWeaponProficiency.onWeaponUsed(player, wpnItem.weapon_category);
+        // Weapon proficiency gain for primary weapon category (or unarmed)
+        if (window.MudWeaponProficiency) {
+          if (player.equipped.weapon != null) {
+            const wpnItem = items[player.equipped.weapon];
+            if (wpnItem?.weapon_category) {
+              const wpResult = window.MudWeaponProficiency.onWeaponUsed(player, wpnItem.weapon_category);
+              if (wpResult?.message) output.push({ type: 'info', text: wpResult.message });
+            }
+          } else {
+            // Unarmed proficiency gain when fighting bare-handed
+            const wpResult = window.MudWeaponProficiency.onWeaponUsed(player, 'unarmed');
             if (wpResult?.message) output.push({ type: 'info', text: wpResult.message });
           }
         }
@@ -2580,7 +2612,7 @@
         if (player.coreStats) {
           const growth = window.MudStats.onDodge();
           const result = window.MudStats.applyGrowth(player.coreStats, growth);
-          if (result.output.length > 0) output.push(...result.output);
+          if (result.output.length > 0) { output.push(...result.output); recalcStats(); }
         }
       } else {
         const mobAtk = Math.floor((mob.stats.attack || 10) * debuffMobAtkMod);
@@ -2604,14 +2636,14 @@
           const vGrowth = window.MudStats.onDamageTaken(mobDmg, player.maxHp, player.hp);
           if (vGrowth) {
             const vResult = window.MudStats.applyGrowth(player.coreStats, vGrowth);
-            if (vResult.output.length > 0) output.push(...vResult.output);
+            if (vResult.output.length > 0) { output.push(...vResult.output); recalcStats(); }
           }
         }
         // Grit grows from being hit
         if (window.MudStats && player.coreStats) {
           const gGrowth = window.MudStats.onHitReceived(mobDmg, player.defense);
           const gResult = window.MudStats.applyGrowth(player.coreStats, gGrowth);
-          if (gResult.output.length > 0) output.push(...gResult.output);
+          if (gResult.output.length > 0) { output.push(...gResult.output); recalcStats(); }
         }
       }
 
@@ -3327,10 +3359,15 @@
       }
       player.focusCostModifier = equipFocusMod;
       // Add weapon proficiency attack bonus for equipped primary weapon
-      if (window.MudWeaponProficiency && player.equipped.weapon != null) {
-        const wpnItem = items[player.equipped.weapon];
-        if (wpnItem?.weapon_category) {
-          bonusAtk += window.MudWeaponProficiency.getAttackBonus(player, wpnItem.weapon_category);
+      if (window.MudWeaponProficiency) {
+        if (player.equipped.weapon != null) {
+          const wpnItem = items[player.equipped.weapon];
+          if (wpnItem?.weapon_category) {
+            bonusAtk += window.MudWeaponProficiency.getAttackBonus(player, wpnItem.weapon_category);
+          }
+        } else {
+          // Unarmed proficiency attack bonus when fighting bare-handed
+          bonusAtk += window.MudWeaponProficiency.getAttackBonus(player, 'unarmed');
         }
       }
       // Apply stat-derived bonuses if MudStats is loaded
@@ -3356,7 +3393,7 @@
       if (rm.focus)   player.maxFocus = Math.floor(player.maxFocus * (1 + rm.focus));
       if (rm.dodge) {
         player._derived = player._derived || {};
-        player._derived.dodgeBonus = (player._derived.dodgeBonus || 0) + rm.dodge;
+        player._derived.dodgeChance = (player._derived.dodgeChance || 0) + rm.dodge;
       }
 
       // Apply death_weakness penalty to maxHp and maxFocus (-10% each)

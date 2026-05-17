@@ -43,7 +43,8 @@
     "respawn": 45,
     "dialogue": [],
     "flags": [
-      "roaming"
+      "roaming",
+      "animal"
     ],
     "keywords": [
       "forest",
@@ -226,7 +227,8 @@
     "respawn": 20,
     "dialogue": [],
     "flags": [
-      "roaming"
+      "roaming",
+      "animal"
     ],
     "keywords": [
       "field",
@@ -252,7 +254,8 @@
     "respawn": 20,
     "dialogue": [],
     "flags": [
-      "roaming"
+      "roaming",
+      "animal"
     ],
     "keywords": [
       "stray cat",
@@ -278,7 +281,8 @@
     "respawn": 50,
     "dialogue": [],
     "flags": [
-      "roaming"
+      "roaming",
+      "animal"
     ],
     "keywords": [
       "boar",
@@ -440,7 +444,8 @@
     "respawn": 75,
     "dialogue": [],
     "flags": [
-      "roaming"
+      "roaming",
+      "animal"
     ],
     "keywords": [
       "dire",
@@ -466,7 +471,8 @@
     "respawn": 30,
     "dialogue": [],
     "flags": [
-      "stationary"
+      "stationary",
+      "animal"
     ],
     "keywords": [
       "timber",
@@ -492,7 +498,8 @@
     "respawn": 45,
     "dialogue": [],
     "flags": [
-      "stationary"
+      "stationary",
+      "animal"
     ],
     "keywords": [
       "spider",
@@ -1006,7 +1013,8 @@
     "respawn": 25,
     "dialogue": [],
     "flags": [
-      "roaming"
+      "roaming",
+      "animal"
     ],
     "keywords": [
       "plague rat",
@@ -1032,7 +1040,8 @@
     "respawn": 20,
     "dialogue": [],
     "flags": [
-      "roaming"
+      "roaming",
+      "animal"
     ],
     "keywords": [
       "crow",
@@ -1160,7 +1169,8 @@
     "respawn": 90,
     "dialogue": [],
     "flags": [
-      "roaming"
+      "roaming",
+      "animal"
     ],
     "keywords": [
       "owlbear"
@@ -2354,7 +2364,8 @@
     "respawn": 20,
     "dialogue": [],
     "flags": [
-      "roaming"
+      "roaming",
+      "animal"
     ],
     "keywords": [
       "dock rat",
@@ -2380,7 +2391,8 @@
     "respawn": 20,
     "dialogue": [],
     "flags": [
-      "roaming"
+      "roaming",
+      "animal"
     ],
     "keywords": [
       "cat",
@@ -2931,7 +2943,8 @@
     "respawn": 120,
     "dialogue": [],
     "flags": [
-      "stationary"
+      "stationary",
+      "animal"
     ],
     "keywords": [
       "sewer",
@@ -3045,7 +3058,8 @@
     "respawn": 30,
     "dialogue": [],
     "flags": [
-      "roaming"
+      "roaming",
+      "animal"
     ],
     "keywords": [
       "feral dog pack",
@@ -3255,7 +3269,8 @@
     "respawn": 20,
     "dialogue": [],
     "flags": [
-      "roaming"
+      "roaming",
+      "animal"
     ],
     "keywords": [
       "carrion vulture",
@@ -3281,7 +3296,8 @@
     "respawn": 25,
     "dialogue": [],
     "flags": [
-      "roaming"
+      "roaming",
+      "animal"
     ],
     "keywords": [
       "irradiated coyote",
@@ -3307,7 +3323,8 @@
     "respawn": 15,
     "dialogue": [],
     "flags": [
-      "roaming"
+      "roaming",
+      "animal"
     ],
     "keywords": [
       "scrap beetle",
@@ -3516,7 +3533,8 @@
     "respawn": 45,
     "dialogue": [],
     "flags": [
-      "roaming"
+      "roaming",
+      "animal"
     ],
     "keywords": [
       "war dog",
@@ -3863,7 +3881,8 @@
     "respawn": 15,
     "dialogue": [],
     "flags": [
-      "roaming"
+      "roaming",
+      "animal"
     ],
     "keywords": [
       "munitions rat",
@@ -3889,7 +3908,8 @@
     "respawn": 25,
     "dialogue": [],
     "flags": [
-      "stationary"
+      "stationary",
+      "animal"
     ],
     "keywords": [
       "scorpion",
@@ -4151,7 +4171,8 @@
     "respawn": 15,
     "dialogue": [],
     "flags": [
-      "roaming"
+      "roaming",
+      "animal"
     ],
     "keywords": [
       "starlight",
@@ -4177,7 +4198,8 @@
     "respawn": 30,
     "dialogue": [],
     "flags": [
-      "roaming"
+      "roaming",
+      "animal"
     ],
     "keywords": [
       "jellyfish",
@@ -4918,7 +4940,8 @@
     "respawn": 20,
     "dialogue": [],
     "flags": [
-      "roaming"
+      "roaming",
+      "animal"
     ],
     "keywords": [
       "cave",
@@ -4943,7 +4966,8 @@
     "respawn": 15,
     "dialogue": [],
     "flags": [
-      "roaming"
+      "roaming",
+      "animal"
     ],
     "keywords": [
       "pigeon",
@@ -4968,7 +4992,8 @@
     "respawn": 25,
     "dialogue": [],
     "flags": [
-      "roaming"
+      "roaming",
+      "animal"
     ],
     "keywords": [
       "sand scarab",
@@ -5125,7 +5150,8 @@
     "respawn": 75,
     "dialogue": [],
     "flags": [
-      "roaming"
+      "roaming",
+      "animal"
     ],
     "keywords": [
       "anubis jackal",
@@ -5733,7 +5759,8 @@
     "respawn": 30,
     "dialogue": [],
     "flags": [
-      "roaming"
+      "roaming",
+      "animal"
     ],
     "keywords": [
       "sewer",
@@ -5883,7 +5910,8 @@
     "respawn": 10,
     "dialogue": [],
     "flags": [
-      "roaming"
+      "roaming",
+      "animal"
     ],
     "keywords": [
       "sewer",
@@ -5908,7 +5936,8 @@
     "respawn": 20,
     "dialogue": [],
     "flags": [
-      "roaming"
+      "roaming",
+      "animal"
     ],
     "keywords": [
       "slug",
@@ -5933,7 +5962,8 @@
     "respawn": 25,
     "dialogue": [],
     "flags": [
-      "roaming"
+      "roaming",
+      "animal"
     ],
     "keywords": [
       "blind",
@@ -5981,7 +6011,8 @@
     "respawn": 25,
     "dialogue": [],
     "flags": [
-      "roaming"
+      "roaming",
+      "animal"
     ],
     "keywords": [
       "gutter snake",
@@ -6006,7 +6037,8 @@
     "respawn": 30,
     "dialogue": [],
     "flags": [
-      "stationary"
+      "stationary",
+      "animal"
     ],
     "keywords": [
       "spider",
@@ -6031,7 +6063,8 @@
     "respawn": 90,
     "dialogue": [],
     "flags": [
-      "stationary"
+      "stationary",
+      "animal"
     ],
     "keywords": [
       "sewer",
@@ -6834,7 +6867,8 @@
     "respawn": 15,
     "dialogue": [],
     "flags": [
-      "roaming"
+      "roaming",
+      "animal"
     ],
     "keywords": [
       "soul moth",
@@ -6909,7 +6943,8 @@
     "respawn": 45,
     "dialogue": [],
     "flags": [
-      "roaming"
+      "roaming",
+      "animal"
     ],
     "keywords": [
       "spirit fox",
@@ -7027,7 +7062,8 @@
     "respawn": 90,
     "dialogue": [],
     "flags": [
-      "roaming"
+      "roaming",
+      "animal"
     ],
     "keywords": [
       "infernal",
@@ -7073,7 +7109,8 @@
     "respawn": 90,
     "dialogue": [],
     "flags": [
-      "roaming"
+      "roaming",
+      "animal"
     ],
     "keywords": [
       "serpent",
@@ -7272,7 +7309,8 @@
     "respawn": 30,
     "dialogue": [],
     "flags": [
-      "aggressive"
+      "aggressive",
+      "animal"
     ],
     "keywords": [
       "tower",
@@ -7297,7 +7335,8 @@
     "respawn": 30,
     "dialogue": [],
     "flags": [
-      "aggressive"
+      "aggressive",
+      "animal"
     ],
     "keywords": [
       "spider",
@@ -7322,7 +7361,8 @@
     "respawn": 30,
     "dialogue": [],
     "flags": [
-      "aggressive"
+      "aggressive",
+      "animal"
     ],
     "keywords": [
       "feral hound",

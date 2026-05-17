@@ -1793,7 +1793,8 @@
     "type": "armor",
     "slot": "hold",
     "stats": {
-      "defense": 0
+      "defense": 0,
+      "focus_bonus": 5
     },
     "rarity": "uncommon",
     "value": 25

@@ -23,7 +23,7 @@
   /** All valid weapon categories (matches item.weapon_category values). */
   const CATEGORIES = [
     'sword', 'dagger', 'axe', 'blunt', 'polearm',
-    'bow', 'firearm', 'staff', 'exotic'
+    'bow', 'firearm', 'staff', 'exotic', 'unarmed'
   ];
 
   /** Display names for each category. */
@@ -36,7 +36,8 @@
     bow: 'Bows',
     firearm: 'Firearms',
     staff: 'Staves',
-    exotic: 'Exotic Weapons'
+    exotic: 'Exotic Weapons',
+    unarmed: 'Unarmed'
   };
 
   /**
