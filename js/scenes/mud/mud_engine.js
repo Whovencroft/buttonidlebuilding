@@ -1377,6 +1377,35 @@
      * Requires power threshold met + costs QP.
      */
     function doTrain(target) {
+      // Check for weapon style teacher NPC first (advanced proficiency)
+      if (window.MudWeaponTeachers) {
+        const room = currentRoom();
+        const aliveMobs = getAliveMobsInRoom(room);
+        const teacherVnum = window.MudWeaponTeachers.findTeacherInRoom(aliveMobs);
+        if (teacherVnum) {
+          const mobName = getMobName(teacherVnum);
+          // 'learn <styleId>' to learn a specific style
+          if (target && target !== 'list') {
+            const styleTarget = target.toLowerCase().replace(/\s+/g, '_');
+            if (window.MudWeaponTeachers.STYLES[styleTarget]) {
+              const result = window.MudWeaponTeachers.learnStyle(player, styleTarget);
+              if (result.success) recalcStats();
+              return result.output;
+            }
+          }
+          // Show teacher menu (only if teacher has something to say)
+          const menu = window.MudWeaponTeachers.getTeacherMenu(teacherVnum, player, mobName);
+          if (menu.canLearn || menu.output.length > 1) {
+            // If there's also a stat trainer, append both menus
+            if (window.MudTrainers && window.MudTrainers.isTrainer(teacherVnum)) {
+              const statMenu = window.MudTrainers.getTrainingMenu(teacherVnum, player);
+              return [...menu.output, { type: 'info', text: '' }, ...statMenu.output];
+            }
+            return menu.output;
+          }
+        }
+      }
+
       // Check for trainer NPC in the room first (stat training)
       if (window.MudTrainers) {
         const room = currentRoom();
@@ -2452,16 +2481,17 @@
         }
         // Weapon proficiency gain for primary weapon category (or unarmed)
         if (window.MudWeaponProficiency) {
-          if (player.equipped.weapon != null) {
-            const wpnItem = items[player.equipped.weapon];
-            if (wpnItem?.weapon_category) {
-              const wpResult = window.MudWeaponProficiency.onWeaponUsed(player, wpnItem.weapon_category);
-              if (wpResult?.message) output.push({ type: 'info', text: wpResult.message });
-            }
-          } else {
-            // Unarmed proficiency gain when fighting bare-handed
-            const wpResult = window.MudWeaponProficiency.onWeaponUsed(player, 'unarmed');
+          const wpCat = player.equipped.weapon != null
+            ? items[player.equipped.weapon]?.weapon_category
+            : 'unarmed';
+          if (wpCat) {
+            const wpResult = window.MudWeaponProficiency.onWeaponUsed(player, wpCat);
             if (wpResult?.message) output.push({ type: 'info', text: wpResult.message });
+            // Advanced style proficiency gain (same hit, separate track)
+            if (window.MudWeaponTeachers) {
+              const asResult = window.MudWeaponTeachers.onWeaponUsed(player, wpCat);
+              if (asResult?.message) output.push({ type: 'info', text: asResult.message });
+            }
           }
         }
 
@@ -2478,6 +2508,10 @@
             if (window.MudWeaponProficiency && ohItem.weapon_category) {
               const wpResult = window.MudWeaponProficiency.onWeaponUsed(player, ohItem.weapon_category);
               if (wpResult?.message) output.push({ type: 'info', text: wpResult.message });
+              if (window.MudWeaponTeachers) {
+                const asResult = window.MudWeaponTeachers.onWeaponUsed(player, ohItem.weapon_category);
+                if (asResult?.message) output.push({ type: 'info', text: asResult.message });
+              }
             }
           }
         }
@@ -3364,10 +3398,17 @@
           const wpnItem = items[player.equipped.weapon];
           if (wpnItem?.weapon_category) {
             bonusAtk += window.MudWeaponProficiency.getAttackBonus(player, wpnItem.weapon_category);
+            // Advanced style attack bonus (stacks on top of base)
+            if (window.MudWeaponTeachers) {
+              bonusAtk += window.MudWeaponTeachers.getAttackBonus(player, wpnItem.weapon_category);
+            }
           }
         } else {
           // Unarmed proficiency attack bonus when fighting bare-handed
           bonusAtk += window.MudWeaponProficiency.getAttackBonus(player, 'unarmed');
+          if (window.MudWeaponTeachers) {
+            bonusAtk += window.MudWeaponTeachers.getAttackBonus(player, 'unarmed');
+          }
         }
       }
       // Apply stat-derived bonuses if MudStats is loaded
@@ -3383,6 +3424,23 @@
       } else {
         player.attackPower = 10 + bonusAtk;
         player.defense = 5 + bonusDef;
+      }
+
+      // Apply advanced weapon style crit bonus to derived stats
+      if (window.MudWeaponTeachers) {
+        let styleCritBonus = 0;
+        if (player.equipped.weapon != null) {
+          const wpnItem = items[player.equipped.weapon];
+          if (wpnItem?.weapon_category) {
+            styleCritBonus = window.MudWeaponTeachers.getCritBonus(player, wpnItem.weapon_category);
+          }
+        } else {
+          styleCritBonus = window.MudWeaponTeachers.getCritBonus(player, 'unarmed');
+        }
+        if (styleCritBonus > 0) {
+          player._derived = player._derived || {};
+          player._derived.critChance = (player._derived.critChance || 0.01) + styleCritBonus;
+        }
       }
 
       // Apply racial percentage modifiers (from chargen raceMods)

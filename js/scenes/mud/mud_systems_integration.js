@@ -44,7 +44,8 @@
       exhausted: false,
       titleNotified: null,
       invasionState: null,
-      coreStats: null
+      coreStats: null,
+      advancedWeaponStyles: {}
     };
 
     // ─── Non-persisted State ────────────────────────────────────────────
@@ -582,6 +583,14 @@
                 const mastery = val >= 100 ? ' ★ MASTERY' : '';
                 output.push({ type: 'info', text: `  ${name} [${bar}] ${pct}%  (+${bonus} atk)${mastery}` });
               }
+            }
+          }
+
+          // ── Advanced weapon styles section ──
+          if (window.MudWeaponTeachers) {
+            const styleOutput = window.MudWeaponTeachers.formatDisplay(playerState);
+            if (styleOutput.length > 0) {
+              output.push(...styleOutput);
             }
           }
 

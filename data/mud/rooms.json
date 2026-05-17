@@ -540,7 +540,7 @@
     "description": "A reinforced bunker with maps and radios. The CO barks orders. Shells land in the distance.",
     "exits": {
       "south": 4004,
-      "east": 4002,
+      "east": 5,
       "southeast": 4005,
       "southwest": 4003,
       "down": 5
@@ -616,6 +616,9 @@
         ],
         "description": "A worn ledger rests on a metal crate, its pages filled with precise entries tracking every weapon checked in or out. The quartermaster's vigilance ensures nothing goes missing."
       }
+    ],
+    "mobs": [
+      4015
     ]
   },
   "4003": {
@@ -749,6 +752,9 @@
         ],
         "description": "Dark oil stains blot the concrete floor like the marks of tireless toil. They remind all who pass here of the constant struggle to keep machines running under unforgiving conditions."
       }
+    ],
+    "mobs": [
+      4016
     ]
   },
   "4006": {
@@ -5448,7 +5454,7 @@
       "south": 6005,
       "east": 6002,
       "southeast": 6006,
-      "southwest": 6004,
+      "southwest": 7,
       "down": 7
     },
     "flags": [
@@ -5502,6 +5508,9 @@
         ],
         "description": "Rows of scrolls, stone tablets, and ancient hard drives rest in perfect stasis. These hold knowledge spanning every age and dimension."
       }
+    ],
+    "mobs": [
+      6016
     ]
   },
   "6003": {
@@ -5570,6 +5579,9 @@
         ],
         "description": "The arena floor is covered in dark sand stained by countless battles. Beneath the stands, restless lions pace in their iron cages, awaiting their turn."
       }
+    ],
+    "mobs": [
+      6015
     ]
   },
   "6005": {
@@ -5797,11 +5809,12 @@
       "north": 6005,
       "south": 6017,
       "east": 6011,
-      "west": 6098,
+      "west": 6009,
       "northeast": 6006,
       "northwest": 6004,
       "southeast": 6018,
-      "southwest": 6016
+      "southwest": 6016,
+      "down": 6098
     },
     "mob_spawns": [
       1619,
@@ -6168,6 +6181,9 @@
         ],
         "description": "The wooden dojo stands firm, its open doors revealing a place of discipline. Inside, the clash of wooden swords rings out, echoing dedication and skill."
       }
+    ],
+    "mobs": [
+      1815
     ]
   },
   "6019": {
@@ -6213,6 +6229,9 @@
         ],
         "description": "The gleaming wooden floors reflect torchlight, smooth from years of training. They bear the marks of swift movements and disciplined footwork."
       }
+    ],
+    "mobs": [
+      1813
     ]
   },
   "6020": {
@@ -8178,6 +8197,9 @@
         ],
         "description": "This peaceful monastery shelters masters who teach eternal secrets. Many who enter here choose to remain forever, bound by the price of their knowledge."
       }
+    ],
+    "mobs": [
+      1814
     ]
   },
   "6120": {
@@ -8408,6 +8430,9 @@
         ],
         "description": "The grand lobby buzzes with whispered conversations and careful smiles. Here the no-violence policy is enforced with more than just rules - it is a sacred code."
       }
+    ],
+    "mobs": [
+      3015
     ]
   },
   "3006": {
@@ -8715,6 +8740,9 @@
         ],
         "description": "A lone saxophone cries out in a smoky corner, its notes weaving melancholy through the dimly lit room. It seems to carry the souls of every lost dreamer who ever passed through."
       }
+    ],
+    "mobs": [
+      1721
     ]
   },
   "3014": {
@@ -11309,6 +11337,9 @@
         ],
         "description": "A sleek robot chef deftly maneuvers behind the counter, its movements precise and practiced. It delivers each bowl with programmed care, bringing mechanical skill to a culinary art."
       }
+    ],
+    "mobs": [
+      2018
     ]
   },
   "2011": {
@@ -11353,6 +11384,9 @@
         ],
         "description": "Screens glow with streams of code, tangled cables snaking across every surface. The chaotic tech sprawl paints a picture of a mind immersed deeply in digital worlds."
       }
+    ],
+    "mobs": [
+      2019
     ]
   },
   "2012": {
@@ -11490,14 +11524,15 @@
     "name": "Neon Street  -  Central",
     "description": "The busiest intersection. Crowds flow around you like water. A street preacher screams about the singularity. One of the public data terminals is cycling through corrupted output  -  streams of numbers that resolve briefly into a perfect sphere before dissolving back into static.",
     "exits": {
-      "north": 2098,
+      "north": 2009,
       "south": 2022,
       "east": 2016,
       "west": 2014,
       "northeast": 2010,
       "northwest": 2008,
       "southeast": 2023,
-      "southwest": 2021
+      "southwest": 2021,
+      "up": 2098
     },
     "interactables": [
       {
@@ -11527,7 +11562,7 @@
   "2016": {
     "vnum": 2016,
     "zone": 5,
-    "name": "Neon Street  -  East",
+    "name": "Neon Street  -  East End",
     "description": "The street narrows here. Cheaper establishments. A pawn shop, a clinic, a bar with no name.",
     "exits": {
       "north": 2010,
@@ -13766,7 +13801,6 @@
       "east": 6,
       "northeast": 20,
       "southeast": 2,
-      "north": 9001,
       "up": 9001
     },
     "flags": [
@@ -13806,12 +13840,12 @@
     "description": "The upper archway opens onto a staircase that climbs into starlight. Floating islands are visible in the distance. A sign reads: 'Ethereal Drift  -  Between the Stars.'",
     "exits": {
       "north": 20,
-      "south": 2,
       "east": 19,
       "west": 16,
       "southeast": 7,
       "southwest": 12,
-      "up": 5001
+      "up": 5001,
+      "down": 2
     },
     "flags": [
       "safe"
@@ -13929,7 +13963,7 @@
       "southeast": 4,
       "southwest": 5,
       "north": 1001,
-      "up": 1001
+      "up": 6
     },
     "flags": [
       "safe"
@@ -14095,7 +14129,7 @@
     "exits": {
       "north": 12,
       "south": 10,
-      "east": 1,
+      "east": 8,
       "northeast": 2,
       "southeast": 3,
       "southwest": 14,
@@ -14206,7 +14240,7 @@
     "exits": {
       "north": 7,
       "south": 11,
-      "west": 1,
+      "west": 9,
       "northeast": 15,
       "northwest": 2,
       "southwest": 3,
@@ -14385,7 +14419,8 @@
       "northwest": 5,
       "southeast": 18,
       "southwest": 17,
-      "south": 2001
+      "south": 2001,
+      "down": 13
     },
     "flags": [
       "safe"
@@ -14534,7 +14569,6 @@
     "name": "The Undercity Entrance",
     "description": "A heavy iron grate in the floor has been pried open. A ladder descends into darkness. The smell of damp stone and worse things rises from below.",
     "exits": {
-      "north": 3,
       "south": 23,
       "east": 18,
       "west": 17,
@@ -14542,7 +14576,8 @@
       "northwest": 10,
       "southeast": 25,
       "southwest": 24,
-      "down": 7001
+      "down": 7001,
+      "up": 3
     },
     "flags": [
       "safe"
@@ -14741,9 +14776,9 @@
     "name": "Mountain Pass  -  Summit",
     "description": "The wind howls at this narrow pass between two peaks. Snow whips horizontally. The path descends south toward greener lands.",
     "exits": {
-      "south": 1004,
+      "south": 2,
       "east": 1002,
-      "southeast": 1005,
+      "southeast": 1004,
       "southwest": 1003,
       "down": 2
     },
@@ -15295,11 +15330,11 @@
     "name": "King's Road  -  North Gate",
     "description": "The cobblestone road leads to a massive stone gatehouse. Guards in silver tabards check travelers. The trees here are bent outward in a perfect circle, their bark scorched and glassy. At the center, the grass has been burned away to reveal a perfectly smooth crater in the earth.",
     "exits": {
-      "north": 1125,
+      "north": 1009,
       "south": 1021,
       "east": 1016,
       "west": 1014,
-      "northeast": 1010,
+      "northeast": 1125,
       "northwest": 1008,
       "southeast": 1022,
       "southwest": 1020
@@ -15339,7 +15374,7 @@
       "north": 1010,
       "south": 1022,
       "east": 1017,
-      "west": 1125,
+      "west": 1015,
       "northeast": 1011,
       "northwest": 1009,
       "southeast": 1023,
@@ -17317,6 +17352,9 @@
         ],
         "description": "Heavy iron bars imprison the cells lining this dark corridor. From the deepest cell comes scratching sounds, suggesting some restless presence trapped within."
       }
+    ],
+    "mobs": [
+      1133
     ]
   },
   "1103": {
@@ -18482,10 +18520,11 @@
     "description": "A perfectly silent room. Cushions on the floor. The walls absorb all sound and distraction.",
     "exits": {
       "north": 8005,
-      "south": 8098,
+      "south": 8015,
       "west": 8009,
       "northwest": 8004,
-      "southwest": 8014
+      "southwest": 8014,
+      "down": 8098
     },
     "flags": [
       "safe"
@@ -18515,6 +18554,9 @@
         ],
         "description": "The walls are crafted to absorb every sound, creating perfect silence. This design helps clear the mind and deepen focus during meditation."
       }
+    ],
+    "mobs": [
+      8021
     ]
   },
   "8011": {
@@ -20686,7 +20728,8 @@
     "description": "What was once a proud wizard's tower is now a catastrophe of shattered stone and scattered parchment. A massive hole has been punched clean through the eastern and western walls  -  the trajectory curves impossibly upward between entry and exit. Scorched books, melted instruments, and fragments of glowing wards litter the floor. The wizard Aldric paces among the ruins, alternating between fury and fascination.",
     "exits": {
       "south": 1015,
-      "east": 1016
+      "east": 1016,
+      "southwest": 1015
     },
     "mob_spawns": [
       1200
@@ -20873,7 +20916,8 @@
     "password": "binary",
     "password_destination": 2097,
     "exits": {
-      "south": 2015
+      "south": 2015,
+      "down": 2015
     },
     "ambient": [
       "The blank screen flickers faintly with ghostly lines of undeciphered code.",
@@ -21002,7 +21046,8 @@
     "password": "time",
     "password_destination": 6097,
     "exits": {
-      "east": 6010
+      "east": 6010,
+      "up": 6010
     },
     "ambient": [
       "The great sphinx's gaze lingers quietly to the east.",
@@ -21071,7 +21116,8 @@
     "password": "gravity",
     "password_destination": 8097,
     "exits": {
-      "north": 8010
+      "north": 8010,
+      "up": 8010
     },
     "ambient": [
       "Space ripples subtly around a shimmering core at the room's center.",
@@ -21301,5 +21347,38 @@
         "description": "The marble floats before you - impossibly small, dense, and aware. It has silently awaited those persistent enough to follow its trail through countless trials."
       }
     ]
+  },
+  "10010": {
+    "name": "The Threshold of Endings",
+    "zone": "shattered_realm",
+    "description": "Beyond the gate, reality thins to gossamer. The ground beneath you is not ground  -  it is memory, compressed and crystallized. Every step forward echoes with the weight of your journey. Ahead, the world fractures into possibility.",
+    "exits": {
+      "north": 10098,
+      "east": 10012
+    },
+    "flags": [
+      "no_mob",
+      "no_combat"
+    ],
+    "power_tier": "endgame"
+  },
+  "11010": {
+    "name": "The Space Between",
+    "zone": "the_void",
+    "description": "You float in a space that defies description. Not darkness, not light  -  absence. The void has texture here, like static between radio stations. Something pulls you forward, gentle but insistent. The marble's trail ends here  -  or begins.",
+    "exits": {
+      "south": 11012,
+      "down": {
+        "target_vnum": 11099,
+        "locked": true,
+        "key_vnum": null,
+        "description": "The pull intensifies downward. You sense the marble below  -  impossibly close, impossibly far. Only those who have gathered every fragment can descend."
+      }
+    },
+    "flags": [
+      "no_mob",
+      "no_combat"
+    ],
+    "power_tier": "endgame"
   }
 }

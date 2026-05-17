@@ -962,38 +962,33 @@
   },
   "1133": {
     "vnum": 1133,
-    "name": "Blacksmith Apprentice",
-    "description": "A soot-covered youth hammering at a bent horseshoe.",
+    "name": "Scarred Veteran Grimjaw",
+    "description": "A hulking figure covered in old battle scars, chained to the wall by choice rather than force. An enormous axe rests against the stone beside them. Their eyes burn with barely contained fury.",
+    "keywords": [
+      "veteran",
+      "grimjaw",
+      "scarred",
+      "teacher"
+    ],
     "hostile": false,
     "stats": {
-      "hp": 77,
-      "max_hp": 120,
-      "attack": 6,
-      "defense": 5
+      "hp": 700,
+      "max_hp": 700,
+      "attack": 70,
+      "defense": 20
     },
-    "loot_table": [],
-    "respawn": 300,
-    "dialogue": [
-      {
-        "text": "Master says I'll make journeyman by winter!",
-        "conditions": []
-      }
-    ],
     "flags": [
       "npc",
-      "merchant"
+      "teacher"
     ],
-    "keywords": [
-      "blacksmith apprentice",
-      "blacksmith",
-      "apprentice"
+    "dialogue": [
+      {
+        "condition": null,
+        "text": "Defense is for cowards. Swing harder. Swing ANGRIER."
+      }
     ],
-    "sayResponses": {
-      "forge": "Master says I'll be ready to forge on my own in a year. I think he's optimistic.",
-      "weapons": "I can sharpen blades and repair dents. Full forging is above my skill still.",
-      "rumors": "The dungeon below has dwarven metalwork. Master says it's the finest he's ever seen.",
-      "help": "If you need repairs, I can handle basic work. Anything complex, wait for the master."
-    }
+    "loot_table": [],
+    "respawn": -1
   },
   "1134": {
     "vnum": 1134,
@@ -6225,7 +6220,7 @@
   "1720": {
     "vnum": 1720,
     "name": "Tunnel Hermit",
-    "description": "An old woman who knows every passage in the Undercity.",
+    "description": "A gaunt figure wrapped in shadow, barely visible even in direct light. Their hands move in constant, fluid patterns  -  practicing strikes against targets only they can see.",
     "hostile": false,
     "stats": {
       "hp": 80,
@@ -6237,16 +6232,13 @@
     "respawn": 300,
     "dialogue": [
       {
-        "text": "You're lost aren't you? They all get lost.",
-        "conditions": []
-      },
-      {
-        "text": "The deep tunnels are older than the city above.",
-        "conditions": []
+        "condition": null,
+        "text": "The shadow is not where you hide. It is where you strike from."
       }
     ],
     "flags": [
-      "npc"
+      "npc",
+      "teacher"
     ],
     "keywords": [
       "tunnel hermit",
@@ -6288,41 +6280,32 @@
   },
   "1721": {
     "vnum": 1721,
-    "name": "Mushroom Farmer",
-    "description": "A pale man who cultivates edible fungi in the damp tunnels.",
+    "name": "Whisper",
+    "description": "You almost didn't see them. A figure in the darkest corner, wrapped in cloth so black it seems to absorb light. Only their eyes are visible  -  and they're watching you.",
+    "keywords": [
+      "whisper",
+      "shadow",
+      "teacher"
+    ],
     "hostile": false,
     "stats": {
-      "hp": 77,
-      "max_hp": 70,
-      "attack": 4,
-      "defense": 4
+      "hp": 300,
+      "max_hp": 300,
+      "attack": 55,
+      "defense": 10
     },
-    "loot_table": [],
-    "respawn": 300,
+    "flags": [
+      "npc",
+      "teacher"
+    ],
     "dialogue": [
       {
-        "text": "Try the blue caps. Taste like chicken.",
-        "conditions": []
-      },
-      {
-        "text": "Don't eat the glowing ones. Trust me.",
-        "conditions": []
+        "condition": null,
+        "text": "You saw me. That means I let you. Remember that."
       }
     ],
-    "flags": [
-      "npc"
-    ],
-    "keywords": [
-      "mushroom",
-      "farmer",
-      "mushroom farmer"
-    ],
-    "sayResponses": {
-      "mushrooms": "I grow seventeen varieties. Some heal, some harm, some do things I can't explain.",
-      "farm": "The conditions down here are perfect. Dark, damp, and nobody bothers me.",
-      "sell": "I sell to the pawnbroker mostly. He doesn't ask questions about the glowing ones.",
-      "marble": "My largest crop was destroyed overnight. Something rolled through my growing beds. Perfect furrow."
-    }
+    "loot_table": [],
+    "respawn": -1
   },
   "1801": {
     "vnum": 1801,
@@ -9018,5 +9001,335 @@
       "marble": "The Sphere has no soul to judge. It is beyond my authority. This troubles me greatly.",
       "pass": "If you are judged worthy, you may pass deeper into the afterlife. If not... you will not enjoy what follows."
     }
+  },
+  "1813": {
+    "vnum": 1813,
+    "name": "Blade Monk Takeshi",
+    "description": "A weathered monk in simple robes, his hands calloused from decades of sword practice. He moves with an economy of motion that suggests absolute mastery.",
+    "keywords": [
+      "monk",
+      "takeshi",
+      "blade monk",
+      "teacher"
+    ],
+    "hostile": false,
+    "stats": {
+      "hp": 500,
+      "max_hp": 500,
+      "attack": 45,
+      "defense": 30
+    },
+    "flags": [
+      "npc",
+      "teacher"
+    ],
+    "dialogue": [
+      {
+        "condition": null,
+        "text": "The sword is not a weapon. It is an extension of will."
+      }
+    ],
+    "loot_table": [],
+    "respawn": -1
+  },
+  "3015": {
+    "vnum": 3015,
+    "name": "Maestro Beaumont",
+    "description": "A silver-haired gentleman in an immaculate white suit, a rapier resting against his chair. His posture is perfect, his smile dangerous.",
+    "keywords": [
+      "maestro",
+      "beaumont",
+      "fencing master",
+      "teacher"
+    ],
+    "hostile": false,
+    "stats": {
+      "hp": 450,
+      "max_hp": 450,
+      "attack": 50,
+      "defense": 25
+    },
+    "flags": [
+      "npc",
+      "teacher"
+    ],
+    "dialogue": [
+      {
+        "condition": null,
+        "text": "Every parry is an invitation. Every riposte, an acceptance."
+      }
+    ],
+    "loot_table": [],
+    "respawn": -1
+  },
+  "2018": {
+    "vnum": 2018,
+    "name": "Holo-Sensei",
+    "description": "A flickering holographic figure in samurai armor, projected from a device bolted to the counter. Despite being intangible, the blade it holds leaves scorch marks on the air.",
+    "keywords": [
+      "holo",
+      "sensei",
+      "hologram",
+      "teacher"
+    ],
+    "hostile": false,
+    "stats": {
+      "hp": 600,
+      "max_hp": 600,
+      "attack": 55,
+      "defense": 20
+    },
+    "flags": [
+      "npc",
+      "teacher"
+    ],
+    "dialogue": [
+      {
+        "condition": null,
+        "text": "Energy follows intent. The beam blade is thought made manifest."
+      }
+    ],
+    "loot_table": [],
+    "respawn": -1
+  },
+  "1814": {
+    "vnum": 1814,
+    "name": "Grandmaster Yun",
+    "description": "An impossibly old figure seated in perfect stillness. Their hands rest on their knees, each knuckle a weapon unto itself. The air around them feels denser.",
+    "keywords": [
+      "grandmaster",
+      "yun",
+      "master",
+      "teacher"
+    ],
+    "hostile": false,
+    "stats": {
+      "hp": 800,
+      "max_hp": 800,
+      "attack": 60,
+      "defense": 40
+    },
+    "flags": [
+      "npc",
+      "teacher"
+    ],
+    "dialogue": [
+      {
+        "condition": null,
+        "text": "The fist is the first weapon. The last weapon. The only weapon you will never lose."
+      }
+    ],
+    "loot_table": [],
+    "respawn": -1
+  },
+  "8021": {
+    "vnum": 8021,
+    "name": "Void Adept Kira",
+    "description": "A figure floating cross-legged above the ground, surrounded by a faint distortion in space. Their eyes are closed, but you sense they are acutely aware of everything.",
+    "keywords": [
+      "adept",
+      "kira",
+      "void adept",
+      "teacher"
+    ],
+    "hostile": false,
+    "stats": {
+      "hp": 700,
+      "max_hp": 700,
+      "attack": 55,
+      "defense": 35
+    },
+    "flags": [
+      "npc",
+      "teacher"
+    ],
+    "dialogue": [
+      {
+        "condition": null,
+        "text": "Between atoms, there is void. Learn to strike there, and nothing can resist you."
+      }
+    ],
+    "loot_table": [],
+    "respawn": -1
+  },
+  "4015": {
+    "vnum": 4015,
+    "name": "Siege Engineer Volkov",
+    "description": "A massive figure in blast-scarred armor, idly spinning a war hammer that would take two normal people to lift. Craters in the floor mark where they practice.",
+    "keywords": [
+      "engineer",
+      "volkov",
+      "siege engineer",
+      "teacher"
+    ],
+    "hostile": false,
+    "stats": {
+      "hp": 650,
+      "max_hp": 650,
+      "attack": 65,
+      "defense": 45
+    },
+    "flags": [
+      "npc",
+      "teacher"
+    ],
+    "dialogue": [
+      {
+        "condition": null,
+        "text": "Armor is a suggestion. With enough force, everything breaks."
+      }
+    ],
+    "loot_table": [],
+    "respawn": -1
+  },
+  "6015": {
+    "vnum": 6015,
+    "name": "Terracotta General",
+    "description": "A figure of fired clay given impossible life. It stands at attention with a halberd, its movements precise and mechanical yet devastatingly effective.",
+    "keywords": [
+      "general",
+      "terracotta",
+      "terracotta general",
+      "teacher"
+    ],
+    "hostile": false,
+    "stats": {
+      "hp": 550,
+      "max_hp": 550,
+      "attack": 50,
+      "defense": 50
+    },
+    "flags": [
+      "npc",
+      "teacher"
+    ],
+    "dialogue": [
+      {
+        "condition": null,
+        "text": "Reach is control. Control is victory. The polearm commands the battlefield."
+      }
+    ],
+    "loot_table": [],
+    "respawn": -1
+  },
+  "1815": {
+    "vnum": 1815,
+    "name": "Archery Master Hana",
+    "description": "A serene figure with a longbow taller than themselves. They stand motionless, arrow nocked, watching something invisible in the distance with absolute patience.",
+    "keywords": [
+      "archery",
+      "master",
+      "hana",
+      "teacher"
+    ],
+    "hostile": false,
+    "stats": {
+      "hp": 400,
+      "max_hp": 400,
+      "attack": 60,
+      "defense": 15
+    },
+    "flags": [
+      "npc",
+      "teacher"
+    ],
+    "dialogue": [
+      {
+        "condition": null,
+        "text": "Release before you think. The arrow knows where it must go."
+      }
+    ],
+    "loot_table": [],
+    "respawn": -1
+  },
+  "4016": {
+    "vnum": 4016,
+    "name": "Sniper Instructor Reyes",
+    "description": "A lean figure in a ghillie suit, cleaning a rifle with methodical precision. Their eyes never stop scanning, even in conversation. A collection of spent casings forms a neat pyramid nearby.",
+    "keywords": [
+      "sniper",
+      "instructor",
+      "reyes",
+      "teacher"
+    ],
+    "hostile": false,
+    "stats": {
+      "hp": 350,
+      "max_hp": 350,
+      "attack": 70,
+      "defense": 10
+    },
+    "flags": [
+      "npc",
+      "teacher"
+    ],
+    "dialogue": [
+      {
+        "condition": null,
+        "text": "One round. One target. Patience is the deadliest weapon in any arsenal."
+      }
+    ],
+    "loot_table": [],
+    "respawn": -1
+  },
+  "2019": {
+    "vnum": 2019,
+    "name": "The Archmage (Holographic)",
+    "description": "A robed figure rendered in blue light, their staff crackling with simulated arcane energy. The hologram is so detailed you can see individual runes shifting on their skin.",
+    "keywords": [
+      "archmage",
+      "holographic",
+      "wizard",
+      "teacher"
+    ],
+    "hostile": false,
+    "stats": {
+      "hp": 500,
+      "max_hp": 500,
+      "attack": 40,
+      "defense": 30
+    },
+    "flags": [
+      "npc",
+      "teacher"
+    ],
+    "dialogue": [
+      {
+        "condition": null,
+        "text": "The staff channels. Focus flows through it like water through a riverbed. Let it carry you."
+      }
+    ],
+    "loot_table": [],
+    "respawn": -1
+  },
+  "6016": {
+    "vnum": 6016,
+    "name": "Paradox Smith",
+    "description": "A figure that seems to exist in multiple moments simultaneously. Their weapon shifts form between heartbeats  -  blade, whip, chain, something that has no name.",
+    "keywords": [
+      "paradox",
+      "smith",
+      "paradox smith",
+      "teacher"
+    ],
+    "hostile": false,
+    "stats": {
+      "hp": 600,
+      "max_hp": 600,
+      "attack": 55,
+      "defense": 25
+    },
+    "flags": [
+      "npc",
+      "teacher"
+    ],
+    "dialogue": [
+      {
+        "condition": null,
+        "text": "Predictability is death. Chaos is life. Let the weapon decide what it wants to be."
+      }
+    ],
+    "loot_table": [],
+    "respawn": -1
   }
 }
