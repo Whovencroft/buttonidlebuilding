@@ -2106,7 +2106,7 @@ button, input, textarea, select { font: inherit; }
     radial-gradient(circle at 30% 25%,
       #ffffff,
       #dbeafe 22%,
-      var(--secondary) 100%) !important;
+      #475569 100%) !important;
   border: 2px solid rgba(255, 255, 255, 0.65) !important;
   box-shadow: 0 18px 42px rgba(0, 0, 0, 0.3), 0 0 30px rgba(37, 99, 235, 0.25) !important;
 }

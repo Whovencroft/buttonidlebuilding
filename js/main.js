@@ -606,7 +606,7 @@
       elements.appRoot.classList.add('app-ending-slideout');
     }
 
-    // Step 2: After UI slides out (500ms), start the orb transition
+    // Step 2: After UI slides out (1500ms), start the orb transition
     setTimeout(() => {
       const buttonRect = elements.mainButton.getBoundingClientRect();
       const viewportCx = window.innerWidth / 2;
@@ -620,7 +620,7 @@
 
       transitionOverlay.hidden = false;
       transitionOverlay.classList.add('active');
-      transitionNote.textContent = 'The button outgrew counting and dropped into something else.';
+      transitionNote.textContent = '';
 
       transitionOrb.style.left = `${startX}px`;
       transitionOrb.style.top = `${startY}px`;
@@ -637,7 +637,7 @@
           { opacity: 1 }
         ],
         {
-          duration: 400,
+          duration: 1200,
           easing: 'ease-out',
           fill: 'forwards'
         }
@@ -666,7 +666,7 @@
           }
         ],
         {
-          duration: 1600,
+          duration: 3000,
           easing: 'cubic-bezier(0.22, 1, 0.36, 1)',
           fill: 'forwards'
         }
@@ -674,7 +674,7 @@
 
       // Step 3: Only switch scene AFTER orb animation completes
       orbAnimation.finished.then(() => {
-        // Brief pause with marble at center before revealing the scene
+        // Extended pause with marble at center - let confusion build
         setTimeout(() => {
           switchScene('marble', {
             force: true,
@@ -687,7 +687,7 @@
           // Fade out the overlay to reveal the marble scene beneath
           transitionOverlay.animate(
             [{ opacity: 1 }, { opacity: 0 }],
-            { duration: 800, easing: 'ease-in', fill: 'forwards' }
+            { duration: 1200, easing: 'ease-in', fill: 'forwards' }
           ).finished.then(() => {
             clearTransitionOverlay();
             if (elements.appRoot) {
@@ -696,7 +696,7 @@
             renderShell();
             saveGame();
           });
-        }, 600);
+        }, 2000);
       }).catch(() => {
         // Fallback if animation is cancelled
         clearTransitionOverlay();
@@ -713,7 +713,7 @@
         renderShell();
         saveGame();
       });
-    }, 500);
+    }, 1500);
   }
 
 function switchScene(sceneId, options = {}) {

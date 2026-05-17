@@ -1757,15 +1757,15 @@ function completeIdleGame() {
       `;
       fragContainer.appendChild(marble);
 
-      // After shatter completes, call back for transition
+      // After shatter completes, hold the moment before transitioning
       setTimeout(() => {
         if (callback) callback();
         // Clean up fragments after transition starts
         setTimeout(() => {
           if (fragContainer.parentNode) fragContainer.remove();
           btn.style.visibility = '';
-        }, 2000);
-      }, 1000);
+        }, 3000);
+      }, 2500);
     }
 
     function renderUpgradeList() {
