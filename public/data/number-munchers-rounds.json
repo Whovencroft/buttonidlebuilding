@@ -1,0 +1,41 @@
+{
+  "version": 1,
+  "default": {
+    "id": "number_munchers_standard_v1",
+    "startingLives": 3,
+    "maxRounds": 5,
+    "maxMovesPerRound": 24,
+    "grid": {
+      "rows": 6,
+      "cols": 8,
+      "min": 1,
+      "max": 60
+    },
+    "prompts": [
+      {
+        "id": "div2",
+        "text": "Eat numbers divisible by 2",
+        "type": "divisible_by",
+        "value": 2
+      },
+      {
+        "id": "gt30",
+        "text": "Eat numbers greater than 30",
+        "type": "greater_than",
+        "value": 30
+      },
+      {
+        "id": "lt15",
+        "text": "Eat numbers less than 15",
+        "type": "less_than",
+        "value": 15
+      },
+      {
+        "id": "end5",
+        "text": "Eat numbers ending in 5",
+        "type": "ends_with",
+        "value": "5"
+      }
+    ]
+  }
+}

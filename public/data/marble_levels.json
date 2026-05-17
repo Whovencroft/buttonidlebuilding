@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "levels": [
+    {
+      "id": "training_run",
+      "name": "Training Run",
+      "start": {
+        "x": 2,
+        "y": 2
+      },
+      "goal": {
+        "x": 9,
+        "y": 8
+      },
+      "size": {
+        "width": 12,
+        "height": 10
+      },
+      "notes": "Starter scaffold level for the first marble scene migration."
+    }
+  ]
+}

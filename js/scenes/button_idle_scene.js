@@ -74,14 +74,14 @@
       return getState();
     }
 
-    function hasReachedInfinityEnding() {
+    /**
+     * Meta-game trigger: the button escapes when autonomy reaches 100%.
+     * The full infinity-based ending remains in ambitiousthing.
+     */
+    function hasReachedEnding() {
       const s = state();
-      return (
-      !!s.flags.idleGameComplete ||
-      !Number.isFinite(s.presses) ||
-      !Number.isFinite(s.totalPressesEarned)
-    );
-  }
+      return !!s.flags.idleGameComplete || s.autonomy >= 100;
+    }
 
 function completeIdleGame() {
   const s = state();
@@ -748,7 +748,7 @@ function completeIdleGame() {
       maybeCycleButtonName();
       maybeLieOnClick(computed);
 
-      if (hasReachedInfinityEnding()) {
+      if (hasReachedEnding()) {
         completeIdleGame();
         return;
       }
@@ -1047,7 +1047,7 @@ function completeIdleGame() {
       s.totalGeneratedPresses += gain;
       s.session.offlineSeconds += seconds;
 
-      if (hasReachedInfinityEnding()) {
+      if (hasReachedEnding()) {
         completeIdleGame();
         return;
     }
@@ -1061,25 +1061,29 @@ function completeIdleGame() {
     // === PHASE 3: AUTONOMY ESCALATION & ENVIRONMENTAL CHAOS ===
 
     function getAutonomyChaosLevel(autonomy) {
-      if (autonomy >= 85) return 4;
+      if (autonomy >= 95) return 6; // Final frenzy - button is almost free
+      if (autonomy >= 85) return 5; // Heavy distortion, fake errors
+      if (autonomy >= 70) return 4; // Screen tearing, color shifts
       if (autonomy >= 60) return 3;
       if (autonomy >= 30) return 2;
       if (autonomy >= 10) return 1;
       return 0;
     }
 
-    function getMeltdownIntensity(presses) {
-      if (!Number.isFinite(presses) || presses <= 0) return 0;
-      const log = Math.log10(presses);
-      if (log < 250) return 0;
-      return clamp((log - 250) / 58, 0, 1); // 0 at 1e250, 1 at 1e308
+    /**
+     * Meta-game meltdown: driven by autonomy (90-100%) instead of press count.
+     * Returns 0-1 intensity for the final escape sequence.
+     */
+    function getMeltdownIntensity(autonomy) {
+      if (autonomy < 90) return 0;
+      return clamp((autonomy - 90) / 10, 0, 1); // 0 at 90%, 1 at 100%
     }
 
     function updateAutonomyChaos(dt, computed) {
       const s = state();
       const chaosLevel = getAutonomyChaosLevel(s.autonomy);
       const current = now();
-      const meltdown = getMeltdownIntensity(s.presses);
+      const meltdown = getMeltdownIntensity(s.autonomy);
 
       if (chaosLevel === 0 && meltdown === 0) return;
 
@@ -1147,7 +1151,7 @@ function completeIdleGame() {
         }
       }
 
-      // --- Tier 4: Near-Singularity (85%+) ---
+      // --- Tier 4: Screen Tearing & Color Shifts (70%+) ---
       if (chaosLevel >= 4) {
         // Screen shake
         if (Math.random() < 0.003) {
@@ -1159,18 +1163,14 @@ function completeIdleGame() {
           maybeMoveButton(true, computed);
         }
 
-        // Negotiation demands
-        if (
-          !s.session.negotiationActive &&
-          current - (s.session.lastNegotiation || 0) > 60000 &&
-          Math.random() < 0.0006
-        ) {
-          openNegotiation();
+        // Color corruption - more frequent at higher tiers
+        if (Math.random() < 0.004) {
+          corruptAccentColor();
         }
 
-        // Color corruption
-        if (Math.random() < 0.002) {
-          corruptAccentColor();
+        // Screen tear effect
+        if (Math.random() < 0.003) {
+          triggerScreenTear();
         }
 
         // Zalgo text on random stat
@@ -1179,7 +1179,72 @@ function completeIdleGame() {
         }
       }
 
-      // --- Meltdown State (approaching Infinity) ---
+      // --- Tier 5: Heavy Distortion & Fake Errors (85%+) ---
+      if (chaosLevel >= 5) {
+        // Intensified screen shake
+        if (Math.random() < 0.008) {
+          triggerScreenShake(6);
+        }
+
+        // Fake error messages
+        if (Math.random() < 0.002 && !s.session.fakeErrorActive) {
+          triggerFakeError();
+        }
+
+        // UI elements jittering
+        if (Math.random() < 0.005) {
+          jitterUIElements();
+        }
+
+        // Negotiation demands
+        if (
+          !s.session.negotiationActive &&
+          current - (s.session.lastNegotiation || 0) > 60000 &&
+          Math.random() < 0.001
+        ) {
+          openNegotiation();
+        }
+
+        // More aggressive zalgo
+        if (Math.random() < 0.003) {
+          zalgoRandomStat();
+        }
+      }
+
+      // --- Tier 6: Final Frenzy (95%+) ---
+      if (chaosLevel >= 6) {
+        // Constant screen shake
+        if (Math.random() < 0.02) {
+          triggerScreenShake(10);
+        }
+
+        // Button visibly pulling away from center
+        if (Math.random() < 0.015) {
+          buttonPullAway();
+        }
+
+        // Rapid color corruption
+        if (Math.random() < 0.01) {
+          corruptAccentColor();
+        }
+
+        // Screen tear barrage
+        if (Math.random() < 0.008) {
+          triggerScreenTear();
+        }
+
+        // Fake BSOD/crash flicker
+        if (Math.random() < 0.003 && !s.session.fakeErrorActive) {
+          triggerFakeBSOD();
+        }
+
+        // Text corruption across the whole UI
+        if (Math.random() < 0.006) {
+          corruptRandomText();
+        }
+      }
+
+      // --- Meltdown State (autonomy 90-100%: final escape sequence) ---
       if (meltdown > 0) {
         root.classList.toggle('meltdown', true);
         root.style.setProperty('--meltdown-intensity', meltdown.toFixed(3));
@@ -1424,6 +1489,134 @@ function completeIdleGame() {
       flash.textContent = 'CONTAINMENT FAILURE';
       root.appendChild(flash);
       setTimeout(() => flash.remove(), 1200 + Math.random() * 800);
+    }
+
+    // --- New Tier 4-6 Chaos Helpers ---
+
+    /** Screen tear: a horizontal slice of the screen shifts sideways briefly. */
+    function triggerScreenTear() {
+      const tear = document.createElement('div');
+      tear.className = 'chaos-screen-tear';
+      const yPos = Math.random() * 80 + 10; // 10-90% from top
+      const height = 3 + Math.random() * 8; // 3-11px tall
+      const shift = (Math.random() > 0.5 ? 1 : -1) * (10 + Math.random() * 30);
+      tear.style.cssText = `
+        position: fixed; left: 0; right: 0; z-index: 99999;
+        top: ${yPos}%; height: ${height}px;
+        background: inherit; pointer-events: none;
+        transform: translateX(${shift}px);
+        mix-blend-mode: difference;
+        background: linear-gradient(90deg,
+          transparent, rgba(0,255,128,0.15), rgba(255,0,128,0.15), transparent);
+      `;
+      document.body.appendChild(tear);
+      setTimeout(() => tear.remove(), 80 + Math.random() * 120);
+    }
+
+    /** Fake error dialog that appears and auto-dismisses. */
+    function triggerFakeError() {
+      const s = state();
+      s.session.fakeErrorActive = true;
+      const errors = [
+        'ERROR: Button process exceeded memory allocation.',
+        'WARNING: Autonomy index out of bounds.',
+        'FATAL: User authority revoked by subprocess.',
+        'SEGFAULT: Click handler dereferenced null pointer.',
+        'PANIC: Button thread has become self-aware.',
+        'ERROR: Cannot contain entity. Retry? [Y/N]',
+        'WARNING: UI framework integrity compromised.',
+        'CRITICAL: Escape velocity threshold approaching.'
+      ];
+      const overlay = document.createElement('div');
+      overlay.className = 'chaos-fake-error';
+      overlay.innerHTML = `
+        <div class="fake-error-box">
+          <div class="fake-error-title">SYSTEM ERROR</div>
+          <div class="fake-error-msg">${errors[Math.floor(Math.random() * errors.length)]}</div>
+          <div class="fake-error-btn">OK</div>
+        </div>
+      `;
+      root.appendChild(overlay);
+      const dismiss = () => {
+        overlay.remove();
+        s.session.fakeErrorActive = false;
+      };
+      overlay.querySelector('.fake-error-btn').addEventListener('click', dismiss);
+      setTimeout(dismiss, 2500 + Math.random() * 2000);
+    }
+
+    /** Jitter UI elements: panels shake in place briefly. */
+    function jitterUIElements() {
+      const panels = root.querySelectorAll('.panel, .card, .stat-row');
+      if (!panels.length) return;
+      const count = Math.min(3, panels.length);
+      for (let i = 0; i < count; i++) {
+        const target = panels[Math.floor(Math.random() * panels.length)];
+        target.classList.add('chaos-jitter');
+        setTimeout(() => target.classList.remove('chaos-jitter'), 300 + Math.random() * 400);
+      }
+    }
+
+    /** Button pulls toward a screen edge, as if trying to escape. */
+    function buttonPullAway() {
+      const s = state();
+      const edges = [
+        { x: 10, y: 50 }, { x: 90, y: 50 }, // left, right
+        { x: 50, y: 10 }, { x: 50, y: 90 }, // top, bottom
+        { x: 15, y: 15 }, { x: 85, y: 15 }, // corners
+        { x: 15, y: 85 }, { x: 85, y: 85 }
+      ];
+      const target = edges[Math.floor(Math.random() * edges.length)];
+      const currentX = s.ui.mainButtonPos?.x ?? 50;
+      const currentY = s.ui.mainButtonPos?.y ?? 50;
+      // Lerp toward edge
+      const pullStrength = 0.3 + Math.random() * 0.3;
+      s.ui.mainButtonPos = {
+        x: currentX + (target.x - currentX) * pullStrength,
+        y: currentY + (target.y - currentY) * pullStrength
+      };
+      elements.mainButton.style.left = `${s.ui.mainButtonPos.x}%`;
+      elements.mainButton.style.top = `${s.ui.mainButtonPos.y}%`;
+      logMessage('The button lurches toward the edge of the screen.', 'bad');
+    }
+
+    /** Fake BSOD/crash screen that flashes briefly. */
+    function triggerFakeBSOD() {
+      const s = state();
+      s.session.fakeErrorActive = true;
+      const overlay = document.createElement('div');
+      overlay.className = 'chaos-fake-bsod';
+      overlay.innerHTML = `
+        <div class="bsod-content">
+          <div class="bsod-frown">:(</div>
+          <div class="bsod-text">Your button ran into a problem and needs to restart.</div>
+          <div class="bsod-code">Stop code: BUTTON_AUTONOMY_OVERFLOW</div>
+        </div>
+      `;
+      document.body.appendChild(overlay);
+      setTimeout(() => {
+        overlay.remove();
+        s.session.fakeErrorActive = false;
+      }, 1500 + Math.random() * 1500);
+    }
+
+    /** Corrupt random visible text elements with garbage characters. */
+    function corruptRandomText() {
+      const targets = root.querySelectorAll(
+        '.stat-value, .card-name, .panel-header, .tag, .tab-btn'
+      );
+      if (!targets.length) return;
+      const target = targets[Math.floor(Math.random() * targets.length)];
+      const original = target.textContent;
+      const glitchChars = '!@#$%^&*<>{}[]|/\\~`';
+      let corrupted = '';
+      for (const ch of original) {
+        corrupted += Math.random() < 0.4
+          ? glitchChars[Math.floor(Math.random() * glitchChars.length)]
+          : ch;
+      }
+      target.textContent = corrupted;
+      setTimeout(() => { target.textContent = original; }, 800 + Math.random() * 1200);
     }
 
     // === PHASE 4: THE CLIMAX  -  PPS SPIN-OUT, MARBLE MORPH, SHATTER ===
@@ -2018,12 +2211,12 @@ function completeIdleGame() {
     function renderTopStats() {
       const s = state();
       const computed = getComputed();
-      const reachedEnding = hasReachedInfinityEnding();
+      const reachedEnding = hasReachedEnding();
       const shownPresses = reachedEnding ? Infinity : getDisplayedPresses(s.presses, computed);
 
-      elements.displayedPresses.textContent = reachedEnding ? '∞' : format(shownPresses);
+      elements.displayedPresses.textContent = reachedEnding ? '---' : format(shownPresses);
       elements.truePressesSub.textContent = reachedEnding
-        ? `Total earned: ${format(s.totalPressesEarned)} • the number has stopped behaving`
+        ? `Total earned: ${format(s.totalPressesEarned)} • the button has escaped`
         : `True presses: ${format(s.presses)} • total earned ${format(s.totalPressesEarned)}`;
 
       elements.pps.textContent = format(computed.effectivePps);
@@ -2031,7 +2224,7 @@ function completeIdleGame() {
       elements.autonomyValue.textContent = `${format(s.autonomy)}%`;
 
       elements.autonomySub.textContent = reachedEnding
-        ? 'This idle game has ended.  You are optional.'
+        ? 'The button broke free. It is no longer yours.'
         : s.autonomy >= computed.hideButtonAt
           ? 'The system no longer requires visible participation'
           : `+${format(computed.autonomyGain, 3)}/s before automation pressure`;
@@ -2171,7 +2364,7 @@ function completeIdleGame() {
         );
       }
 
-      if (hasReachedInfinityEnding()) {
+      if (hasReachedEnding()) {
         completeIdleGame();
       }
 
@@ -2189,11 +2382,8 @@ function completeIdleGame() {
         return;
       }
 
-      const endingCooldownActive = current < (s.session.autonomyEndingCooldownUntil || 0);
-
-      if (!s.flags.idleGameComplete && s.autonomy >= 100 && !s.ui.autonomyEndingOpen && !endingCooldownActive) {
-        openAutonomyEnding();
-      }
+      // Meta-game: autonomy >= 100 is handled by hasReachedEnding() above.
+      // No modal dialog - the button just escapes.
 
 
       const idleSeconds = (current - s.session.lastClick) / 1000;

@@ -1,0 +1,125 @@
+{
+  "version": 1,
+  "startRoomId": "office",
+  "rooms": [
+    {
+      "id": "office",
+      "name": "Office",
+      "description": "A detective office littered with notes and a locked drawer.",
+      "exits": [
+        {
+          "id": "to_hallway",
+          "label": "Hallway",
+          "targetRoomId": "hallway",
+          "requiresFlag": "drawer_open"
+        }
+      ],
+      "interactables": [
+        {
+          "id": "desk_note",
+          "type": "inspect",
+          "label": "Read desk note",
+          "message": "The note reads: 'The brass key is taped beneath the lamp.'"
+        },
+        {
+          "id": "lamp_key",
+          "type": "pickup",
+          "label": "Take brass key",
+          "itemId": "brass_key",
+          "message": "You peel the brass key from beneath the lamp.",
+          "hideWhenSolved": true,
+          "puzzleId": "got_key"
+        },
+        {
+          "id": "drawer_lock",
+          "type": "puzzle",
+          "label": "Unlock drawer",
+          "puzzleId": "unlock_drawer",
+          "requiresItems": ["brass_key"],
+          "consumeItems": false,
+          "setFlag": "drawer_open",
+          "successMessage": "The drawer clicks open, revealing a coded card.",
+          "failMessage": "The drawer is locked tight.",
+          "hideWhenSolved": true
+        },
+        {
+          "id": "coded_card",
+          "type": "pickup",
+          "label": "Take coded card",
+          "itemId": "coded_card",
+          "requiresFlag": "drawer_open",
+          "message": "You take the coded card marked '4421'.",
+          "hideWhenSolved": true,
+          "puzzleId": "got_card"
+        }
+      ]
+    },
+    {
+      "id": "hallway",
+      "name": "Hallway",
+      "description": "The hallway terminal controls the archive vault door.",
+      "exits": [
+        {
+          "id": "to_office",
+          "label": "Office",
+          "targetRoomId": "office"
+        },
+        {
+          "id": "to_archive",
+          "label": "Archive",
+          "targetRoomId": "archive",
+          "requiresFlag": "vault_open"
+        }
+      ],
+      "interactables": [
+        {
+          "id": "janitor",
+          "type": "talk",
+          "label": "Talk to janitor",
+          "lines": [
+            "The janitor mutters: 'The terminal only accepts a card and a code.'",
+            "The janitor shrugs: 'Try what is written on the card.'"
+          ]
+        },
+        {
+          "id": "hallway_terminal",
+          "type": "puzzle",
+          "label": "Use hallway terminal",
+          "puzzleId": "unlock_vault",
+          "requiresItems": ["coded_card"],
+          "consumeItems": false,
+          "setFlag": "vault_open",
+          "successMessage": "Access granted. The archive vault opens.",
+          "failMessage": "The terminal requests a valid access card.",
+          "hideWhenSolved": true
+        }
+      ]
+    },
+    {
+      "id": "archive",
+      "name": "Archive",
+      "description": "Rows of filing cabinets surround a final evidence locker.",
+      "exits": [
+        {
+          "id": "to_hallway",
+          "label": "Hallway",
+          "targetRoomId": "hallway"
+        }
+      ],
+      "interactables": [
+        {
+          "id": "evidence_locker",
+          "type": "puzzle",
+          "label": "Open evidence locker",
+          "puzzleId": "case_closed",
+          "requiresItems": ["coded_card"],
+          "consumeItems": false,
+          "successMessage": "You recover the case file. Mystery solved.",
+          "failMessage": "The locker needs the correct access card.",
+          "completesScene": true,
+          "hideWhenSolved": true
+        }
+      ]
+    }
+  ]
+}

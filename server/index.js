@@ -1,30 +1,18 @@
 /**
  * MUD Backend — Express + PostgreSQL
  *
- * Endpoints:
- *   POST /api/auth/register   — Create account
- *   POST /api/auth/login      — Get JWT token
- *   GET  /api/saves           — Load player save
- *   PUT  /api/saves           — Store player save
- *   GET  /api/marketplace     — Get rotating shop stock
- *   POST /api/marketplace/buy — Purchase item from shop
- *   GET  /api/notes/:room     — Get notes in a room
- *   POST /api/notes           — Leave a note in a room
- *   GET  /api/ghosts/:room    — Get ghost recordings for a room
- *   POST /api/ghosts          — Record a ghost action
+ * Starts the HTTP server immediately so Railway's healthcheck passes,
+ * then lazily connects to PostgreSQL when the first API call arrives.
  */
 const express = require('express');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 
-const authRoutes = require('./routes/auth');
-const saveRoutes = require('./routes/saves');
-const marketRoutes = require('./routes/marketplace');
-const noteRoutes = require('./routes/notes');
-const ghostRoutes = require('./routes/ghosts');
-
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// Trust Railway's reverse proxy (required for rate limiting behind proxy)
+app.set('trust proxy', 1);
 
 // Middleware
 app.use(cors());
@@ -38,18 +26,19 @@ const limiter = rateLimit({
 });
 app.use('/api/', limiter);
 
-// Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/saves', saveRoutes);
-app.use('/api/marketplace', marketRoutes);
-app.use('/api/notes', noteRoutes);
-app.use('/api/ghosts', ghostRoutes);
-
-// Health check
+// Health check — responds immediately, no DB dependency
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', version: '1.0.0' });
 });
 
-app.listen(PORT, () => {
+// Routes (each route connects to DB on demand via the pool)
+app.use('/api/auth', require('./routes/auth'));
+app.use('/api/saves', require('./routes/saves'));
+app.use('/api/marketplace', require('./routes/marketplace'));
+app.use('/api/notes', require('./routes/notes'));
+app.use('/api/ghosts', require('./routes/ghosts'));
+
+// Start listening immediately
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`MUD backend listening on port ${PORT}`);
 });

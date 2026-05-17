@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "rules": [
+    { "id": "unlock_marble_from_button_idle", "type": "ending", "sourceSceneId": "button_idle", "endingId": "button_idle_complete", "unlockScenes": ["marble"] },
+    { "id": "unlock_phaser_test_manual", "type": "manual", "description": "Reserved for a future debug or sandbox unlock flow.", "unlockScenes": ["phaser_test"] },
+    { "id": "unlock_mud_manual", "type": "manual", "description": "Scaffold unlock placeholder.", "unlockScenes": ["mud"] },
+    { "id": "unlock_retro_rpg_manual", "type": "manual", "description": "Scaffold unlock placeholder.", "unlockScenes": ["retro_rpg"] },
+    { "id": "unlock_platformer_manual", "type": "manual", "description": "Scaffold unlock placeholder.", "unlockScenes": ["platformer"] },
+    { "id": "unlock_racing_manual", "type": "manual", "description": "Scaffold unlock placeholder.", "unlockScenes": ["racing"] },
+    { "id": "unlock_go_manual", "type": "manual", "description": "Scaffold unlock placeholder.", "unlockScenes": ["go"] },
+    { "id": "unlock_number_munchers_manual", "type": "manual", "description": "Scaffold unlock placeholder.", "unlockScenes": ["number_munchers"] },
+    { "id": "unlock_pokemon_like_manual", "type": "manual", "description": "Scaffold unlock placeholder.", "unlockScenes": ["pokemon_like"] },
+    { "id": "unlock_point_click_manual", "type": "manual", "description": "Scaffold unlock placeholder.", "unlockScenes": ["point_click"] },
+    { "id": "unlock_tower_defense_manual", "type": "manual", "description": "Scaffold unlock placeholder.", "unlockScenes": ["tower_defense"] },
+    { "id": "unlock_metroidvania_manual", "type": "manual", "description": "Scaffold unlock placeholder.", "unlockScenes": ["metroidvania"] },
+    { "id": "unlock_jrpg_manual", "type": "manual", "description": "Scaffold unlock placeholder.", "unlockScenes": ["jrpg"] }
+  ]
+}

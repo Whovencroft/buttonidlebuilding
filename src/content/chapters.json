@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "startChapterId": "chapter_0",
+  "chapters": [
+    { "id": "chapter_0", "title": "The Button", "sceneId": "button_idle", "endings": ["button_idle_complete"], "next": { "button_idle_complete": "marble" }, "unlocks": ["marble"] },
+    { "id": "chapter_1", "title": "The Drop", "sceneId": "marble", "endings": ["marble_complete"], "next": {}, "unlocks": [] },
+    { "id": "sandbox_0", "title": "Adapter Sandbox", "sceneId": "phaser_test", "endings": ["phaser_test_complete"], "next": {}, "unlocks": [] },
+    { "id": "chapter_2", "title": "Terminal Dreams", "sceneId": "mud", "endings": ["mud_complete"], "next": {}, "unlocks": [] },
+    { "id": "chapter_3", "title": "Cartridge Echo", "sceneId": "retro_rpg", "endings": ["retro_rpg_complete"], "next": {}, "unlocks": [] },
+    { "id": "chapter_4", "title": "Gravity Rehearsal", "sceneId": "platformer", "endings": ["platformer_complete"], "next": {}, "unlocks": [] },
+    { "id": "chapter_5", "title": "Neon Circuit", "sceneId": "racing", "endings": ["racing_complete"], "next": {}, "unlocks": [] },
+    { "id": "chapter_6", "title": "Stone Logic", "sceneId": "go", "endings": ["go_complete"], "next": {}, "unlocks": [] },
+    { "id": "chapter_7", "title": "Classroom Glitch", "sceneId": "number_munchers", "endings": ["number_munchers_complete"], "next": {}, "unlocks": [] },
+    { "id": "chapter_8", "title": "Pocket Storm", "sceneId": "pokemon_like", "endings": ["pokemon_like_complete"], "next": {}, "unlocks": [] },
+    { "id": "chapter_9", "title": "Ink and Cursor", "sceneId": "point_click", "endings": ["point_click_complete"], "next": {}, "unlocks": [] },
+    { "id": "chapter_10", "title": "Siege Geometry", "sceneId": "tower_defense", "endings": ["tower_defense_complete"], "next": {}, "unlocks": [] },
+    { "id": "chapter_11", "title": "Labyrinth Body", "sceneId": "metroidvania", "endings": ["metroidvania_complete"], "next": {}, "unlocks": [] },
+    { "id": "chapter_12", "title": "Final Chorus", "sceneId": "jrpg", "endings": ["jrpg_complete"], "next": {}, "unlocks": [] }
+  ]
+}

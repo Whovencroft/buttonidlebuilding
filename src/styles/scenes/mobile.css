@@ -1,0 +1,37 @@
+:root {
+  --safe-top: 0px;
+  --safe-right: 0px;
+  --safe-bottom: 0px;
+  --safe-left: 0px;
+}
+
+.app {
+  padding-top: calc(var(--space-sm, 8px) + var(--safe-top));
+  padding-right: calc(var(--space-sm, 8px) + var(--safe-right));
+  padding-bottom: calc(var(--space-sm, 8px) + var(--safe-bottom));
+  padding-left: calc(var(--space-sm, 8px) + var(--safe-left));
+}
+
+.touch-overlay {
+  position: fixed;
+  left: var(--space-md, 16px);
+  bottom: calc(var(--space-md, 16px) + var(--safe-bottom));
+  display: none;
+  grid-template-columns: repeat(2, 56px);
+  gap: var(--space-sm, 8px);
+  z-index: 900;
+}
+
+.touch-overlay.active {
+  display: grid;
+}
+
+.touch-overlay button {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-lg, 12px);
+  border: 1px solid var(--secondary, #334155);
+  background: rgba(30, 41, 59, 0.88);
+  color: var(--on-inverse, #E2E8F0);
+  min-height: var(--touch-min, 44px);
+}

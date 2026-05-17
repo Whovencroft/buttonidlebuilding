@@ -1,0 +1,97 @@
+{
+  "version": 1,
+  "startMapId": "town_square",
+  "startPlayer": { "x": 2, "y": 2 },
+  "maps": [
+    {
+      "id": "town_square",
+      "name": "Town Square",
+      "width": 16,
+      "height": 12,
+      "spawn": { "x": 2, "y": 2 },
+      "blocked": [
+        "0,0","1,0","2,0","3,0","4,0","5,0","6,0","7,0","8,0","9,0","10,0","11,0","12,0","13,0","14,0","15,0",
+        "0,11","1,11","2,11","3,11","4,11","5,11","6,11","7,11","8,11","9,11","10,11","11,11","12,11","13,11","14,11","15,11",
+        "0,1","0,2","0,3","0,4","0,5","0,6","0,7","0,8","0,9","0,10",
+        "15,1","15,2","15,3","15,4","15,5","15,6","15,7","15,8","15,9","15,10",
+        "6,4","6,5","6,6","7,6","8,6"
+      ],
+      "npcs": [
+        {
+          "id": "village_elder",
+          "x": 4,
+          "y": 3,
+          "lines": [
+            "Elder: The east gate opens only when the watch lever is pulled.",
+            "Elder: Pull the lever by the old wall and report back."
+          ],
+          "setFlag": "met_elder"
+        }
+      ],
+      "triggers": [
+        {
+          "id": "lever_event",
+          "type": "flag",
+          "x": 12,
+          "y": 8,
+          "setFlag": "east_gate_open",
+          "requiresFlag": "met_elder",
+          "message": "You pull the watch lever. The east gate unlocks."
+        },
+        {
+          "id": "east_exit",
+          "type": "warp",
+          "x": 14,
+          "y": 5,
+          "targetMapId": "east_path",
+          "targetPlayer": { "x": 1, "y": 5 },
+          "requiresFlag": "east_gate_open",
+          "message": "You pass through the east gate."
+        }
+      ]
+    },
+    {
+      "id": "east_path",
+      "name": "East Path",
+      "width": 14,
+      "height": 10,
+      "spawn": { "x": 1, "y": 5 },
+      "blocked": [
+        "0,0","1,0","2,0","3,0","4,0","5,0","6,0","7,0","8,0","9,0","10,0","11,0","12,0","13,0",
+        "0,9","1,9","2,9","3,9","4,9","5,9","6,9","7,9","8,9","9,9","10,9","11,9","12,9","13,9",
+        "0,1","0,2","0,3","0,4","0,5","0,6","0,7","0,8",
+        "13,1","13,2","13,3","13,4","13,5","13,6","13,7","13,8",
+        "4,4","5,4","6,4","8,5","9,5"
+      ],
+      "npcs": [
+        {
+          "id": "ranger",
+          "x": 3,
+          "y": 7,
+          "lines": [
+            "Ranger: The shrine ahead marks the end of this trial.",
+            "Ranger: Step onto the shrine to complete the chapter."
+          ]
+        }
+      ],
+      "triggers": [
+        {
+          "id": "return_town",
+          "type": "warp",
+          "x": 1,
+          "y": 5,
+          "targetMapId": "town_square",
+          "targetPlayer": { "x": 13, "y": 5 },
+          "message": "You return to town."
+        },
+        {
+          "id": "shrine_complete",
+          "type": "complete",
+          "x": 11,
+          "y": 2,
+          "message": "You reached the shrine and completed the retro RPG route."
+        }
+      ]
+    }
+  ]
+}

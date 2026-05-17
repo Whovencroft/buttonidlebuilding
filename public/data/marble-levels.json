@@ -1,0 +1,23 @@
+{
+  "source": "host_progression_overrides",
+  "version": 2,
+  "levelOrder": [
+    "training_run",
+    "switchback_basin",
+    "needle_gauntlet"
+  ],
+  "rewards": {
+    "training_run": {
+      "bonusPresses": 0,
+      "statusNote": "First completion unlocks the marble path."
+    },
+    "switchback_basin": {
+      "bonusPresses": 2500,
+      "statusNote": "Switchback clear grants a host bonus payout."
+    },
+    "needle_gauntlet": {
+      "bonusPresses": 10000,
+      "statusNote": "Needle clear grants a high-risk bonus payout."
+    }
+  }
+}

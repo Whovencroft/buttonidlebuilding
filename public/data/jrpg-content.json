@@ -1,0 +1,62 @@
+{
+  "version": 1,
+  "startRouteId": "frontier_road",
+  "startNodeId": "gate",
+  "starterInventory": { "potions": 2, "ethers": 1 },
+  "starterEquipment": {
+    "hero": "bronze_sword",
+    "hero:armor": "leather_tunic",
+    "mage": "oak_staff",
+    "mage:armor": "linen_robe"
+  },
+  "starterParty": [
+    {
+      "id": "hero",
+      "name": "Hero",
+      "maxHp": 64,
+      "attack": 11,
+      "defense": 6,
+      "skillPower": 5,
+      "weaponId": "bronze_sword",
+      "armorId": "leather_tunic"
+    },
+    {
+      "id": "mage",
+      "name": "Mage",
+      "maxHp": 46,
+      "attack": 8,
+      "defense": 4,
+      "skillPower": 8,
+      "weaponId": "oak_staff",
+      "armorId": "linen_robe"
+    }
+  ],
+  "equipment": {
+    "weapons": {
+      "bronze_sword": { "attackBonus": 2 },
+      "oak_staff": { "attackBonus": 1 },
+      "steel_blade": { "attackBonus": 4 }
+    },
+    "armors": {
+      "leather_tunic": { "defenseBonus": 1 },
+      "linen_robe": { "defenseBonus": 1 },
+      "chain_mail": { "defenseBonus": 3 }
+    }
+  },
+  "enemies": [
+    { "id": "slime", "name": "Slime", "maxHp": 24, "attack": 6, "defense": 2, "skillPower": 0 },
+    { "id": "wolf", "name": "Dire Wolf", "maxHp": 38, "attack": 9, "defense": 3, "skillPower": 1 },
+    { "id": "sentinel", "name": "Iron Sentinel", "maxHp": 56, "attack": 11, "defense": 5, "skillPower": 2 }
+  ],
+  "routes": [
+    {
+      "id": "frontier_road",
+      "name": "Frontier Road",
+      "nodes": [
+        { "id": "gate", "name": "Gate Outpost", "enemyId": "slime", "reward": { "potions": 1 } },
+        { "id": "crossing", "name": "River Crossing", "enemyId": "wolf", "reward": { "potions": 1 } },
+        { "id": "citadel", "name": "Citadel Steps", "enemyId": "sentinel", "reward": { "equipment": "steel_blade" } }
+      ]
+    }
+  ]
+}

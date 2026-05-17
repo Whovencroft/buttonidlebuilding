@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "startSceneId": "button_idle",
+  "scenes": [
+    { "id": "button_idle", "kind": "dom", "title": "Button Idle", "chapterId": "chapter_0", "rootId": "buttonIdleSceneRoot", "hostMode": "shell", "unlockedByDefault": true, "description": "The opening idle scene. This remains DOM-first and owns the button economy." },
+    { "id": "marble", "kind": "canvas", "title": "Marble", "chapterId": "chapter_1", "rootId": "marbleSceneRoot", "hostMode": "fullscreen", "unlockedByDefault": false, "description": "The first real-time scene. This begins as a custom canvas runtime." },
+    { "id": "phaser_test", "kind": "phaser", "title": "Phaser Test", "chapterId": "sandbox_0", "rootId": "phaserTestSceneRoot", "hostMode": "fullscreen", "unlockedByDefault": false, "description": "A sandbox scene used to validate the Phaser scene adapter before larger genre scenes are added." },
+    { "id": "mud", "kind": "dom", "title": "MUD", "chapterId": "chapter_2", "rootId": "mudSceneRoot", "hostMode": "shell", "unlockedByDefault": false, "description": "Text-command scene scaffold for future MUD systems." },
+    { "id": "retro_rpg", "kind": "phaser", "title": "Retro RPG", "chapterId": "chapter_3", "rootId": "retroRpgSceneRoot", "hostMode": "fullscreen", "unlockedByDefault": false, "description": "Retro RPG scaffold for Phaser-based world traversal." },
+    { "id": "platformer", "kind": "phaser", "title": "Platformer", "chapterId": "chapter_4", "rootId": "platformerSceneRoot", "hostMode": "fullscreen", "unlockedByDefault": false, "description": "Platformer scaffold for physics-heavy action gameplay." },
+    { "id": "racing", "kind": "phaser", "title": "Racing", "chapterId": "chapter_5", "rootId": "racingSceneRoot", "hostMode": "fullscreen", "unlockedByDefault": false, "description": "Racing scene scaffold for future track systems." },
+    { "id": "go", "kind": "canvas", "title": "Go", "chapterId": "chapter_6", "rootId": "goSceneRoot", "hostMode": "fullscreen", "unlockedByDefault": false, "description": "Board-game canvas scaffold for Go rules and board state." },
+    { "id": "number_munchers", "kind": "canvas", "title": "Number Munchers", "chapterId": "chapter_7", "rootId": "numberMunchersSceneRoot", "hostMode": "fullscreen", "unlockedByDefault": false, "description": "Canvas scaffold for Number Munchers gameplay loops." },
+    { "id": "pokemon_like", "kind": "phaser", "title": "Pokémon-like RPG", "chapterId": "chapter_8", "rootId": "pokemonLikeSceneRoot", "hostMode": "fullscreen", "unlockedByDefault": false, "description": "Phaser scaffold for Pokémon-like capture/battle systems." },
+    { "id": "point_click", "kind": "dom", "title": "Point & Click", "chapterId": "chapter_9", "rootId": "pointClickSceneRoot", "hostMode": "shell", "unlockedByDefault": false, "description": "DOM scaffold for point-and-click narrative interactions." },
+    { "id": "tower_defense", "kind": "phaser", "title": "Tower Defense", "chapterId": "chapter_10", "rootId": "towerDefenseSceneRoot", "hostMode": "fullscreen", "unlockedByDefault": false, "description": "Phaser scaffold for lane and tower systems." },
+    { "id": "metroidvania", "kind": "phaser", "title": "Metroidvania", "chapterId": "chapter_11", "rootId": "metroidvaniaSceneRoot", "hostMode": "fullscreen", "unlockedByDefault": false, "description": "Phaser scaffold for ability-gated exploration." },
+    { "id": "jrpg", "kind": "phaser", "title": "JRPG", "chapterId": "chapter_12", "rootId": "jrpgSceneRoot", "hostMode": "fullscreen", "unlockedByDefault": false, "description": "Phaser scaffold for party and turn-based systems." }
+  ]
+}

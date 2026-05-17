@@ -1,0 +1,106 @@
+{
+  "version": 1,
+  "startRoomId": "atrium",
+  "startSpawn": { "x": 2, "y": 9 },
+  "rooms": [
+    {
+      "id": "atrium",
+      "name": "Abandoned Atrium",
+      "width": 22,
+      "height": 12,
+      "solids": [
+        "0,11","1,11","2,11","3,11","4,11","5,11","6,11","7,11","8,11","9,11","10,11","11,11","12,11","13,11","14,11","15,11","16,11","17,11","18,11","19,11","20,11","21,11",
+        "7,8","8,8","9,8"
+      ],
+      "hazards": ["13,11"],
+      "checkpoints": [{ "id": "cp_atrium", "x": 2, "y": 10 }],
+      "abilities": [],
+      "flags": [],
+      "doors": [
+        {
+          "id": "door_upper",
+          "x": 20,
+          "y": 10,
+          "width": 1,
+          "height": 1,
+          "targetRoomId": "upper_passage",
+          "targetSpawn": { "x": 1, "y": 10 },
+          "requiresAbility": null,
+          "requiresFlag": null,
+          "setFlagOnEnter": "entered_upper_passage"
+        },
+        {
+          "id": "door_core",
+          "x": 10,
+          "y": 7,
+          "width": 1,
+          "height": 1,
+          "targetRoomId": "core_chamber",
+          "targetSpawn": { "x": 2, "y": 10 },
+          "requiresAbility": "doubleJump",
+          "requiresFlag": "entered_upper_passage",
+          "setFlagOnEnter": null
+        }
+      ],
+      "goal": null
+    },
+    {
+      "id": "upper_passage",
+      "name": "Upper Passage",
+      "width": 18,
+      "height": 12,
+      "solids": [
+        "0,11","1,11","2,11","3,11","4,11","5,11","6,11","7,11","8,11","9,11","10,11","11,11","12,11","13,11","14,11","15,11","16,11","17,11",
+        "5,8","6,8","7,8",
+        "10,6","11,6","12,6"
+      ],
+      "hazards": ["8,11","9,11"],
+      "checkpoints": [{ "id": "cp_upper", "x": 11, "y": 5 }],
+      "abilities": [{ "id": "ability_double_jump", "type": "doubleJump", "x": 12, "y": 5 }],
+      "flags": [{ "id": "upper_beacon", "x": 15, "y": 10 }],
+      "doors": [
+        {
+          "id": "door_return",
+          "x": 0,
+          "y": 10,
+          "width": 1,
+          "height": 1,
+          "targetRoomId": "atrium",
+          "targetSpawn": { "x": 19, "y": 10 },
+          "requiresAbility": null,
+          "requiresFlag": null,
+          "setFlagOnEnter": null
+        }
+      ],
+      "goal": null
+    },
+    {
+      "id": "core_chamber",
+      "name": "Core Chamber",
+      "width": 16,
+      "height": 12,
+      "solids": [
+        "0,11","1,11","2,11","3,11","4,11","5,11","6,11","7,11","8,11","9,11","10,11","11,11","12,11","13,11","14,11","15,11"
+      ],
+      "hazards": ["5,11","6,11","7,11"],
+      "checkpoints": [{ "id": "cp_core", "x": 2, "y": 10 }],
+      "abilities": [],
+      "flags": [{ "id": "core_seen", "x": 9, "y": 10 }],
+      "doors": [
+        {
+          "id": "door_core_return",
+          "x": 0,
+          "y": 10,
+          "width": 1,
+          "height": 1,
+          "targetRoomId": "atrium",
+          "targetSpawn": { "x": 11, "y": 9 },
+          "requiresAbility": null,
+          "requiresFlag": null,
+          "setFlagOnEnter": null
+        }
+      ],
+      "goal": { "x": 13, "y": 10, "endingId": "metroidvania_complete" }
+    }
+  ]
+}

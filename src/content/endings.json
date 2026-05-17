@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "endings": [
+    { "id": "button_idle_complete", "sceneId": "button_idle", "label": "The Button Escapes", "description": "The idle game ends and transitions into the marble scene.", "reward": { "markMarbleUnlocked": true, "unlockScenes": ["marble"] } },
+    { "id": "marble_complete", "sceneId": "marble", "label": "Training Run Cleared", "description": "The marble scene reports completion and any level reward payload." },
+    { "id": "phaser_test_complete", "sceneId": "phaser_test", "label": "Adapter Verified", "description": "The Phaser test scene proved that mount, update, and resize work." },
+    { "id": "mud_complete", "sceneId": "mud", "label": "Command Path Complete", "description": "MUD scaffold completion placeholder for future systems." },
+    { "id": "retro_rpg_complete", "sceneId": "retro_rpg", "label": "Retro Quest Complete", "description": "Retro RPG scaffold completion placeholder." },
+    { "id": "platformer_complete", "sceneId": "platformer", "label": "Platform Path Complete", "description": "Platformer scaffold completion placeholder." },
+    { "id": "racing_complete", "sceneId": "racing", "label": "Circuit Complete", "description": "Racing scaffold completion placeholder." },
+    { "id": "go_complete", "sceneId": "go", "label": "Board Solved", "description": "Go scaffold completion placeholder." },
+    { "id": "number_munchers_complete", "sceneId": "number_munchers", "label": "Numbers Cleared", "description": "Number Munchers scaffold completion placeholder." },
+    { "id": "pokemon_like_complete", "sceneId": "pokemon_like", "label": "Pocket League Complete", "description": "Pokémon-like scaffold completion placeholder." },
+    { "id": "point_click_complete", "sceneId": "point_click", "label": "Case Closed", "description": "Point and click scaffold completion placeholder." },
+    { "id": "tower_defense_complete", "sceneId": "tower_defense", "label": "Siege Repelled", "description": "Tower defense scaffold completion placeholder." },
+    { "id": "metroidvania_complete", "sceneId": "metroidvania", "label": "Labyrinth Mastered", "description": "Metroidvania scaffold completion placeholder." },
+    { "id": "jrpg_complete", "sceneId": "jrpg", "label": "Final Party Victory", "description": "JRPG scaffold completion placeholder." }
+  ]
+}

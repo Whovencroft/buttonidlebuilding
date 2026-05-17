@@ -29,7 +29,7 @@
     }
 
     function currentLevelId() {
-      return marbleSlice().currentLevelId || 'training_ground';
+      return marbleSlice().currentLevelId || 'level_1';
     }
 
     function buildDom() {
@@ -385,7 +385,7 @@
 
     function onStateLoaded() {
       const slice = marbleSlice();
-      if (!slice.currentLevelId) slice.currentLevelId = 'training_ground';
+      if (!slice.currentLevelId) slice.currentLevelId = 'level_1';
       prepare();
       renderLevelStrip(true);
       render();

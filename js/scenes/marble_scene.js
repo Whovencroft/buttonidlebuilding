@@ -4,7 +4,7 @@
   const DEFAULT_SUPPORT_RADIUS = 0.12;
   const DEFAULT_SEED = 0x5f3759df;
 
-  function resolveLevel(levelOrId = 'training_ground') {
+  function resolveLevel(levelOrId = 'level_1') {
     if (levelOrId && typeof levelOrId === 'object' && typeof levelOrId.id === 'string') {
       return levelOrId;
     }
@@ -37,7 +37,7 @@
       return level.generatorSpec.seed >>> 0;
     }
     if (typeof window.MarbleLevels?.hashSeed === 'function') {
-      return window.MarbleLevels.hashSeed(level?.id || 'training_ground');
+      return window.MarbleLevels.hashSeed(level?.id || 'level_1');
     }
     return DEFAULT_SEED;
   }
@@ -64,7 +64,7 @@
     };
   }
 
-  function createRuntime(levelOrId = 'training_ground') {
+  function createRuntime(levelOrId = 'level_1') {
     const level = resolveLevel(levelOrId);
     const marble = createMarbleBody();
     const seed = createSeed(level);

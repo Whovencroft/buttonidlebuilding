@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "startRoomId": "atrium",
+  "rooms": [
+    {
+      "id": "atrium",
+      "title": "Atrium of Lost Buttons",
+      "description": "A tiled room hums with old switchboard ghosts. A brass door stands north.",
+      "exits": { "north": "archive" },
+      "items": ["rusted_key"],
+      "onEnterFlag": "visited_atrium"
+    },
+    {
+      "id": "archive",
+      "title": "Archive Hall",
+      "description": "Shelves of unlabeled manuals line the walls. A steel hatch lies east.",
+      "exits": { "south": "atrium", "east": "vault" },
+      "items": ["seal_token"],
+      "onEnterFlag": "visited_archive"
+    },
+    {
+      "id": "vault",
+      "title": "Echo Vault",
+      "description": "A terminal blinks: COMPLETE to finalize this chapter path.",
+      "exits": { "west": "archive" },
+      "items": [],
+      "onEnterFlag": "visited_vault"
+    }
+  ]
+}
