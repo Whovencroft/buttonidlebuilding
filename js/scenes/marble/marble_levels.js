@@ -1842,10 +1842,11 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     fillSurfaceRect(level, 120, 42, 6, 5, { baseHeight: 15.0, shape: 'flat' });
     fillSurfaceRect(level, 121, 52, 5, 2, { baseHeight: 15.0, shape: 'flat' });
     // z=16.0 (peak / secret tunnel entrance)
-    fillSurfaceRect(level, 131, 36, 1, 5, { baseHeight: 16.0, shape: 'flat' });
-    fillSurfaceRect(level, 132, 37, 2, 1, { baseHeight: 16.0, shape: 'flat' });
-    fillSurfaceRect(level, 132, 39, 2, 1, { baseHeight: 16.0, shape: 'flat' });
-    fillSurfaceRect(level, 133, 38, 5, 1, { baseHeight: 16.0, shape: 'flat' });
+    fillSurfaceRect(level, 131, 36, 1, 1, { baseHeight: 16.0, shape: 'flat' });
+    fillSurfaceRect(level, 131, 40, 1, 1, { baseHeight: 16.0, shape: 'flat' });
+    // Wider track area at peak for secret tunnel and goal
+    fillSurfaceRect(level, 134, 37, 4, 3, { baseHeight: 16.0, shape: 'flat' });
+    fillSurfaceRect(level, 133, 38, 1, 1, { baseHeight: 16.0, shape: 'flat' });
 
     // --- Ramp surfaces ---
     // Base ramps (z=0 to z=0.75, north-facing)
@@ -1893,90 +1894,22 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     fillSurfaceRect(level, 113, 56, 3, 1, { baseHeight: 12.0, shape: 'slope_n', rise: 1.0 });
     fillSurfaceRect(level, 113, 55, 3, 1, { baseHeight: 13.0, shape: 'slope_n', rise: 1.0 });
     fillSurfaceRect(level, 113, 54, 3, 1, { baseHeight: 14.0, shape: 'slope_n', rise: 1.0 });
-    // East bridge ramps to peak (z=15.0 to z=16.0 over 5 tiles)
-    fillSurfaceRect(level, 126, 37, 1, 3, { baseHeight: 15.0, shape: 'slope_e', rise: 0.2 });
-    fillSurfaceRect(level, 127, 37, 1, 3, { baseHeight: 15.2, shape: 'slope_e', rise: 0.2 });
-    fillSurfaceRect(level, 128, 37, 1, 3, { baseHeight: 15.4, shape: 'slope_e', rise: 0.2 });
-    fillSurfaceRect(level, 129, 37, 1, 3, { baseHeight: 15.6, shape: 'slope_e', rise: 0.2 });
-    fillSurfaceRect(level, 130, 37, 1, 3, { baseHeight: 15.8, shape: 'slope_e', rise: 0.2 });
+    // East bridge ramp: z=15 up to z=19 (5 tiles, 0.8 rise each), then down to z=16
+    fillSurfaceRect(level, 126, 37, 1, 3, { baseHeight: 15.0, shape: 'slope_e', rise: 0.8 });
+    fillSurfaceRect(level, 127, 37, 1, 3, { baseHeight: 15.8, shape: 'slope_e', rise: 0.8 });
+    fillSurfaceRect(level, 128, 37, 1, 3, { baseHeight: 16.6, shape: 'slope_e', rise: 0.8 });
+    fillSurfaceRect(level, 129, 37, 1, 3, { baseHeight: 17.4, shape: 'slope_e', rise: 0.8 });
+    fillSurfaceRect(level, 130, 37, 1, 3, { baseHeight: 18.2, shape: 'slope_e', rise: 0.8 });
+    // Downslope from z=19 back to z=16 (3 tiles, 1.0 drop each)
+    fillSurfaceRect(level, 131, 37, 1, 3, { baseHeight: 18.0, shape: 'slope_w', rise: 1.0 });
+    fillSurfaceRect(level, 132, 37, 1, 3, { baseHeight: 17.0, shape: 'slope_w', rise: 1.0 });
+    fillSurfaceRect(level, 133, 37, 1, 3, { baseHeight: 16.0, shape: 'slope_w', rise: 1.0 });
+    // Conveyor at (125,38) pointing east - pushes marble up the ramp
+    setSurface(level, 125, 38, { baseHeight: 15.0, shape: 'flat', conveyor: { x: 1, y: 0, strength: 18.0 } });
 
-    // --- Funnel 1: tunnel_2 entrance (center 117.5, 44.5) ---
-    setSurface(level, 115, 42, { baseHeight: 15.0, shape: 'funnel', rise: 1.0, funnelCenterX: 117.5, funnelCenterY: 44.5, funnelMaxDist: 2.5 });
-    setSurface(level, 116, 42, { baseHeight: 15.0, shape: 'funnel', rise: 1.0, funnelCenterX: 117.5, funnelCenterY: 44.5, funnelMaxDist: 2.5 });
-    setSurface(level, 115, 43, { baseHeight: 15.0, shape: 'funnel', rise: 1.0, funnelCenterX: 117.5, funnelCenterY: 44.5, funnelMaxDist: 2.5 });
-    setSurface(level, 117, 42, { baseHeight: 15.0, shape: 'funnel', rise: 1.0, funnelCenterX: 117.5, funnelCenterY: 44.5, funnelMaxDist: 2.5 });
-    setSurface(level, 116, 43, { baseHeight: 15.0, shape: 'funnel', rise: 1.0, funnelCenterX: 117.5, funnelCenterY: 44.5, funnelMaxDist: 2.5 });
-    setSurface(level, 115, 44, { baseHeight: 15.0, shape: 'funnel', rise: 1.0, funnelCenterX: 117.5, funnelCenterY: 44.5, funnelMaxDist: 2.5 });
-    setSurface(level, 118, 42, { baseHeight: 15.0, shape: 'funnel', rise: 1.0, funnelCenterX: 117.5, funnelCenterY: 44.5, funnelMaxDist: 2.5 });
-    setSurface(level, 117, 43, { baseHeight: 15.0, shape: 'funnel', rise: 1.0, funnelCenterX: 117.5, funnelCenterY: 44.5, funnelMaxDist: 2.5 });
-    setSurface(level, 116, 44, { baseHeight: 15.0, shape: 'funnel', rise: 1.0, funnelCenterX: 117.5, funnelCenterY: 44.5, funnelMaxDist: 2.5 });
-    setSurface(level, 115, 45, { baseHeight: 15.0, shape: 'funnel', rise: 1.0, funnelCenterX: 117.5, funnelCenterY: 44.5, funnelMaxDist: 2.5 });
-    setSurface(level, 119, 42, { baseHeight: 15.0, shape: 'funnel', rise: 1.0, funnelCenterX: 117.5, funnelCenterY: 44.5, funnelMaxDist: 2.5 });
-    setSurface(level, 118, 43, { baseHeight: 15.0, shape: 'funnel', rise: 1.0, funnelCenterX: 117.5, funnelCenterY: 44.5, funnelMaxDist: 2.5 });
-    setSurface(level, 116, 45, { baseHeight: 15.0, shape: 'funnel', rise: 1.0, funnelCenterX: 117.5, funnelCenterY: 44.5, funnelMaxDist: 2.5 });
-    setSurface(level, 115, 46, { baseHeight: 15.0, shape: 'funnel', rise: 1.0, funnelCenterX: 117.5, funnelCenterY: 44.5, funnelMaxDist: 2.5 });
-    setSurface(level, 119, 43, { baseHeight: 15.0, shape: 'funnel', rise: 1.0, funnelCenterX: 117.5, funnelCenterY: 44.5, funnelMaxDist: 2.5 });
-    setSurface(level, 118, 44, { baseHeight: 15.0, shape: 'funnel', rise: 1.0, funnelCenterX: 117.5, funnelCenterY: 44.5, funnelMaxDist: 2.5 });
-    setSurface(level, 117, 45, { baseHeight: 15.0, shape: 'funnel', rise: 1.0, funnelCenterX: 117.5, funnelCenterY: 44.5, funnelMaxDist: 2.5 });
-    setSurface(level, 116, 46, { baseHeight: 15.0, shape: 'funnel', rise: 1.0, funnelCenterX: 117.5, funnelCenterY: 44.5, funnelMaxDist: 2.5 });
-    setSurface(level, 119, 44, { baseHeight: 15.0, shape: 'funnel', rise: 1.0, funnelCenterX: 117.5, funnelCenterY: 44.5, funnelMaxDist: 2.5 });
-    setSurface(level, 118, 45, { baseHeight: 15.0, shape: 'funnel', rise: 1.0, funnelCenterX: 117.5, funnelCenterY: 44.5, funnelMaxDist: 2.5 });
-    setSurface(level, 117, 46, { baseHeight: 15.0, shape: 'funnel', rise: 1.0, funnelCenterX: 117.5, funnelCenterY: 44.5, funnelMaxDist: 2.5 });
-    setSurface(level, 119, 45, { baseHeight: 15.0, shape: 'funnel', rise: 1.0, funnelCenterX: 117.5, funnelCenterY: 44.5, funnelMaxDist: 2.5 });
-    setSurface(level, 118, 46, { baseHeight: 15.0, shape: 'funnel', rise: 1.0, funnelCenterX: 117.5, funnelCenterY: 44.5, funnelMaxDist: 2.5 });
-    setSurface(level, 119, 46, { baseHeight: 15.0, shape: 'funnel', rise: 1.0, funnelCenterX: 117.5, funnelCenterY: 44.5, funnelMaxDist: 2.5 });
+    // Funnels are now created by placeTunnel with correct entryZ values
 
-    // --- Funnel 2: tunnel_3 entrance (center 123.5, 49.5) ---
-    setSurface(level, 121, 47, { baseHeight: 15.0, shape: 'funnel', rise: 1.0, funnelCenterX: 123.5, funnelCenterY: 49.5, funnelMaxDist: 2.5 });
-    setSurface(level, 122, 47, { baseHeight: 15.0, shape: 'funnel', rise: 1.0, funnelCenterX: 123.5, funnelCenterY: 49.5, funnelMaxDist: 2.5 });
-    setSurface(level, 121, 48, { baseHeight: 15.0, shape: 'funnel', rise: 1.0, funnelCenterX: 123.5, funnelCenterY: 49.5, funnelMaxDist: 2.5 });
-    setSurface(level, 123, 47, { baseHeight: 15.0, shape: 'funnel', rise: 1.0, funnelCenterX: 123.5, funnelCenterY: 49.5, funnelMaxDist: 2.5 });
-    setSurface(level, 122, 48, { baseHeight: 15.0, shape: 'funnel', rise: 1.0, funnelCenterX: 123.5, funnelCenterY: 49.5, funnelMaxDist: 2.5 });
-    setSurface(level, 121, 49, { baseHeight: 15.0, shape: 'funnel', rise: 1.0, funnelCenterX: 123.5, funnelCenterY: 49.5, funnelMaxDist: 2.5 });
-    setSurface(level, 124, 47, { baseHeight: 15.0, shape: 'funnel', rise: 1.0, funnelCenterX: 123.5, funnelCenterY: 49.5, funnelMaxDist: 2.5 });
-    setSurface(level, 123, 48, { baseHeight: 15.0, shape: 'funnel', rise: 1.0, funnelCenterX: 123.5, funnelCenterY: 49.5, funnelMaxDist: 2.5 });
-    setSurface(level, 122, 49, { baseHeight: 15.0, shape: 'funnel', rise: 1.0, funnelCenterX: 123.5, funnelCenterY: 49.5, funnelMaxDist: 2.5 });
-    setSurface(level, 121, 50, { baseHeight: 15.0, shape: 'funnel', rise: 1.0, funnelCenterX: 123.5, funnelCenterY: 49.5, funnelMaxDist: 2.5 });
-    setSurface(level, 125, 47, { baseHeight: 15.0, shape: 'funnel', rise: 1.0, funnelCenterX: 123.5, funnelCenterY: 49.5, funnelMaxDist: 2.5 });
-    setSurface(level, 124, 48, { baseHeight: 15.0, shape: 'funnel', rise: 1.0, funnelCenterX: 123.5, funnelCenterY: 49.5, funnelMaxDist: 2.5 });
-    setSurface(level, 122, 50, { baseHeight: 15.0, shape: 'funnel', rise: 1.0, funnelCenterX: 123.5, funnelCenterY: 49.5, funnelMaxDist: 2.5 });
-    setSurface(level, 121, 51, { baseHeight: 15.0, shape: 'funnel', rise: 1.0, funnelCenterX: 123.5, funnelCenterY: 49.5, funnelMaxDist: 2.5 });
-    setSurface(level, 125, 48, { baseHeight: 15.0, shape: 'funnel', rise: 1.0, funnelCenterX: 123.5, funnelCenterY: 49.5, funnelMaxDist: 2.5 });
-    setSurface(level, 124, 49, { baseHeight: 15.0, shape: 'funnel', rise: 1.0, funnelCenterX: 123.5, funnelCenterY: 49.5, funnelMaxDist: 2.5 });
-    setSurface(level, 123, 50, { baseHeight: 15.0, shape: 'funnel', rise: 1.0, funnelCenterX: 123.5, funnelCenterY: 49.5, funnelMaxDist: 2.5 });
-    setSurface(level, 122, 51, { baseHeight: 15.0, shape: 'funnel', rise: 1.0, funnelCenterX: 123.5, funnelCenterY: 49.5, funnelMaxDist: 2.5 });
-    setSurface(level, 125, 49, { baseHeight: 15.0, shape: 'funnel', rise: 1.0, funnelCenterX: 123.5, funnelCenterY: 49.5, funnelMaxDist: 2.5 });
-    setSurface(level, 124, 50, { baseHeight: 15.0, shape: 'funnel', rise: 1.0, funnelCenterX: 123.5, funnelCenterY: 49.5, funnelMaxDist: 2.5 });
-    setSurface(level, 123, 51, { baseHeight: 15.0, shape: 'funnel', rise: 1.0, funnelCenterX: 123.5, funnelCenterY: 49.5, funnelMaxDist: 2.5 });
-    setSurface(level, 125, 50, { baseHeight: 15.0, shape: 'funnel', rise: 1.0, funnelCenterX: 123.5, funnelCenterY: 49.5, funnelMaxDist: 2.5 });
-    setSurface(level, 124, 51, { baseHeight: 15.0, shape: 'funnel', rise: 1.0, funnelCenterX: 123.5, funnelCenterY: 49.5, funnelMaxDist: 2.5 });
-    setSurface(level, 125, 51, { baseHeight: 15.0, shape: 'funnel', rise: 1.0, funnelCenterX: 123.5, funnelCenterY: 49.5, funnelMaxDist: 2.5 });
 
-    // --- Funnel 3: tunnel_1 entrance (center 121.5, 164.5) ---
-    setSurface(level, 119, 162, { baseHeight: 6.0, shape: 'funnel', rise: 1.0, funnelCenterX: 121.5, funnelCenterY: 164.5, funnelMaxDist: 2.5 });
-    setSurface(level, 120, 162, { baseHeight: 6.0, shape: 'funnel', rise: 1.0, funnelCenterX: 121.5, funnelCenterY: 164.5, funnelMaxDist: 2.5 });
-    setSurface(level, 119, 163, { baseHeight: 6.0, shape: 'funnel', rise: 1.0, funnelCenterX: 121.5, funnelCenterY: 164.5, funnelMaxDist: 2.5 });
-    setSurface(level, 121, 162, { baseHeight: 6.0, shape: 'funnel', rise: 1.0, funnelCenterX: 121.5, funnelCenterY: 164.5, funnelMaxDist: 2.5 });
-    setSurface(level, 120, 163, { baseHeight: 6.0, shape: 'funnel', rise: 1.0, funnelCenterX: 121.5, funnelCenterY: 164.5, funnelMaxDist: 2.5 });
-    setSurface(level, 119, 164, { baseHeight: 6.0, shape: 'funnel', rise: 1.0, funnelCenterX: 121.5, funnelCenterY: 164.5, funnelMaxDist: 2.5 });
-    setSurface(level, 122, 162, { baseHeight: 6.0, shape: 'funnel', rise: 1.0, funnelCenterX: 121.5, funnelCenterY: 164.5, funnelMaxDist: 2.5 });
-    setSurface(level, 121, 163, { baseHeight: 6.0, shape: 'funnel', rise: 1.0, funnelCenterX: 121.5, funnelCenterY: 164.5, funnelMaxDist: 2.5 });
-    setSurface(level, 120, 164, { baseHeight: 6.0, shape: 'funnel', rise: 1.0, funnelCenterX: 121.5, funnelCenterY: 164.5, funnelMaxDist: 2.5 });
-    setSurface(level, 119, 165, { baseHeight: 6.0, shape: 'funnel', rise: 1.0, funnelCenterX: 121.5, funnelCenterY: 164.5, funnelMaxDist: 2.5 });
-    setSurface(level, 123, 162, { baseHeight: 6.0, shape: 'funnel', rise: 1.0, funnelCenterX: 121.5, funnelCenterY: 164.5, funnelMaxDist: 2.5 });
-    setSurface(level, 122, 163, { baseHeight: 6.0, shape: 'funnel', rise: 1.0, funnelCenterX: 121.5, funnelCenterY: 164.5, funnelMaxDist: 2.5 });
-    setSurface(level, 120, 165, { baseHeight: 6.0, shape: 'funnel', rise: 1.0, funnelCenterX: 121.5, funnelCenterY: 164.5, funnelMaxDist: 2.5 });
-    setSurface(level, 119, 166, { baseHeight: 6.0, shape: 'funnel', rise: 1.0, funnelCenterX: 121.5, funnelCenterY: 164.5, funnelMaxDist: 2.5 });
-    setSurface(level, 123, 163, { baseHeight: 6.0, shape: 'funnel', rise: 1.0, funnelCenterX: 121.5, funnelCenterY: 164.5, funnelMaxDist: 2.5 });
-    setSurface(level, 122, 164, { baseHeight: 6.0, shape: 'funnel', rise: 1.0, funnelCenterX: 121.5, funnelCenterY: 164.5, funnelMaxDist: 2.5 });
-    setSurface(level, 121, 165, { baseHeight: 6.0, shape: 'funnel', rise: 1.0, funnelCenterX: 121.5, funnelCenterY: 164.5, funnelMaxDist: 2.5 });
-    setSurface(level, 120, 166, { baseHeight: 6.0, shape: 'funnel', rise: 1.0, funnelCenterX: 121.5, funnelCenterY: 164.5, funnelMaxDist: 2.5 });
-    setSurface(level, 123, 164, { baseHeight: 6.0, shape: 'funnel', rise: 1.0, funnelCenterX: 121.5, funnelCenterY: 164.5, funnelMaxDist: 2.5 });
-    setSurface(level, 122, 165, { baseHeight: 6.0, shape: 'funnel', rise: 1.0, funnelCenterX: 121.5, funnelCenterY: 164.5, funnelMaxDist: 2.5 });
-    setSurface(level, 121, 166, { baseHeight: 6.0, shape: 'funnel', rise: 1.0, funnelCenterX: 121.5, funnelCenterY: 164.5, funnelMaxDist: 2.5 });
-    setSurface(level, 123, 165, { baseHeight: 6.0, shape: 'funnel', rise: 1.0, funnelCenterX: 121.5, funnelCenterY: 164.5, funnelMaxDist: 2.5 });
-    setSurface(level, 122, 166, { baseHeight: 6.0, shape: 'funnel', rise: 1.0, funnelCenterX: 121.5, funnelCenterY: 164.5, funnelMaxDist: 2.5 });
-    setSurface(level, 123, 166, { baseHeight: 6.0, shape: 'funnel', rise: 1.0, funnelCenterX: 121.5, funnelCenterY: 164.5, funnelMaxDist: 2.5 });
 
     // --- Elevator platform ---
     // 3x3 platform cycling z=8 to z=12, centered at (121.5, 108.5)
@@ -1994,15 +1927,16 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     placeTunnel(level, {
       id: 'secret_tunnel',
       path: [
-        { x: 132.5, y: 38.5, z: 16.0 },
+        { x: 135.5, y: 38.5, z: 16.0 },
         { x: 147.5, y: 55.5, z: 8.0 },
         { x: 162.5, y: 72.5, z: 0.0 }
       ],
       speed: 10,
       hidden: true,
+      hiddenFallback: 16.0,
       funnelRadius: 1
     });
-    // Tunnel 1: mid-mountain shortcut down
+    // Tunnel 1: mid-mountain shortcut down (track at z=6, mouth at z=5)
     placeTunnel(level, {
       id: 'tunnel_1',
       path: [
@@ -2011,9 +1945,10 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
         { x: 121.5, y: 184.5, z: 0.0 }
       ],
       speed: 8,
+      entryZ: 6.0,
       funnelRadius: 2
     });
-    // Tunnel 2: summit to base (long drop)
+    // Tunnel 2: summit to base (long drop, track at z=15)
     placeTunnel(level, {
       id: 'tunnel_2',
       path: [
@@ -2022,9 +1957,10 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
         { x: 122.5, y: 184.5, z: 0.0 }
       ],
       speed: 8,
+      entryZ: 15.0,
       funnelRadius: 2
     });
-    // Tunnel 3: summit to base (alternate path)
+    // Tunnel 3: summit to base (alternate path, track at z=15)
     placeTunnel(level, {
       id: 'tunnel_3',
       path: [
@@ -2033,6 +1969,7 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
         { x: 120.5, y: 184.5, z: 0.0 }
       ],
       speed: 8,
+      entryZ: 15.0,
       funnelRadius: 2
     });
 
