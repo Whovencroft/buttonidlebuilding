@@ -23,28 +23,28 @@
   const RACES = [
     { id: 'human',      name: 'Human',      desc: 'Adaptable and versatile. No bonuses, no weaknesses.',
       mods: {} },
-    { id: 'elf',        name: 'Elf',        desc: 'Graceful and attuned to magic. Bonus focus.',
-      mods: { focus: 0.02 } },
-    { id: 'dwarf',      name: 'Dwarf',      desc: 'Stout and resilient. Bonus to defense.',
-      mods: { defense: 0.03 } },
-    { id: 'android',    name: 'Android',    desc: 'Synthetic humanoid. High defense, reduced healing.',
-      mods: { defense: 0.03, healing: -0.10 } },
-    { id: 'mutant',     name: 'Mutant',     desc: 'Radiation-touched survivor. High attack, fragile.',
-      mods: { attack: 0.05 } },
-    { id: 'revenant',   name: 'Revenant',   desc: 'Undying spirit in borrowed flesh. Balanced with slow regen.',
-      mods: { attack: 0.02, defense: 0.02, regen: -0.20 } },
-    { id: 'nephilim',   name: 'Nephilim',   desc: 'Half-divine bloodline. Strong but hunted by fate.',
-      mods: { attack: 0.03, defense: 0.03, ghostEncounter: 0.20, invasionChance: 0.20 } },
-    { id: 'oni',        name: 'Oni',        desc: 'Horned warrior spirit. Devastating strength, all enemies aggro.',
-      mods: { hp: 0.05, allAggro: true } },
-    { id: 'shade',      name: 'Shade',      desc: 'Living shadow. Excellent evasion.',
-      mods: { dodge: 0.05 } },
-    { id: 'augmented',  name: 'Augmented',  desc: 'Jack of all trades, master of none. Cannot glimmer above tier 6, but glimmers faster.',
-      mods: { glimmerCap: 6, glimmerSpeed: 0.50 } },
-    { id: 'beastkin',   name: 'Beastkin',   desc: 'Animal-hybrid warrior. Bonus to ATK/DEF, animals are sacred.',
-      mods: { attack: 0.03, defense: 0.03, animalNoKill: true } },
-    { id: 'golem',      name: 'Golem',      desc: 'Animated stone construct. Immense HP, slow cooldowns.',
-      mods: { hp: 0.05, cooldownPenalty: 2 } }
+    { id: 'elf',        name: 'Elf',        desc: 'Graceful and attuned to magic. High attack and focus, less hardy.',
+      mods: { hp: -0.05, attack: 0.04, focus: 0.10 } },
+    { id: 'dwarf',      name: 'Dwarf',      desc: 'Stout and resilient. Bonus to HP and defense.',
+      mods: { hp: 0.10, defense: 0.06 } },
+    { id: 'android',    name: 'Android',    desc: 'Synthetic humanoid. High defense, decent HP and attack, reduced healing.',
+      mods: { hp: 0.05, attack: 0.02, defense: 0.08, healing: -0.10 } },
+    { id: 'mutant',     name: 'Mutant',     desc: 'Radiation-touched survivor. High attack, fragile body and weak armor.',
+      mods: { hp: -0.05, attack: 0.08, defense: -0.03 } },
+    { id: 'revenant',   name: 'Revenant',   desc: 'Undying spirit in borrowed flesh. Balanced stats, slow regen.',
+      mods: { hp: 0.05, attack: 0.02, defense: 0.03, regen: -0.20 } },
+    { id: 'nephilim',   name: 'Nephilim',   desc: 'Half-divine bloodline. Strong and resilient, but hunted by fate.',
+      mods: { attack: 0.06, defense: 0.03, ghostEncounter: 0.20, invasionChance: 0.20 } },
+    { id: 'oni',        name: 'Oni',        desc: 'Horned warrior spirit. Devastating strength and bulk, all enemies aggro.',
+      mods: { hp: 0.10, attack: 0.06, defense: -0.03, allAggro: true } },
+    { id: 'shade',      name: 'Shade',      desc: 'Living shadow. Excellent evasion and defense, weak to sustained damage.',
+      mods: { hp: -0.10, attack: 0.04, defense: 0.10, dodge: 0.05 } },
+    { id: 'augmented',  name: 'Augmented',  desc: 'Cybernetically enhanced. Jack of all trades, glimmers faster but caps at tier 6.',
+      mods: { hp: 0.05, attack: 0.04, defense: 0.03, glimmerCap: 6, glimmerSpeed: 0.50 } },
+    { id: 'beastkin',   name: 'Beastkin',   desc: 'Animal-hybrid warrior. Fast and fierce, animals are sacred.',
+      mods: { attack: 0.06, defense: 0.03, animalNoKill: true } },
+    { id: 'golem',      name: 'Golem',      desc: 'Animated stone construct. Immense HP and defense, slow and weak attacks.',
+      mods: { hp: 0.20, attack: -0.02, defense: 0.10, cooldownPenalty: 2 } }
   ];
 
   /* ─── Base Class Stats (hidden from player, keyed by class id) ──────────── */
@@ -535,13 +535,21 @@
       RACES.forEach((r, i) => {
         const m = r.mods || {};
         const tags = [];
-        if (m.attack)   tags.push(`ATK +${Math.round(m.attack * 100)}%`);
-        if (m.defense)  tags.push(`DEF +${Math.round(m.defense * 100)}%`);
-        if (m.hp)       tags.push(`HP +${Math.round(m.hp * 100)}%`);
-        if (m.focus)    tags.push(`Focus +${Math.round(m.focus * 100)}%`);
-        if (m.dodge)    tags.push(`Dodge +${Math.round(m.dodge * 100)}%`);
-        if (m.healing)  tags.push(`Healing ${Math.round(m.healing * 100)}%`);
-        if (m.regen)    tags.push(`Regen ${Math.round(m.regen * 100)}%`);
+        const fmt = (label, v) => `${label} ${v > 0 ? '+' : ''}${Math.round(v * 100)}%`;
+        if (m.hp)       tags.push(fmt('HP', m.hp));
+        if (m.attack)   tags.push(fmt('ATK', m.attack));
+        if (m.defense)  tags.push(fmt('DEF', m.defense));
+        if (m.focus)    tags.push(fmt('Focus', m.focus));
+        if (m.dodge)    tags.push(fmt('Dodge', m.dodge));
+        if (m.healing)  tags.push(fmt('Healing', m.healing));
+        if (m.regen)    tags.push(fmt('Regen', m.regen));
+        if (m.allAggro)     tags.push('All Aggro');
+        if (m.animalNoKill) tags.push('Animals Sacred');
+        if (m.glimmerCap)   tags.push(`Glimmer Cap T${m.glimmerCap}`);
+        if (m.glimmerSpeed) tags.push(`Glimmer +${Math.round(m.glimmerSpeed * 100)}%`);
+        if (m.cooldownPenalty) tags.push(`CD +${m.cooldownPenalty}s`);
+        if (m.ghostEncounter) tags.push(`Ghosts +${Math.round(m.ghostEncounter * 100)}%`);
+        if (m.invasionChance) tags.push(`Invasions +${Math.round(m.invasionChance * 100)}%`);
         const tagStr = tags.length ? ` [${tags.join(', ')}]` : '';
         lines.push({ type: 'items', text: `  ${i + 1}. ${r.name}${tagStr}` });
         lines.push({ type: 'info', text: `      ${r.desc}` });
@@ -668,7 +676,8 @@
         activeQuests: [],
         completedQuests: [],
         questCompletionCounts: {},
-        killCounts: {}
+        killCounts: {},
+        coreStats: { vigor: 1, precision: 1, grit: 1, instinct: 1, xp: {} }
       };
     }
 

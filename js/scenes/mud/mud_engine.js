@@ -52,6 +52,10 @@
     if (savedState && savedState.player) {
       player = { ...createDefaultPlayer(), ...savedState.player };
     }
+    // Ensure coreStats exists (legacy saves may have null)
+    if (!player.coreStats) {
+      player.coreStats = { vigor: 1, precision: 1, grit: 1, instinct: 1, xp: {} };
+    }
 
     function createDefaultPlayer() {
       return {
@@ -82,7 +86,7 @@
         glimmeredDefs: {},  // Runtime cache: { [abilityId]: ability def } for chain evolutions
         focusCostModifier: 0,
         recallPoint: 1,
-        coreStats: null
+        coreStats: { vigor: 1, precision: 1, grit: 1, instinct: 1, xp: {} }
       };
     }
 
