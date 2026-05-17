@@ -202,7 +202,8 @@
         min: actor.travel.min ?? actor.z ?? 0,
         max: actor.travel.max ?? (actor.z ?? 0) + 2,
         speed: actor.travel.speed ?? 1,
-        cycle: actor.travel.cycle ?? null
+        cycle: actor.travel.cycle ?? null,
+        pauseDuration: actor.travel.pauseDuration ?? 1.5
       } : null,
       data: actor.data ?? null,
       // Tunnel-specific fields
@@ -1087,13 +1088,29 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
       }
       state.topHeight = state.z;
     } else if (actor.kind === ACTOR_KINDS.ELEVATOR && actor.travel) {
+      // Elevator with pause at endpoints: move up, pause, move down, pause
       const span = Math.max(0.001, actor.travel.max - actor.travel.min);
-      const cycle = Math.max(0.4, actor.travel.cycle ?? (span / Math.max(0.05, actor.travel.speed)) * 2);
-      const phase = ((clock % cycle) / cycle) * Math.PI * 2;
-      const wave = (Math.sin(phase - Math.PI / 2) + 1) * 0.5;
+      const pause = actor.travel.pauseDuration ?? 1.5;
+      const moveTime = span / Math.max(0.05, actor.travel.speed);
+      const cycle = actor.travel.cycle ?? (moveTime * 2 + pause * 2);
+      const t = clock % cycle;
+      let ratio;
+      if (t < moveTime) {
+        // Moving up
+        ratio = t / moveTime;
+      } else if (t < moveTime + pause) {
+        // Paused at top
+        ratio = 1.0;
+      } else if (t < moveTime * 2 + pause) {
+        // Moving down
+        ratio = 1.0 - (t - moveTime - pause) / moveTime;
+      } else {
+        // Paused at bottom
+        ratio = 0.0;
+      }
       state.x = actor.x;
       state.y = actor.y;
-      state.z = lerp(actor.travel.min, actor.travel.max, wave);
+      state.z = lerp(actor.travel.min, actor.travel.max, ratio);
       state.topHeight = state.z;
     } else if (actor.kind === ACTOR_KINDS.TIMED_GATE) {
       const closedDuration = Math.max(0.1, actor.closedDuration ?? 1.3);
@@ -1831,54 +1848,59 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     fillSurfaceRect(level, 133, 38, 5, 1, { baseHeight: 16.0, shape: 'flat' });
 
     // --- Ramp surfaces ---
-    // Base ramps (z=0.25 to z=1.0, north-facing)
-    setSurface(level, 116, 183, { baseHeight: 0.25, shape: 'slope_n', rise: 0.25 });
-    setSurface(level, 126, 183, { baseHeight: 0.25, shape: 'slope_n', rise: 0.25 });
-    setSurface(level, 116, 182, { baseHeight: 0.5, shape: 'slope_n', rise: 0.25 });
-    setSurface(level, 126, 182, { baseHeight: 0.5, shape: 'slope_n', rise: 0.25 });
-    setSurface(level, 116, 181, { baseHeight: 0.75, shape: 'slope_n', rise: 0.25 });
-    setSurface(level, 126, 181, { baseHeight: 0.75, shape: 'slope_n', rise: 0.25 });
-    // Lower switchback ramps (z=1.5 to z=4.0)
-    setSurface(level, 117, 178, { baseHeight: 1.5, shape: 'slope_n', rise: 0.5 });
-    setSurface(level, 125, 178, { baseHeight: 1.5, shape: 'slope_n', rise: 0.5 });
-    setSurface(level, 117, 177, { baseHeight: 2.0, shape: 'slope_n', rise: 0.5 });
-    setSurface(level, 125, 177, { baseHeight: 2.0, shape: 'slope_n', rise: 0.5 });
-    setSurface(level, 118, 176, { baseHeight: 2.5, shape: 'slope_e', rise: 0.5 });
-    setSurface(level, 118, 175, { baseHeight: 2.5, shape: 'slope_n', rise: 1.5 });
-    setSurface(level, 124, 175, { baseHeight: 2.5, shape: 'slope_n', rise: 1.5 });
-    setSurface(level, 124, 176, { baseHeight: 2.5, shape: 'slope_w', rise: 0.5 });
-    setSurface(level, 119, 176, { baseHeight: 3.0, shape: 'slope_e', rise: 0.5 });
-    setSurface(level, 119, 175, { baseHeight: 3.0, shape: 'slope_n', rise: 0.5 });
-    setSurface(level, 123, 175, { baseHeight: 3.0, shape: 'slope_n', rise: 0.5 });
-    setSurface(level, 123, 176, { baseHeight: 3.0, shape: 'slope_w', rise: 0.5 });
-    fillSurfaceRect(level, 123, 173, 1, 2, { baseHeight: 3.5, shape: 'slope_e', rise: 0.5 });
-    fillSurfaceRect(level, 119, 173, 1, 2, { baseHeight: 3.5, shape: 'slope_w', rise: 0.5 });
-    setSurface(level, 124, 173, { baseHeight: 4.0, shape: 'slope_e', rise: 0.5 });
-    setSurface(level, 118, 174, { baseHeight: 4.0, shape: 'slope_n', rise: 0.5 });
-    setSurface(level, 124, 174, { baseHeight: 4.0, shape: 'slope_n', rise: 0.5 });
-    setSurface(level, 118, 173, { baseHeight: 4.0, shape: 'slope_w', rise: 0.5 });
-    // Mid-mountain ramps (z=4.5 to z=8.0)
-    fillSurfaceRect(level, 116, 172, 2, 1, { baseHeight: 4.5, shape: 'slope_n', rise: 0.5 });
-    fillSurfaceRect(level, 125, 172, 2, 1, { baseHeight: 4.5, shape: 'slope_n', rise: 0.5 });
-    fillSurfaceRect(level, 116, 171, 2, 1, { baseHeight: 5.0, shape: 'slope_n', rise: 0.5 });
-    fillSurfaceRect(level, 125, 171, 2, 1, { baseHeight: 5.0, shape: 'slope_n', rise: 0.5 });
-    fillSurfaceRect(level, 116, 170, 2, 1, { baseHeight: 5.5, shape: 'slope_n', rise: 0.5 });
-    fillSurfaceRect(level, 125, 170, 2, 1, { baseHeight: 5.5, shape: 'slope_n', rise: 0.5 });
-    fillSurfaceRect(level, 116, 169, 2, 1, { baseHeight: 6.0, shape: 'slope_n', rise: 0.5 });
-    fillSurfaceRect(level, 125, 169, 2, 1, { baseHeight: 6.0, shape: 'slope_n', rise: 0.5 });
-    fillSurfaceRect(level, 120, 159, 3, 1, { baseHeight: 6.5, shape: 'slope_n', rise: 0.5 });
-    fillSurfaceRect(level, 120, 158, 3, 1, { baseHeight: 7.0, shape: 'slope_n', rise: 0.5 });
-    fillSurfaceRect(level, 120, 157, 3, 1, { baseHeight: 7.5, shape: 'slope_n', rise: 0.5 });
-    fillSurfaceRect(level, 120, 156, 3, 1, { baseHeight: 8.0, shape: 'slope_n', rise: 0.5 });
-    // Summit approach ramps (z=13.0 to z=16.0)
-    fillSurfaceRect(level, 113, 56, 3, 1, { baseHeight: 13.0, shape: 'slope_n', rise: 1.0 });
-    fillSurfaceRect(level, 113, 55, 3, 1, { baseHeight: 14.0, shape: 'slope_n', rise: 1.0 });
-    fillSurfaceRect(level, 113, 54, 3, 1, { baseHeight: 15.0, shape: 'slope_n', rise: 0.5 });
-    // East bridge ramps to peak
-    fillSurfaceRect(level, 126, 37, 1, 3, { baseHeight: 15.5, shape: 'slope_e', rise: 0.5 });
-    fillSurfaceRect(level, 127, 37, 1, 3, { baseHeight: 16.0, shape: 'slope_e', rise: 1.0 });
-    fillSurfaceRect(level, 128, 37, 1, 3, { baseHeight: 17.0, shape: 'slope_e', rise: 2.0 });
-    fillSurfaceRect(level, 129, 37, 1, 3, { baseHeight: 19.0, shape: 'slope_e', rise: 2.0 });
+    // Base ramps (z=0 to z=0.75, north-facing)
+    setSurface(level, 116, 183, { baseHeight: 0.0, shape: 'slope_n', rise: 0.25 });
+    setSurface(level, 126, 183, { baseHeight: 0.0, shape: 'slope_n', rise: 0.25 });
+    setSurface(level, 116, 182, { baseHeight: 0.25, shape: 'slope_n', rise: 0.25 });
+    setSurface(level, 126, 182, { baseHeight: 0.25, shape: 'slope_n', rise: 0.25 });
+    setSurface(level, 116, 181, { baseHeight: 0.5, shape: 'slope_n', rise: 0.25 });
+    setSurface(level, 126, 181, { baseHeight: 0.5, shape: 'slope_n', rise: 0.25 });
+    // Transition ramps to z=1.0 flats
+    setSurface(level, 116, 180, { baseHeight: 0.75, shape: 'slope_n', rise: 0.25 });
+    setSurface(level, 126, 180, { baseHeight: 0.75, shape: 'slope_n', rise: 0.25 });
+    // Lower switchback ramps (z=1.0 to z=4.0)
+    setSurface(level, 117, 178, { baseHeight: 1.0, shape: 'slope_n', rise: 0.5 });
+    setSurface(level, 125, 178, { baseHeight: 1.0, shape: 'slope_n', rise: 0.5 });
+    setSurface(level, 117, 177, { baseHeight: 1.5, shape: 'slope_n', rise: 0.5 });
+    setSurface(level, 125, 177, { baseHeight: 1.5, shape: 'slope_n', rise: 0.5 });
+    setSurface(level, 118, 176, { baseHeight: 2.0, shape: 'slope_e', rise: 0.5 });
+    setSurface(level, 118, 175, { baseHeight: 2.0, shape: 'slope_n', rise: 0.5 });
+    setSurface(level, 124, 175, { baseHeight: 2.0, shape: 'slope_n', rise: 0.5 });
+    setSurface(level, 124, 176, { baseHeight: 2.0, shape: 'slope_w', rise: 0.5 });
+    setSurface(level, 119, 176, { baseHeight: 2.5, shape: 'slope_e', rise: 0.5 });
+    setSurface(level, 119, 175, { baseHeight: 2.5, shape: 'slope_n', rise: 0.5 });
+    setSurface(level, 123, 175, { baseHeight: 2.5, shape: 'slope_n', rise: 0.5 });
+    setSurface(level, 123, 176, { baseHeight: 2.5, shape: 'slope_w', rise: 0.5 });
+    fillSurfaceRect(level, 123, 173, 1, 2, { baseHeight: 3.0, shape: 'slope_e', rise: 0.5 });
+    fillSurfaceRect(level, 119, 173, 1, 2, { baseHeight: 3.0, shape: 'slope_w', rise: 0.5 });
+    setSurface(level, 124, 173, { baseHeight: 3.5, shape: 'slope_e', rise: 0.5 });
+    setSurface(level, 118, 174, { baseHeight: 2.5, shape: 'slope_n', rise: 1.5 });
+    setSurface(level, 124, 174, { baseHeight: 2.5, shape: 'slope_n', rise: 1.5 });
+    setSurface(level, 118, 173, { baseHeight: 3.5, shape: 'slope_w', rise: 0.5 });
+    // Mid-mountain ramps (z=4.0 to z=6.0)
+    fillSurfaceRect(level, 116, 172, 2, 1, { baseHeight: 4.0, shape: 'slope_n', rise: 0.5 });
+    fillSurfaceRect(level, 125, 172, 2, 1, { baseHeight: 4.0, shape: 'slope_n', rise: 0.5 });
+    fillSurfaceRect(level, 116, 171, 2, 1, { baseHeight: 4.5, shape: 'slope_n', rise: 0.5 });
+    fillSurfaceRect(level, 125, 171, 2, 1, { baseHeight: 4.5, shape: 'slope_n', rise: 0.5 });
+    fillSurfaceRect(level, 116, 170, 2, 1, { baseHeight: 5.0, shape: 'slope_n', rise: 0.5 });
+    fillSurfaceRect(level, 125, 170, 2, 1, { baseHeight: 5.0, shape: 'slope_n', rise: 0.5 });
+    fillSurfaceRect(level, 116, 169, 2, 1, { baseHeight: 5.5, shape: 'slope_n', rise: 0.5 });
+    fillSurfaceRect(level, 125, 169, 2, 1, { baseHeight: 5.5, shape: 'slope_n', rise: 0.5 });
+    // Central ramps (z=6.0 to z=8.0)
+    fillSurfaceRect(level, 120, 159, 3, 1, { baseHeight: 6.0, shape: 'slope_n', rise: 0.5 });
+    fillSurfaceRect(level, 120, 158, 3, 1, { baseHeight: 6.5, shape: 'slope_n', rise: 0.5 });
+    fillSurfaceRect(level, 120, 157, 3, 1, { baseHeight: 7.0, shape: 'slope_n', rise: 0.5 });
+    fillSurfaceRect(level, 120, 156, 3, 1, { baseHeight: 7.5, shape: 'slope_n', rise: 0.5 });
+    // Summit approach ramps (z=12.0 to z=15.0)
+    fillSurfaceRect(level, 113, 56, 3, 1, { baseHeight: 12.0, shape: 'slope_n', rise: 1.0 });
+    fillSurfaceRect(level, 113, 55, 3, 1, { baseHeight: 13.0, shape: 'slope_n', rise: 1.0 });
+    fillSurfaceRect(level, 113, 54, 3, 1, { baseHeight: 14.0, shape: 'slope_n', rise: 1.0 });
+    // East bridge ramps to peak (z=15.0 to z=16.0 over 5 tiles)
+    fillSurfaceRect(level, 126, 37, 1, 3, { baseHeight: 15.0, shape: 'slope_e', rise: 0.2 });
+    fillSurfaceRect(level, 127, 37, 1, 3, { baseHeight: 15.2, shape: 'slope_e', rise: 0.2 });
+    fillSurfaceRect(level, 128, 37, 1, 3, { baseHeight: 15.4, shape: 'slope_e', rise: 0.2 });
+    fillSurfaceRect(level, 129, 37, 1, 3, { baseHeight: 15.6, shape: 'slope_e', rise: 0.2 });
+    fillSurfaceRect(level, 130, 37, 1, 3, { baseHeight: 15.8, shape: 'slope_e', rise: 0.2 });
 
     // --- Funnel 1: tunnel_2 entrance (center 117.5, 44.5) ---
     setSurface(level, 115, 42, { baseHeight: 15.0, shape: 'funnel', rise: 1.0, funnelCenterX: 117.5, funnelCenterY: 44.5, funnelMaxDist: 2.5 });
@@ -1959,14 +1981,14 @@ function sampleSupportSurface(level, x, y, radius = 0.18, clearance = 0.72, opti
     setSurface(level, 123, 166, { baseHeight: 6.0, shape: 'funnel', rise: 0.5, funnelCenterX: 121.5, funnelCenterY: 164.5, funnelMaxDist: 2.5 });
 
     // --- Elevator platform ---
-    // 3x3 platform cycling z=8 to z=12
+    // 3x3 platform cycling z=8 to z=12, centered at (121.5, 108.5)
     fillSurfaceRect(level, 120, 107, 3, 3, { baseHeight: 8.0, shape: 'flat' });
     addActor(level, {
       id: 'elevator_1',
       kind: 'elevator',
-      x: 121.5, y: 108.5, z: 8.0,
+      x: 120, y: 107, z: 8.0,
       width: 3, height: 3,
-      travel: { axis: 'z', min: 8.0, max: 12.0, speed: 2 }
+      travel: { axis: 'z', min: 8.0, max: 12.0, speed: 2, pauseDuration: 1.5 }
     });
 
     // --- Tunnels ---
